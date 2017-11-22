@@ -1,3 +1,6 @@
+.idea
+/data
+/prv
 __pycache__/
 env/
 build/
@@ -6,4 +9,3 @@ eggs/
 .eggs/
 *.egg-info/
 *.egg
-.idea

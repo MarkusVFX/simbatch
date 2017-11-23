@@ -1,4 +1,5 @@
 .idea
+.cache/
 /data
 /prv
 __pycache__/

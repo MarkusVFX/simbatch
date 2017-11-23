@@ -1,8 +1,9 @@
 .idea
 .cache/
+
 /data
 /prv
-__pycache__/
+
 env/
 build/
 dist/
@@ -10,3 +11,6 @@ eggs/
 .eggs/
 *.egg-info/
 *.egg
+*.pyc
+core/*.pyc
+__pycache__/

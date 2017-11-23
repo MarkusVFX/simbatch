@@ -1,0 +1,1 @@
+print "core/__init__.py"

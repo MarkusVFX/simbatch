@@ -1,5 +1,5 @@
 from settings import Settings
-from SimBatchLibCommon import CommonFunctions
+from common import CommonFunctions
 
 class SimBatch:
     s=None

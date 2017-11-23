@@ -1,0 +1,19 @@
+{
+  "definition": {
+    "meta": {
+      "id": 5,
+      "software": "Stand-alone",
+      "actions": 4
+    },
+    "actions": [
+      {"action":
+        {
+          "aid": 1,
+          "name": "Script",
+          "desc": "execute RF script",
+          "template": ["executor.max_script_py(\"", "<f>", "\")"]
+        }
+      }
+    ]
+  }
+}

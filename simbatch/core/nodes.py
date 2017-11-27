@@ -1,5 +1,5 @@
 
-class Nodes:
+class SimNodes:
     batch = None
     comfun = None
 

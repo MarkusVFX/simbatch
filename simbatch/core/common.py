@@ -1,13 +1,15 @@
 import sys
+import json
 import pytest
 from os import path
+from collections import OrderedDict
 from datetime import datetime
 
 
 class CommonFunctions:
     debug_level = None
 
-    def __init__(self, debug_level):
+    def __init__(self, debug_level=3):
         self.debug_level = debug_level
 
     def print_list(self, get_list, check_float=False):
@@ -16,6 +18,40 @@ class CommonFunctions:
                 print "     ", index, " : ", val, "   ___  ", self.is_float(val)
             else:
                 print "     ", index, " : ", val
+
+    # values ...
+    @staticmethod
+    def is_int(value):
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def is_float(value):
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
+    def int_or_val(self, in_val, def_val):
+        if self.is_int(in_val):
+            if self.debug_level >= 5:
+                print " [db] (int_or_val) is int", in_val, def_val
+            return int(in_val)
+        else:
+            if self.debug_level >= 3:
+                print " [WRN] (int_or_val) is not int!", in_val, def_val
+            return def_val
+
+    @staticmethod
+    def str_with_zeros(number, zeros=3):
+        stri = str(number)
+        while len(stri) < zeros:
+            stri = "0" + stri
+        return stri
 
     @staticmethod
     def list_as_string(get_list, only_first=False, start_from_item=0, separator=";"):
@@ -48,101 +84,6 @@ class CommonFunctions:
         else:
             return tmp_list
 
-    @staticmethod
-    def create_empty_file(file_name):
-        with open(file_name, 'a') as f:
-            f.write("")
-
-    @staticmethod
-    def load_from_file(file_name):
-        with open(file_name, 'a') as f:
-            content = f.readlines()
-            content = [x.strip() for x in content]
-            return content
-
-    @staticmethod
-    def save_to_file(file_name, content):
-        with open(file_name, 'w') as f:
-            f.write(content)
-
-    @staticmethod
-    def is_int(value):
-        try:
-            int(value)
-            return True
-        except ValueError:
-            return False
-
-    @staticmethod
-    def is_float(value):
-        try:
-            float(value)
-            return True
-        except ValueError:
-            return False
-
-    def int_or_val(self, in_val, def_val):
-        if self.is_int(in_val):
-            if self.debug_level >= 5:
-                print " [db] (int_or_val) is int", in_val, def_val
-            return int(in_val)
-        else:
-            if self.debug_level >= 3:
-                print " [WRN] (int_or_val) is not int!", in_val, def_val
-            return def_val
-
-    def path_exists(self, check_path, dir_type):
-        if path.exists(check_path):
-            return True
-        else:
-            if len(dir_type) > 0:
-                if self.debug_level >= 1:
-                    print " [ERR] dir (", dir_type, ") dont exist!"
-            return False
-
-    def get_proper_path(self, get_path):
-        if len(get_path) > 3:
-            if get_path[:-1] != "\\":
-                get_path += "\\"
-        else:
-            if self.debug_level >= 1:
-                print " [ERR] (get_proper_path) (", get_path, ") dont exist!"
-        return get_path
-
-    def file_exists(self, check_file, file_type_message):
-        if path.exists(check_file):
-            return True
-        else:
-            if len(check_file) > 0:
-                if len(file_type_message) > 0:
-                    if self.debug_level >= 1:
-                        print " [ERR]  ", file_type_message, "not exist !  (", check_file, ")\n"
-            else:
-                if self.debug_level >= 1:
-                    print " [ERR] checkFile parameter empty! \n"
-            return False
-
-    @staticmethod
-    def current_scripts_path():
-        return path.dirname(path.realpath(sys.argv[0])) + "\\"
-
-    @staticmethod
-    def add_wigdets(lay, arr):
-        for ar in arr:
-            lay.add_widget(ar)
-
-    @staticmethod
-    def add_layouts(lay, arr):
-        for ar in arr:
-            lay.add_layout(ar)
-
-    @staticmethod
-    def str_with_zeros(number, zeros=3):
-        stri = str(number)
-        while len(stri) < zeros:
-            stri = "0" + stri
-        return stri
-
     def find_string_in_list(self, strings_array, wanted_string, exactly=True, starting=False, db=False):
         for index, sa in enumerate(strings_array):
             if exactly:
@@ -169,6 +110,7 @@ class CommonFunctions:
                         return index
         return None
 
+    # time date ...
     @staticmethod
     def get_current_time(filename_mode=False, only_time=False):
         if filename_mode:
@@ -184,9 +126,52 @@ class CommonFunctions:
         if seconds < 60:
             return str(int(seconds)) + "s"
         elif seconds < 3600:
-            return "{:.1f}m".format(1.0*seconds / 60)
+            return "{:.1f}m".format(1.0 * seconds / 60)
         else:
-            return "{:.1f}h".format(1.0*seconds / 3600)
+            return "{:.1f}h".format(1.0 * seconds / 3600)
+
+    # files directories ...
+    @staticmethod
+    def current_scripts_path():
+        return path.dirname(path.realpath(sys.argv[0])) + "\\"
+
+    def file_exists(self, check_file, file_type_message):
+        if path.exists(check_file):
+            return True
+        else:
+            if len(check_file) > 0:
+                if len(file_type_message) > 0:
+                    if self.debug_level >= 1:
+                        print " [ERR] File {} not exist !  ({})\n".format(file_type_message, check_file)
+                else:
+                    if self.debug_level >= 4:
+                        print " [INF] File {} not exist.".format(file_type_message)
+            else:
+                if self.debug_level >= 1:
+                    print " [ERR] File name length is zero! {}".format( file_type_message)
+            return False
+
+    def path_exists(self, check_path, dir_type):
+        if path.exists(check_path):
+            return True
+        else:
+            if len(dir_type) > 0:
+                if self.debug_level >= 1:
+                    print " [ERR] dir (", dir_type, ") dont exist!"
+            return False
+
+    def get_proper_path(self, get_path):
+        if len(get_path) > 0:
+            if get_path.find("/") >= 0:
+                if get_path[-1] != "/":
+                    get_path += "/"
+            else:
+                if get_path[-1] != "\\":
+                    get_path += "\\"
+        else:
+            if self.debug_level >= 1:
+                print " [ERR] (get_proper_path) (", get_path, ") len 0 !"
+        return get_path
 
     @staticmethod
     def is_absolute(path):
@@ -199,6 +184,49 @@ class CommonFunctions:
                 return True
         return False
 
+    @staticmethod
+    def create_empty_file(file_name):
+        with open(file_name, 'a') as f:
+            f.write("")
+
+    @staticmethod
+    def load_from_file(file_name):  # TODO rename it: load content from file
+        with open(file_name, 'a') as f:
+            content = f.readlines()
+            content = [x.strip() for x in content]
+            return content
+
+    def load_json_file(self, file_name):
+        json_data = None
+        if self.file_exists(file_name, file_name):
+            with open(file_name) as f:
+                json_data = json.load(f, object_pairs_hook=OrderedDict)
+        return json_data
+
+    def save_json_file(self, file_name, content):
+        json_data = None
+        # if self.file_exists(file_name, file_name): # if self.comfun.file_exists(file, "") :
+
+        with open(file_name, 'w') as f:
+            json.dump(content, f,  indent=2)
+        return json_data
+
+    @staticmethod
+    def save_to_file(file_name, content):
+        with open(file_name, 'w') as f:
+            f.write(content)
+
+    # widgets QT ...
+    @staticmethod
+    def add_wigdets(lay, arr):
+        for ar in arr:
+            lay.addWidget(ar)
+
+    @staticmethod
+    def add_layouts(lay, arr):
+        for ar in arr:
+            lay.addLayout(ar)
+
     def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir=""):
         start_dir = ""
         if len(force_start_dir) > 0:
@@ -207,7 +235,7 @@ class CommonFunctions:
             if len(qt_edit_line.text()) > 0:
                 start_dir = qt_edit_line.text()
 
-        get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  ###  TODO caption="hymmmm...."
+        get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="hymmmm...."
         get_directory = get_directory.replace("/", "\\")
         if self.debug_level >= 3:
             print ' [INF] selected_directory:', get_directory
@@ -215,6 +243,11 @@ class CommonFunctions:
             qt_edit_line.setText(get_directory + "\\")
             return get_directory + "\\"
         return ""
+
+    @staticmethod
+    def if_empty_put_text(qt_edit_line, text):
+        if len(qt_edit_line.text()) == 0:
+            qt_edit_line.setText(text)
 
     @staticmethod
     def get_get_file(qt_edit_line, qt_file_dialog, init_dir):

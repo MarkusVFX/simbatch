@@ -1,0 +1,111 @@
+
+PROJECT:
+0 INT  id
+1 STR  project_name
+2 INT  is_default
+3 INT  state_id
+4 STR  state
+5 INT  project_directory
+6 STR  working_directory
+7 STR  cameras_directory
+8 STR  cache_directory
+9 STR  env_directory
+10 STR  props_directory
+11 STR  scripts_directory
+12 STR  custom_directory
+13 STR  description
+14 STR  seq_shot_take_pattern
+
+
+
+SCHEMA:
+0  INT  id
+1  STR  schema_name  -> schemaDirectory
+2  STR  description
+3  STR  colorA
+4  STR  colorB
+5  INT  schemaVersion  
+6  STR  objectsToSim   !!!  not used 
+7  STR  projectName
+8  INT  projectID
+9  INT  soft_id          1 hou     2 maya   3 max   4 RF  5 Standalone    6 c4D  7 Nuke  8 Mari  9 Blender
+10  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
+11 ? ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
+
+
+
+
+
+
+
+TASK:
+0  INT  id
+1  STR  taskName    .
+2  INT  schemaID (hide)
+3  STR  user
+4  INT  userID (hide)
+5  STR  shotA   
+6  STR  shotB
+7  STR  shotC
+8  INT  frameFrom (hide)
+9  INT  frameTo  (hide)
+10 STR  state
+11 INT  stateID (not used)
+12 STR  stateColor
+13 INT  schVer (schema version)
+14 INT  queVer (queue version)
+15 STR  evolution  (DMP, DRG, TIM)
+16 INT  prior
+17 STR  options
+18 STR  description
+19 INT  projID
+20 INT  taskVer
+21 INT  frameRangeStatus
+
+
+
+2;scht dd;4;M;1;01;001;take05;22;40;liczy;4;ff12dd;4;5;6;tt;N_14;2016.01.06;x;xx;xxx;
+QUEUE:
+0 INT  id
+1 STR  schema_name
+2 INT  taskID
+3 STR  user
+4 INT  userID
+5 STR  shotA
+6 STR  shotB
+7 STR  shotC
+8 INT  frameFrom
+9 INT  frameTo
+10 STR  state
+11 INT  stateID
+12 STR  stateColor
+13 INT  version
+14 STR  evolution (DMP, DRG, TIM)
+15 INT  evolutionNr 
+16 STR  evolutionScriptType (MXS, MEL, PY)
+17 STR  evolutionScript ("evo01_BRN_+10")
+18 INT  prior
+19 STR  description
+20 STR  simNode
+21 INT  simNodeID
+22 STR  time
+23 INT  projID
+24 INT  soft_id
+       
+
+       
+NODES:
+0 INT  id
+1 STR  nodeName
+2 INT  state
+3 INT  stateID
+4 STR  color
+5 STR  colorUp
+6 STR  state file
+7 STR  description
+
+
+
+
+
+

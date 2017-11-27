@@ -1,0 +1,33 @@
+P - project
+S - schema
+T - task
+Q - queue
+N - node
+U - user
+
+
+STATUSES:
+
+0;NULL      gray if undefined
+1;INIT      T Q 
+2;WAITING   Q N   
+3;QUEUED    T
+4;WORKING   T   N
+5;SIM       Q
+6;CACHE     Q
+7;RENDER    Q    
+8;HOLD      T Q N
+9;ERROR     T Q N
+10;OK       T
+11;DONE     T Q
+12;REVIEW   T  
+13;ACCEPTED T
+14;REJECTED T
+15;
+16;
+17;
+18;
+19;
+20;INACTIVE P S U
+21;HOLD     P S
+22;ACTIVE   P S U

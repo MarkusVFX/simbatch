@@ -94,6 +94,26 @@ def test_hours_format_seconds_to_string(comfun):
     assert comfun.format_seconds_to_string(75000) == "20.8h"
 
 
+def test_get_proper_path_01(comfun):
+    assert comfun.get_proper_path("aaaa") == "aaaa\\"
+
+
+def test_get_proper_path_02(comfun):
+    assert comfun.get_proper_path("c:/cee") == "c:/cee/"
+
+
+def test_get_proper_path_03(comfun):
+    assert comfun.get_proper_path("\\\\proj\\cee") == "\\\\proj\\cee\\"
+
+
+def test_get_proper_path_04(comfun):
+    assert comfun.get_proper_path("path\\") == "path\\"
+
+
+def test_get_proper_path_05(comfun):
+    assert comfun.get_proper_path("path/") == "path/"
+
+
 def test_std_is_absolute(comfun):
     assert comfun.is_absolute("c:\\\\dir\\\\win") is True
     assert comfun.is_absolute("c:/dir/win") is True
@@ -105,4 +125,3 @@ def test_std_get_incremented_name(comfun):
     assert comfun.get_incremented_name("name__123") == "name__124"
     assert comfun.get_incremented_name("name__1") == "name__2"
     assert comfun.get_incremented_name("name__4", db=True) == "name__5"
-

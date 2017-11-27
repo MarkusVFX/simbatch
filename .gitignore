@@ -12,5 +12,4 @@ eggs/
 *.egg-info/
 *.egg
 *.pyc
-core/*.pyc
 __pycache__/

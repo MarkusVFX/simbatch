@@ -1,0 +1,75 @@
+#data types
+STR_D   string, directory
+STR_F   string, file
+STR     string
+INT     integer
+
+
+
+#SIMBATCH:
+STR_D   <simbatch_dir>
+STR_D   <simbatch_data_dir>
+STR_D   <simbatch_working_dir>
+
+
+
+#PROJ:
+INT     <project_id>
+STR     <project_name>
+STR_D   <project_root_dir>
+STR_D   <project_cache_dir>
+STR_D   <project_camera_dir>
+STR_D   <project_props_dir>
+STR_D   <project_env_dir>
+STR_D   <project_scripts_dir>
+
+
+
+#SCHEMA:
+STR     <schema_name>  
+INT     <schema_id>
+STR_D   <schema_base_setup>
+STR_D   <schema_scenes_dir>
+STR_D   <schema_prevs_dir>
+STR_D   <schema_renders_dir>
+STR_D   <schema_simcache_dir>
+STR_D   <schema_animcache_dir>
+STR_D   <schema_cameras_dir>
+STR_D   <scripts_dir>
+
+
+#TASK:
+STR     <task_name>  
+INT     <task_id>
+
+STR     <seq> or <seq#> or <seq##> or ...
+STR     <sequence_name>
+INT     <sequence_number>
+
+STR     <sh> or <sh#> or <sh##> or ...
+STR     <shot_name>
+INT     <shot_number>
+
+STR     <take> or <take#> or <take##> or ...
+STR     <take_name>
+INT     <take_number>
+
+STR_D   <shot_anim_caches>
+STR_D   <shot_output_caches>
+STR_F   <shot_camera>
+STR_F   <shot_env_file>
+STR_F   <shot_prop_file>
+
+
+
+#TIME
+INT     <sim_fr_st>
+INT     <sim_fr_end>
+INT     <prev_fr_st>
+INT     <prev_fr_end>
+
+
+
+
+
+

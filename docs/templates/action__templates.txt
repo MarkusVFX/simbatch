@@ -13,3 +13,4 @@ Maya example
 3dsmax example:
  scriptActionTemplate: ["loadMaxFile ","<f>", " quiet:True"]
  scriptParamTemplate: ["$" , "<o>"  , "." , "<p>" , "=" , "<v>"]
+

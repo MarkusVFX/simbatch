@@ -17,13 +17,13 @@ class Settings:
     json_settings_data = None
     soft_id = None
     current_soft_name = ""
-    ui_color_mode = 1
     state_colors = []
     state_colors_up = []
 
     # loaded settings (config.ini)
     store_data_mode = None
     debug_level = None
+    ui_color_mode = 1
     store_data_json_directory = None
     store_data_backup_directory = None
     store_data_definitions_directory = None
@@ -49,6 +49,29 @@ class Settings:
     CHECK_SCREEN_RES_ON_START = 1
     WITH_GUI = 1
 
+    default_settings = {"! json info":
+                            {"config": "this is basic config",
+                             "format": "more about json format: http://json.org"},
+                        "datamode":
+                            {"current": 1, "modes": "1-json, 2-MySQL"},
+                        "colormode":
+                            {"current": 2, "levels": "1 gray,  2 pastel,  3 dark,  4 custom  "},
+                        "debuglevel":
+                            {"current": 4, "levels": "1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL "},
+                        "storedata":
+                            {"datadirectory": "S:/simbatch/data/",
+                             "backupdirectory": "S:/simbatch/data/backups/",
+                             "definitionsdirectory": "S:/simbatch/simbatch/definitions/"},
+                        "sql":
+                            {"db": "127.0.1.220", "user": "default", "pass": "default", "port": "3306"},
+                        "adminuser":
+                            {"name": "admin", "sign": "A", "pass": "pass"},
+                        "window":
+                            {"posx": 70, "posy": 150, "sizex": 600, "sizey": 800}
+                        }
+
+
+
     def __init__(self, soft_id, ini_file="config.ini"):
         self.set_current_soft(soft_id)
         self.ini_file = ini_file
@@ -59,6 +82,8 @@ class Settings:
         if self.loading_state == 2:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
+
+
 
     def load_settings(self):
         if self.comfun.file_exists(self.ini_file, "settings init"):
@@ -88,6 +113,42 @@ class Settings:
         else:
             print " [ERR] ini file not exists: ", self.ini_file
             self.loading_state = -1
+
+    def save_settings(self, file=""):
+        comfun = self.comfun
+        dataPath = self.store_data_json_directory
+
+        self.default_settings["datamode"]["current"] = self.store_data_mode
+        self.default_settings["colormode"]["current"] = self.ui_color_mode
+        self.default_settings["debuglevel"]["current"] = self.debug_level
+        self.default_settings["storedata"]["datadirectory"] = self.store_data_json_directory
+        self.default_settings["storedata"]["backupdirectory"] = self.store_data_backup_directory
+        self.default_settings["storedata"]["definitionsdirectory"] = self.store_data_definitions_directory
+        self.default_settings["sql"]["db"] = self.sql[0]   # PRO VERSION
+        self.default_settings["sql"]["user"] = self.sql[1]    # PRO VERSION
+        self.default_settings["sql"]["pass"] = self.sql[2]    # PRO VERSION
+        self.default_settings["sql"]["port"] = self.sql[3]    # PRO VERSION
+        self.default_settings["window"]["posx"] = self.window[0]
+        self.default_settings["window"]["posy"] = self.window[1]
+        self.default_settings["window"]["sizex"] = self.window[2]
+        self.default_settings["window"]["sizey"] = self.window[3]
+
+        if len(file) == 0:
+            file = comfun.current_scripts_path() + "config.ini"  # JSON format
+        comfun.save_to_file(file, json.dumps(self.default_settings, indent=2, sort_keys=True))
+        print ' [INF] settings saved to: ', file
+
+        if self.store_data_mode == 1:
+            if comfun.file_exists(dataPath + self.JSON_PROJECTS_FILE_NAME, "") == False:
+                comfun.create_empty_file(dataPath + self.JSON_PROJECTS_FILE_NAME)
+            if comfun.file_exists(dataPath + self.JSON_SCHEMAS_FILE_NAME, "") == False:
+                comfun.create_empty_file(dataPath + self.JSON_SCHEMAS_FILE_NAME)
+            if comfun.file_exists(dataPath + self.JSON_TASKS_FILE_NAME, "") == False:
+                comfun.create_empty_file(dataPath + self.JSON_TASKS_FILE_NAME)
+            if comfun.file_exists(dataPath + self.JSON_QUEUE_FILE_NAME, "") == False:
+                comfun.create_empty_file(dataPath + self.JSON_QUEUE_FILE_NAME)
+            if comfun.file_exists(dataPath + self.JSON_SIMNODES_FILE_NAME, "") == False:
+                comfun.create_empty_file(dataPath + self.JSON_SIMNODES_FILE_NAME)
 
     def set_current_soft(self, soft_id):
         #  1 Houdini,  2 Maya,  3 3dsmax,  4  RF,  5 standalone,  6 blender , 7 cinema 4d
@@ -176,63 +237,6 @@ class Settings:
                 self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
                 self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
             return False
-
-    def save_settings(self, file=""):
-        comfun = self.comfun
-        dataPath = self.batchDataPath
-
-        content = """[mode]
-(1-txt, 2-sqlite, 3-MySQL)=""" + str(self.store_data_mode) + """
-[txtdata]
-Data=""" + self.batchDataPath + """
-Schemas=""" + self.schemasFileName + """
-Tasks=""" + self.tasksFileName + """
-Queue=""" + self.queueFileName + """
-Nodes=""" + self.nodesFileName + """
-Projects=""" + self.json_projects_file_name + """
-[sqlite]
-file and path=""" + self.sqliteFileName + """
-[MySQL]
-db=""" + self.mysql_host + """
-user=""" + self.mysql_user + """
-pass=""" + self.mysql_pass + """
-port=""" + self.mysql_port + """
-[user]
-name=""" + self.userName + """
-sign=""" + self.userSign + """
-pass=""" + self.userPass + """
-[window]
-posx=""" + str(self.wnd[0]) + """
-posy=""" + str(self.wnd[1]) + """
-sizex=""" + str(self.wnd[2]) + """
-sizey=""" + str(self.wnd[3]) + """
-"""
-        if len(file) == 0:
-            file = comfun.current_scripts_path() + "dataStore.ini"
-        comfun.save_to_file(file, content)
-        print ' [INF] settings saved to: ', file
-
-        if self.store_data_mode == 1:
-            if comfun.file_exists(dataPath + self.schemasFileName, "") == False:
-                comfun.create_empty_file(dataPath + self.schemasFileName)
-
-            if comfun.file_exists(dataPath + self.tasksFileName, "") == False:
-                comfun.create_empty_file(dataPath + self.tasksFileName)
-
-            if comfun.file_exists(dataPath + self.queueFileName, "") == False:
-                comfun.create_empty_file(dataPath + self.queueFileName)
-
-            if comfun.file_exists(dataPath + self.nodesFileName, "") == False:
-                comfun.create_empty_file(dataPath + self.nodesFileName)
-
-            if comfun.file_exists(dataPath + self.json_projects_file_name, "") == False:
-                comfun.create_empty_file(dataPath + self.json_projects_file_name)
-
-        if self.store_data_mode == 2:  # 1 text file   2  sqlite  3 MySQL
-            1
-        if self.store_data_mode == 3:  # 1 text file   2  sqlite  3 MySQL
-            1
-
 
 if __name__ == "__main__":
     settings = Settings("..\\config.ini")

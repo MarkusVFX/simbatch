@@ -181,7 +181,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget = QTabWidget(self)
         self.qt_tab_widget = qt_tab_widget
 
-        qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")  # TODO
+        qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")
         qt_tab_widget.addTab(self.pro_ui.qt_widget_projects, "Projects")
         #  qt_tab_widget.addTab(sch.widgetSchema, "Schemas")
         #  qt_tab_widget.addTab(tsk.widgetTasks, "Tasks")
@@ -191,9 +191,9 @@ class MainWindow(QMainWindow):
         qt_tab_widget.setMinimumSize(220, 400)
 
         if self.s.loading_state < 10:
-            qt_tab_widget.setCurrentIndex(1) #  show settings
+            qt_tab_widget.setCurrentIndex(1)    # show settings
         else:
-            qt_tab_widget.setCurrentIndex(1) #  show tasks
+            qt_tab_widget.setCurrentIndex(1)    # show tasks
 
         qt_lay_central.addWidget(qt_tab_widget)
         qt_central_widget.setLayout(qt_lay_central)
@@ -224,3 +224,21 @@ class MainWindow(QMainWindow):
     def on_clicked_but_refresh(self):
         if self.s.debug_level >= 3:
             print " [INF] but_refresh"
+
+    def resizeEvent(self, event):            # PySide  resizeEvent
+        self.on_resize_window(event)
+
+    def on_resize_window(self, event):
+        newSize = event.size()
+        self.s.window[2] = newSize.width()
+        self.s.window[3] = newSize.height()
+
+    def moveEvent(self, event):             # PySide  moveEvent
+        self.on_move_window(event)
+
+    def on_move_window(self, event):
+        newPos = event.pos()
+        self.s.window[0] = newPos.x()
+        self.s.window[1] = newPos.y()
+
+

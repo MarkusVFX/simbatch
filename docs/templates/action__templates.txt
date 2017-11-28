@@ -5,3 +5,11 @@
 <ts> time start
 <te> time end
 <c> camera
+
+Maya example
+ scriptActionTemplate: ["print \"   object: ", "<o>", "\"  "]
+ scriptActionTemplate: ["file -f   -typ \"mayaBinary\" -o \"","<f>", "\"; "] )]
+
+3dsmax example:
+ scriptActionTemplate: ["loadMaxFile ","<f>", " quiet:True"]
+ scriptParamTemplate: ["$" , "<o>"  , "." , "<p>" , "=" , "<v>"]

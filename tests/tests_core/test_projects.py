@@ -14,12 +14,12 @@ def proj():
     return projects.Projects(batch)
 
 
-def test_get_index_from_id(proj):
-    assert proj.get_index_from_id(2) is None
-
-
 def test_empty1_clear_all_projects_data(proj):
     assert proj.clear_all_projects_data() is True
+
+
+def test_get_index_from_id(proj):
+    assert proj.get_index_from_id(2) is None
 
 
 def test_create_example_project_data(proj):

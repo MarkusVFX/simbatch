@@ -176,7 +176,7 @@ class Projects:
                 for field in PROJECT_DATA_FIELDS_NAMES:
                     proj[field[0]] = eval('p.'+field[1])
                 formated_data["projects"]["data"][i] = proj
-                print PROJECT_DATA_FIELDS_NAMES[i]
+                # print PROJECT_DATA_FIELDS_NAMES[i]
             return formated_data
         else:  # SQL txt TODO
             return False
@@ -194,7 +194,7 @@ class Projects:
 
         if generate_directory_patterns:
             project_to_add.seq_shot_take_pattern = self.get_dir_patterns(project_to_add.cache_directory)
-            project_to_add.cameras_shot_directory_pattern = self.get_dir_patterns(project_to_add.cameras_directory)
+            #  project_to_add.cameras_shot_directory_pattern = self.get_dir_patterns(project_to_add.cameras_directory)
 
         self.projects_data.append(project_to_add)
         self.total_projects += 1
@@ -208,6 +208,7 @@ class Projects:
         if self.current_project_index is not None :
             up_proj = self.projects_data[self.current_project_index]
             up_proj.project_name = mock_project.project_name
+            up_proj.project_directory = mock_project.project_directory
             up_proj.working_directory = mock_project.working_directory
             up_proj.cameras_directory = mock_project.cameras_directory
             up_proj.cache_directory = mock_project.cache_directory
@@ -225,13 +226,13 @@ class Projects:
     #  example data for beginner users and for tests
     def create_example_project_data(self, do_save=True):
         collect_ids = 0
-        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "exampleWokingDir",
+        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "ZexampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<seq##>_<sh###>", "sample project 1")
-        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:/exampleProj", "exampleWokingDir",
+        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj", "fx",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "s_<sh##>>", "sample project 2")
-        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "exampleWokingDir",
+        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "ZZexampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<sh###>", "sample project 3")
         collect_ids += self.add_project(sample_project_1)
@@ -306,15 +307,14 @@ class Projects:
         if db or self.s.debug_level >= 4:
             print "  [db]  (get_dir_patterns) deep debug start:", dir
         full_dir_pattern = None
-
         return full_dir_pattern
 
     #  load projects data after startup or after reload
     def load_projects(self):
         if self.s.store_data_mode == 1:
-            self.load_projects_from_json()
+            return self.load_projects_from_json()
         if self.s.store_data_mode == 2:
-            self.load_projects_from_mysql()
+            return self.load_projects_from_mysql()
 
     #  load projects data form json
     def load_projects_from_json(self, file=None):
@@ -377,7 +377,7 @@ class Projects:
     #  save projects data as json
     def save_projects_to_json(self, file=None):
         if file is None:
-            file = self.s.store_data_json_directory + "zzz" + self.s.JSON_PROJECTS_FILE_NAME
+            file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
         content = self.format_projects_data(json=True)
         self.comfun.save_json_file(file, content)
         return True

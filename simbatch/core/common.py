@@ -1,4 +1,5 @@
 import sys
+import os
 import json
 import pytest
 from os import path
@@ -172,6 +173,55 @@ class CommonFunctions:
             if self.debug_level >= 1:
                 print " [ERR] (get_proper_path) (", get_path, ") len 0 !"
         return get_path
+
+
+    @staticmethod
+    def get_path_from_full(full):
+        return os.path.dirname(full)
+
+    @staticmethod
+    def create_directory(directory):
+        if len(directory) > 0:
+            if not os.path.exists(directory):
+                if directory[1] == ":":
+                    check_drive = directory[0] + ":\\"
+                    if os.path.exists(check_drive):   # TODO os.access
+                        os.makedirs(directory)
+                        return True
+                    else:
+                        print "ERR drive: ", directory[0], " NOT EXIST !!!"
+                        return False
+                else:  # TODO test server \\
+                    os.makedirs(directory)
+                    return True
+            else:
+                print " [INF] directory EXIST, not created:  ", directory, "\n"
+                return False
+        else:
+            print " [WRN] directory null name    ", directory, "\n"
+            return False
+
+    @staticmethod
+    def remove_directory(directory):
+        if len(directory) > 0:
+            if os.path.exists(directory):
+                if directory[1] == ":":
+                    check_drive = directory[0] + ":\\"
+                    if os.path.exists(check_drive):   # TODO os.access
+                        os.rmdir(directory)
+                        return True
+                    else:
+                        print "ERR drive: ", directory[0], " NOT EXIST !!!"
+                        return False
+                else:  # TODO test server \\
+                    os.rmdir(directory)
+                    return True
+            else:
+                print " [INF] directory not EXIST, not removed:  ", directory, "\n"
+                return False
+        else:
+            print " [WRN] directory null name    ", directory, "\n"
+            return False
 
     @staticmethod
     def is_absolute(path):

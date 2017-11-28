@@ -1,6 +1,9 @@
 from simbatch.core import common
 import pytest
 
+# TODO check dir on prepare tests
+TESTING_AREA_DIR = "S:\\simbatch\\data\\"
+
 
 @pytest.fixture
 def comfun():
@@ -112,6 +115,25 @@ def test_get_proper_path_04(comfun):
 
 def test_get_proper_path_05(comfun):
     assert comfun.get_proper_path("path/") == "path/"
+
+
+def test_get_path_from_full(comfun):
+    assert comfun.get_path_from_full("c:\\oki\\doki\\test.png") == "c:\\oki\\doki"
+    assert comfun.get_path_from_full("\\\\serv\\doki\\test.png") == "\\\\serv\\doki"
+
+
+def test_create_directory(comfun):
+    assert comfun.path_exists(TESTING_AREA_DIR, "") is True
+    assert comfun.path_exists(TESTING_AREA_DIR + "test_dir", "") is False
+    assert comfun.create_directory(TESTING_AREA_DIR + "test_dir") is True
+    assert comfun.path_exists(TESTING_AREA_DIR + "test_dir", "") is True
+
+
+def test_remove_directory(comfun):
+    assert comfun.path_exists(TESTING_AREA_DIR, "") is True
+    assert comfun.path_exists(TESTING_AREA_DIR + "test_dir", "") is True
+    assert comfun.remove_directory(TESTING_AREA_DIR + "test_dir") is True
+    assert comfun.path_exists(TESTING_AREA_DIR + "test_dir", "") is False
 
 
 def test_std_is_absolute(comfun):

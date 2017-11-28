@@ -5,7 +5,7 @@ except ImportError:
     print "PySide.QtGui ERR"
 
 from widgets import *
-from simbatch.core.projects import *
+from core.projects import *
 
 
 class ProjectListItem(QWidget):
@@ -54,9 +54,9 @@ class ProjectsUI:
     qt_form_edit = None
     qt_form_remove = None
 
-    add_form_state = 0
-    edit_form_state = 0
-    remove_form_state = 0
+    add_form_state = 0   # 0 hidden form, 1 showed form
+    edit_form_state = 0   # 0 hidden form,  1 showed form
+    remove_form_state = 0   # 0 hidden form,  1 showed form
 
     comfun = None
     debug_level = None
@@ -141,7 +141,8 @@ class ProjectsUI:
         wfa_buttons.button.clicked.connect(
             lambda: self.on_click_add_project(wfa_project_name_edit.get_txt(), wfa_project_dir_edit.get_txt(),
                                               wfa_working_dir_edit.get_txt(), wfa_cam_dir_edit.get_txt(),
-                                              wfa_ani_dir_edit.get_txt(), wfa_descr_edit.get_txt()))
+                                              wfa_ani_dir_edit.get_txt(), wfa_descr_edit.get_txt(),
+                                              wfa_buttons.qt_pin_check_box.isChecked()))
 
         qt_form_add_layout.addLayout(wfa_proj_name_label.qt_widget_layout)
         qt_form_add_layout.addLayout(wfa_project_name_edit.qt_widget_layout)
@@ -205,7 +206,9 @@ class ProjectsUI:
                                               wfe_project_cam_dir_edit.get_txt(),
                                               wfe_project_anicache_dir_edit.get_txt(),
                                               wfe_buttons.qt_second_check_box.isChecked(),
-                                              wfe_project_description_edit.get_txt()))
+                                              wfe_project_description_edit.get_txt(),
+                                              wfe_buttons.qt_pin_check_box.isChecked()
+                                              ))
         self.qt_fe_description = wfe_project_description_edit.qt_edit_line
         self.qtcb_fe_default_proj = wfe_buttons.qt_second_check_box
 
@@ -242,6 +245,8 @@ class ProjectsUI:
         qt_form_remove_layout.addRow(" ", wfr_buttons.qt_widget_layout)
         qt_form_remove_layout.addRow(" ", QLabel("   "))
 
+        wfr_buttons.button.clicked.connect(lambda: self.on_click_confirm_remove_project())
+
         qt_gb_remove = QGroupBox()
         qt_gb_remove.setLayout(qt_form_remove_layout)
         qt_form_remove_layout_ext.addWidget(qt_gb_remove)
@@ -250,20 +255,20 @@ class ProjectsUI:
 
         self.hide_all_forms()
 
-        qt_but_add_project = QPushButton("Add Project")
-        qt_but_edit_project = QPushButton("Edit Project")
+        qt_but_add_form = QPushButton("Add Project")
+        qt_but_edit_form = QPushButton("Edit Project")
         qt_but_def_project = QPushButton("Set Def Project")
-        qt_but_remove_project = QPushButton("Remove Project")
+        qt_but_remove_form = QPushButton("Remove Project")
 
-        qt_but_add_project.clicked.connect(self.on_click_add)
-        qt_but_edit_project.clicked.connect(self.on_click_edit)
+        qt_but_add_form.clicked.connect(self.on_click_add_form)
+        qt_but_edit_form.clicked.connect(self.on_click_edit_form)
         qt_but_def_project.clicked.connect(self.on_click_set_def)
-        qt_but_remove_project.clicked.connect(self.on_click_remove)
+        qt_but_remove_form.clicked.connect(self.on_click_remove_form)
 
         qt_lay_projects_lists.addWidget(qt_list_projects)
 
         self.comfun.add_wigdets(qt_lay_projects_buttons,
-                                [qt_but_add_project, qt_but_edit_project, qt_but_def_project, qt_but_remove_project])
+                                [qt_but_add_form, qt_but_edit_form, qt_but_def_project, qt_but_remove_form])
         self.comfun.add_layouts(qt_project_main_layout,
                                 [qt_lay_projects_lists, qt_lay_projects_forms, qt_lay_projects_buttons])
         self.init_projects()
@@ -388,6 +393,10 @@ class ProjectsUI:
     def get_dialog_anicache_directory(self, qt_edit_line):
         return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
 
+
+    #  Add
+    #  Add  Add
+    #  Add  Add  Add
     def clear_form_add(self):
         self.wfa_project_name_edit.qt_edit_line.setText("")
         self.wfa_project_dir_edit.qt_edit_line.setText("")
@@ -396,7 +405,7 @@ class ProjectsUI:
         self.wfa_ani_dir_edit.qt_edit_line.setText("")
         self.wfa_descr_edit.qt_edit_line.setText("")
 
-    def on_click_add(self):
+    def on_click_add_form(self):
         if self.add_form_state == 0:
             self.hide_all_forms()
             self.qt_form_add.show()
@@ -406,7 +415,7 @@ class ProjectsUI:
             self.add_form_state = 0
 
     def on_click_add_project(self, new_project_name, project_directory, working_directory, cameras_directory,
-                             cache_directory, description):
+                             cache_directory, description, pin_checked):
         if len(new_project_name) > 0:
             cb_state = False   # TODO  get cb_state
             if cb_state:
@@ -420,10 +429,9 @@ class ProjectsUI:
             if self.batch.p.total_projects == 0:
                 set_active = 1
 
-            seq_shot_take_pattern = self.batch.p.get_dir_patterns(cache_directory)
             new_project = SingleProject(0, new_project_name, set_active, 1, "INIT", project_directory,
                                         working_directory, cameras_directory, cache_directory, "", "", "", "",
-                                        seq_shot_take_pattern, description)
+                                        "generate_directory_patterns=True", description)
 
             ret_id = self.batch.p.add_project(new_project, do_save=True, generate_directory_patterns=True)
 
@@ -435,16 +443,20 @@ class ProjectsUI:
             self.qt_list_projects.setItemWidget(list_item, list_item_widget)
             self.batch.i.create_project_working_directory(new_project.working_directory_absolute)
 
-            self.clear_form_add()
-            self.qt_form_add.hide()
-            self.add_form_state = 0
+
+            if pin_checked is False:
+                self.clear_form_add()
+                self.qt_form_add.hide()
+                self.add_form_state = 0
 
             self.reset_list(set_active_id=self.batch.p.current_project_id)
             #  self.schUI.hide_all_forms()  TODO  !!!!!!!
         else:
             self.top_ui.set_top_info(" Fill project name !", 8)
-
-    def on_click_edit(self):
+    #  Edit
+    #  Edit  Edit
+    #  Edit  Edit  Edit
+    def on_click_edit_form(self):
         if self.edit_form_state == 0:
             self.hide_all_forms()
             self.qt_form_edit.show()
@@ -454,6 +466,39 @@ class ProjectsUI:
             self.qt_form_edit.hide()
             self.edit_form_state = 0
 
+    def save_project_changes(self, new_project_name, project_directory, working_directory, cameras_directory,
+                             cache_directory, cb_state, description, pin_checked):
+        if len(new_project_name) > 0:
+            if cb_state:
+                set_active = 1
+            else:
+                set_active = 0
+
+            # using 'SingleProject' class only fof transfer data. This is temporary object
+            mock_project = SingleProject(0, new_project_name, set_active, 1, "MOCK", project_directory,
+                                         working_directory, cameras_directory, cache_directory, "", "", "", "",
+                                         "MOCK", description)
+            self.batch.p.update_project(mock_project, do_save=True)
+            """
+            current_list_index = self.qt_list_projects.currentRow()
+            ed_item = self.qt_list_projects.item(current_list_index)
+
+            list_item_widget = ProjectListItem(str(self.batch.p.projects_data[self.batch.p.current_project_index].id),
+                                               new_project_name, project_directory, description)
+            self.qt_list_projects.setItemWidget(ed_item, list_item_widget)
+            """
+
+            if pin_checked is False:
+                self.qt_form_edit.hide()
+                self.edit_form_state = 0
+
+            self.reset_list()
+        else:
+            self.top_ui.set_top_info(" Fill project name !", 8)
+
+    #  Def
+    #  Def  Def
+    #  Def  Def  Def
     def on_click_set_def(self):
         self.set_as_default()
 
@@ -472,7 +517,10 @@ class ProjectsUI:
             else:
                 self.qtcb_fe_default_proj.setChecked(False)
 
-    def on_click_remove(self):
+    #  Remove
+    #  Remove  Remove
+    #  Remove  Remove  Remove
+    def on_click_remove_form(self):
         if self.remove_form_state == 0:
             self.hide_all_forms()
             self.qt_form_remove.show()
@@ -481,39 +529,15 @@ class ProjectsUI:
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
-    def on_click_confirm_remove_project(self):
+    def on_click_confirm_remove_project(self):  # TODO  REMOVE SCHEMAS AND TASKS !!!
         if self.batch.p.current_project_index >= 0:
-            self.batch.p.remove_single_project(index=self.batch.p.current_project_index, do_save=True)
-            self.qt_list_projects.takeItem(self.batch.p.current_project_index + 1)
-            self.last_project_index = -1
+            remove_index = self.batch.p.current_project_index
             self.batch.p.current_project_index = -1
+            self.last_project_index = -1
+            self.batch.p.remove_single_project(index=remove_index, do_save=True)
+            self.qt_list_projects.takeItem(remove_index + 1)    # TODO INDEX ON VISIBLE LIST ! (when filter exist)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
-
-    def save_project_changes(self, new_project_name, project_directory, working_directory, cameras_directory,
-                             cache_directory, cb_state, description):
-        if len(new_project_name) > 0:
-            if cb_state:
-                set_active = 1
-            else:
-                set_active = 0
-
-            # using 'SingleProject' class only fof transfer data. This is temporary object
-            mock_project = SingleProject(0, new_project_name, set_active, 1, "MOCK", project_directory,
-                                        working_directory, cameras_directory, cache_directory, "", "", "", "",
-                                        "MOCK", description)
-            self.batch.p.update_project(mock_project, do_save=True)
-            """
-            current_list_index = self.qt_list_projects.currentRow()
-            ed_item = self.qt_list_projects.item(current_list_index)
-
-            list_item_widget = ProjectListItem(str(self.batch.p.projects_data[self.batch.p.current_project_index].id),
-                                               new_project_name, project_directory, description)
-            self.qt_list_projects.setItemWidget(ed_item, list_item_widget)
-            """
-            self.reset_list()
-        else:
-            self.top_ui.set_top_info(" Fill project name !", 8)
 
     def update_sch_after_proj_changed(self):
         """########### UPDATE SCH ##############"""

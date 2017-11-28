@@ -60,9 +60,15 @@ class SimBatch:
     def clear_all_stored_data(self):
         self.p.clear_all_projects_data(clear_stored_data=True)
 
+    def clear_all_memory_data(self):
+        self.p.clear_all_projects_data()
+
     def load_data(self):
-        self.p.load_projects()
-        self.p.init_default_proj()
+        if self.p.load_projects():
+            self.p.init_default_proj()
+            return True
+        else:
+            return False
 
     def create_example_data(self):
         self.p.create_example_project_data()

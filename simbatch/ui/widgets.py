@@ -88,7 +88,6 @@ class ButtonWithCheckBoxes():
         self.qt_widget_layout = QHBoxLayout()
         if len(pin_text) > 0:
             self.qt_pin_check_box = QCheckBox(pin_text)
-            self.qt_pin_check_box.setEnabled(False)
             self.qt_widget_layout.addWidget(self.qt_pin_check_box)
         if len(cb2_text) > 0:
             self.qt_second_check_box = QCheckBox(cb2_text)

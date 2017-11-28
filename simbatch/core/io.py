@@ -13,46 +13,18 @@ class InOutStorage:
         self.s = batch.s
 
     @staticmethod
-    def is_absolute(path):
-        if len(path) > 2:
-            if path[1] == ":" and path[2] == "\\":
-                return 1
-            if path[0] == "\\" and path[1] == "\\":
-                return 1
-        return 0
-
-    @staticmethod
     def get_flat_name(name):
         return re.sub('\s', '_', name)
 
-    @staticmethod
-    def get_path_from_full(full):
-        return os.path.dirname(full)
-
-    @staticmethod
-    def create_directory(directory):
-        if len(directory) > 0:
-            if not os.path.exists(directory):
-                if directory[1] == ":":
-                    check_drive = directory[0] + ":\\"
-                    if os.path.exists(check_drive):   # TODO os.access
-                        os.makedirs(directory)
-                    else:
-                        print "ERR drive: ", directory[0], " NOT EXIST !!!"
-            else:
-                print " [INF] directory EXIST, not created:  ", directory, "\n"
-        else:
-            print " [WRN] directory null name    ", directory, "\n"
-
     def create_project_working_directory(self, directory):
-        self.create_directory(directory)
+        self.comfun.create_directory(directory)
 
     def create_schema_directory(self, directory):
-        self.create_directory(directory)
-        self.create_directory(directory + "base_setup\\")
-        self.create_directory(directory + "computed_setups\\")
-        self.create_directory(directory + "prevs\\")
-        self.create_directory(directory + "cache\\")
+        self.comfun.create_directory(directory)
+        self.comfun.create_directory(directory + "base_setup\\")
+        self.comfun.create_directory(directory + "computed_setups\\")
+        self.comfun.create_directory(directory + "prevs\\")
+        self.comfun.create_directory(directory + "cache\\")
 
     @staticmethod
     def get_setup_ext(soft_id):
@@ -141,17 +113,17 @@ class InOutStorage:
         else:
             return [0, 0, 0]
 
-    def generate_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
+    def generate_tuple_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
         if len(self.p.projects_data) < self.p.current_project_index or self.p.current_project_index < 0:
             print " ERR wrong current proj ID  ", self.p.current_project_index, len(self.p.projects_data)
-            return [-1, ""]
+            return (-1, "")
         else:
             proj_working_dir = self.p.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
             directory = proj_working_dir + schema_flat_name + "\\base_setup\\"
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.p.current_project.zeros_in_version)
-            file_ext = self.get_setup_ext(self.s.current_soft)
-            return [1, directory + schema_flat_name + file_version + file_ext]
+            file_ext = self.get_setup_ext(self.s.soft_id)
+            return (1, directory + schema_flat_name + file_version + file_ext)
 
 
 

@@ -1,0 +1,7 @@
+<o> object  
+<p> paramProperties  
+<v> value
+<f> filename_string
+<ts> time start
+<te> time end
+<c> camera

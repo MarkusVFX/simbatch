@@ -8,6 +8,7 @@ except ImportError:
 
 from ui_wizard import WizardUI
 from ui_projects import ProjectsUI
+from ui_schemas import SchemasUI
 from ui_settings import SettingsUI
 
 
@@ -168,7 +169,7 @@ class MainWindow(QMainWindow):
         self.top_ui = top
         self.wiz_ui = WizardUI(batch, top)
         self.pro_ui = ProjectsUI(batch, top)
-        #  self.sch_ui = SchemasUI(batch)
+        self.sch_ui = SchemasUI(batch, top)
         #  self.tsk_ui = TasksUI(batch)
         #  self.que_ui = QueueUI(batch)
         #  self.nod_ui = NodesUI(batch)

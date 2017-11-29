@@ -6,7 +6,8 @@ except ImportError:
 
 from widgets import *
 
-class WizardUI():
+
+class WizardUI:
     qt_widget_wizard = None
     qt_lay_wizard_main = None
 
@@ -20,10 +21,10 @@ class WizardUI():
         self.batch = batch
         self.comfun = batch.comfun
         self.top_ui = top
-        self.initUI()
+        self.init_ui()
         self.current_soft = batch.s.soft_id
 
-    def initUI(self):
+    def init_ui(self):
         qt_widget_wizard = QWidget()
         qt_widget_wizard.setContentsMargins(20, 20, 20, 20)
 

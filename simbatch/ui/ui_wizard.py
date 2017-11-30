@@ -53,7 +53,7 @@ class WizardUI:
         wizard_step_UseCurScene = ButtonOnLayout("Use Current Project", width=180)
         qt_lay_step_1b = QHBoxLayout()
         self.comfun.add_layouts(qt_lay_step_1b, [wizard_step_CreateProject.qt_widget_layout,
-                                                 SimpleLabel("or", labelMaximum=10).qt_widget_layout,
+                                                 SimpleLabel("or", label_maximum=10).qt_widget_layout,
                                                  wizard_step_UseCurScene.qt_widget_layout])
 
         ### self s1

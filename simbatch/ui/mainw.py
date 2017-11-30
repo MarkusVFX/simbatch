@@ -184,7 +184,7 @@ class MainWindow(QMainWindow):
 
         qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")
         qt_tab_widget.addTab(self.pro_ui.qt_widget_projects, "Projects")
-        #  qt_tab_widget.addTab(sch.widgetSchema, "Schemas")
+        qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
         #  qt_tab_widget.addTab(tsk.widgetTasks, "Tasks")
         #  qt_tab_widget.addTab(que.widgetQueue, "Queue")
         #  qt_tab_widget.addTab(nod.widgetNodes, "Sim Nodes")

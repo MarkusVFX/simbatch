@@ -22,15 +22,13 @@ SCHEMA:
 0  INT  id
 1  STR  schema_name  -> schemaDirectory
 2  STR  description
-3  STR  colorA
-4  STR  colorB
-5  INT  schemaVersion  
-6  STR  objectsToSim   !!!  not used 
-7  STR  projectName
-8  INT  projectID
-9  INT  soft_id          1 hou     2 maya   3 max   4 RF  5 Standalone    6 c4D  7 Nuke  8 Mari  9 Blender
-10  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
-11 ? ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
+3  INT  schemaVersion  
+4  STR  objectsToSim   !!!  not used 
+5  STR  projectName
+6  INT  projectID
+7  INT  soft_id          1 hou     2 maya   3 max   4 RF  5 Standalone    6 c4D  7 Nuke  8 Mari  9 Blender
+8  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
+9  ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
 
 
 

@@ -105,9 +105,6 @@ class Projects:
     max_id = 0
     total_projects = 0
 
-
-
-
     def __init__(self, batch):
         self.batch = batch
         self.comfun = batch.comfun
@@ -205,7 +202,7 @@ class Projects:
         return project_to_add.id
 
     def update_project(self, mock_project, do_save=False):   # "mock_project" used only for transfer data from ui
-        if self.current_project_index is not None :
+        if self.current_project_index is not None:
             up_proj = self.projects_data[self.current_project_index]
             up_proj.project_name = mock_project.project_name
             up_proj.project_directory = mock_project.project_directory
@@ -214,25 +211,24 @@ class Projects:
             up_proj.cache_directory = mock_project.cache_directory
             up_proj.is_default = mock_project.is_default
             if up_proj.is_default == 1:
-               self.set_proj_as_default(index=self.current_project_index)
+                self.set_proj_as_default(index=self.current_project_index)
             up_proj.description = mock_project.description
-            if do_save == True :
+            if do_save is True:
                 self.save_projects()
-        else :
+        else:
             if self.s.debug_level >= 1:
                 print " [ERR] (update_project) self.current_project_index is None"
-
 
     #  example data for beginner users and for tests
     def create_example_project_data(self, do_save=True):
         collect_ids = 0
-        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "ZexampleWokingDir",
+        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<seq##>_<sh###>", "sample project 1")
         sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj", "fx",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "s_<sh##>>", "sample project 2")
-        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "ZZexampleWokingDir",
+        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<sh###>", "sample project 3")
         collect_ids += self.add_project(sample_project_1)
@@ -299,7 +295,6 @@ class Projects:
                     return False
         return True
 
-
     #  get directory pattern for current project
     #  pattern is generated basis on directories structure on storage
     #  used for construct new path, generate path for load
@@ -317,13 +312,13 @@ class Projects:
             return self.load_projects_from_mysql()
 
     #  load projects data form json
-    def load_projects_from_json(self, file=None):
-        if file is None:
-            file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
-        if self.comfun.file_exists(file, "projects file"):
+    def load_projects_from_json(self, json_file=None):
+        if json_file is None:
+            json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
+        if self.comfun.file_exists(json_file, "projects file"):
             if self.s.debug_level >= 3:
-                print " [INF] loading projects: " + file
-            json_projects = self.comfun.load_json_file(file)
+                print " [INF] loading projects: " + json_file
+            json_projects = self.comfun.load_json_file(json_file)
 
             if "projects" in json_projects.keys():
                 if json_projects['projects']['meta']['total'] > 0:
@@ -332,7 +327,7 @@ class Projects:
                             new_project = SingleProject(int(li['id']), li['name'], int(li['def']), int(li['state_id']),
                                                         li['state'], li['d_proj'], li['d_wrk'], li['d_cam'],
                                                         li['d_cach'], li['d_env'], li['d_prop'], li['d_scr'],
-                                                        li['d_cust'], li['pattern'] , li['desc'] )
+                                                        li['d_cust'], li['pattern'], li['desc'])
                             self.add_project(new_project)
                     return True
 
@@ -345,20 +340,14 @@ class Projects:
                                                 li['d_cust'], li['pattern'] , li['desc'] )
                     self.add_project(new_project)
             """
-
-
-
-
-
             else:
                 if self.s.debug_level >= 2:
-                    print " [WRN] no projects data in : ", file
+                    print " [WRN] no projects data in : ", json_file
                 return False
         else:
             if self.s.debug_level >= 2:
-                print " [WRN] projects file not exists : ", file
+                print " [WRN] projects file not exists : ", json_file
             return False
-
 
     #  load projects data from sql
     def load_projects_from_mysql(self):

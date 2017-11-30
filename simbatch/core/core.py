@@ -26,7 +26,7 @@ class SimBatch:
         self.q = Queue(self)
         self.n = SimNodes(self)
         self.i = InOutStorage(self)
-        #  self.o = Softwares(self.s, self.i)
+        #  self.o = Softwares(self)  <- Definitions
         #  self.s.load_definitions()
         print " [INF] SimBatch started"
 
@@ -62,11 +62,15 @@ class SimBatch:
 
     def clear_all_memory_data(self):
         self.p.clear_all_projects_data()
+        self.c.create_example_project_data()
 
     def load_data(self):
         if self.p.load_projects():
             self.p.init_default_proj()
-            return True
+            if self.c.load_schemas():
+                return True
+            else:
+                return False
         else:
             return False
 

@@ -8,11 +8,12 @@ TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 
 @pytest.fixture(scope="module")
 def io():
-    sib = core.SimBatch(5, ini_file="S:/simbatch/simbatch/config.ini")
+    # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
+    sib = core.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
     sib.clear_all_memory_data()
     sib.p.create_example_project_data(do_save=False)
     sib.p.update_current_from_index(1)
-    return inout.InOutStorage(sib)
+    return sib.i
 
 
 def test_get_flat_name(io):

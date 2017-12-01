@@ -1,45 +1,65 @@
 import copy
+import os
 
-#  from common import CommonFunctions
+SCHEMA_DATA_FIELDS_NAMES = [
+    ('id', 'id'),
+    ('name', 'schema_name'),
+    ('state_id', 'state_id'),
+    ('state', 'state'),
+    ('version', 'schema_version'),
+    ('proj', 'project_name'),
+    ('proj_id', 'project_id'),
+    ('definition', 'definition_id'),
+    ('actions', 'actions_array'),
+    ('desc', 'description')
+]
+
+ACTION_DATA_FIELDS_NAMES = [
+    ('id', 'id'),
+    ('name', 'action_name'),
+    ('type', 'action_type'),
+    ('sub_type', 'action_sub_type'),
+    ('param', 'action_param'),
+    ('soft_id', 'soft_id')
+]
 
 
 class SingleAction:
-    def __init__(self, action_id, soft_id, action_type, action_sub_type, action_param):
+    def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
         self.id = action_id
-        self.soft_id = soft_id
+        self.action_name = action_name
         self.action_type = action_type
         self.action_sub_type = action_sub_type
         self.action_param = action_param
+        self.soft_id = soft_id
 
 
 class SchemaItem:
-    total_items = 0
-    max_id = 0
 
-    def __init__(self, schema_id, schema_name, description, schema_version, objects_to_sim, project_name, project_id,
-                 soft_id, actions):
-        if schema_id > 0:
-            self.max_id = schema_id
-        else:
-            self.max_id += 1
-            self.total_items += 1
+    def __init__(self, schema_id, schema_name, state_id, state, schema_version, project_id, project_name, definition_id,
+                 actions, description):
 
-        self.id = self.max_id
+        self.id = schema_id
         self.schema_name = schema_name
-        self.description = description
+        self.state_id = state_id
+        self.state = state
         self.schema_version = schema_version
-        self.objects_to_sim = objects_to_sim
-        self.project_name = project_name
         self.project_id = project_id
-        self.soft_id = soft_id
-        self.actions = actions
-        self.actions_array = []
-        self.actions_string_to_array()
+        self.project_name = project_name
+        self.definition_id = definition_id
+        self.actions_string = ""
+        self.actions_array = actions
+        self.description = description
+        self.actions_to_string()
+
+    def actions_to_string(self):
+        for a in self.actions_array:
+            self.actions_string += a + "|"
 
     def actions_string_to_array(self, stri=""):
         arr_out = []
         if len(stri) == 0:
-            stri = self.actions
+            stri = self.actions_string
         arr1 = stri.split('|')
         for strWew in arr1:
             if len(strWew) > 0:
@@ -61,11 +81,11 @@ class Schemas:
         self.comfun = batch.comfun
 
     #  print schema data, for debug
-    def print_schemas(self):
+    def print_all(self):
         for c in self.schemas_data:
             print "\n   {} id:{} state:{}".format(c.schema_name, c.id, c.state)
             print "   ", c.schema_version
-            print "   sch proj:{},    proj id:{},   soft id:{} ".format(c.project_name, c.project_id, c.soft_id)
+            print "   sch proj:{},    proj id:{},  definition:{} ".format(c.project_name, c.project_id, c.definition_id)
             print "   ."
             for a in c.actions_array:
                 print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
@@ -80,8 +100,6 @@ class Schemas:
                 print "       current id: ", self.current_schema_id
                 print "       current schema: ", self.current_schema.schema_name
             print "   ."
-
-
 
     def get_schema_names(self, as_string=False, fit=[]):
         schema_names = []
@@ -115,7 +133,7 @@ class Schemas:
                 return counter
             counter += 1
         print "   [WRN] no schema with name: ", schema_name
-        return -1
+        return None
 
     def get_schema_index_by_id(self, get_id):
         counter = 0
@@ -124,7 +142,7 @@ class Schemas:
                 return counter
             counter += 1
         print "   [WRN] no schema with ID: ", get_id
-        return -1
+        return None
 
     def update_current_schema(self, schema_id=-1, index=-1, last=-1):
         if last == 1:
@@ -133,9 +151,8 @@ class Schemas:
             self.current_schema_id = last_sch.id
             return 1
         else:
-            1
             # TODO
-        print " [WRN] update_current_schema parameter missing !\n"
+            print " [WRN] update_current_schema parameter missing !\n"
 
     def get_current_project_schemas_indexes(self, proj_id):
         counter = 0
@@ -146,29 +163,29 @@ class Schemas:
             counter += 1
         return schemas_indexes
 
-    def create_example_project_data(self, proj_id):
-        sample_schema_item_1 = SchemaItem(0, "schema 1", "first schema", "base.max", "s1", "sch1", proj_id, 1, "")
-        sample_schema_item_2 = SchemaItem(0, "schema 2", "fire by FumeFx", "base.max", "s2", "sch2", proj_id, 1, "")
-        sample_schema_item_3 = SchemaItem(0, "schema 3", "fire with smoke", "base.max", "s3", "sch3", proj_id, 2, "")
-        sample_schema_item_4 = SchemaItem(0, "schema 4", "cloth with fire", "base.max", "s4", "sch4", proj_id, 3, "")
-        self.add_schema(sample_schema_item_1)
-        self.add_schema(sample_schema_item_2)
-        self.add_schema(sample_schema_item_3)
-        self.add_schema(sample_schema_item_4, do_save=True)
-        return self.max_id
-
     def update_current_from_id(self, schema_id):
-        counter = 0
-        for sch in self.schemas_data:
+        for i, sch in enumerate(self.schemas_data):
             if sch.id == schema_id:
-                self.current_schema_index = counter
-            counter += 1
+                self.current_schema_index = i
+                self.current_schema_id = schema_id
+                self.current_schema = sch
+                return i
+        self.current_schema_id = None
+        self.current_schema_index = None
+        self.current_schema = None
+        return False
 
     def update_current_from_index(self, index):
         if len(self.schemas_data) > 0 and index > -1:
+            self.current_schema_index = index
             self.current_schema_id = self.schemas_data[index].id
+            self.current_schema = self.schemas_data[index]
+            return self.current_schema_id
         else:
-            self.current_schema_id = -1
+            self.current_schema_id = None
+            self.current_schema_index = None
+            self.current_schema = None
+            return False
 
     def add_schema(self, schema_item, do_save=False):
         if schema_item.id > 0:
@@ -178,8 +195,14 @@ class Schemas:
             schema_item.id = self.max_id
         self.schemas_data.append(schema_item)
         self.total_schemas += 1
+
         if do_save is True:
-            self.save_schemas()
+            if self.save_schemas():
+                return schema_item.id
+            else:
+                return False
+        else:
+            return schema_item.id
 
     def update_schema(self, edited_schema_item, do_save=False):
         if self.current_schema_index >= 0:
@@ -198,89 +221,155 @@ class Schemas:
             print " [ERR] self.current_schema_index < 0  (none selected ???) "
 
     def increase_curent_schema_version(self):
-        cur_sch = self.schemas_data[self.current_schema_index]
-        print "  increase_curent_schema_version  ", cur_sch.schema_version, str(int(cur_sch.schema_version) + 1)
-        self.schemas_data[self.current_schema_index].schema_version = str(int(cur_sch.schema_version) + 1)
-        self.save_schemas()
+        if self.current_schema is not None:
+            cur_sch = self.current_schema
+            if self.s.debug_level >= 4:
+                print "  [db] curent_schema_ver++  ", cur_sch.schema_version, str(int(cur_sch.schema_version) + 1)
+            self.schemas_data[self.current_schema_index].schema_version = str(int(cur_sch.schema_version) + 1)
+            self.save_schemas()
+        else:
+            if self.s.debug_level >= 1:
+                print " [ERR] (increase_curent_schema_version) current schema undefined"
 
-    def remove_single_schema(self, index=-1, id=-1, do_save=False):
+    def remove_single_schema(self, index=None, id=None, do_save=False):
+        if index is None and id is None:
+            return False
         if id > 0:
-            index_by_id = 0
-            for q in self.schemas_data:
+            for i, q in enumerate(self.schemas_data):
                 if q.id == id:
-                    del self.schemas_data[index_by_id]
-                    #  TODO    algorithm max_id
+                    del self.schemas_data[i]
                     self.total_schemas -= 1
-                    print "  [INF]  remove_single_schema id ", id
                     break
-                index_by_id += 1
+            if do_save is False:
+                return True
         if index >= 0:
             del self.schemas_data[index]
-            #  TODO    algorithm max_id
             self.total_schemas -= 1
-            print "  [INF]  remove_single_schema index ", index
+            if do_save is False:
+                return True
         if do_save is True:
-            self.save_schemas()
+            return self.save_schemas()
 
-    def clear_all_schemas(self):
+    def delete_json_schema_file(self, json_file=None):
+        if json_file is None:
+            json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
+        if self.comfun.file_exists(json_file):
+            return os.remove(json_file)
+
+    def clear_schemas_in_mysql(self):
+        # PRO VERSION with sql
+        pass
+
+    def clear_all_schemas_data(self, clear_stored_data=False):
         del self.schemas_data[:]
         self.max_id = 0
         self.total_schemas = 0
-        self.current_schema_id = -1
-        self.current_schema_index = -1
+        self.current_schema_id = None
+        self.current_schema_index = None
         # TODO check clear UI val (last current...)
+        if clear_stored_data:
+            if self.s.store_data_mode == 1:
+                if self.delete_json_schema_file():
+                    return True
+                else:
+                    return False
+            if self.s.store_data_mode == 2:
+                if self.clear_schemas_in_mysql():
+                    return True
+                else:
+                    return False
+        return True
+
+    def create_example_schemas_data(self, do_save=True):
+        collect_ids = 0
+        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, 1, "proj1", 1, [], "first schema")
+        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 4, 2, "proj2", 3, [], "fire by FumeFx")
+        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 22, 2, "proj2", 2, [], "fire with smoke")
+        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 40, 3, "proj3", 4, [], "cloth with fire")
+        collect_ids += self.add_schema(sample_schema_item_1)
+        collect_ids += self.add_schema(sample_schema_item_2)
+        collect_ids += self.add_schema(sample_schema_item_3)
+        collect_ids += self.add_schema(sample_schema_item_4, do_save=do_save)
+        return collect_ids
 
     def load_schemas(self):
         if self.s.store_data_mode == 1:
-            self.load_schemas_from_json()
+            return self.load_schemas_from_json()
         if self.s.store_data_mode == 2:
-            self.load_schemas_from_mysql()
+            return self.load_schemas_from_mysql()
 
     def load_schemas_from_json(self, json_file=""):
         if len(json_file) == 0:
             json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
-        print " [INF] loading schema: " + json_file
-        if self.comfun.file_exists(json_file, "schema file"):
-            f = open(json_file, 'r')
-            for line in f.readlines():
-                if len(line) > 4:
-                    li = line.split(";")
-                    new_schema_item = SchemaItem(int(li[0]), li[1], li[2], li[3], li[4],
-                                                 li[5], int(li[6]), int(li[7]), li[8])
-                    self.add_schema(new_schema_item)
-            f.close()
+        if self.comfun.file_exists(json_file, info="schema file"):
+            if self.s.debug_level >= 2:
+                print " [INF] loading schema: " + json_file
+            json_schemas = self.comfun.load_json_file(json_file)
+
+            if "schemas" in json_schemas.keys():
+                if json_schemas['schemas']['meta']['total'] > 0:
+                    for li in json_schemas['schemas']['data'].values():
+                        if len(li) >= 10:
+                            for lia in li['actions']:
+                                print " actions "   # TODO
+                            # new_schema_actions = [Action()]
+                            new_schema_actions = []
+                            new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['state_id']), li['state'],
+                                                         int(li['version']), int(li['proj_id']), li['proj'],
+                                                         int(li['definition']), new_schema_actions, li['desc'])
+
+                            self.add_schema(new_schema_item)
+                    return True
+            else:
+                if self.s.debug_level >= 2:
+                    print " [WRN] no projects data in : ", json_file
+                return False
+        else:
+            if self.s.debug_level >= 1:
+                print " [ERR] no schema file: " + json_file
+                return False
 
     @staticmethod
     def load_schemas_from_mysql():
-        #  PRO VERSION
-        1
+        #  PRO version with sql
+        pass
 
     def save_schemas(self):
         if self.s.store_data_mode == 1:
-            self.save_schemas_to_json()
+            return self.save_schemas_to_json()
         if self.s.store_data_mode == 2:
-            self.save_schemas_to_mysql()
+            return self.save_schemas_to_mysql()
 
-    def save_schemas_to_json(self, content=None, json_file=None):
+    # 'projects_data' list  for backup or save
+    def format_schemas_data(self, json=False, sql=False, backup=False):
+        if json == sql == backup == False:
+            if self.s.debug_level >= 1:
+                print " [ERR] (format_projects_data) no format param !"
+        else:
+            if json or backup:
+                t = self.comfun.get_current_time()
+                formated_data = {"schemas": {"meta": {"total": self.total_schemas, "timestamp": t}, "data": {}}}
+                for i, sd in enumerate(self.schemas_data):
+                    sch = {}
+                    for field in SCHEMA_DATA_FIELDS_NAMES:
+                        sch[field[0]] = eval('sd.'+field[1])
+                    formated_data["schemas"]["data"][i] = sch
+                return formated_data
+            else:
+                # PRO version with SQL
+                return False
+
+    #  save projects data as json
+    def save_schemas_to_json(self, json_file=None):
         if json_file is None:
             json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
-        if path.exists(json_file):
-            print " [INF] saving schemas: " + json_file
-            if content is None:
-                content = ""
-                for c in self.schemas_data:
-                    content_line = str(c.id) + ';' + c.schema_name + ';' + c.description + ';' + str(
-                        c.schema_version) + ';' + c.objects_to_sim + ';' + c.project_name + ';' + str(
-                        c.project_id) + ';' + str(c.soft_id) + ';' + c.actions + ';\n'
-                    content += content_line
-            self.comfun.save_to_file(json_file, content)
-        else:
-            print " [ERR] schema file not exist !\n"
+        content = self.format_schemas_data(json=True)
+        return self.comfun.save_json_file(json_file, content)
 
     @staticmethod
     def save_schemas_to_mysql():
-        #  PRO VERSION
-        1
+        #  PRO version with sql
+        pass
 
     def get_all_object_from_all_schemas(self, soft_id=0):
         if soft_id <= 0:
@@ -295,7 +384,7 @@ class Schemas:
     def copy_schema(self, source_schema_index, proj_target_id):
         if 0 <= source_schema_index < len(self.schemas_data):
             new_sch = copy.deepcopy(self.schemas_data[source_schema_index])
-            new_sch.id = -1
+            new_sch.id = 0
             new_sch.project_id = proj_target_id
             if proj_target_id >= 0:
                 self.add_schema(new_sch, do_save=False)

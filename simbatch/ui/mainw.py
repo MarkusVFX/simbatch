@@ -1,4 +1,5 @@
 import ctypes
+# import win32con  multiscreen resolution
 
 try:
     from PySide.QtCore import *
@@ -104,7 +105,7 @@ class TopMenuUI:
 
 
 class MainWindow(QMainWindow):
-    sim_batch = None
+    batch = None
     comfun = None
     debug_level = None
 
@@ -119,19 +120,19 @@ class MainWindow(QMainWindow):
 
     qt_tab_widget = None
 
-    def __init__(self, sim_batch, parent=None):
+    def __init__(self, batch, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.sim_batch = sim_batch
-        self.comfun = sim_batch.comfun
-        self.s = sim_batch.s
-        self.init_ui(sim_batch)
-        self.debug_level = sim_batch.s.debug_level
+        self.batch = batch
+        self.comfun = batch.comfun
+        self.s = batch.s
+        self.init_ui(batch)
+        self.debug_level = batch.s.debug_level
 
     def init_ui(self, batch):
         user32 = ctypes.windll.user32
         wnd = self.s.window
-        current_screen_width = user32.GetSystemMetrics(0)
-        current_screen_height = user32.GetSystemMetrics(1)
+        current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
+        current_screen_height = user32.GetSystemMetrics(79)   # SM_CYVIRTUALSCREEN
 
         if len(wnd) == 4:
             x_wnd_pos = wnd[0]
@@ -167,9 +168,9 @@ class MainWindow(QMainWindow):
         top.qt_but_refresh.clicked.connect(self.on_clicked_but_refresh)
 
         self.top_ui = top
-        self.wiz_ui = WizardUI(batch, top)
-        self.pro_ui = ProjectsUI(batch, top)
-        self.sch_ui = SchemasUI(batch, top)
+        self.wiz_ui = WizardUI(batch, self, top)
+        self.pro_ui = ProjectsUI(batch, self, top)
+        self.sch_ui = SchemasUI(batch, self, top)
         #  self.tsk_ui = TasksUI(batch)
         #  self.que_ui = QueueUI(batch)
         #  self.nod_ui = NodesUI(batch)
@@ -191,10 +192,14 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         qt_tab_widget.setMinimumSize(220, 400)
 
-        if self.s.loading_state < 10:
-            qt_tab_widget.setCurrentIndex(1)    # show settings
+        if self.s.store_data_mode == 1:
+            if self.comfun.path_exists(self.s.store_data_json_directory):
+                qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB: show tasks
+            else:
+                qt_tab_widget.setCurrentIndex(3)    # NO data dir : show settings
         else:
-            qt_tab_widget.setCurrentIndex(1)    # show tasks
+            # PRO version
+            pass
 
         qt_lay_central.addWidget(qt_tab_widget)
         qt_central_widget.setLayout(qt_lay_central)
@@ -230,16 +235,14 @@ class MainWindow(QMainWindow):
         self.on_resize_window(event)
 
     def on_resize_window(self, event):
-        newSize = event.size()
-        self.s.window[2] = newSize.width()
-        self.s.window[3] = newSize.height()
+        new_size = event.size()
+        self.s.window[2] = new_size.width()
+        self.s.window[3] = new_size.height()
 
     def moveEvent(self, event):             # PySide  moveEvent
         self.on_move_window(event)
 
     def on_move_window(self, event):
-        newPos = event.pos()
-        self.s.window[0] = newPos.x()
-        self.s.window[1] = newPos.y()
-
-
+        new_pos = event.pos()
+        self.s.window[0] = new_pos.x()
+        self.s.window[1] = new_pos.y()

@@ -49,6 +49,7 @@ class ProjectsUI:
 
     batch = None
     top_ui = None
+    mainw = None
 
     qt_form_add = None
     qt_form_edit = None
@@ -62,15 +63,16 @@ class ProjectsUI:
     debug_level = None
 
     freeze_list_on_changed = 0
-    last_project_index = -1    # used for list item color change to unselected
+    last_project_index = None    # used for list item color change to unselected
 
-    def __init__(self, batch, top):
+    def __init__(self, batch, mainw, top):
         self.batch = batch
         self.p = batch.p
         self.s = batch.s
         self.comfun = batch.comfun
         self.debug_level = batch.s.debug_level
         self.top_ui = top
+        self.mainw = mainw
 
         #  self.schUI = batch.schemasUI TODO
         #  self.tskUI = batch.tasksUI TODO
@@ -393,7 +395,6 @@ class ProjectsUI:
     def get_dialog_anicache_directory(self, qt_edit_line):
         return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
 
-
     #  Add
     #  Add  Add
     #  Add  Add  Add
@@ -443,7 +444,6 @@ class ProjectsUI:
             self.qt_list_projects.setItemWidget(list_item, list_item_widget)
             self.batch.i.create_project_working_directory(new_project.working_directory_absolute)
 
-
             if pin_checked is False:
                 self.clear_form_add()
                 self.qt_form_add.hide()
@@ -453,6 +453,7 @@ class ProjectsUI:
             #  self.schUI.hide_all_forms()  TODO  !!!!!!!
         else:
             self.top_ui.set_top_info(" Fill project name !", 8)
+
     #  Edit
     #  Edit  Edit
     #  Edit  Edit  Edit
@@ -532,8 +533,8 @@ class ProjectsUI:
     def on_click_confirm_remove_project(self):  # TODO  REMOVE SCHEMAS AND TASKS !!!
         if self.batch.p.current_project_index >= 0:
             remove_index = self.batch.p.current_project_index
-            self.batch.p.current_project_index = -1
-            self.last_project_index = -1
+            self.batch.p.current_project_index = None
+            self.last_project_index = None
             self.batch.p.remove_single_project(index=remove_index, do_save=True)
             self.qt_list_projects.takeItem(remove_index + 1)    # TODO INDEX ON VISIBLE LIST ! (when filter exist)
             self.qt_form_remove.hide()
@@ -541,17 +542,16 @@ class ProjectsUI:
 
     def update_sch_after_proj_changed(self):
         """########### UPDATE SCH ##############"""
-        # self.schUI.updateSchemasList()
-        self.batch.c.currentSchemaID = -1
-        self.batch.c.currentSchemaIndex = -1
-        self.batch.c.currentSchemaListIndex = -1
-        # self.schUI.updateArrOfVisibleIDs()
+        self.mainw.sch_ui.current_of_visible_schema_index = None
+        self.mainw.sch_ui.last_schema_list_index = None
+        self.mainw.sch_ui.reset_list()
+        self.batch.c.update_current_from_index(None)
 
     def update_tsk_after_proj_changed(self):
         ########### UPDATE TSK  ##############
-        self.batch.t.currentTaskID = -1
-        self.batch.t.currentTaskIndex = -1
-        self.batch.t.currentTaskListIndex = -1
+        self.batch.t.currentTaskID = None
+        self.batch.t.currentTaskIndex = None
+        self.batch.t.currentTaskListIndex = None
         #self.tskUI.FormCreate.updateSchemaNamesCombo(self.batch.c.arraySchemasInCurrentProject,
          #                                            self.batch.c.arraySchemasIDs, 0)
         #self.tskUI.qt_form_edit.updateSchemaNamesCombo(self.batch.c.arraySchemasInCurrentProject,
@@ -598,11 +598,12 @@ class ProjectsUI:
                         color_index = 21  # HOLD TODO  const
             else:
                 if self.debug_level >= 2:
-                    print " [WRN] currentListIndex: {} len proj:{}".format(current_list_index, len(self.batch.p.projects_data))
+                    print " [WRN] currentListIndex: {} len proj:{}".format(current_list_index,
+                                                                           len(self.batch.p.projects_data))
                 return False
 
             # UI list
-            if current_list_index >= 0 and current_list_index < self.batch.p.total_projects:
+            if 0 <= current_list_index < self.batch.p.total_projects:
                 item_c = self.qt_list_projects.item(current_list_index + 1)
                 cur_color = self.batch.s.state_colors_up[color_index].color()
                 item_c.setBackground(cur_color)
@@ -624,4 +625,3 @@ class ProjectsUI:
                 self.qt_fe_anicache_dir.setText(cur_proj.cache_directory)
                 self.qt_fe_description.setText(cur_proj.description)
                 self.qtcb_fe_default_proj.setChecked(cur_proj.is_default)
-

@@ -245,7 +245,7 @@ class SettingsUI:
 
     def on_click_save_settings(self):
         dataPath = str(self.qt_settings_data_directory_edit.text())
-        if self.comfun.path_exists(dataPath, "Data Path"):
+        if self.comfun.path_exists(dataPath, info="Data Path"):
             self.settings.batchDataPath = dataPath
             self.settings.save_settings()
 

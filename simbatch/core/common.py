@@ -1,7 +1,6 @@
 import sys
 import os
 import json
-import pytest
 from os import path
 from collections import OrderedDict
 from datetime import datetime
@@ -131,34 +130,39 @@ class CommonFunctions:
         else:
             return "{:.1f}h".format(1.0 * seconds / 3600)
 
-    # files directories ...
+    # files and directories ...
     @staticmethod
     def current_scripts_path():
         return path.dirname(path.realpath(sys.argv[0])) + "\\"
 
-    def file_exists(self, check_file, file_type_message):
+    def file_exists(self, check_file, info=""):
         if path.exists(check_file):
             return True
         else:
-            if len(check_file) > 0:
-                if len(file_type_message) > 0:
+            if len(info) > 0:
+                if len(info) > 0:
                     if self.debug_level >= 1:
-                        print " [ERR] File {} not exist !  ({})\n".format(file_type_message, check_file)
+                        print " [WRN] File {} not exist !  ({})\n".format(check_file, info)
                 else:
                     if self.debug_level >= 4:
-                        print " [INF] File {} not exist.".format(file_type_message)
+                        print " [WRN] File {} not exist.".format(check_file)
             else:
                 if self.debug_level >= 1:
-                    print " [ERR] File name length is zero! {}".format( file_type_message)
+                    print " [ERR] File name length is zero! {}".format(info)
             return False
 
-    def path_exists(self, check_path, dir_type):
-        if path.exists(check_path):
-            return True
+    def path_exists(self, check_path, info=""):
+        if isinstance(check_path, basestring):
+            if path.exists(str(check_path)):
+                return True
+            else:
+                if len(info) > 0:
+                    if self.debug_level >= 1:
+                        print " [ERR] dir (", info, ") dont exist!"
+                return False
         else:
-            if len(dir_type) > 0:
-                if self.debug_level >= 1:
-                    print " [ERR] dir (", dir_type, ") dont exist!"
+            if self.debug_level >= 1:
+                print " [ERR] (path_exists) wrong parameter!", check_path, info
             return False
 
     def get_proper_path(self, get_path):
@@ -173,7 +177,6 @@ class CommonFunctions:
             if self.debug_level >= 1:
                 print " [ERR] (get_proper_path) (", get_path, ") len 0 !"
         return get_path
-
 
     @staticmethod
     def get_path_from_full(full):
@@ -224,13 +227,13 @@ class CommonFunctions:
             return False
 
     @staticmethod
-    def is_absolute(path):
-        if len(path) > 2:
-            if path[1] == ":" and path[2] == "\\":
+    def is_absolute(check_path):
+        if len(check_path) > 2:
+            if check_path[1] == ":" and check_path[2] == "\\":
                 return True
-            if path[1] == ":" and path[2] == "/":
+            if check_path[1] == ":" and check_path[2] == "/":
                 return True
-            if path[0] == "\\" and path[1] == "\\":
+            if check_path[0] == "\\" and check_path[1] == "\\":
                 return True
         return False
 
@@ -253,13 +256,14 @@ class CommonFunctions:
                 json_data = json.load(f, object_pairs_hook=OrderedDict)
         return json_data
 
-    def save_json_file(self, file_name, content):
+    @staticmethod
+    def save_json_file(file_name, content):
         json_data = None
         # if self.file_exists(file_name, file_name): # if self.comfun.file_exists(file, "") :
 
         with open(file_name, 'w') as f:
             json.dump(content, f,  indent=2)
-        return json_data
+        return True   # TODO  Exception
 
     @staticmethod
     def save_to_file(file_name, content):

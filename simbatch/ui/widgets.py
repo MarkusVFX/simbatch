@@ -130,7 +130,7 @@ class CheckBoxes:
 
 class RadioButtons:
     qt_widget_layout = None
-    currentActive = -1
+    currentActive = None
     qt_radio_butt_1 = None
     qt_radio_butt_2 = None
     qt_radio_butt_3 = None

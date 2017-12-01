@@ -164,19 +164,24 @@ class Projects:
             return False
 
     #  'projects_data' list  for backup or save
-    def format_projects_data(self, json=True):
-        if json:
-            t = self.comfun.get_current_time()
-            formated_data = {"projects": {"meta": {"total": self.total_projects, "timestamp": t}, "data": {}}}
-            for i, p in enumerate(self.projects_data):
-                proj = {}
-                for field in PROJECT_DATA_FIELDS_NAMES:
-                    proj[field[0]] = eval('p.'+field[1])
-                formated_data["projects"]["data"][i] = proj
-                # print PROJECT_DATA_FIELDS_NAMES[i]
-            return formated_data
-        else:  # SQL txt TODO
-            return False
+    def format_projects_data(self, json=False, sql=False, backup=False ):
+        if json == sql == backup == False:
+            if self.s.debug_level >= 1:
+                print " [ERR] (format_projects_data) no format param !"
+        else:
+            if json or backup:
+                t = self.comfun.get_current_time()
+                formated_data = {"projects": {"meta": {"total": self.total_projects, "timestamp": t}, "data": {}}}
+                for i, p in enumerate(self.projects_data):
+                    proj = {}
+                    for field in PROJECT_DATA_FIELDS_NAMES:
+                        proj[field[0]] = eval('p.'+field[1])
+                    formated_data["projects"]["data"][i] = proj
+                    # print PROJECT_DATA_FIELDS_NAMES[i]
+                return formated_data
+            else:
+                # PRO version with SQL
+                return False
 
     #  add project to 'projects_data' list  on load  and on add by user
     def add_project(self, project_to_add, do_save=False, generate_directory_patterns=False):
@@ -218,23 +223,6 @@ class Projects:
         else:
             if self.s.debug_level >= 1:
                 print " [ERR] (update_project) self.current_project_index is None"
-
-    #  example data for beginner users and for tests
-    def create_example_project_data(self, do_save=True):
-        collect_ids = 0
-        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "exampleWokingDir",
-                                         "cam", "cache", "env", "props", "scripts", "custom",
-                                         "<seq##>\<seq##>_<sh###>", "sample project 1")
-        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj", "fx",
-                                         "cam", "cache", "env", "props", "scripts", "custom",
-                                         "s_<sh##>>", "sample project 2")
-        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "exampleWokingDir",
-                                         "cam", "cache", "env", "props", "scripts", "custom",
-                                         "<seq##>\<sh###>", "sample project 3")
-        collect_ids += self.add_project(sample_project_1)
-        collect_ids += self.add_project(sample_project_2)
-        collect_ids += self.add_project(sample_project_3, do_save=do_save)
-        return collect_ids
 
     #  check is project with index is default
     def check_is_default(self, index=None):
@@ -304,6 +292,23 @@ class Projects:
         full_dir_pattern = None
         return full_dir_pattern
 
+    #  example data for beginner users and for tests
+    def create_example_project_data(self, do_save=True):
+        collect_ids = 0
+        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "exampleWokingDir",
+                                         "cam", "cache", "env", "props", "scripts", "custom",
+                                         "<seq##>\<seq##>_<sh###>", "sample project 1")
+        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj", "fx",
+                                         "cam", "cache", "env", "props", "scripts", "custom",
+                                         "s_<sh##>>", "sample project 2")
+        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "exampleWokingDir",
+                                         "cam", "cache", "env", "props", "scripts", "custom",
+                                         "<seq##>\<sh###>", "sample project 3")
+        collect_ids += self.add_project(sample_project_1)
+        collect_ids += self.add_project(sample_project_2)
+        collect_ids += self.add_project(sample_project_3, do_save=do_save)
+        return collect_ids
+
     #  load projects data after startup or after reload
     def load_projects(self):
         if self.s.store_data_mode == 1:
@@ -315,7 +320,7 @@ class Projects:
     def load_projects_from_json(self, json_file=None):
         if json_file is None:
             json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
-        if self.comfun.file_exists(json_file, "projects file"):
+        if self.comfun.file_exists(json_file, info="projects file"):
             if self.s.debug_level >= 3:
                 print " [INF] loading projects: " + json_file
             json_projects = self.comfun.load_json_file(json_file)
@@ -368,8 +373,7 @@ class Projects:
         if file is None:
             file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
         content = self.format_projects_data(json=True)
-        self.comfun.save_json_file(file, content)
-        return True
+        return self.comfun.save_json_file(file, content)
 
     #  save projects data to sql
     def save_projects_to_mysql(self):
@@ -379,16 +383,15 @@ class Projects:
         return True
 
     #  remove single project
-    def remove_single_project(self, index=-1, id=-1, do_save=False):
-        if index == -1 and id == -1:
+    def remove_single_project(self, index=None, id=None, do_save=False):
+        if index == None and id == None:
             return False
         if id > 0:
-            for q in self.projects_data:
+            for i, q in enumerate(self.projects_data):
                 if q.id == id:
-                    del self.projects_data[index]
+                    del self.projects_data[i]
                     self.total_projects -= 1
                     break
-                index += 1
             if do_save is False:
                 return True
         if index >= 0:
@@ -397,17 +400,14 @@ class Projects:
             if do_save is False:
                 return True
         if do_save is True:
-            if self.save_projects():
-                return True
-            else:
-                return False
+            return self.save_projects()
 
     #  delete json file from storage
     def delete_json_project_file(self, file=None):
         if file is None:
             file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
-        if self.comfun.file_exists(file, ""):
-            os.remove(file)
+        if self.comfun.file_exists(file):
+            return os.remove(file)
 
     #  clear project data from sql
     def clear_projects_in_mysql(self):

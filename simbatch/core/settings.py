@@ -21,7 +21,7 @@ class Settings:
     state_colors_up = []
 
     # loaded settings (config.ini)
-    store_data_mode = None
+    store_data_mode = None   #  1 json     2 MySQL
     debug_level = None
     ui_color_mode = 1
     store_data_json_directory = None
@@ -32,7 +32,7 @@ class Settings:
     window = None
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.02"
+    SIMBATCH_VERSION = "v0.2.04"
 
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
@@ -86,7 +86,7 @@ class Settings:
 
 
     def load_settings(self):
-        if self.comfun.file_exists(self.ini_file, "settings init"):
+        if self.comfun.file_exists(self.ini_file, info="settings init"):
             self.loading_state = 1
             with open(self.ini_file) as f:
                 self.json_settings_data = json.load(f)
@@ -139,15 +139,15 @@ class Settings:
         print ' [INF] settings saved to: ', file
 
         if self.store_data_mode == 1:
-            if comfun.file_exists(dataPath + self.JSON_PROJECTS_FILE_NAME, "") == False:
+            if comfun.file_exists(dataPath + self.JSON_PROJECTS_FILE_NAME) == False:
                 comfun.create_empty_file(dataPath + self.JSON_PROJECTS_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_SCHEMAS_FILE_NAME, "") == False:
+            if comfun.file_exists(dataPath + self.JSON_SCHEMAS_FILE_NAME) == False:
                 comfun.create_empty_file(dataPath + self.JSON_SCHEMAS_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_TASKS_FILE_NAME, "") == False:
+            if comfun.file_exists(dataPath + self.JSON_TASKS_FILE_NAME) == False:
                 comfun.create_empty_file(dataPath + self.JSON_TASKS_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_QUEUE_FILE_NAME, "") == False:
+            if comfun.file_exists(dataPath + self.JSON_QUEUE_FILE_NAME) == False:
                 comfun.create_empty_file(dataPath + self.JSON_QUEUE_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_SIMNODES_FILE_NAME, "") == False:
+            if comfun.file_exists(dataPath + self.JSON_SIMNODES_FILE_NAME) == False:
                 comfun.create_empty_file(dataPath + self.JSON_SIMNODES_FILE_NAME)
 
     def set_current_soft(self, soft_id):
@@ -209,7 +209,7 @@ class Settings:
         if self.debug_level >= 3:
             print " [INF] loading colors: ", color_file
 
-        if self.comfun.file_exists(color_file, "colors file"):
+        if self.comfun.file_exists(color_file, info="colors file"):
             self.state_colors = []
             self.state_colors_up = []
             for i in range(0, 40):

@@ -13,14 +13,16 @@ class WizardUI:
 
     batch = None
     top_ui = None
+    mainw = None
 
     comfun = None
     current_soft = None
 
-    def __init__(self, batch, top):
+    def __init__(self, batch, mainw, top):
         self.batch = batch
         self.comfun = batch.comfun
         self.top_ui = top
+        self.mainw = mainw
         self.init_ui()
         self.current_soft = batch.s.soft_id
 
@@ -63,9 +65,6 @@ class WizardUI:
         self.s1initFileEL = wizard_step_1c.qt_edit_line
         self.s1projDescEL = wizard_step_1d.qt_edit_line
         self.s1CurrentSceneCB = wizard_but_use_cur_scene.qt_second_check_box
-
-
-
         self.comfun.add_layouts(qt_lay_step_1a, [wizard_step_1a.qt_widget_layout, wizard_step_1b.qt_widget_layout,
                                                  wizard_step_1bb.qt_widget_layout, wizard_step_1c.qt_widget_layout,
                                                  wizard_step_1d.qt_widget_layout,

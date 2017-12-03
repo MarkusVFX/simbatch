@@ -26,7 +26,6 @@ class EditLineWithButtons:
     qt_edit_line = None
     text_on_button_1 = None
     text_on_button_2 = None
-    editLineStrValue = ""
     label = None
 
     def __init__(self, label_text, edit_text_string="", label_minimum_size=0, text_on_button_1="", text_on_button_2="",

@@ -20,45 +20,44 @@ PROJECT:
 
 SCHEMA:
 0  INT  id
-1  STR  schema_name  -> schemaDirectory
-2  STR  description
-3  INT  schemaVersion  
-4  STR  objectsToSim   !!!  not used 
-5  STR  projectName
-6  INT  projectID
-7  INT  soft_id          1 hou     2 maya   3 max   4 RF  5 Standalone    6 c4D  7 Nuke  8 Mari  9 Blender
-8  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
-9  ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
+1  STR  schema_name
+2  INT  state_id
+3  STR  state
+4  INT  schema_version 
+6  INT  project_id
+7  STR  project_name
+8  INT  definition_id          1 hou     2 maya   3 max   4 RF  5 Standalone    6 c4D  7 Nuke  8 Mari  9 Blender
+9  ARR  actions
+10 STR  description
 
 
-
-
-
+#  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
+#  ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
 
 
 TASK:
 0  INT  id
-1  STR  taskName    .
-2  INT  schemaID (hide)
+1  STR  task_name    .
+2  INT  schema_id (hide)
 3  STR  user
-4  INT  userID (hide)
-5  STR  shotA   
-6  STR  shotB
-7  STR  shotC
-8  INT  frameFrom (hide)
-9  INT  frameTo  (hide)
+4  INT  user_id (hide)
+5  STR  shot_A   
+6  STR  shot_B
+7  STR  shot_C
+8  INT  frame_from (hide)
+9  INT  frame_to  (hide)
 10 STR  state
 11 INT  stateID (not used)
 12 STR  stateColor
-13 INT  schVer (schema version)
-14 INT  queVer (queue version)
+13 INT  schema_ver (schema version)
+14 INT  queue_ver (queue version)
 15 STR  evolution  (DMP, DRG, TIM)
 16 INT  prior
 17 STR  options
 18 STR  description
-19 INT  projID
-20 INT  taskVer
-21 INT  frameRangeStatus
+19 INT  proj_id
+20 INT  task_ver
+21 INT  frame_range_status
 
 
 
@@ -68,12 +67,12 @@ QUEUE:
 1 STR  schema_name
 2 INT  taskID
 3 STR  user
-4 INT  userID
-5 STR  shotA
-6 STR  shotB
-7 STR  shotC
-8 INT  frameFrom
-9 INT  frameTo
+4 INT  user_id
+5 STR  shot_A
+6 STR  shot_B
+7 STR  shot_B
+8 INT  frame_from
+9 INT  frame_to
 10 STR  state
 11 INT  stateID
 12 STR  stateColor
@@ -87,7 +86,7 @@ QUEUE:
 20 STR  simNode
 21 INT  simNodeID
 22 STR  time
-23 INT  projID
+23 INT  proj_id
 24 INT  soft_id
        
 

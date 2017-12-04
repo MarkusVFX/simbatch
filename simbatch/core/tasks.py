@@ -1,3 +1,5 @@
+import copy
+
 
 class TaskItem():
     def __init__(self, id, task_name, schema_id, user, user_id, shot_A, shot_B, shot_C, frame_from, frame_to, state, state_id, schema_ver, queue_ver,evolution, prior, options, description, proj_id, frame_range_status, task_ver ):
@@ -113,13 +115,13 @@ class Tasks:
         curr_task = self.tasks_data[self.current_task_index]
         return [self.comfun.int_or_val(curr_task.frame_from, 1), self.comfun.int_or_val(curr_task.frame_to, 2)]
 
-    def create_example_project_data(self,  schema_id, proj_id ):
+    def create_example_project_data(self,  schema_id, proj_id):
         sample_task_1 = TaskItem(0, "schema tre", schema_id, "M", 1, "01", "001", "a", 10, 20, "Waiting", 2, "a.max",
                                  1, "evo01", 5, "inp:1,1,1", "first task", proj_id, 0, 1)
         sample_task_2 = TaskItem(0, "schema tre", schema_id, "M", 1, "01", "002", "", 10, 20, "Waiting", 2, "a.max",
-                                 1, "evo10", 5, "inp:1,1,1", "first task", proj_id, 0 , 1)
+                                 1, "evo10", 5, "inp:1,1,1", "first task", proj_id, 0, 1)
         sample_task_3 = TaskItem(0, "schema tre", schema_id, "M", 1, "03", "456", "fix", 10, 20, "Waiting", 2, "a.max",
-                                 44, "evo22", 5, "inp:1,1,1", "first task", proj_id, 0 , 1)
+                                 44, "evo22", 5, "inp:1,1,1", "first task", proj_id, 0, 1)
         self.add_task(sample_task_1)
         self.add_task(sample_task_2)
         self.add_task(sample_task_3)
@@ -137,10 +139,72 @@ class Tasks:
         if do_save is True:
             self.save_tasks()
 
-    def remove_task (self, id):
+    def update_task(self, edited_task_item, do_save=False):
+        if 0 <= self.current_task_index < len(self.tasks_data):
+            self.tasks_data[self.current_task_index] = copy.deepcopy(edited_task_item)
+            if do_save is True:
+                self.save_tasks()
+        else:
+            if self.s.debug_level >= 1:
+                print "  [ERR] wrong current_task_id:", self.current_task_index
+
+    def set_state(self, task_id, state):
         index = 0
-        for t in self.tasks_data :
-            if t.id == id :
+        for q in self.tasks_data:
+            if q.id == task_id:
+                self.tasks_data[index].state = state
+                break
+            index += 1
+
+    def remove_task(self, task_id):
+        index = 0
+        for t in self.tasks_data:
+            if t.id == task_id:
                 del self.tasks_data[index]
                 break
             index += 1
+
+    def clear_all_tasks_data(self):
+        del self.tasks_data[:]
+        self.max_id = 0
+        self.total_tasks = 0
+        self.current_task_id = None
+        self.current_task_index = None
+
+    def load_tasks(self):
+        if self.s.store_data_mode == 1:
+            self.load_tasks_from_json()
+        if self.s.store_data_mode == 2:
+            self.load_tasks_from_mysql()
+
+    def load_tasks_from_json(self, json_file=""):
+        if len(json_file) == 0:
+            json_file = self.s.batch_data_path + self.s.tasks_file_name
+        # TODO
+
+    def load_tasks_from_mysql(self):
+        # PRO VERSION
+        if self.s.debug_level >= 3:
+            print "  [INF] relational database available in the PRO version"
+
+    def save_tasks(self):
+        if self.s.store_data_mode == 1:
+            self.save_tasks_to_json()
+        if self.s.store_data_mode == 2:
+            self.save_tasks_to_mysql()
+
+    def save_tasks_to_json(self, json_file=None):
+        if json_file is None:
+            json_file = self.s.batch_data_path + self.s.tasks_file_name
+        # TODO
+
+    def save_tasks_to_mysql(self):
+        # PRO VERSION
+        if self.s.debug_level >= 3:
+            print "  [INF] relational database available in the PRO version"
+
+
+
+
+
+

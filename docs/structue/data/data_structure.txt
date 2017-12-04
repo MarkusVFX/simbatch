@@ -65,7 +65,7 @@ TASK:
 QUEUE:
 0 INT  id
 1 STR  schema_name
-2 INT  taskID
+2 INT  task_id
 3 STR  user
 4 INT  user_id
 5 STR  shot_A
@@ -78,13 +78,13 @@ QUEUE:
 12 STR  stateColor
 13 INT  version
 14 STR  evolution (DMP, DRG, TIM)
-15 INT  evolutionNr 
-16 STR  evolutionScriptType (MXS, MEL, PY)
-17 STR  evolutionScript ("evo01_BRN_+10")
+15 INT  evolution_nr 
+16 STR  evolution_script_type (MXS, MEL, PY)
+17 STR  evolution_script ("evo01_BRN_+10")
 18 INT  prior
 19 STR  description
-20 STR  simNode
-21 INT  simNodeID
+20 STR  sim_node
+21 INT  sim_node_id
 22 STR  time
 23 INT  proj_id
 24 INT  soft_id

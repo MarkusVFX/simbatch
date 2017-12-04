@@ -21,6 +21,35 @@ class SimpleLabel():
         self.qt_widget_layout.addWidget(label)
 
 
+class ComboLabel():
+    qt_widget_layout = None
+    combo = None
+    text_on_button_1 = None
+
+    def __init__(self, label_text, combo_items_arr, combo_current_index=0, label_minimum_size=0, text_on_button_1="",
+                 buttonSize=0):
+        self.qt_widget_layout = QHBoxLayout()
+        if len(label_text) > 0:
+            label = QLabel(label_text)
+            if label_minimum_size > 0:
+                label.setMinimumWidth(label_minimum_size)
+            self.qt_widget_layout.addWidget(label)
+
+        combo = QComboBox()
+        for it in combo_items_arr:
+            combo.addItem(it)
+        combo.setCurrentIndex(combo_current_index)
+        self.qt_widget_layout.addWidget(combo)
+        self.combo = combo
+
+        if len(text_on_button_1) > 0:
+            self.text_on_button_1 = QPushButton(text_on_button_1)
+            self.qt_widget_layout.addWidget(self.text_on_button_1)
+            if buttonSize > 0:
+                self.text_on_button_1.setMaximumWidth(buttonSize)
+
+
+
 class EditLineWithButtons:
     qt_widget_layout = None
     qt_edit_line = None

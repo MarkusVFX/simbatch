@@ -4,8 +4,9 @@ try:
 except ImportError:
     print "PySide.QtGui ERR"
 
-from ui_queue import QueueItem
 from widgets import *
+from ui_queue import QueueItem
+
 
 
 class AddToQueueForm (QWidget):
@@ -26,17 +27,19 @@ class AddToQueueForm (QWidget):
     actions_widgets_array = []
     actionsCount = 0
 
-    all_actions_array = [] 
+    all_actions_array = []
     comfun = None
 
-    def __init__( self, batch):
+    def __init__(self, batch):
         QWidget.__init__(self)
         self.form_atq_local_item = QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "" ,2 ,"ver" , "evo" ,1 ,"" ,"", 50,
                                              " 1 ", "", 0, "", 1, 3)
-        self.batch = batch
-        self.s = self.batch.s
-        self.comfun = self.batch.comfun
+        #self.batch = batch
+        #self.s = self.batch.s
+        #self.comfun = self.batch.comfun
         self.init_ui_elements()
+
+
 
     def init_ui_elements(self):
         qt_form_add_layout = QVBoxLayout()
@@ -73,7 +76,7 @@ class AddToQueueForm (QWidget):
         qt_form_add_layout.addLayout(qt_button_cb_add_to_queue.qt_widget_layout)
 
         qt_gb_atq = QGroupBox()
-        qt_gb_atq.setLayout(qt_form_add_layout)
+        #qt_gb_atq.setLayout(qt_form_add_layout)
         self.qt_gb_add_to_queue_now = qt_gb_atq
         qt_form_add_layout.addWidget(qt_gb_atq)
 
@@ -87,7 +90,7 @@ class AddToQueueForm (QWidget):
         self.execute_button = qt_button_cb_add_to_queue.button
 
         self.setLayout(qt_form_add_layout)
-        qt_edit_button_sim_from.qt_edit_line.textChanged.connect(self.on_change_sim_from)
-        qt_edit_button_sim_to.qt_edit_line.textChanged.connect(self.on_change_sim_to)
-        qt_edit_button_frame_from.qt_edit_line.textChanged.connect(self.on_change_render_from)
-        qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)
+        # qt_edit_button_sim_from.qt_edit_line.textChanged.connect(self.on_change_sim_from)
+        # qt_edit_button_sim_to.qt_edit_line.textChanged.connect(self.on_change_sim_to)
+        # qt_edit_button_frame_from.qt_edit_line.textChanged.connect(self.on_change_render_from)
+        # qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)

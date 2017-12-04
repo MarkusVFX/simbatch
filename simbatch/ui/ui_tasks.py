@@ -129,7 +129,7 @@ class TasksFormCreateOrEdit(QWidget):
     batch = None
     batchSchemas = None
 
-    def __init__(self, batch, mode):  # , top):
+    def __init__(self, batch, mode, top):
         QWidget.__init__(self)
         self.form_task_item = TaskItem(0, "", 0, "M", 1, "", "", "", 0, 10, "", 2, 0, 0, "", 5, "", "", 1, 0, 0)
 
@@ -140,7 +140,7 @@ class TasksFormCreateOrEdit(QWidget):
         self.batch = batch
         self.s = batch.s
         self.batchSchemas = batch.c
-        # self.top_ui = top
+        self.top_ui = top
 
     def init_ui_elements(self, sch):
         qt_layout_out_form_create = QVBoxLayout()
@@ -351,14 +351,15 @@ class TasksFormCreateOrEdit(QWidget):
                     self.top_ui.set_top_info(" Cant detect frame range ", 7)
 
     def get_frame_range_from_scene(self):
-        ret = self.batch.o.soft_conn.get_curent_frame_range()
+        #ret = self.batch.o.soft_conn.get_curent_frame_range()
+        ret = None  # TODO   .o.  sOftwares -> definitions
         print "   get_frame_range_from_scene    ", ret
         if not ret is None:
             self.qt_edit_line_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
             self.qt_edit_line_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
             self.top_ui.set_top_info(" Set frame range:  [" + str(ret[0]) + ":" + str(ret[1]) + "]")
         else:
-            self.top_ui.set_top_info(" Cant detect frame range ", 7)
+            self.top_ui.set_top_info(" Can't detect frame range ", 7)
 
     def clear_vars(self):
         self.form_task_item = TaskItem(0, "", 0, "M", 1, "", "", "", 0, 10, "", 2, "ffdc82", 0, 0, "", 5, "", "", 1)
@@ -425,7 +426,7 @@ class TasksUI:
         # CREATE
         # CREATE CREATE
         # CREATE CREATE CREATE
-        qt_schema_form_create = TasksFormCreateOrEdit(self.batch, "create")
+        qt_schema_form_create = TasksFormCreateOrEdit(self.batch, "create", top)
         self.qt_schema_form_create = qt_schema_form_create
         qt_schema_form_create.execute_button.button.clicked.connect(
             lambda: self.on_click_add_task(qt_schema_form_create.form_task_item))
@@ -433,7 +434,7 @@ class TasksUI:
         # EDIT
         # EDIT EDIT
         # EDIT EDIT EDIT
-        qt_form_edit = TasksFormCreateOrEdit(self.batch, "edit")
+        qt_form_edit = TasksFormCreateOrEdit(self.batch, "edit", top)
         self.qt_form_edit = qt_form_edit
         qt_form_edit.execute_button.button.clicked.connect(
             lambda: self.on_click_update_task(qt_form_edit.form_task_item))
@@ -464,7 +465,8 @@ class TasksUI:
         # QUEUE QUEUE QUEUE
         qt_form_add = AddToQueueForm(self.batch)
         self.qt_form_add = qt_form_add
-        qt_form_add.execute_button.clicked.connect(lambda: self.on_click_add_to_queue())
+        #qt_form_add.execute_button.clicked.connect(lambda: self.on_click_add_to_queue())
+        qt_form_add.execute_button.clicked.connect(self.on_click_add_to_queue)
 
         ###
         ###  ###
@@ -600,7 +602,7 @@ class TasksUI:
             if self.batch.t.current_task_index >= 0:
                 curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
                 self.qt_schema_form_create.update_create_ui(curr_task.schema_id)
-            elif self.batch.c.curr_schema_index >= 0:
+            elif self.batch.c.current_schema_index >= 0:
                 curSch = self.batch.c.schemas_data[self.batch.c.curr_schema_index]
                 self.qt_schema_form_create.update_create_ui(schemaId=curSch.id)
             else:

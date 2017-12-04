@@ -1,5 +1,4 @@
 import ctypes
-# import win32con  multiscreen resolution
 
 try:
     from PySide.QtCore import *
@@ -10,6 +9,7 @@ except ImportError:
 from ui_wizard import WizardUI
 from ui_projects import ProjectsUI
 from ui_schemas import SchemasUI
+from ui_tasks import TasksUI
 from ui_settings import SettingsUI
 
 
@@ -83,7 +83,7 @@ class TopMenuUI:
                 txt = txt[:limit] + "  ..."
         self.qt_lbl_info.setText(txt)
         if self.current_top_info_mode != mode:
-            if self.batch.s.currentSoft == 2:
+            if self.batch.s.soft_id == 2:
                 if mode == 1:
                     self.qt_lbl_info.setStyleSheet("")
                 if mode == 7:
@@ -171,9 +171,9 @@ class MainWindow(QMainWindow):
         self.wiz_ui = WizardUI(batch, self, top)
         self.pro_ui = ProjectsUI(batch, self, top)
         self.sch_ui = SchemasUI(batch, self, top)
-        #  self.tsk_ui = TasksUI(batch)
-        #  self.que_ui = QueueUI(batch)
-        #  self.nod_ui = NodesUI(batch)
+        self.tsk_ui = TasksUI(batch, self, top)
+        #self.que_ui = QueueUI(batch)
+        #self.nod_ui = NodesUI(batch)
 
         self.set_ui = SettingsUI(batch, top)
 
@@ -186,7 +186,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")
         qt_tab_widget.addTab(self.pro_ui.qt_widget_projects, "Projects")
         qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
-        #  qt_tab_widget.addTab(tsk.widgetTasks, "Tasks")
+        qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
         #  qt_tab_widget.addTab(que.widgetQueue, "Queue")
         #  qt_tab_widget.addTab(nod.widgetNodes, "Sim Nodes")
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
@@ -194,9 +194,9 @@ class MainWindow(QMainWindow):
 
         if self.s.store_data_mode == 1:
             if self.comfun.path_exists(self.s.store_data_json_directory):
-                qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB: show tasks
+                qt_tab_widget.setCurrentIndex(1)  # STANDARD TAB: show tasks
             else:
-                qt_tab_widget.setCurrentIndex(3)    # NO data dir : show settings
+                qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings
         else:
             # PRO version
             pass

@@ -1,57 +1,53 @@
-#  import sys
 import json
-#  import pytest
-#  from os import path
 from common import CommonFunctions
 
 try:
     from PySide.QtGui import *
     from PySide.QtCore import *
 except ImportError:
-    print "PySide.QtGui ERR"
+    print " [ERR] import PySide error"
 
 
 class Settings:
-    ini_file = None
-    loading_state = 0
-    json_settings_data = None
-    soft_id = None
-    current_soft_name = ""
-    state_colors = []
-    state_colors_up = []
+    ini_file = None                 # basic config file
+    loading_state = 0               # check basic config # TODO data loading and GUI init
+    json_settings_data = None       # basic config data
+    soft_id = None                  # current soft mode
 
-    # loaded settings (config.ini)
-    store_data_mode = None   #  1 json     2 MySQL
-    debug_level = None
-    ui_color_mode = 1
-    store_data_json_directory = None
-    store_data_backup_directory = None
-    store_data_definitions_directory = None
-    sql = [None, None, None, None]
-    admin_user = None
-    window = None
+    # basic config settings (def:config.ini)
+    store_data_mode = None                      # 1 json     2 MySQL (PRO version)
+    debug_level = None                          # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
+    store_data_json_directory = None            # dir basic config settings (def:config.ini)
+    store_data_backup_directory = None          # dir backup data
+    store_data_definitions_directory = None     # dir with software, actions, engines and param definitions
+    sql = [None, None, None, None]              # "db"  "pass" "port" "user" (PRO version)
+    admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.04"
-
+    SIMBATCH_VERSION = "v0.2.05"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
     JSON_QUEUE_FILE_NAME = "data_queue.json"
     JSON_SIMNODES_FILE_NAME = "data_simnodes.json"
 
+    # GUI settings
+    current_soft_name = ""  # only for display at this moment
+    ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
+    state_colors = []       # item list colors
+    state_colors_up = []    # selected item list colors
+    window = None           # store def window position
+
+    # check screen resolution: protect window position (outside screen if second monitor is off)
+    CHECK_SCREEN_RES_ON_START = 1
+    WITH_GUI = 1  # loading color schema # TODO auto detect
     COLORS_PASTEL_FILE_NAME = "colors_pastel.ini"
     COLORS_CUSTOM_FILE_NAME = "colors_custom.ini"
     COLORS_GRAY_FILE_NAME = "colors_gray.ini"
     COLORS_DARK_FILE_NAME = "colors_dark.ini"
 
-    # check screen resolution and limit window positon
-    CHECK_SCREEN_RES_ON_START = 1
-    WITH_GUI = 1
-
     default_settings = {"! json info":
-                            {"config": "this is basic config",
-                             "format": "more about json format: http://json.org"},
+                        {"config": "this is basic config", "format": "more about json format: http://json.org"},
                         "datamode":
                             {"current": 1, "modes": "1-json, 2-MySQL"},
                         "colormode":
@@ -70,8 +66,6 @@ class Settings:
                             {"posx": 70, "posy": 150, "sizex": 600, "sizey": 800}
                         }
 
-
-
     def __init__(self, soft_id, ini_file="config.ini"):
         self.set_current_soft(soft_id)
         self.ini_file = ini_file
@@ -82,8 +76,6 @@ class Settings:
         if self.loading_state == 2:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
-
-
 
     def load_settings(self):
         if self.comfun.file_exists(self.ini_file, info="settings init"):
@@ -114,9 +106,9 @@ class Settings:
             print " [ERR] ini file not exists: ", self.ini_file
             self.loading_state = -1
 
-    def save_settings(self, file=""):
+    def save_settings(self, settings_file=""):
         comfun = self.comfun
-        dataPath = self.store_data_json_directory
+        data_path = self.store_data_json_directory
 
         self.default_settings["datamode"]["current"] = self.store_data_mode
         self.default_settings["colormode"]["current"] = self.ui_color_mode
@@ -133,25 +125,24 @@ class Settings:
         self.default_settings["window"]["sizex"] = self.window[2]
         self.default_settings["window"]["sizey"] = self.window[3]
 
-        if len(file) == 0:
-            file = comfun.current_scripts_path() + "config.ini"  # JSON format
-        comfun.save_to_file(file, json.dumps(self.default_settings, indent=2, sort_keys=True))
-        print ' [INF] settings saved to: ', file
+        if len(settings_file) == 0:
+            settings_file = comfun.current_scripts_path() + "config.ini"  # JSON format
+        comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True))
+        print ' [INF] settings saved to: ', settings_file
 
         if self.store_data_mode == 1:
-            if comfun.file_exists(dataPath + self.JSON_PROJECTS_FILE_NAME) == False:
-                comfun.create_empty_file(dataPath + self.JSON_PROJECTS_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_SCHEMAS_FILE_NAME) == False:
-                comfun.create_empty_file(dataPath + self.JSON_SCHEMAS_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_TASKS_FILE_NAME) == False:
-                comfun.create_empty_file(dataPath + self.JSON_TASKS_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_QUEUE_FILE_NAME) == False:
-                comfun.create_empty_file(dataPath + self.JSON_QUEUE_FILE_NAME)
-            if comfun.file_exists(dataPath + self.JSON_SIMNODES_FILE_NAME) == False:
-                comfun.create_empty_file(dataPath + self.JSON_SIMNODES_FILE_NAME)
+            if comfun.file_exists(data_path + self.JSON_PROJECTS_FILE_NAME) is False:
+                comfun.create_empty_file(data_path + self.JSON_PROJECTS_FILE_NAME)
+            if comfun.file_exists(data_path + self.JSON_SCHEMAS_FILE_NAME) is False:
+                comfun.create_empty_file(data_path + self.JSON_SCHEMAS_FILE_NAME)
+            if comfun.file_exists(data_path + self.JSON_TASKS_FILE_NAME) is False:
+                comfun.create_empty_file(data_path + self.JSON_TASKS_FILE_NAME)
+            if comfun.file_exists(data_path + self.JSON_QUEUE_FILE_NAME) is False:
+                comfun.create_empty_file(data_path + self.JSON_QUEUE_FILE_NAME)
+            if comfun.file_exists(data_path + self.JSON_SIMNODES_FILE_NAME) is False:
+                comfun.create_empty_file(data_path + self.JSON_SIMNODES_FILE_NAME)
 
-    def set_current_soft(self, soft_id):
-        #  1 Houdini,  2 Maya,  3 3dsmax,  4  RF,  5 standalone,  6 blender , 7 cinema 4d
+    def set_current_soft(self, soft_id):  # 1 Houdini,  2 Maya,  3 3dsmax,  4  RF,  5 standalone,  6 blender, 7 c4d, ...
         self.soft_id = soft_id
         if soft_id == 1:
             self.current_soft_name = "Houdini"
@@ -218,7 +209,6 @@ class Settings:
                 self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
 
             f = open(color_file, 'r')
-            #li_counter = 0
             for li_counter, line in enumerate(f.readlines()):
                 li = line.split(";")
                 if len(li) > 7:
@@ -228,8 +218,6 @@ class Settings:
                     self.state_colors_up[li_counter] = QBrush(
                         QColor.fromRgb(self.comfun.int_or_val(li[6], 140), self.comfun.int_or_val(li[7], 140),
                                        self.comfun.int_or_val(li[8], 140), a=255))
-
-                    #li_counter += 1
             f.close()
             return True
         else:
@@ -237,6 +225,7 @@ class Settings:
                 self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
                 self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
             return False
+        
 
 if __name__ == "__main__":
     settings = Settings("..\\config.ini")

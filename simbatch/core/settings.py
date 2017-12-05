@@ -34,7 +34,7 @@ class Settings:
     # GUI settings
     current_soft_name = ""  # only for display at this moment
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
-    ui_brightnes_mode = 1   # 0 dark mode  1 light mode
+    ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors
     state_colors_up = []    # selected item list colors
     window = None           # store def window position

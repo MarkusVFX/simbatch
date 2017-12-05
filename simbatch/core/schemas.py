@@ -97,7 +97,7 @@ class Schemas:
         for c in self.schemas_data:
             print "\n\n   {}   id:{}   state:{}".format(c.schema_name, c.id, c.state)
             print "   sch ver:", c.schema_version
-            print "   sch proj:{},    proj id:{},  definition:{} ".format(c.project_name, c.project_id, c.definition_id)
+            print "   proj id:{},  definition:{} ".format(c.project_id, c.definition_id)
             for a in c.actions_array:
                 print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
         print "\n\n"
@@ -127,7 +127,7 @@ class Schemas:
         print "   [WRN] no schema with ID: ", get_id
         return None
 
-    def get_schema_index_by_name(self, schema_name):
+    def get_index_by_name(self, schema_name):
         counter = 0
         for sch in self.schemas_data:
             if sch.schema_name == schema_name:
@@ -136,7 +136,7 @@ class Schemas:
         print "   [WRN] no schema with name: ", schema_name
         return None
 
-    def get_schema_index_by_id(self, get_id):
+    def get_index_by_id(self, get_id):
         counter = 0
         for sch in self.schemas_data:
             if sch.id == get_id:
@@ -308,8 +308,7 @@ class Schemas:
             if self.s.debug_level >= 3:
                 print " [INF] loading schemas: " + json_file
             json_schemas = self.comfun.load_json_file(json_file)
-
-            if "schemas" in json_schemas.keys():
+            if json_schemas is not None and "schemas" in json_schemas.keys():
                 if json_schemas['schemas']['meta']['total'] > 0:
                     for li in json_schemas['schemas']['data'].values():
                         if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
@@ -323,8 +322,8 @@ class Schemas:
                             self.add_schema(new_schema_item)
                         else:
                             if self.s.debug_level >= 2:
-                                print " [WRN] schema data not consistent: {} {}".format(len(li),
-                                                                                        len(SCHEMA_ITEM_FIELDS_NAMES))
+                                print "   [WRN] schema data not consistent: {} {}".format(len(li),
+                                                                                          len(SCHEMA_ITEM_FIELDS_NAMES))
                     return True
             else:
                 if self.s.debug_level >= 2:

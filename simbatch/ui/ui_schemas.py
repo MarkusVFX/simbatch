@@ -426,16 +426,13 @@ class SchemasUI:
     schema_software_id = None
 
     #  schema list
-    current_of_visible_schema_index = None
+    current_schema_list_index = None
     last_schema_list_index = None
     list_visible_schemas_ids = []
     list_visible_schemas_names =[]
 
     # freeze list update on multi change/remove
     freeze_list_on_changed = 0
-
-    # self.current_of_visible_schema_index = -1
-    # self.last_schema_list_index = -1
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
@@ -584,7 +581,10 @@ class SchemasUI:
         list_schemas.addItem(qt_list_item)
         list_schemas.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
-        qt_list_item.setBackground(self.s.state_colors[30])
+        if self.s.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.s.state_colors[0])
+        else:
+            qt_list_item.setBackground(self.s.state_colors_up[0])
 
         for schema in self.c.schemas_data:
             if schema.project_id == self.batch.p.current_project_id:
@@ -656,7 +656,7 @@ class SchemasUI:
         print "  remove "  # TODO
 
     def menu_open(self):
-        current_schema_id = self.c.list_visible_schemas_ids[self.c.current_of_visible_schema_index]
+        current_schema_id = self.c.list_visible_schemas_ids[self.c.current_schema_list_index]
         print "  list_schemas_double_clicked : ", current_schema_id
         sch = self.c.get_schema_by_id(current_schema_id)
         self.load_base_setup(sch.schema_name, sch.schemaVersion)
@@ -913,7 +913,7 @@ class SchemasUI:
 
     def list_schemas_double_clicked(self, item):
         if self.s.debug_level >= 3:
-            print " [db] list_schemas_double_clicked ", self.c.current_of_visible_schema_index, item
+            print " [db] list_schemas_double_clicked ", self.c.current_schema_list_index, item
             if self.s.debug_level >= 7:
                 print "    [db]", item
         self.menu_open()
@@ -923,8 +923,8 @@ class SchemasUI:
             if self.s.debug_level >= 3:
                 print " [db] list_schemas_current_changed ", self.list_schemas.currentRow()
 
-            if self.current_of_visible_schema_index >= 0:  # TODO fix on DELETE item !!!!
-                item = self.list_schemas.item(self.current_of_visible_schema_index + 1)
+            if self.current_schema_list_index >= 0:  # TODO fix on DELETE item !!!!
+                item = self.list_schemas.item(self.current_schema_list_index + 1)
                 color_index = 25  # 25;ACTIVE   ;187;222;255;__;195;255;255;      Schema ACTIVE     S     ### TODO const
                 if item is None:
                     # TODO !!!
@@ -941,8 +941,8 @@ class SchemasUI:
                 current_schema_index = self.c.current_schema_index
                 self.c.update_current_from_id(self.list_visible_schemas_ids[current_list_index - 1])
 
-                self.last_schema_list_index = self.current_of_visible_schema_index
-                self.current_of_visible_schema_index = current_list_index - 1
+                self.last_schema_list_index = self.current_schema_list_index
+                self.current_schema_list_index = current_list_index - 1
 
                 cur_schema = self.c.schemas_data[current_schema_index]
                 self.c.current_schema_id = cur_schema.id

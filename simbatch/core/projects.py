@@ -35,14 +35,14 @@ class SingleProject:
 
         self.id = project_id
         self.project_name = project_name
-        self.project_directory = self.comfun.get_proper_path(project_directory)
-        self.working_directory = self.comfun.get_proper_path(working_directory)
-        self.cameras_directory = self.comfun.get_proper_path(cameras_directory)
-        self.cache_directory = self.comfun.get_proper_path(cache_directory)
-        self.env_directory = self.comfun.get_proper_path(env_directory)
-        self.props_directory = self.comfun.get_proper_path(props_directory)
-        self.scripts_directory = self.comfun.get_proper_path(scripts_directory)
-        self.custom_directory = self.comfun.get_proper_path(custom_directory)
+        self.project_directory = self.comfun.get_proper_path(project_directory, info="proj dir")
+        self.working_directory = self.comfun.get_proper_path(working_directory, info="wrk dir")
+        self.cameras_directory = self.comfun.get_proper_path(cameras_directory, info="cam dir")
+        self.cache_directory = self.comfun.get_proper_path(cache_directory, info="ani cache dir")
+        self.env_directory = self.comfun.get_proper_path(env_directory, info="env dir")
+        self.props_directory = self.comfun.get_proper_path(props_directory, info="props dir")
+        self.scripts_directory = self.comfun.get_proper_path(scripts_directory, info="scripts dir")
+        self.custom_directory = self.comfun.get_proper_path(custom_directory, info="custom dir")
 
         self.working_directory_absolute = ""
         self.cameras_directory_absolute = ""
@@ -154,6 +154,7 @@ class Projects:
         else:
             if self.debug_level >= 1:
                 print " [ERR] (update_current_from_id)  no index found:{}".format(id)
+            self.current_project_id = None
             return False
 
     #  update id, inxed and current for fast use by all modules
@@ -334,8 +335,7 @@ class Projects:
             if self.s.debug_level >= 3:
                 print " [INF] loading projects: " + json_file
             json_projects = self.comfun.load_json_file(json_file)
-
-            if "projects" in json_projects.keys():
+            if json_projects is not None and "projects" in json_projects.keys():
                 if json_projects['projects']['meta']['total'] > 0:
                     for li in json_projects['projects']['data'].values():
                         if len(li) == len(PROJECT_ITEM_FIELDS_NAMES):
@@ -344,6 +344,10 @@ class Projects:
                                                         li['d_cach'], li['d_env'], li['d_prop'], li['d_scr'],
                                                         li['d_cust'], li['pattern'], li['desc'])
                             self.add_project(new_project)
+                        else:
+                            if self.s.debug_level >= 2:
+                                print "   [WRN] proj data not consistent:{} {}".format(len(li),
+                                                                                       len(PROJECT_ITEM_FIELDS_NAMES))
                     return True
 
                 """ 

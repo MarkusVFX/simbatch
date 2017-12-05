@@ -172,8 +172,8 @@ class MainWindow(QMainWindow):
         self.pro_ui = ProjectsUI(batch, self, top)
         self.sch_ui = SchemasUI(batch, self, top)
         self.tsk_ui = TasksUI(batch, self, top)
-        #self.que_ui = QueueUI(batch)
-        #self.nod_ui = NodesUI(batch)
+        # self.que_ui = QueueUI(batch)
+        # self.nod_ui = NodesUI(batch)
 
         self.set_ui = SettingsUI(batch, top)
 
@@ -230,6 +230,41 @@ class MainWindow(QMainWindow):
     def on_clicked_but_refresh(self):
         if self.s.debug_level >= 3:
             print " [INF] but_refresh"
+
+
+        self.s.update_ui_colors()
+
+        print " [INF] update PROJECTS"
+        curr_p_id = self.batch.p.current_project_id
+        self.batch.p.clear_all_projects_data()
+        self.batch.p.load_projects()
+        self.batch.p.update_current_from_id(curr_p_id)
+        self.pro_ui.reset_list()
+
+        print " [INF] update SCHEMAS"
+        self.sch_ui.clear_list()
+        self.batch.c.clear_all_schemas_data()
+        self.batch.c.load_schemas()
+        self.sch_ui.init_schemas()
+
+        print " [INF] update TASKS"
+        self.tsk_ui.clear_list()
+        self.batch.t.clear_all_tasks_data()
+        self.batch.t.load_tasks()
+        self.tsk_ui.init_tasks()
+
+        print " [INF] update QUEUE"
+        # self.que_ui
+
+        print " [INF] update SIMNODES"
+        # self.nod_ui
+
+
+
+
+
+
+
 
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)

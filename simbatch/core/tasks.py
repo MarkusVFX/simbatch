@@ -24,7 +24,7 @@ TASK_ITEM_FIELDS_NAMES = [
 
 class TaskItem:
     def __init__(self, task_id, task_name, state_id, state, project_id, schema_id, sequence, shot, take,
-                 frame_from, frame_to, schema_ver, task_ver, queue_ver, options, user_id, prior, description):
+                 frame_from, frame_to, schema_ver, task_ver, queue_ver, options, user_id, priority, description):
         self.id = task_id
         self.task_name = task_name
         self.state_id = state_id
@@ -41,7 +41,7 @@ class TaskItem:
         self.queue_ver = queue_ver
         self.options = options
         self.user_id = user_id
-        self.priority = prior
+        self.priority = priority
         self.description = description
 
 
@@ -85,7 +85,7 @@ class Tasks:
                                                                         t.schema_ver, t.task_ver, t.queue_ver)
         print "\n\n"
 
-    def get_task_index_from_id(self, get_id):
+    def get_index_by_id(self, get_id):
         for i, tsk in enumerate(self.tasks_data):
             if tsk.id == get_id:
                 return i
@@ -112,14 +112,16 @@ class Tasks:
             self.current_task_id = self.tasks_data[index].id
             self.current_task_index = index
             self.current_task = self.tasks_data[index]
+            return self.current_task_id
         else:
             self.current_task_index = None
             self.current_task_id = None
             self.current_task = None
+            return False
 
     def get_seq_shot_take(self, task_id=0, task_index=0, with_sequence_dir=0):
         if task_id > 0:
-            curr_index = self.get_task_index_from_id(task_id)
+            curr_index = self.get_index_by_id(task_id)
             curr_task = self.tasks_data[curr_index]
         else:
             if task_index > 0:
@@ -151,10 +153,10 @@ class Tasks:
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
         sample_task_1 = TaskItem(0, "task 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_2 = TaskItem(0, "task 2", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_3 = TaskItem(0, "task 3", 1, "INIT", 2, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_4 = TaskItem(0, "task 4", 1, "INIT", 3, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_5 = TaskItem(0, "task 5", 1, "INIT", 3, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_2 = TaskItem(0, "task 2", 1, "INIT", 1, 1,  "01", "002", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_3 = TaskItem(0, "task 3", 1, "INIT", 2, 1,  "02", "004", "b", 7, 28, 4, 5, 6, "o", 1, 8, "d")
+        sample_task_4 = TaskItem(0, "task 4", 1, "INIT", 3, 1,  "10", "022", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_5 = TaskItem(0, "task 5", 1, "INIT", 3, 1,  "40", "070", "", 10, 20, 1, 1, 1, "", 1, 50, "")
         collect_ids += self.add_task(sample_task_1)
         collect_ids += self.add_task(sample_task_2)
         collect_ids += self.add_task(sample_task_3)
@@ -198,13 +200,24 @@ class Tasks:
                 break
             index += 1
 
-    def remove_task(self, task_id):
-        index = 0
-        for t in self.tasks_data:
-            if t.id == task_id:
-                del self.tasks_data[index]
-                break
-            index += 1
+    def remove_single_task(self, index=None, id=None, do_save=False):
+        if index is None and id is None:
+            return False
+        if id > 0:
+            for i, tsk in enumerate(self.tasks_data):
+                if tsk.id == id:
+                    del self.tasks_data[i]
+                    self.total_tasks -= 1
+                    break
+            if do_save is False:
+                return True
+        if index >= 0:
+            del self.tasks_data[index]
+            self.total_tasks -= 1
+            if do_save is False:
+                return True
+        if do_save is True:
+            return self.save_tasks()
 
     def delete_json_tasks_file(self, json_file=None):
         if json_file is None:
@@ -238,9 +251,9 @@ class Tasks:
 
     def load_tasks(self):
         if self.s.store_data_mode == 1:
-            self.load_tasks_from_json()
+            return self.load_tasks_from_json()
         if self.s.store_data_mode == 2:
-            self.load_tasks_from_mysql()
+            return self.load_tasks_from_mysql()
 
     def load_tasks_from_json(self, json_file=""):
         if len(json_file) == 0:
@@ -249,20 +262,25 @@ class Tasks:
             if self.s.debug_level >= 2:
                 print " [INF] loading tasks: " + json_file
             json_tasks = self.comfun.load_json_file(json_file)
-
-            if "tasks" in json_tasks.keys():
+            if json_tasks is not None and "tasks" in json_tasks.keys():
                 if json_tasks['tasks']['meta']['total'] > 0:
                     for li in json_tasks['tasks']['data'].values():
                         if len(li) == len(TASK_ITEM_FIELDS_NAMES):
                             new_task_item = TaskItem(int(li['id']), li['name'], int(li['state_id']), li['state'],
-                                                         int(li['version']), int(li['proj_id']), li['proj'],
-                                                         int(li['definition']), new_schema_actions, li['desc'])
-
+                                                         int(li['project']), int(li['schema']), li['sequence'],
+                                                         li['shot'], li['take'],
+                                                         int(li['frame_from']), int(li['frame_to']),
+                                                         int(li['sch_ver']), int(li['tsk_ver']), int(li['que_ver']),
+                                                         li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
+                        else:
+                            if self.s.debug_level >= 2:
+                                print "   [WRN] task data not consistent: {} {}".format(len(li),
+                                                                                        len(TASK_ITEM_FIELDS_NAMES))
                     return True
             else:
                 if self.s.debug_level >= 2:
-                    print " [WRN] no projects data in : ", json_file
+                    print "   [WRN] no tasks data in : ", json_file
                 return False
         else:
             if self.s.debug_level >= 1:

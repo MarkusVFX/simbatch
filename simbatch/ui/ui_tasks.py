@@ -493,6 +493,44 @@ class TasksUI:
 
         self.comfun.add_layouts(qt_lay_tasks_main, [qt_lay_tasks_list, qt_lay_tasks_forms, qt_lay_tasks_buttons])
 
+        self.init_tasks()
+
+    def init_tasks(self):
+        tasks_data = self.batch.t.tasks_data
+        widget_list = self.list_tasks
+        qt_list_item = QListWidgetItem(widget_list)
+        qt_list_item.setBackground(QBrush(QColor("#ddd")))
+        qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+        list_item_widget = TaskListItem("ID", "task name", "user", "seq", "sh", "take", "state", "schV", "tskV","queV",
+                                        "opts", "descr")
+
+        widget_list.addItem(qt_list_item)
+        widget_list.setItemWidget(qt_list_item, list_item_widget)
+        qt_list_item.setSizeHint(QSize(1, 24))
+        if self.s.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.s.state_colors[0])
+        else:
+            qt_list_item.setBackground(self.s.state_colors_up[0])
+
+        for tsk in tasks_data:
+            qt_list_item = QListWidgetItem(widget_list)
+            if tsk.state_id == 1:
+                color_index = 20  # ACTIVE    # TODO  CONST
+            else:
+                color_index = 21  # HOLD     # TODO  CONST
+            cur_color = self.s.state_colors[color_index].color()
+            qt_list_item.setBackground(cur_color)
+            list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
+                                            tsk.sequence, tsk.shot, tsk.take, tsk.state,
+                                            str(tsk.schema_ver), str(tsk.task_ver), str(tsk.queue_ver),
+                                            tsk.options, tsk.description)
+
+            widget_list.addItem(qt_list_item)
+            widget_list.setItemWidget(qt_list_item, list_item_widget)
+            qt_list_item.setSizeHint(QSize(130, 26))
+            qt_list_item.setBackground(self.s.state_colors[tsk.state_id])
+
     def reset_list(self):
         self.freeze_list_on_changed = 1
         index = self.batch.t.current_task_index

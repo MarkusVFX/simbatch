@@ -277,36 +277,37 @@ class ProjectsUI:
 
     def init_projects(self):
         projects = self.p.projects_data
-        wigdet_list = self.qt_list_projects   # TODO  wigdet_list    gd -> dg
-        list_item = QListWidgetItem(wigdet_list)
-        list_item.setBackground(QBrush(QColor("#ddd")))
-        list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+        widget_list = self.qt_list_projects
+        qt_list_item = QListWidgetItem(widget_list)
+        qt_list_item.setBackground(QBrush(QColor("#ddd")))
+        qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
         list_item_widget = ProjectListItem("ID", "proj name", "project dir", "description")
 
-        wigdet_list.addItem(list_item)
-        wigdet_list.setItemWidget(list_item, list_item_widget)
-        list_item.setSizeHint(QSize(1, 24))
+        widget_list.addItem(qt_list_item)
+        widget_list.setItemWidget(qt_list_item, list_item_widget)
+        qt_list_item.setSizeHint(QSize(1, 24))
 
-        list_item.setBackground(self.s.state_colors[0])
+        if self.s.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.s.state_colors[0])
+        else:
+            qt_list_item.setBackground(self.s.state_colors_up[0])
 
         for ip in range(self.p.total_projects):
-            list_item = QListWidgetItem(wigdet_list)
+            qt_list_item = QListWidgetItem(widget_list)
             if projects[ip].is_default == 1:
-                color_index = 22  # DEF    # TODO  CONST
+                color_index = 23  # DEFAULT    # TODO  CONST
             else:
-                if projects[ip].state_id == 1:
-                    color_index = 20  # ACTIVE    # TODO  CONST
-                else:
-                    color_index = 21  # HOLD     # TODO  CONST
+                color_index = projects[ip].state_id
+
             cur_color = self.s.state_colors[color_index].color()
-            list_item.setBackground(cur_color)
+            qt_list_item.setBackground(cur_color)
             list_item_widget = ProjectListItem(str(projects[ip].id), projects[ip].project_name,
                                                projects[ip].project_directory, projects[ip].description)
 
-            wigdet_list.addItem(list_item)
-            wigdet_list.setItemWidget(list_item, list_item_widget)
-            list_item.setSizeHint(QSize(130, 26))
+            widget_list.addItem(qt_list_item)
+            widget_list.setItemWidget(qt_list_item, list_item_widget)
+            qt_list_item.setSizeHint(QSize(130, 26))
 
     def clear_list(self):
         while self.qt_list_projects.count() > 0:
@@ -336,7 +337,7 @@ class ProjectsUI:
 
     def menu_set_active(self):
         self.batch.p.projects_data[self.batch.p.current_project_index].state = "ACTIVE"  # TODO cnst !
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = 1  # TODO cnst !
+        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = 22  # TODO cnst !
         self.batch.p.save_projects()
         self.reset_list()
 
@@ -420,17 +421,17 @@ class ProjectsUI:
         if len(new_project_name) > 0:
             cb_state = False   # TODO  get cb_state
             if cb_state:
-                set_active = 1
+                set_default = 1
             else:
-                set_active = 0
+                set_default = 0
             working_directory = self.batch.comfun.get_proper_path(working_directory)
             cameras_directory = self.batch.comfun.get_proper_path(cameras_directory)
             cache_directory = self.batch.comfun.get_proper_path(cache_directory)
 
             if self.batch.p.total_projects == 0:
-                set_active = 1
+                set_default = 1
 
-            new_project = SingleProject(0, new_project_name, set_active, 1, "INIT", project_directory,
+            new_project = SingleProject(0, new_project_name, set_default, 22, "ACTIVE", project_directory,
                                         working_directory, cameras_directory, cache_directory, "", "", "", "",
                                         "generate_directory_patterns=True", description)
 

@@ -251,11 +251,11 @@ class SettingsUI:
 
             if self.sample_data_state:
                 batch = self.batch
-                projID = batch.p.createSampleData()
-                schemaID = batch.c.createSampleData(projID)  # TODO
-                taskID = batch.t.createSampleData(schemaID, projID)  # TODO
-                batch.q.createSampleData(taskID, projID)  # TODO
-                batch.n.createSampleData()  # TODO
+                batch.p.create_example_project_data(do_save=True)
+                batch.c.create_example_schemas_data(do_save=True)
+                batch.t.create_example_tasks_data(do_save=True)
+                # batch.q.createSampleData(taskID, projID)  # TODO
+                # batch.n.createSampleData()  # TODO
                 if self.settings.debug_level >= 3:
                     print " [INF] created sample data: ", dataPath
         else:

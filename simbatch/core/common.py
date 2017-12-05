@@ -135,9 +135,16 @@ class CommonFunctions:
     def current_scripts_path():
         return path.dirname(path.realpath(sys.argv[0])) + "\\"
 
-    def file_exists(self, check_file, info=""):
+    def file_exists(self, check_file, info="", check_not_empty=False):
         if path.exists(check_file):
-            return True
+            if check_not_empty:
+                finfo = os.stat(check_file)
+                if finfo.st_size > 0:
+                    return True
+                else:
+                    return False
+            else:
+                return True
         else:
             if len(check_file) > 0:
                 if len(info) > 0:
@@ -165,7 +172,7 @@ class CommonFunctions:
                 print " [ERR] (path_exists) wrong parameter!", check_path, info
             return False
 
-    def get_proper_path(self, get_path):
+    def get_proper_path(self, get_path, info=""):
         if len(get_path) > 0:
             if get_path.find("/") >= 0:
                 if get_path[-1] != "/":
@@ -175,7 +182,7 @@ class CommonFunctions:
                     get_path += "\\"
         else:
             if self.debug_level >= 1:
-                print " [ERR] (get_proper_path) (", get_path, ") len 0 !"
+                print " [ERR] (get_proper_path) param len 0 ! ({})".format(info)
         return get_path
 
     @staticmethod
@@ -269,11 +276,12 @@ class CommonFunctions:
             return content
 
     def load_json_file(self, file_name):
-        json_data = None
-        if self.file_exists(file_name, file_name):
+        if self.file_exists(file_name, info=file_name, check_not_empty=True):
             with open(file_name) as f:
                 json_data = json.load(f, object_pairs_hook=OrderedDict)
-        return json_data
+            return json_data
+        else:
+            return None
 
     @staticmethod
     def save_json_file(file_name, content):

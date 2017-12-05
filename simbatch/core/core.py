@@ -97,6 +97,11 @@ class SimBatch:
             print " NODES: "
             self.n.print_all()
             self.n.print_current()
+
+        if index == 4:
+            print " SETTINGS: "
+            self.s.print_all()
+
         print "\n\n"
 
     def clear_all_stored_data(self):
@@ -111,7 +116,10 @@ class SimBatch:
         if self.p.load_projects():
             self.p.init_default_proj()
             if self.c.load_schemas():
-                return True
+                if self.t.load_tasks():
+                    return True
+                else:
+                    return False
             else:
                 return False
         else:

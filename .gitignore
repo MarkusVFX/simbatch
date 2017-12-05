@@ -1,8 +1,10 @@
 .idea
 .cache/
 
+
 /data
 /prv
+simbatch/config.ini
 
 env/
 build/

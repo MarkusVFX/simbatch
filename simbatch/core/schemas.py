@@ -6,13 +6,12 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ('name', 'schema_name'),
     ('state_id', 'state_id'),
     ('state', 'state'),
-    ('version', 'schema_version'),
-    ('proj', 'project_name'),
     ('proj_id', 'project_id'),
     ('definition', 'definition_id'),
+    ('version', 'schema_version'),
     ('actions', 'actions_array'),
     ('desc', 'description')
-]
+    ]
 
 ACTION_DATA_FIELDS_NAMES = [
     ('id', 'id'),
@@ -21,8 +20,7 @@ ACTION_DATA_FIELDS_NAMES = [
     ('sub_type', 'action_sub_type'),
     ('param', 'action_param'),
     ('soft_id', 'soft_id')
-]
-
+    ]
 
 class SingleAction:
     def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
@@ -35,20 +33,18 @@ class SingleAction:
 
 
 class SchemaItem:
-
-    def __init__(self, schema_id, schema_name, state_id, state, schema_version, project_id, project_name, definition_id,
-                 actions, description):
+    def __init__(self, schema_id, schema_name, state_id, state, project_id, definition_id, schema_version,
+                 actions_array, description):
 
         self.id = schema_id
         self.schema_name = schema_name
         self.state_id = state_id
         self.state = state
-        self.schema_version = schema_version
         self.project_id = project_id
-        self.project_name = project_name
         self.definition_id = definition_id
+        self.schema_version = schema_version
+        self.actions_array = actions_array
         self.actions_string = ""
-        self.actions_array = actions
         self.description = description
         self.actions_to_string()
 
@@ -75,6 +71,9 @@ class Schemas:
     current_schema = None   # TODO  update !!!
     current_schema_id = None
     current_schema_index = None
+
+    sample_data_checksum = None
+    sample_data_total = None
 
     def __init__(self, batch):
         self.s = batch.s
@@ -284,14 +283,16 @@ class Schemas:
 
     def create_example_schemas_data(self, do_save=True):
         collect_ids = 0
-        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, 1, "proj1", 1, [], "first schema")
-        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 4, 2, "proj2", 3, [], "fire by FumeFx")
-        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 22, 2, "proj2", 2, [], "fire with smoke")
-        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 40, 3, "proj3", 4, [], "cloth with fire")
+        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, 1, 1, [], "first schema")
+        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 1, 2, 3, [], "fire by FumeFx")
+        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 2, 2, 5, [], "fire with smoke")
+        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 3, 3, 4, [], "cloth with fire")
         collect_ids += self.add_schema(sample_schema_item_1)
         collect_ids += self.add_schema(sample_schema_item_2)
         collect_ids += self.add_schema(sample_schema_item_3)
         collect_ids += self.add_schema(sample_schema_item_4, do_save=do_save)
+        self.sample_data_checksum = 10
+        self.sample_data_total = 4
         return collect_ids
 
     def load_schemas(self):
@@ -304,23 +305,26 @@ class Schemas:
         if len(json_file) == 0:
             json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file, info="schemas file"):
-            if self.s.debug_level >= 2:
+            if self.s.debug_level >= 3:
                 print " [INF] loading schemas: " + json_file
             json_schemas = self.comfun.load_json_file(json_file)
 
             if "schemas" in json_schemas.keys():
                 if json_schemas['schemas']['meta']['total'] > 0:
                     for li in json_schemas['schemas']['data'].values():
-                        if len(li) >= 10:
+                        if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
                             for lia in li['actions']:
                                 print " actions "   # TODO
                             # new_schema_actions = [Action()]
                             new_schema_actions = []
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['state_id']), li['state'],
-                                                         int(li['version']), int(li['proj_id']), li['proj'],
-                                                         int(li['definition']), new_schema_actions, li['desc'])
-
+                                                         int(li['proj_id']), int(li['definition']), int(li['version']),
+                                                         new_schema_actions, li['desc'])
                             self.add_schema(new_schema_item)
+                        else:
+                            if self.s.debug_level >= 2:
+                                print " [WRN] schema data not consistent: {} {}".format(len(li),
+                                                                                        len(SCHEMA_ITEM_FIELDS_NAMES))
                     return True
             else:
                 if self.s.debug_level >= 2:
@@ -349,8 +353,8 @@ class Schemas:
                 print " [ERR] (format_projects_data) no format param !"
         else:
             if json or backup:
-                t = self.comfun.get_current_time()
-                formated_data = {"schemas": {"meta": {"total": self.total_schemas, "timestamp": t}, "data": {}}}
+                tim = self.comfun.get_current_time()
+                formated_data = {"schemas": {"meta": {"total": self.total_schemas, "timestamp": tim}, "data": {}}}
                 for i, sd in enumerate(self.schemas_data):
                     sch = {}
                     for field in SCHEMA_ITEM_FIELDS_NAMES:

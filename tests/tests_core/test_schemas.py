@@ -20,12 +20,16 @@ def test_prepare_data_directory_by_delete_all_files(sib):
 
 
 def test_no_schema_data(sib):
+    assert len(sib.s.store_data_json_directory) > 0
+    assert len(sib.s.JSON_SCHEMAS_FILE_NAME) > 0
     assert sib.comfun.file_exists(sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME) is False
 
 
 def test_create_example_schemas_data(sib):
-    assert sib.c.create_example_schemas_data(do_save=True) == 10
-    assert sib.c.total_schemas == 4
+    assert sib.c.create_example_schemas_data(do_save=True) == sib.c.sample_data_checksum
+    assert sib.c.sample_data_checksum is not None
+    assert sib.c.sample_data_total is not None
+    assert sib.c.total_schemas == sib.c.sample_data_total
 
 
 def test_exist_proj_data(sib):
@@ -44,8 +48,8 @@ def test_json_schemas_data(sib):
     if sib.s.store_data_mode == 1:
         json_file = sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME
         json_schemas = sib.comfun.load_json_file(json_file)
-        jskon_keys = json_schemas.keys()
-        assert ("schemas" in jskon_keys) is True
+        json_keys = json_schemas.keys()
+        assert ("schemas" in json_keys) is True
 
 
 def test_get_none_index_from_id(sib):
@@ -54,7 +58,9 @@ def test_get_none_index_from_id(sib):
 
 def test_load_schemas_from_json(sib):
     json_file = sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME
+    assert sib.comfun.file_exists(sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME) is True
     assert sib.c.load_schemas_from_json(json_file=json_file) is True
+    assert sib.c.total_schemas == sib.c.sample_data_total
 
 def test_get2_index_from_id(sib):
     assert sib.c.get_schema_index_by_id(2) == 1
@@ -68,8 +74,8 @@ def test_get3_index_from_id(sib):
 
 
 def test_total_schemas(sib):
-    assert sib.c.total_schemas == 4
-    assert len(sib.c.schemas_data) == 4
+    assert sib.c.total_schemas == sib.c.sample_data_total
+    assert len(sib.c.schemas_data) == sib.c.sample_data_total
 
 
 def test_update_current_from_id(sib):
@@ -96,9 +102,8 @@ def test_schema_item_details(sib):
     assert sib.c.current_schema.schema_name == "schema 3"
     assert sib.c.current_schema.state_id == 22
     assert sib.c.current_schema.state == "ACTIVE"
-    assert sib.c.current_schema.schema_version == 22
+    assert sib.c.current_schema.schema_version == 5
     assert sib.c.current_schema.project_id == 2
-    assert sib.c.current_schema.project_name == "proj2"
     assert sib.c.current_schema.definition_id == 2
     assert len(sib.c.current_schema.actions_array) == 0
     assert sib.c.current_schema.description == "fire with smoke"

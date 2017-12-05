@@ -3,43 +3,46 @@ import os
 
 TASK_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
-    ('name', 'schema_name'),
+    ('name', 'task_name'),
     ('state_id', 'state_id'),
     ('state', 'state'),
-    ('version', 'schema_version'),
-    ('proj', 'project_name'),
-    ('proj_id', 'project_id'),
-    ('definition', 'definition_id'),
-    ('actions', 'actions_array'),
-    ('desc', 'description')
-]
+    ('project', 'project_id'),
+    ('schema', 'schema_id'),
+    ('sequence', 'sequence'),
+    ('shot', 'shot'),
+    ('take', 'take'),
+    ('frame_from', 'frame_from'),
+    ('frame_to', 'frame_to'),
+    ('sch_ver', 'schema_ver'),
+    ('tsk_ver', 'task_ver'),
+    ('que_ver', 'queue_ver'),
+    ('options', 'options'),
+    ('user', 'user_id'),
+    ('prior', 'priority'),
+    ('desc', 'description')]
 
 
 class TaskItem:
-    def __init__(self, task_id, task_name, schema_id, user, user_id, shot_A, shot_B, shot_C, frame_from, frame_to,
-                 state, state_id, schema_ver, queue_ver, evolution, prior, options, description, proj_id,
-                 frame_range_status, task_ver):
+    def __init__(self, task_id, task_name, state_id, state, project_id, schema_id, sequence, shot, take,
+                 frame_from, frame_to, schema_ver, task_ver, queue_ver, options, user_id, prior, description):
         self.id = task_id
         self.task_name = task_name
+        self.state_id = state_id
+        self.state = state
+        self.project_id = project_id
         self.schema_id = schema_id
-        self.user = user
-        self.user_id = user_id
-        self.shot_A = shot_A
-        self.shot_B = shot_B
-        self.shot_C = shot_C
+        self.sequence = sequence
+        self.shot = shot
+        self.take = take
         self.frame_from = frame_from
         self.frame_to = frame_to
-        self.state = state
-        self.state_id = state_id
-        self.task_ver = task_ver
         self.schema_ver = schema_ver
+        self.task_ver = task_ver
         self.queue_ver = queue_ver
-        self.evolution = evolution
-        self.prior = prior
         self.options = options
+        self.user_id = user_id
+        self.priority = prior
         self.description = description
-        self.proj_id = proj_id
-        self.frame_range_status = frame_range_status
 
 
 class Tasks:
@@ -52,6 +55,9 @@ class Tasks:
     current_task_id = None
     current_task_index = None
     current_task = None
+
+    sample_data_checksum = None
+    sample_data_total = None
 
     def __init__(self, batch):
         self.batch = batch
@@ -111,7 +117,7 @@ class Tasks:
             self.current_task_id = None
             self.current_task = None
 
-    def get_seq_shot_take(self, task_id=0, task_index=0, with_sh_A_dir=0):
+    def get_seq_shot_take(self, task_id=0, task_index=0, with_sequence_dir=0):
         if task_id > 0:
             curr_index = self.get_task_index_from_id(task_id)
             curr_task = self.tasks_data[curr_index]
@@ -121,39 +127,43 @@ class Tasks:
             else:
                 curr_task = self.tasks_data[self.current_task_index]
         ret = ""
-        if len(curr_task.shot_A) > 0:
-            if with_sh_A_dir == 0:
-                ret = curr_task.shot_A
+        if len(curr_task.sequence) > 0:
+            if with_sequence_dir == 0:
+                ret = curr_task.sequence
             else:
-                ret = curr_task.shot_A + "\\" + curr_task.shot_A
-        if len(curr_task.shot_B) > 0:
+                ret = curr_task.sequence + "\\" + curr_task.sequence
+        if len(curr_task.shot) > 0:
             if len(ret) > 0:
-                ret += "_"+curr_task.shot_B
+                ret += "_"+curr_task.shot
             else:
-                ret = curr_task.shot_B
-        if len(curr_task.shot_C) > 0:
+                ret = curr_task.shot
+        if len(curr_task.take) > 0:
             if len(ret) > 0:
-                ret += "_"+curr_task.shot_C
+                ret += "_"+curr_task.take
             else:
-                ret = curr_task.shot_C
+                ret = curr_task.take
         return ret
 
     def get_task_frame_range(self):
         curr_task = self.tasks_data[self.current_task_index]
         return [self.comfun.int_or_val(curr_task.frame_from, 1), self.comfun.int_or_val(curr_task.frame_to, 2)]
 
-    def create_example_project_data(self,  schema_id, proj_id):
-        sample_task_1 = TaskItem(0, "schema tre", schema_id, "M", 1, "01", "001", "a", 10, 20, "Waiting", 2, "a.max",
-                                 1, "evo01", 5, "inp:1,1,1", "first task", proj_id, 0, 1)
-        sample_task_2 = TaskItem(0, "schema tre", schema_id, "M", 1, "01", "002", "", 10, 20, "Waiting", 2, "a.max",
-                                 1, "evo10", 5, "inp:1,1,1", "first task", proj_id, 0, 1)
-        sample_task_3 = TaskItem(0, "schema tre", schema_id, "M", 1, "03", "456", "fix", 10, 20, "Waiting", 2, "a.max",
-                                 44, "evo22", 5, "inp:1,1,1", "first task", proj_id, 0, 1)
-        self.add_task(sample_task_1)
-        self.add_task(sample_task_2)
-        self.add_task(sample_task_3)
+    def create_example_tasks_data(self, do_save=True):
+        collect_ids = 0
+        sample_task_1 = TaskItem(0, "task 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_2 = TaskItem(0, "task 2", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_3 = TaskItem(0, "task 3", 1, "INIT", 2, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_4 = TaskItem(0, "task 4", 1, "INIT", 3, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_5 = TaskItem(0, "task 5", 1, "INIT", 3, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        collect_ids += self.add_task(sample_task_1)
+        collect_ids += self.add_task(sample_task_2)
+        collect_ids += self.add_task(sample_task_3)
+        collect_ids += self.add_task(sample_task_4)
+        collect_ids += self.add_task(sample_task_5, do_save=do_save)
+        self.sample_data_checksum = 15
+        self.sample_data_total = 5
         self.save_tasks()
-        return self.max_id
+        return collect_ids
 
     def add_task(self, task_item, do_save=False):
         if task_item.id > 0:
@@ -164,7 +174,12 @@ class Tasks:
         self.tasks_data.append(task_item)
         self.total_tasks += 1
         if do_save is True:
-            self.save_tasks()
+            if self.save_tasks():
+                return task_item.id
+            else:
+                return False
+        else:
+            return task_item.id
 
     def update_task(self, edited_task_item, do_save=False):
         if 0 <= self.current_task_index < len(self.tasks_data):
@@ -229,7 +244,7 @@ class Tasks:
 
     def load_tasks_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.s.batch_data_path + self.s.tasks_file_name
+            json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
         if self.comfun.file_exists(json_file, info="tasks file"):
             if self.s.debug_level >= 2:
                 print " [INF] loading tasks: " + json_file
@@ -238,7 +253,7 @@ class Tasks:
             if "tasks" in json_tasks.keys():
                 if json_tasks['tasks']['meta']['total'] > 0:
                     for li in json_tasks['tasks']['data'].values():
-                        if len(li) >= 10:
+                        if len(li) == len(TASK_ITEM_FIELDS_NAMES):
                             new_task_item = TaskItem(int(li['id']), li['name'], int(li['state_id']), li['state'],
                                                          int(li['version']), int(li['proj_id']), li['proj'],
                                                          int(li['definition']), new_schema_actions, li['desc'])
@@ -261,14 +276,34 @@ class Tasks:
 
     def save_tasks(self):
         if self.s.store_data_mode == 1:
-            self.save_tasks_to_json()
+            return self.save_tasks_to_json()
         if self.s.store_data_mode == 2:
-            self.save_tasks_to_mysql()
+            return self.save_tasks_to_mysql()
 
+    def format_tasks_data(self, json=False, sql=False, backup=False):
+        if json == sql == backup == False:
+            if self.s.debug_level >= 1:
+                print " [ERR] (format_projects_data) no format param !"
+        else:
+            if json or backup:
+                tim = self.comfun.get_current_time()
+                formated_data = {"tasks": {"meta": {"total": self.total_tasks, "timestamp": tim}, "data": {}}}
+                for i, td in enumerate(self.tasks_data):
+                    tsk = {}
+                    for field in TASK_ITEM_FIELDS_NAMES:
+                        tsk[field[0]] = eval('td.'+field[1])
+                    formated_data["tasks"]["data"][i] = tsk
+                return formated_data
+            else:
+                # PRO version with SQL
+                return False
+
+    # save tasks data as json
     def save_tasks_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.s.batch_data_path + self.s.tasks_file_name
-        # TODO
+            json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
+        content = self.format_tasks_data(json=True)
+        return self.comfun.save_json_file(json_file, content)
 
     def save_tasks_to_mysql(self):
         # PRO VERSION

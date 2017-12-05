@@ -70,7 +70,8 @@ class SchemaFormCreateOrEdit(QWidget):
 
     def __init__(self, batch, mode, current_soft_id, top):
         QWidget.__init__(self)
-        self.schema_item_form_operation = SchemaItem(0, "", 1, "", 1, 1, "proj_name", 1, [], "")
+        self.schema_item_form_operation = SchemaItem(0, "", 1, "NULL", 1, 1, 1, [], "")
+
         self.batch = batch
         self.s = self.batch.s
         if mode == "edit":

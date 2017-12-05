@@ -23,12 +23,14 @@ SCHEMA:
 1  STR  schema_name
 2  INT  state_id
 3  STR  state
-4  INT  schema_version 
-6  INT  project_id
-7  STR  project_name
-8  INT  definition_id          1 hou     2 maya   3 max   4 RF  5 Standalone    6 c4D  7 Nuke  8 Mari  9 Blender
-9  ARR  actions
-10 STR  description
+4  INT  project_id
+5  INT  definition_id     1 Houdini   2 Maya  3 max  4 RF  5 Standalone  6 c4D  7 Nuke  8 Mari  9 Blender
+6  INT  schema_version 
+7  ARR  actions_array
+8  STR  description
+
+ACTION:
+
 
 
 #  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
@@ -37,40 +39,35 @@ SCHEMA:
 
 TASK:
 0  INT  id
-1  STR  task_name    .
-2  INT  schema_id (hide)
-3  STR  user
-4  INT  user_id (hide)
-5  STR  shot_A   
-6  STR  shot_B
-7  STR  shot_C
-8  INT  frame_from (hide)
-9  INT  frame_to  (hide)
-10 STR  state
-11 INT  stateID (not used)
-12 STR  stateColor
-13 INT  schema_ver (schema version)
-14 INT  queue_ver (queue version)
-15 STR  evolution  (DMP, DRG, TIM)
-16 INT  prior
-17 STR  options
-18 STR  description
-19 INT  proj_id
-20 INT  task_ver
-21 INT  frame_range_status
+1  STR  task_name 
+2  INT  state_id
+3  STR  state
+4  INT  proj_id
+5  INT  schema_id
+6  STR  sequence   
+7  STR  shot
+8  STR  take
+9  INT  frame_from
+10 INT  frame_to
+11 INT  schema_ver
+12 INT  task_ver 
+13 INT  queue_ver
+14 STR  options
+15 INT  user_id
+16 INT  priority
+17 STR  description
 
 
 
-2;scht dd;4;M;1;01;001;take05;22;40;liczy;4;ff12dd;4;5;6;tt;N_14;2016.01.06;x;xx;xxx;
 QUEUE:
 0 INT  id
 1 STR  schema_name
 2 INT  task_id
 3 STR  user
 4 INT  user_id
-5 STR  shot_A
-6 STR  shot_B
-7 STR  shot_B
+5 STR  sequence
+6 STR  shot
+7 STR  shot
 8 INT  frame_from
 9 INT  frame_to
 10 STR  state
@@ -79,8 +76,8 @@ QUEUE:
 13 INT  version
 14 STR  evolution (DMP, DRG, TIM)
 15 INT  evolution_nr 
-16 STR  evolution_script_type (MXS, MEL, PY)
-17 STR  evolution_script ("evo01_BRN_+10")
+16 STR  evolution_script_type (PY, MEL, MXS)
+17 STR  evolution_script
 18 INT  prior
 19 STR  description
 20 STR  sim_node

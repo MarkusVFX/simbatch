@@ -1,12 +1,12 @@
 import os
 from common import CommonFunctions
 
-PROJECT_DATA_FIELDS_NAMES = [
+PROJECT_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'project_name'),
-    ('def', 'is_default'),
     ('state_id', 'state_id'),
     ('state', 'state'),
+    ('def', 'is_default'),
     ('d_proj', 'project_directory'),
     ('d_wrk', 'working_directory'),
     ('d_cam', 'cameras_directory'),
@@ -105,6 +105,9 @@ class Projects:
     max_id = 0
     total_projects = 0
 
+    sample_data_checksum = None
+    sample_data_total = None
+
     def __init__(self, batch):
         self.batch = batch
         self.comfun = batch.comfun
@@ -179,10 +182,10 @@ class Projects:
                 formated_data = {"projects": {"meta": {"total": self.total_projects, "timestamp": t}, "data": {}}}
                 for i, p in enumerate(self.projects_data):
                     proj = {}
-                    for field in PROJECT_DATA_FIELDS_NAMES:
+                    for field in PROJECT_ITEM_FIELDS_NAMES:
                         proj[field[0]] = eval('p.'+field[1])
                     formated_data["projects"]["data"][i] = proj
-                    # print PROJECT_DATA_FIELDS_NAMES[i]
+                    # print PROJECT_ITEM_FIELDS_NAMES[i]
                 return formated_data
             else:
                 # PRO version with SQL
@@ -312,6 +315,8 @@ class Projects:
         collect_ids += self.add_project(sample_project_1)
         collect_ids += self.add_project(sample_project_2)
         collect_ids += self.add_project(sample_project_3, do_save=do_save)
+        self.sample_data_checksum = 6
+        self.sample_data_total = 3
         return collect_ids
 
     #  load projects data after startup or after reload
@@ -333,7 +338,7 @@ class Projects:
             if "projects" in json_projects.keys():
                 if json_projects['projects']['meta']['total'] > 0:
                     for li in json_projects['projects']['data'].values():
-                        if len(li) >= 13:
+                        if len(li) == len(PROJECT_ITEM_FIELDS_NAMES):
                             new_project = SingleProject(int(li['id']), li['name'], int(li['def']), int(li['state_id']),
                                                         li['state'], li['d_proj'], li['d_wrk'], li['d_cam'],
                                                         li['d_cach'], li['d_env'], li['d_prop'], li['d_scr'],

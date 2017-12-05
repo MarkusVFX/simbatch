@@ -1,13 +1,25 @@
+from random import randint
+from os import path
+from shutil import rmtree
+from time import sleep
 from simbatch.core import common
 import pytest
 
-# TODO check dir on prepare tests
-TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 
+# TODO check dir on prepare tests
+TESTING_AREA_DIR = "S:/simbatch/data/tests_data/"
+TEST_DIR = "test_dir/"
+random_file = None
 
 @pytest.fixture
 def comfun():
     return common.CommonFunctions(5)
+
+def test_prepare_env():
+    if path.exists(TESTING_AREA_DIR+TEST_DIR) is True: # clear TESTING_AREA_DIR
+        print "\n\n [test db] dir exists:", TESTING_AREA_DIR+TEST_DIR
+        rmtree(TESTING_AREA_DIR+TEST_DIR, ignore_errors=True)
+        sleep(5) # case TEST_DIR is user's current directory
 
 
 def test_std_list_as_string(comfun):
@@ -104,7 +116,6 @@ def test_get_proper_path_01(comfun):
 def test_get_proper_path_02(comfun):
     assert comfun.get_proper_path("c:/cee") == "c:/cee/"
 
-
 def test_get_proper_path_03(comfun):
     assert comfun.get_proper_path("\\\\proj\\cee") == "\\\\proj\\cee\\"
 
@@ -124,9 +135,32 @@ def test_get_path_from_full(comfun):
 
 def test_create_directory(comfun):
     assert comfun.path_exists(TESTING_AREA_DIR) is True
-    assert comfun.path_exists(TESTING_AREA_DIR + "test_dir") is False
-    assert comfun.create_directory(TESTING_AREA_DIR + "test_dir") is True
-    assert comfun.path_exists(TESTING_AREA_DIR + "test_dir") is True
+    assert comfun.path_exists(TESTING_AREA_DIR + TEST_DIR) is False
+    assert comfun.create_directory(TESTING_AREA_DIR + TEST_DIR) is True
+    assert comfun.path_exists(TESTING_AREA_DIR + TEST_DIR) is True
+
+
+def test_wrong_file_param(comfun):
+    assert comfun.file_exists("") is False
+
+
+def test_not_file_exists(comfun):
+    global random_file
+    random_str = str(randint(1000, 9999))
+    random_file = "{}test_dir/random_file_{}.txt".format(TESTING_AREA_DIR, random_str)
+    assert comfun.file_exists(random_file) is False
+
+
+def test_create_empty_file(comfun):
+    assert comfun.create_empty_file(random_file) is True
+
+
+def test_file_exists(comfun):
+    assert comfun.file_exists(random_file) is True
+
+
+def test_delete_file(comfun):
+    assert comfun.delete_file(random_file) is True
 
 
 def test_remove_directory(comfun):

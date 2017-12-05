@@ -139,7 +139,7 @@ class CommonFunctions:
         if path.exists(check_file):
             return True
         else:
-            if len(info) > 0:
+            if len(check_file) > 0:
                 if len(info) > 0:
                     if self.debug_level >= 1:
                         print " [WRN] File {} not exist !  ({})\n".format(check_file, info)
@@ -211,7 +211,7 @@ class CommonFunctions:
                 if directory[1] == ":":
                     check_drive = directory[0] + ":\\"
                     if os.path.exists(check_drive):   # TODO os.access
-                        os.rmdir(directory)
+                        os.rmdir(directory)           # TODO shutil.rmtree
                         return True
                     else:
                         print "ERR drive: ", directory[0], " NOT EXIST !!!"
@@ -239,8 +239,27 @@ class CommonFunctions:
 
     @staticmethod
     def create_empty_file(file_name):
-        with open(file_name, 'a') as f:
-            f.write("")
+        try:
+            with open(file_name, 'a') as f:
+                f.write("")
+            return True
+        except IOError as e:
+            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
+
+    @staticmethod
+    def delete_file(file_name):
+        try:
+            os.remove(file_name)
+            return True
+        except IOError as e:
+            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            return True
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
 
     @staticmethod
     def load_from_file(file_name):  # TODO rename it: load content from file

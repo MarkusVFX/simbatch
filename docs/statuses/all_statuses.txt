@@ -8,7 +8,7 @@ U - user
 
 STATUSES:
 
-0;NULL      gray if undefined
+0;NULL      P S T Q N U
 1;INIT      T Q 
 2;WAITING   Q N   
 3;QUEUED    T
@@ -26,7 +26,7 @@ STATUSES:
 15;
 16;
 17;
-18;
+18;CUSTOM   P S T Q N U
 19;
 20;INACTIVE P S U
 21;HOLD     P S

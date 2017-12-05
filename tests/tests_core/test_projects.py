@@ -26,8 +26,9 @@ def test_no_proj_data(sib):
 
 
 def test_create_example_project_data(sib):
-    assert sib.p.create_example_project_data(do_save=True) == 6
-    assert sib.p.total_projects == 3
+    assert sib.p.create_example_project_data(do_save=True) == sib.p.sample_data_checksum
+    assert sib.p.sample_data_checksum is not None
+    assert sib.p.total_projects == sib.p.sample_data_total
 
 
 def test_exist_proj_data(sib):

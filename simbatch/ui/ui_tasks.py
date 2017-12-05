@@ -131,7 +131,7 @@ class TasksFormCreateOrEdit(QWidget):
 
     def __init__(self, batch, mode, top):
         QWidget.__init__(self)
-        self.form_task_item = TaskItem(0, "", 0, "M", 1, "", "", "", 0, 10, "", 2, 0, 0, "", 5, "", "", 1, 0, 0)
+        self.form_task_item = TaskItem(0, "sample", 1, "NULL", 1, 1, "01", "001", "", 0, 100, 1, 1, 1, "", 1, 50, "")
 
         if mode == "edit":
             self.form_mode = 2
@@ -362,7 +362,7 @@ class TasksFormCreateOrEdit(QWidget):
             self.top_ui.set_top_info(" Can't detect frame range ", 7)
 
     def clear_vars(self):
-        self.form_task_item = TaskItem(0, "", 0, "M", 1, "", "", "", 0, 10, "", 2, "ffdc82", 0, 0, "", 5, "", "", 1)
+        self.form_task_item = TaskItem(0, "sample", 1, "NULL", 1, 1, "01", "001", "", 0, 100, 1, 1, 1, "", 1, 50, "")
 
 
 class TasksUI:

@@ -214,10 +214,10 @@ class MainWindow(QMainWindow):
             print " [INF] init lists"
 
     def on_clicked_but_print_general(self):
-        self.sim_batch.print_important_values()
+        self.batch.print_important_values()
 
     def on_clicked_but_print_details(self):
-        self.sim_batch.print_current_module_values(self.qt_tab_widget.currentIndex())  # valid for: P S T Q N
+        self.batch.print_current_detailed_values(self.qt_tab_widget.currentIndex())  # valid for: P S T Q N
 
     def on_clicked_but_debug(self):
         if self.s.debug_level >= 3:

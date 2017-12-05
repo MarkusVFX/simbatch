@@ -34,6 +34,7 @@ class Settings:
     # GUI settings
     current_soft_name = ""  # only for display at this moment
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
+    ui_brightnes_mode = 1   # 0 dark mode  1 light mode
     state_colors = []       # item list colors
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
@@ -76,6 +77,28 @@ class Settings:
         if self.loading_state == 2:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
+
+    def print_all(self):
+        print " loading_state: ", self.loading_state
+        print " ini_file: ", self.ini_file
+        print " soft_id: ", self.soft_id
+
+        print " json_settings_data[datamode][current]: ", self.json_settings_data["datamode"]["current"]
+        print " json_settings_data[colormode][current]: ", self.json_settings_data["colormode"]["current"]
+        print " json_settings_data[debuglevel][current]: ", self.json_settings_data["debuglevel"]["current"]
+        print " json_settings_data[window]: ", self.json_settings_data["window"]
+
+        print " store_data_mode: ", self.store_data_mode
+        print " debug_level: ", self.debug_level
+        print " store_data_json_directory: ", self.store_data_json_directory
+        print " store_data_backup_directory: ", self.store_data_backup_directory
+        print " store_data_definitions_directory: ", self.store_data_definitions_directory
+        print " sql settings: ", self.sql
+        print " admin_user: ", self.admin_user
+
+        print "\n\n"
+
+
 
     def load_settings(self):
         if self.comfun.file_exists(self.ini_file, info="settings init"):
@@ -225,7 +248,7 @@ class Settings:
                 self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
                 self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
             return False
-        
+
 
 if __name__ == "__main__":
     settings = Settings("..\\config.ini")

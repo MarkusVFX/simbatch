@@ -1,7 +1,7 @@
 import copy
 import os
 
-SCHEMA_DATA_FIELDS_NAMES = [
+SCHEMA_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'schema_name'),
     ('state_id', 'state_id'),
@@ -81,25 +81,27 @@ class Schemas:
         self.comfun = batch.comfun
 
     #  print schema data, for debug
-    def print_all(self):
-        for c in self.schemas_data:
-            print "\n   {} id:{} state:{}".format(c.schema_name, c.id, c.state)
-            print "   ", c.schema_version
-            print "   sch proj:{},    proj id:{},  definition:{} ".format(c.project_name, c.project_id, c.definition_id)
-            print "   ."
-            for a in c.actions_array:
-                print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
-        print "schemaas count: ", self.total_schemas, "\n"
+    def print_current(self):
+        print "       current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
+                                                                         self.current_schema_index,
+                                                                         self.total_schemas)
+        if self.current_schema_id is not None:
+            cur_sch = self.current_schema
+            print "       current schema name: ", cur_sch.schema_name
+            print "       definition id:{}   project id:{}".format(cur_sch.definition_id, cur_sch.project_id)
+            for i, a in enumerate(cur_sch.actions_array):
+                print "        a:{}  soft:{}   type:{}  sub type:{} ".format(i, a.soft_id, a.action_type, a.actionParam)
 
+    def print_all(self):
         if self.total_schemas == 0:
             print "   [INF] no schema loaded"
-        else:
-            print "\n   [INF] total schemas count:", self.total_schemas
-            if self.current_schema_index is not None:
-                print "       current index: ", self.current_schema_index
-                print "       current id: ", self.current_schema_id
-                print "       current schema: ", self.current_schema.schema_name
-            print "   ."
+        for c in self.schemas_data:
+            print "\n\n   {}   id:{}   state:{}".format(c.schema_name, c.id, c.state)
+            print "   sch ver:", c.schema_version
+            print "   sch proj:{},    proj id:{},  definition:{} ".format(c.project_name, c.project_id, c.definition_id)
+            for a in c.actions_array:
+                print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
+        print "\n\n"
 
     def get_schema_names(self, as_string=False, fit=[]):
         schema_names = []
@@ -301,9 +303,9 @@ class Schemas:
     def load_schemas_from_json(self, json_file=""):
         if len(json_file) == 0:
             json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
-        if self.comfun.file_exists(json_file, info="schema file"):
+        if self.comfun.file_exists(json_file, info="schemas file"):
             if self.s.debug_level >= 2:
-                print " [INF] loading schema: " + json_file
+                print " [INF] loading schemas: " + json_file
             json_schemas = self.comfun.load_json_file(json_file)
 
             if "schemas" in json_schemas.keys():
@@ -351,7 +353,7 @@ class Schemas:
                 formated_data = {"schemas": {"meta": {"total": self.total_schemas, "timestamp": t}, "data": {}}}
                 for i, sd in enumerate(self.schemas_data):
                     sch = {}
-                    for field in SCHEMA_DATA_FIELDS_NAMES:
+                    for field in SCHEMA_ITEM_FIELDS_NAMES:
                         sch[field[0]] = eval('sd.'+field[1])
                     formated_data["schemas"]["data"][i] = sch
                 return formated_data

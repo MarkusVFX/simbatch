@@ -10,6 +10,7 @@ from ui_wizard import WizardUI
 from ui_projects import ProjectsUI
 from ui_schemas import SchemasUI
 from ui_tasks import TasksUI
+from ui_queue import QueueUI
 from ui_settings import SettingsUI
 
 
@@ -172,8 +173,8 @@ class MainWindow(QMainWindow):
         self.pro_ui = ProjectsUI(batch, self, top)
         self.sch_ui = SchemasUI(batch, self, top)
         self.tsk_ui = TasksUI(batch, self, top)
-        # self.que_ui = QueueUI(batch)
-        # self.nod_ui = NodesUI(batch)
+        self.que_ui = QueueUI(batch, self, top)
+        # self.nod_ui = NodesUI(batch, self, top)
 
         self.set_ui = SettingsUI(batch, top)
 
@@ -187,7 +188,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.pro_ui.qt_widget_projects, "Projects")
         qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
         qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
-        #  qt_tab_widget.addTab(que.widgetQueue, "Queue")
+        qt_tab_widget.addTab(self.que_ui.qt_widget_queue, "Queue")
         #  qt_tab_widget.addTab(nod.widgetNodes, "Sim Nodes")
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         qt_tab_widget.setMinimumSize(220, 400)

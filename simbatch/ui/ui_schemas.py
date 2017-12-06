@@ -71,7 +71,6 @@ class SchemaFormCreateOrEdit(QWidget):
     def __init__(self, batch, mode, current_soft_id, top):
         QWidget.__init__(self)
         self.schema_item_form_operation = SchemaItem(0, "", 1, "NULL", 1, 1, 1, [], "")
-
         self.batch = batch
         self.s = self.batch.s
         if mode == "edit":
@@ -829,10 +828,8 @@ class SchemasUI:
         self.c.addSchema(new_schema_item, do_save=True)
         list_item = QListWidgetItem(self.list_schemas)
         list_item_widget = SchemaListItem(str(new_schema_item.id), new_schema_item.schema_name,
-                                          new_schema_item.description,
-                                          str(new_schema_item.schemaVersion), new_schema_item.objectsToSim,
-                                          new_schema_item.project_name, new_schema_item.projectID,
-                                          new_schema_item.soft_id)
+                                          new_schema_item.description, str(new_schema_item.schemaVersion) )
+
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
         print "[db] addschema  DIR ", self.batch.p.current_project_id

@@ -19,12 +19,12 @@ class SimBatch:
         self.comfun = CommonFunctions(debug_level=self.s.debug_level)
 
         self.u = Users(self)
-        self.d = Definitions(self)
         self.p = Projects(self)
         self.c = Schemas(self)
         self.t = Tasks(self)
         self.q = Queue(self)
         self.n = SimNodes(self)
+        self.d = Definitions(self)
         self.i = InOutStorage(self)
         #  self.o = Softwares(self)  <- Definitions
         #  self.s.load_definitions()

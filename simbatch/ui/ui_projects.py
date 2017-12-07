@@ -578,24 +578,18 @@ class ProjectsUI:
                 last_proj_state_id = self.batch.p.projects_data[self.last_project_index].state_id
                 last_proj_def = self.batch.p.projects_data[self.last_project_index].is_default
                 if last_proj_def == 1:
-                    color_index = 22   # DEF TODO  const
+                    color_index = 23   # DEF TODO  const
                 else:
-                    if last_proj_state_id == 1:
-                        color_index = 20   # ACTIVE TODO  const
-                    else:
-                        color_index = 21   # HOLD TODO  const
+                    color_index = last_proj_state_id
                 if last_item is not None:
                     last_item.setBackground(self.batch.s.state_colors[color_index].color())
 
             if current_list_index < len(self.batch.p.projects_data) and self.batch.p.total_projects > 0:
                 cur_proj = self.batch.p.projects_data[current_list_index]
                 if cur_proj.is_default == 1:
-                    color_index = 22   # DEF  TODO  const
+                    color_index = 23   # DEF  TODO  const
                 else:
-                    if cur_proj.state_id == 1:
-                        color_index = 20  # ACTIVE TODO  const
-                    else:
-                        color_index = 21  # HOLD TODO  const
+                    color_index = cur_proj.state_id
             else:
                 if self.debug_level >= 2:
                     print " [WRN] currentListIndex: {} len proj:{}".format(current_list_index,

@@ -326,8 +326,8 @@ class SchemaFormCreateOrEdit(QWidget):
         self.remove_all_action_buttons()
         self.remove_all_software_buttons()
 
-        if len(self.batch.d.softwares_array) + 1 > mode:
-            for a in self.batch.d.softwares_array[mode - 1].softwareActions:
+        if len(self.batch.d.definitions_array) + 1 > mode:
+            for a in self.batch.d.definitions_array[mode - 1].softwareActions:
                 b = self.add_software_button(a.action_sub_type)
                 if self.batch.p.current_project_index >= 0:
                     curr_proj = self.batch.p.projects_data[self.batch.p.current_project_index]
@@ -381,7 +381,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.schema_item_form_operation.actions = a_str
 
     def clear_vars(self):
-        self.schema_item_form_operation = SchemaItem(0, "", "", "", "", "", "", "", 0, 1, "")
+        self.schema_item_form_operation = SchemaItem(0, "", 0, "", 0, 0, 0, [], "")
 
     def set_rb_checked(self, index):
         if index == 1:
@@ -601,9 +601,9 @@ class SchemasUI:
 
     def update_schemas_list(self):
         self.init_schemas()
-        self.update_visible_schemas_ids()
+        self.update_current_project_schemas()
 
-    def update_visible_schemas_ids(self):
+    def update_current_project_schemas(self):
         list_visible_schemas_names = []
         list_visible_schemas_ids = []
         for schema in self.c.schemas_data:
@@ -670,7 +670,7 @@ class SchemasUI:
         cur_schema = self.c.schemas_data[cur_sch_index]
         print " [db] save as :", cur_schema.schema_name, cur_schema.id
         print " [db] save as :", ret
-        self.batch.o.soCo.save_curent_scene_as(ret[1])
+        self.batch.d.soco.save_curent_scene_as(ret[1])
 
     def menu_locate_base_setup(self):
         import subprocess
@@ -821,17 +821,16 @@ class SchemasUI:
 
     def add_single_schema(self, new_schema_item):
         new_schema_item.id = -1  # TODO   check -1 !!!!!!!!!!
-        self.c.addSchema(new_schema_item, do_save=True)
+        self.c.add_schema(new_schema_item, do_save=True)
         list_item = QListWidgetItem(self.list_schemas)
         list_item_widget = SchemaListItem(str(new_schema_item.id), new_schema_item.schema_name,
-                                          new_schema_item.description, str(new_schema_item.schemaVersion))
-
+                                          new_schema_item.description, str(new_schema_item.schema_version))
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
         print "[db] addschema  DIR ", self.batch.p.current_project_id
         sch_dir = self.batch.p.projects_data[
                      self.batch.p.current_project_index].working_directory_absolute + new_schema_item.schema_name + "\\"
-        self.batch.d.create_schema_directory(sch_dir)
+        self.batch.i.create_schema_directory(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):
         if self.s.debug_level >= 4:
@@ -843,18 +842,18 @@ class SchemasUI:
         if new_schema_item is None or len(new_schema_item.schema_name) == 0:
             self.top_ui.set_top_info(" Insert schema name ", 8)
         else:
-            new_schema_item.colorA = "3478b8"
-            new_schema_item.colorB = "3885dd"
-            if self.comfun.is_float(new_schema_item.schemaVersion) is False:
-                new_schema_item.schemaVersion = 1
+            new_schema_item.state_id = 22
+            new_schema_item.state = "ACTIVE"
+            if self.comfun.is_float(new_schema_item.schema_version) is False:
+                new_schema_item.schema_version = 1
             self.add_single_schema(copy.copy(new_schema_item))
 
             if save_as_base == 1:  # save as base setup
-                save_as = self.batch.d.generate_tuple_base_setup_file_name(new_schema_item.schema_name)
+                save_as = self.batch.i.generate_tuple_base_setup_file_name(new_schema_item.schema_name)
                 if self.s.debug_level >= 4:
                     print "\n  [db] with saveAs: ", save_as
                     print "\n  [db] wit2 saveAs: ", save_as[1]
-                self.batch.o.soCo.save_curent_scene_as(save_as[1])
+                self.batch.d.soco.save_curent_scene_as(save_as[1])
             else:
                 if self.s.debug_level >= 3:
                     print "\n  [db]  new_schema_item.save_as_base_state : ", save_as_base
@@ -864,11 +863,12 @@ class SchemasUI:
             self.schema_form_create.clear_vars()
             self.schema_form_create.hide()
             self.create_form_state = 0
-            self.update_visible_schemas_ids()
-            self.batch.tasksUI.schema_form_create.updateSchemaNamesCombo(self.c.arraySchemasInCurrentProject,
-                                                                         self.c.list_visible_schemas_ids, 0)
-            self.batch.tasksUI.schema_form_edit.updateSchemaNamesCombo(self.c.arraySchemasInCurrentProject,
-                                                                       self.c.list_visible_schemas_ids, 0)
+            self.update_current_project_schemas()
+
+            self.mainw.tsk_ui.qt_schema_form_create.update_schema_names_combo(self.c.current_project_schemas_names,
+                                                                           self.c.current_project_schemas_ids, 0)
+            self.mainw.tsk_ui.qt_form_edit.update_schema_names_combo(self.c.current_project_schemas_names,
+                                                                         self.c.current_project_schemas_ids, 0)
             self.reload_schemas_data_and_refresh_list()
 
     def on_click_update_schema(self, edited_schema_item):
@@ -896,7 +896,7 @@ class SchemasUI:
         if file_to_load[0] == 1:
             if self.s.debug_level >= 1:
                 print "\n  [INF]   loadFile: ", file_to_load[1]
-            self.batch.o.soCo.loadScene(file_to_load[1])
+            self.batch.d.soco.load_scene(file_to_load[1])
         else:
             if self.s.debug_level >= 1:
                 print "\n  [ERR]   loadFile: ", file_to_load
@@ -913,33 +913,32 @@ class SchemasUI:
             if self.s.debug_level >= 3:
                 print " [db] list_schemas_current_changed ", self.list_schemas.currentRow()
 
-            if self.current_list_item_index >= 0:  # TODO fix on DELETE item
+            if self.current_list_item_index is not None:  # TODO fix on DELETE item
                 item = self.list_schemas.item(self.current_list_item_index + 1)
-                color_index = 25  # 25;ACTIVE   ;187;222;255;__;195;255;255;      Schema ACTIVE     S  # TODO const
-                if item is None:
-                    # TODO !!!
+                color_index = 22
+                if item is None: # TODO !!!
                     if self.s.debug_level >= 1:
                         print " [ERR] current list schema item is undefined !", self.list_schemas.currentRow()
                 else:
                     item.setBackground(self.s.state_colors[color_index].color())
 
-            current_list_index = self.list_schemas.currentRow()
+            current_list_item_index = self.list_schemas.currentRow()
 
-            if current_list_index > 0:
-                current_schema_id = self.list_visible_schemas_ids[current_list_index - 1]
+            if current_list_item_index > 0:
+                current_schema_id = self.list_visible_schemas_ids[current_list_item_index - 1]
                 self.c.update_current_from_id(current_schema_id)
                 current_schema_index = self.c.current_schema_index
-                self.c.update_current_from_id(self.list_visible_schemas_ids[current_list_index - 1])
+                self.c.update_current_from_id(self.list_visible_schemas_ids[current_list_item_index - 1])
 
                 self.last_list_item_index = self.current_list_item_index
-                self.current_list_item_index = current_list_index - 1
+                self.current_list_item_index = current_list_item_index - 1
 
                 cur_schema = self.c.schemas_data[current_schema_index]
                 self.c.current_schema_id = cur_schema.id
                 cur_sch_name = cur_schema.schema_name
 
-                item_c = self.list_schemas.item(current_list_index)
-                color_index = 25  # TODO const
+                item_c = self.list_schemas.item(current_list_item_index)
+                color_index = self.c.schemas_data[current_schema_index].state_id
                 item_c.setBackground(self.s.state_colors_up[color_index].color())
 
                 if self.top_ui is not None:
@@ -947,7 +946,7 @@ class SchemasUI:
                 else:
                     print " [ERR] top_ui undefined ", self.top_ui
             else:
-                print " WRN [on sch chng] current_list_index:", current_list_index
+                print " WRN [on sch chng] current_list_index:", current_list_item_index
 
             if self.edit_form_state == 1:
                 cur_schema = self.c.current_schema

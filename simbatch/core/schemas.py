@@ -71,9 +71,13 @@ class Schemas:
     current_schema = None   # TODO  update !!!
     current_schema_id = None
     current_schema_index = None
+    current_schema_software_id = None   # used for SoftwareConnector
 
     sample_data_checksum = None
     sample_data_total = None
+
+    current_project_schemas_ids = []     # used for combo
+    current_project_schemas_names = []
 
     def __init__(self, batch):
         self.s = batch.s

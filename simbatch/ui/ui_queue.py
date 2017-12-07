@@ -65,8 +65,8 @@ class QueueUI():
         # EDIT EDIT EDIT
         qt_form_edit = QWidget()
         self.qt_form_edit = qt_form_edit
-        qt_form_edit_layout = QVBoxLayout()
-        qt_form_edit.setLayout(qt_form_edit_layout)
+        qt_form_edit_layout_ext = QVBoxLayout()
+        qt_form_edit.setLayout(qt_form_edit_layout_ext)
 
         qt_form_edit_layout = QVBoxLayout()
 
@@ -92,9 +92,9 @@ class QueueUI():
         qt_form_edit_layout.addLayout(qt_cb_button_save.qt_widget_layout)
 
         # TODO
-        # qt_gb_edit = QGroupBox()
-        # qt_gb_edit.setLayout(qt_form_edit_layout)
-        # qt_form_edit_layout.addWidget(qt_gb_edit)
+        qt_gb_edit = QGroupBox()
+        qt_gb_edit.setLayout(qt_form_edit_layout)
+        qt_form_edit_layout_ext.addWidget(qt_gb_edit)
 
         # REMOVE
         # REMOVE REMOVE
@@ -116,7 +116,6 @@ class QueueUI():
         qt_gb_remove = QGroupBox()
         qt_gb_remove.setLayout(qt_form_remove_layout)
         qt_form_remove_layout_ext.addWidget(qt_gb_remove)
-
 
         self.comfun.add_wigdets(qt_lay_forms, [qt_form_edit, qt_form_remove])
 
@@ -148,25 +147,25 @@ class QueueUI():
 
     def on_click_menu_set_init(self):
         self.batch.q.queue_data[self.batch.q.current_queue_index].state = "INIT"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 1  ###  TODO const !
+        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 1  # TODO const !
         self.batch.q.save_queue()
         self.reset_list()
 
     def on_click_menu_set_working(self):
         self.batch.q.queue_data[self.batch.q.current_queue_index].state = "WORKING"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 4  ###  TODO const !
+        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 4  # TODO const !
         self.batch.q.save_queue()
         self.reset_list()
 
     def on_click_menu_set_done(self):
         self.batch.q.queue_data[self.batch.q.current_queue_index].state = "DONE"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 11  ###  TODO const !
+        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 11  # TODO const !
         self.batch.q.save_queue()
         self.reset_list()
 
     def on_click_menu_set_hold(self):
         self.batch.q.queue_data[self.batch.q.current_queue_index].state = "HOLD"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 21  ###  TODO const !
+        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 21  # TODO const !
         self.batch.q.save_queue()
         self.reset_list()
 
@@ -188,7 +187,7 @@ class QueueUI():
 
     def on_menu_open_computed_scene(self):
         cur_queue_item = self.batch.q.queue_data[self.batch.q.current_queue_index]
-        proj_id = cur_queue_item.proj_id
+        # proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
@@ -206,7 +205,8 @@ class QueueUI():
         self.reset_list()
         print "  remove "
 
-    def on_click_menu_spacer(self):
+    @staticmethod
+    def on_click_menu_spacer():
         print "  ____  "
 
     def on_right_click_show_menu(self, pos):
@@ -247,17 +247,30 @@ class QueueUI():
 
     def on_click_form_edit_fill(self):
         if self.batch.q.current_queue_index >= 0:
-            currQueueItem = self.batch.q.queue_data[self.batch.q.current_queue_index]
-            self.qt_edit_fe_name.setText(currQueueItem.queue_item_name)
-            self.qt_edit_fe_pror.setText(str(currQueueItem.prior))
-            self.qt_edit_fe_state.setText(currQueueItem.state)
-            self.qt_fe_description.setText(currQueueItem.description)
+            curr_queue_item = self.batch.q.queue_data[self.batch.q.current_queue_index]
+            self.qt_edit_fe_name.setText(curr_queue_item.queue_item_name)
+            self.qt_edit_fe_pror.setText(str(curr_queue_item.prior))
+            self.qt_edit_fe_state.setText(curr_queue_item.state)
+            self.qt_fe_description.setText(curr_queue_item.description)
         else:
             print " [WRN] Please Select Queue Item"
             self.top_ui.set_top_info(" Please Select Queue Item", 7)
 
-    def add_queue_item_to_list(self, newQueueItem):
-        pass
+    def add_queue_item_to_list(self, new_queue_item):
+        wigdet_list = self.list_queue
+        qt_list_item = QListWidgetItem(wigdet_list)
+        qt_list_item.setBackground(QBrush(QColor("#ddd")))
+        qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+        new_queue_item = new_queue_item
+        color_index = new_queue_item.state_id
+        qItemColor = self.batch.s.state_colors[color_index].color()
+        list_item_widget = QueueListItem(str(new_queue_item.id), new_queue_item.queue_item_name, new_queue_item.user,
+                                         str(new_queue_item.prior), new_queue_item.state, new_queue_item.evolution,
+                                         new_queue_item.sim_node, new_queue_item.description, qItemColor)
+
+        wigdet_list.addItem(qt_list_item)
+        wigdet_list.setItemWidget(qt_list_item, list_item_widget)
+        qt_list_item.setSizeHint(QSize(1, 24))
 
     def add_to_queue_and_update_list(self, formATQ):
         pass

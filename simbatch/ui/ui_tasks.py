@@ -13,8 +13,8 @@ from ui_tasks_atqf import AddToQueueForm
 
 
 class TaskListItem(QWidget):
-    def __init__(self, txt_id, txt_schema, txt_user, txt_shot_A, txt_shot_B, txt_shot_C, txt_state, txt_schema_version,
-                 txt_queue_version, txt_evolution, txt_option, txt_comm, parent=None):
+    def __init__(self, txt_id, txt_schema, txt_user, txt_sequence, txt_shot, txt_take, txt_state, txt_schema_version,
+                 txt_queue_version, txt_option, txt_comm):
         super(TaskListItem, self).__init__()
         self.qt_widget = QWidget(self)
 
@@ -55,21 +55,21 @@ class TaskListItem(QWidget):
         self.qt_label_state.setMaximumWidth(55)
         self.qt_lay.addWidget(self.qt_label_state)
 
-        self.qt_label_shot = QLabel(txt_shot_A)
+        self.qt_label_shot = QLabel(txt_sequence)
         self.qt_label_shot.setFont(self.qt_label_font)
         self.qt_label_shot.setStyleSheet("""color:#000;padding-left:4px;""")
         self.qt_label_shot.setMinimumWidth(33)
         self.qt_label_shot.setMaximumWidth(40)
         self.qt_lay.addWidget(self.qt_label_shot)
 
-        self.qt_label_shot = QLabel(txt_shot_B)
+        self.qt_label_shot = QLabel(txt_shot)
         self.qt_label_shot.setFont(self.qt_label_font)
         self.qt_label_shot.setStyleSheet("""color:#000;""")
         self.qt_label_shot.setMinimumWidth(33)
         self.qt_label_shot.setMaximumWidth(40)
         self.qt_lay.addWidget(self.qt_label_shot)
 
-        self.qt_label_shot = QLabel(txt_shot_C)
+        self.qt_label_shot = QLabel(txt_take)
         self.qt_label_shot.setFont(self.qt_label_font)
         self.qt_label_shot.setStyleSheet("""color:#000;""")
         self.qt_label_shot.setMinimumWidth(33)
@@ -90,13 +90,6 @@ class TaskListItem(QWidget):
         self.qt_label_queue_version.setMaximumWidth(40)
         self.qt_lay.addWidget(self.qt_label_queue_version)
 
-        self.qt_label_frame_start = QLabel(txt_evolution)
-        self.qt_label_frame_start.setFont(self.qt_label_font)
-        self.qt_label_frame_start.setStyleSheet("""color:#000;""")
-        self.qt_label_frame_start.setMinimumWidth(26)
-        self.qt_label_frame_start.setMaximumWidth(26)
-        self.qt_lay.addWidget(self.qt_label_frame_start)
-
         self.qt_label_frame_end = QLabel(txt_option)
         self.qt_label_frame_end.setFont(self.qt_label_font)
         self.qt_label_frame_end.setStyleSheet("""color:#000;""")
@@ -116,18 +109,35 @@ class TaskListItem(QWidget):
 
 class TasksFormCreateOrEdit(QWidget):
     form_mode = 1  # 1 create    2 edit
-    execute_button = None
-    form_task_item = None
-    shAQLine = None
-    shBQLine = None
-    shCQLine = None
-    priorQLine = None
-    verQLine = None
-    frStaQLine = None
-    frEndQLine = None
+    form_task_item = None  # store new or edited data as TaskItem
 
     batch = None
     batchSchemas = None
+
+    schemas_id_array = []
+
+    # GUI QT elements
+    qt_fae_schema_description_edit = None
+    qt_schema_name_combo = None
+    qt_combo_state_names = None
+
+    qt_edit_line_sequence = None
+    qt_edit_line_shot = None
+    qt_edit_line_take = None
+    qt_edit_line_priority = None
+    qt_edit_line_version = None
+
+    qt_edit_line_frame_start = None
+    qt_edit_line_frame_end = None
+    execute_button = None
+
+    # shAQLine = None
+    # shBQLine = None
+    # shCQLine = None
+    # priorQLine = None
+    # verQLine = None
+    # frStaQLine = None
+    # frEndQLine = None
 
     def __init__(self, batch, mode, top):
         QWidget.__init__(self)
@@ -153,11 +163,11 @@ class TasksFormCreateOrEdit(QWidget):
         self.qt_combo_state_names = qt_combo_state.combo
 
         qt_edit_buton_sequence = EditLineWithButtons("Sequence ", label_minimum_size=70)
-        self.qt_edit_line_sh_A = qt_edit_buton_sequence.qt_edit_line
+        self.qt_edit_line_sequence = qt_edit_buton_sequence.qt_edit_line
         qt_edit_buton_shot = EditLineWithButtons("Shot ", label_minimum_size=50, align_right=1)
-        self.qt_edit_line_sh_B = qt_edit_buton_shot.qt_edit_line
+        self.qt_edit_line_shot = qt_edit_buton_shot.qt_edit_line
         qt_edit_buton_take = EditLineWithButtons("Take ", label_minimum_size=50, align_right=1)
-        self.qt_edit_line_sh_C = qt_edit_buton_take.qt_edit_line
+        self.qt_edit_line_take = qt_edit_buton_take.qt_edit_line
         qt_edit_buton_prior = EditLineWithButtons("Prior ", label_minimum_size=50, align_right=1)
         self.qt_edit_line_priority = qt_edit_buton_prior.qt_edit_line
         qt_edit_buton_version = EditLineWithButtons("Ver ", label_minimum_size=50, align_right=1)
@@ -200,7 +210,6 @@ class TasksFormCreateOrEdit(QWidget):
         qt_layout_form_create.addLayout(qt_button_cb_create_save_task.qt_widget_layout)
 
         qt_gb_create_edit = QGroupBox()
-        qt_gb_create_edit = QGroupBox()
         if self.form_mode == 1:
             qt_gb_create_edit.setTitle("Create Task")
         else:
@@ -212,34 +221,34 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.setLayout(qt_layout_out_form_create)
 
-    def update_create_ui(self, schemaId=-1):
+    def update_create_ui(self, schema_id=-1):
         self.qt_combo_state_names.setCurrentIndex(1)
-        print " update ", schemaId
-        if schemaId == -1:
+        print " update ", schema_id
+        if schema_id == -1:
             print " ____update ", self.qt_schema_name_combo.count()
             self.qt_schema_name_combo.setCurrentIndex(self.qt_schema_name_combo.count() - 1)
         else:
-            arrIndex = 0
+            arr_index = 0
             for arrEl in self.schemas_id_array:
-                if arrEl == schemaId:
-                    print " ____set ", arrIndex
-                    self.qt_schema_name_combo.setCurrentIndex(arrIndex)
-                arrIndex += 1
+                if arrEl == schema_id:
+                    print " ____set ", arr_index
+                    self.qt_schema_name_combo.setCurrentIndex(arr_index)
+                arr_index += 1
 
     def update_edit_ui(self, cur_task):
         self.qt_combo_state_names.setCurrentIndex(self.qt_combo_state_names.findText(cur_task.state))
 
-        arrIndex = 0
+        arr_index = 0
         for arrEl in self.schemas_id_array:
             if arrEl == cur_task.schema_id:
-                print " ____set edit  ", arrIndex
-                self.qt_schema_name_combo.setCurrentIndex(arrIndex)
-            arrIndex += 1
+                print " ____set edit  ", arr_index
+                self.qt_schema_name_combo.setCurrentIndex(arr_index)
+            arr_index += 1
 
         self.form_task_item = cur_task
-        self.qt_edit_line_sh_A.setText(cur_task.shot_A)
-        self.qt_edit_line_sh_B.setText(cur_task.shot_B)
-        self.qt_edit_line_sh_C.setText(cur_task.shot_C)
+        self.qt_edit_line_sequence.setText(cur_task.shot_A)
+        self.qt_edit_line_shot.setText(cur_task.shot_B)
+        self.qt_edit_line_take.setText(cur_task.shot_C)
 
         self.qt_edit_line_frame_start.setText(str(cur_task.frame_from))
         self.qt_edit_line_frame_end.setText(str(cur_task.frame_to))
@@ -249,96 +258,95 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.qt_fae_schema_description_edit.setText(cur_task.description)
 
-    def updateSchemasIdArr(self, schemas_id_array):
+    def update_schemas_id_arr(self, schemas_id_array):
         self.schemas_id_array = schemas_id_array
 
-    def updateSchemaNamesCombo(self, comboItemsArr, schemas_id_array, comboCurrentIndex):
+    def update_schema_names_combo(self, combo_items_arr, schemas_id_array, combo_current_index):
         self.qt_schema_name_combo.clear()
-        self.updateSchemasIdArr(schemas_id_array)
-        for it in comboItemsArr:
+        self.update_schemas_id_arr(schemas_id_array)
+        for it in combo_items_arr:
             self.qt_schema_name_combo.addItem(it)
-        self.qt_schema_name_combo.setCurrentIndex(comboCurrentIndex)
+        self.qt_schema_name_combo.setCurrentIndex(combo_current_index)
 
     def compile_imputs(self):
         self.form_task_item.task_name = self.qt_schema_name_combo.currentText()
         if self.qt_schema_name_combo.currentIndex() >= 0:
-            if self.s.deBugLevel >= 5:
+            if self.s.debug_level >= 5:
                 print "[db sch on tsk a] ", self.qt_schema_name_combo.currentIndex()
                 print "[db sch on tsk c] ", self.schemas_id_array
             if len(self.schemas_id_array) > 0:
-                if self.s.deBugLevel >= 5:
+                if self.s.debug_level >= 5:
                     print "[db sch on tsk b] ", self.schemas_id_array[0], len(self.schemas_id_array)
             if len(self.schemas_id_array) > self.qt_schema_name_combo.currentIndex():
                 self.form_task_item.schema_id = self.schemas_id_array[self.qt_schema_name_combo.currentIndex()]
             else:
-                if self.s.deBugLevel >= 1:
+                if self.s.debug_level >= 1:
                     print "  [ERR74]  compile_imputs   ", len(self.schemas_id_array)
                     print "  [ERR74]  compile_imputs   ", self.qt_schema_name_combo.currentIndex()
         else:
             self.form_task_item.schema_id = -1
-            if self.s.deBugLevel >= 1:
-                print " WRN [compile_imputs]  qt_schema_name_combo.currentIndex: ", self.qt_schema_name_combo.currentIndex
+            if self.s.debug_level >= 1:
+                print "   [WRN] (compile_imputs)  schema_name_combo:", self.qt_schema_name_combo.currentIndex
 
-        self.form_task_item.proj_id = self.sch.schemas_data[self.sch.curr_schema_index].projectID
+        if self.batch.c.current_schema_index is None:   # TODO check it
+            if self.s.debug_level >= 1:
+                print "\n     [ERR] (compile_imputs)  self.sch.curr_schema_index: ", self.batch.c.current_schema_index
 
-        if self.sch.curr_schema_index < 0:  ## TODO
-            if self.s.deBugLevel >= 1:
-                print "\n ERR [compile_imputs]   self.sch.curr_schema_index: ", self.sch.curr_schema_index, "\n"
+        if self.batch.p.current_project_id is not None:
+            self.form_task_item.project_id = self.batch.p.current_project_id
 
-        self.form_task_item.stateColor = "3478b8"
+        self.form_task_item.state_color = "3478b8"
         self.form_task_item.state = self.qt_combo_state_names.currentText()
         self.form_task_item.state_id = self.qt_combo_state_names.currentIndex()
 
-        self.form_task_item.schema_ver = (self.sch.get_schema_by_id(self.form_task_item.schema_id)).schemaVersion
+        self.form_task_item.schema_ver = (self.batch.c.get_schema_by_id(self.form_task_item.schema_id)).schema_version
         self.form_task_item.queue_ver = 0
 
-        self.form_task_item.shot_A = self.qt_edit_line_sh_A.text()
-        self.form_task_item.shot_B = self.qt_edit_line_sh_B.text()
-        self.form_task_item.shot_C = self.qt_edit_line_sh_C.text()
+        self.form_task_item.shot_A = self.qt_edit_line_sequence.text()
+        self.form_task_item.shot_B = self.qt_edit_line_shot.text()
+        self.form_task_item.shot_C = self.qt_edit_line_take.text()
 
-        self.form_task_item.frame_from = self.comfun.int_or_val(self.qt_edit_line_frame_start.text(), 0)
-        self.form_task_item.frame_to = self.comfun.int_or_val(self.qt_edit_line_frame_end.text(), 0)
+        self.form_task_item.frame_from = self.batch.comfun.int_or_val(self.qt_edit_line_frame_start.text(), 0)
+        self.form_task_item.frame_to = self.batch.comfun.int_or_val(self.qt_edit_line_frame_end.text(), 0)
 
         if self.qt_edit_line_priority.text().isdigit():
             self.form_task_item.prior = int(self.qt_edit_line_priority.text())
         else:
             self.form_task_item.prior = 50
 
-        self.form_task_item.schema_ver = self.comfun.int_or_val(self.qt_edit_line_version.text(), 1)
+        self.form_task_item.schema_ver = self.batch.comfun.int_or_val(self.qt_edit_line_version.text(), 1)
 
         self.form_task_item.description = self.qt_fae_schema_description_edit.text()
 
     def get_frame_range_from_cache(self):
-        hack_A = self.qt_edit_line_sh_A.text()
-        hack_B = self.qt_edit_line_sh_B.text()
-        hack_C = self.qt_edit_line_sh_C.text()
+        hack__a = self.qt_edit_line_sequence.text()
+        hack__b = self.qt_edit_line_shot.text()
 
         curr_proj = self.batch.p.projects_data[self.batch.p.current_project_index]
 
-        paSeq = self.batch.p.getSeqPattern(curr_proj.seq_shot_take_pattern)
-        paSh = self.batch.p.getShPattern(curr_proj.seq_shot_take_pattern)
+        pa_seq = self.batch.p.getSeqPattern(curr_proj.seq_shot_take_pattern)
+        pa_sh = self.batch.p.getShPattern(curr_proj.seq_shot_take_pattern)
 
-        if len(paSh) > 0:
-            cutIndex = paSh.find("<sh")
-            paSh = paSh[cutIndex:]
+        if len(pa_sh) > 0:
+            cut_index = pa_sh.find("<sh")
+            pa_sh = pa_sh[cut_index:]
 
-        pa_seq_zeros = paSeq.count('#')
-        pa_sh_zeros = paSh.count('#')
+        pa_seq_zeros = pa_seq.count('#')
+        pa_sh_zeros = pa_sh.count('#')
 
-        search_A = ""
-        search_B = ""
-        if len(hack_A) > 0:
-            if self.comfun.is_float(hack_A):
-                search_A = self.comfun.str_with_zeros(hack_A, pa_seq_zeros)
-                self.qt_edit_line_sh_A.setText(search_A)
-                if len(hack_B) > 0:
-                    if self.comfun.is_float(hack_B):
-                        search_B = self.comfun.str_with_zeros(hack_B, pa_sh_zeros)
-                        self.qt_edit_line_sh_B.setText(search_B)
+        search__b = ""
+        if len(hack__a) > 0:
+            if self.comfun.is_float(hack__a):
+                search__a = self.comfun.str_with_zeros(hack__a, pa_seq_zeros)
+                self.qt_edit_line_sequence.setText(search__a)
+                if len(hack__b) > 0:
+                    if self.comfun.is_float(hack__b):
+                        search__b = self.comfun.str_with_zeros(hack__b, pa_sh_zeros)
+                        self.qt_edit_line_sh_B.setText(search__b)
 
                 parametric_dir = "<project_cache_dir>" + curr_proj.seq_shot_take_pattern
-                ret_imp_dir = self.batch.d.get_import_dir(parametric_dir, hack_frame_range=True, hack_A=search_A,
-                                                          hack_B=search_B, hack_C="")
+                ret_imp_dir = self.batch.d.get_import_dir(parametric_dir, hack_frame_range=True, hack_A=search__a,
+                                                          hack_B=search__b, hack_C="")
                 fr = self.batch.d.get_frame_range_from_dir(ret_imp_dir)
 
                 if fr[0] == 1:
@@ -351,10 +359,10 @@ class TasksFormCreateOrEdit(QWidget):
                     self.top_ui.set_top_info(" Cant detect frame range ", 7)
 
     def get_frame_range_from_scene(self):
-        #ret = self.batch.o.soft_conn.get_curent_frame_range()
-        ret = None  # TODO   .o.  sOftwares -> definitions
+        # ret = self.batch.o.soft_conn.get_curent_frame_range()
+        ret = None  # TODO   .o.  softwares -> definitions
         print "   get_frame_range_from_scene    ", ret
-        if not ret is None:
+        if ret is not None:
             self.qt_edit_line_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
             self.qt_edit_line_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
             self.top_ui.set_top_info(" Set frame range:  [" + str(ret[0]) + ":" + str(ret[1]) + "]")
@@ -376,7 +384,7 @@ class TasksUI:
     batch = None
     top_ui = None
 
-    createFormState = 0
+    create_form_state = 0
     edit_form_state = 0
     remove_form_state = 0
     add_form_state = 0
@@ -384,11 +392,10 @@ class TasksUI:
     comfun = None
 
     widgetsInList = []
-
     array_visible_tasks_ids = []
 
-    current_task_list_index = None
-    last_task_list_index = None
+    current_list_item_index = None
+    last_list_item_index = None
 
     freeze_list_on_changed = 0
 
@@ -465,12 +472,11 @@ class TasksUI:
         # QUEUE QUEUE QUEUE
         qt_form_add = AddToQueueForm(self.batch)
         self.qt_form_add = qt_form_add
-        #qt_form_add.execute_button.clicked.connect(lambda: self.on_click_add_to_queue())
         qt_form_add.execute_button.clicked.connect(self.on_click_add_to_queue)
 
-        ###
-        ###  ###
-        ###  ###  ###
+        # TAB LAY
+        # TAB LAY LAY
+        # TAB LAY LAY LAY
         self.comfun.add_wigdets(qt_lay_tasks_forms, [qt_schema_form_create, qt_form_edit, qt_form_remove, qt_form_add])
 
         self.hide_all_forms()
@@ -480,10 +486,10 @@ class TasksUI:
         qt_button_remove_task = QPushButton("Remove  ")
         qt_button_add_to_queue = QPushButton("Add to Queue")
 
-        qt_button_create_task.clicked.connect(self.on_click_create)
-        qt_button_edit_task.clicked.connect(self.on_click_edit)
-        qt_button_remove_task.clicked.connect(self.on_click_remove)
-        qt_button_add_to_queue.clicked.connect(self.on_click_add_to_queue)
+        qt_button_create_task.clicked.connect(self.on_click_show_create)
+        qt_button_edit_task.clicked.connect(self.on_click_show_edit)
+        qt_button_remove_task.clicked.connect(self.on_click_show_remove)
+        qt_button_add_to_queue.clicked.connect(self.on_click_show_add_to_queue)
 
         qt_lay_tasks_list.addWidget(list_tasks)
 
@@ -502,7 +508,7 @@ class TasksUI:
         qt_list_item.setBackground(QBrush(QColor("#ddd")))
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-        list_item_widget = TaskListItem("ID", "task name", "user", "seq", "sh", "take", "state", "schV", "tskV","queV",
+        list_item_widget = TaskListItem("ID", "task name", "user", "seq", "sh", "take", "state", "schV", "queV",
                                         "opts", "descr")
 
         widget_list.addItem(qt_list_item)
@@ -523,7 +529,7 @@ class TasksUI:
             qt_list_item.setBackground(cur_color)
             list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
                                             tsk.sequence, tsk.shot, tsk.take, tsk.state,
-                                            str(tsk.schema_ver), str(tsk.task_ver), str(tsk.queue_ver),
+                                            str(tsk.schema_ver), str(tsk.queue_ver),
                                             tsk.options, tsk.description)
 
             widget_list.addItem(qt_list_item)
@@ -535,7 +541,7 @@ class TasksUI:
         self.freeze_list_on_changed = 1
         index = self.batch.t.current_task_index
         self.clear_list()
-        self.batch.init_tasks(self.list_tasks)
+        self.init_tasks()
         self.batch.t.current_task_index = index
         self.batch.t.current_task_id = self.batch.t.tasks_data[self.batch.t.current_task_index].id
         self.freeze_list_on_changed = 0
@@ -568,8 +574,8 @@ class TasksUI:
         self.on_click_confirm_remove_project()
 
     def on_click_menu_sch_ver_from_schema(self):
-        curSch = self.batch.c.get_schema_by_id(self.batch.t.tasks_data[self.batch.t.current_task_index].schema_id)
-        self.batch.t.tasks_data[self.batch.t.current_task_index].schema_ver = curSch.schemaVersion
+        cur_sch = self.batch.c.get_schema_by_id(self.batch.t.tasks_data[self.batch.t.current_task_index].schema_id)
+        self.batch.t.tasks_data[self.batch.t.current_task_index].schema_ver = cur_sch.schemaVersion
         self.batch.t.save_tasks()
         self.reset_list()
 
@@ -592,18 +598,19 @@ class TasksUI:
 
     def on_click_menu_open_computed(self):
         curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
-        tskID = curr_task.id
+        tsk_id = curr_task.id
         version = curr_task.queue_ver
-        evoNr = -1
-        loadFile = self.batch.d.getComputedSetupFile(tskID, version, evoNr)  ####   getSchemaBaseSetupFile()
-        if loadFile[0] == 1:
-            if self.s.deBugLevel >= 1:
-                print "\n  [INF]   loadFile: ", loadFile[1]
-            self.batch.o.soft_conn.load_scene(loadFile[1])
+        evo_nr = -1
+        file_to_load = self.batch.d.getComputedSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
+        if file_to_load[0] == 1:
+            if self.s.debug_level >= 1:
+                print "\n  [INF]   loadFile: ", file_to_load[1]
+            self.batch.o.soft_conn.load_scene(file_to_load[1])
         else:
-            print "\n  [WRN]   loadFile not exist: ", loadFile[1]
+            print "\n  [WRN]   loadFile not exist: ", file_to_load[1]
 
-    def on_click_menu_spacer(self):
+    @staticmethod
+    def on_click_menu_spacer():
         print "  ____  "
 
     def on_right_click_show_menu(self, pos):
@@ -634,15 +641,15 @@ class TasksUI:
         self.remove_form_state = 0
         self.add_form_state = 0
 
-    def on_click_create(self):
+    def on_click_show_create(self):
         if self.create_form_state == 0:
             self.hide_all_forms()
             if self.batch.t.current_task_index >= 0:
                 curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
                 self.qt_schema_form_create.update_create_ui(curr_task.schema_id)
             elif self.batch.c.current_schema_index >= 0:
-                curSch = self.batch.c.schemas_data[self.batch.c.curr_schema_index]
-                self.qt_schema_form_create.update_create_ui(schemaId=curSch.id)
+                cur_sch = self.batch.c.schemas_data[self.batch.c.curr_schema_index]
+                self.qt_schema_form_create.update_create_ui(schema_id=cur_sch.id)
             else:
                 self.qt_schema_form_create.update_create_ui()
             self.qt_schema_form_create.get_frame_range_from_scene()
@@ -652,7 +659,7 @@ class TasksUI:
             self.qt_schema_form_create.hide()
             self.create_form_state = 0
 
-    def on_click_edit (self):
+    def on_click_show_edit(self):
         if self.edit_form_state == 0:
             self.hide_all_forms()
             if self.batch.t.current_task_index >= 0:
@@ -667,8 +674,7 @@ class TasksUI:
             self.qt_form_edit.hide()
             self.edit_form_state = 0
 
-
-    def on_click_remove(self):
+    def on_click_show_remove(self):
         if self.remove_form_state == 0:
             self.hide_all_forms()
             self.qt_form_remove.show()
@@ -677,7 +683,7 @@ class TasksUI:
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
-    def on_click_add_to_queue(self):
+    def on_click_show_add_to_queue(self):
         print " [db] on_click_add_to_queue  proj:  : ", self.batch.p.current_project_id
         if self.add_form_state == 0:
             if self.batch.t.current_task_index >= 0:
@@ -697,18 +703,18 @@ class TasksUI:
             self.qt_form_add.hide()
             self.add_form_state = 0
 
-    def add_single_task(self, newTaskItem):
-        self.batch.t.add_task( newTaskItem, do_save = True)
+    def add_single_task(self, new_task_item):
+        self.batch.t.add_task(new_task_item, do_save=True)
         qt_list_item = QListWidgetItem(self.list_tasks)
-        list_item_widget = TaskListItem(str(newTaskItem.id), newTaskItem.task_name, newTaskItem.user,
-                                        newTaskItem.shot_A, newTaskItem.shot_B, newTaskItem.shot_C, newTaskItem.state,
-                                        str(newTaskItem.schema_ver), str(newTaskItem.queue_ver), newTaskItem.evolution,
-                                        newTaskItem.options, newTaskItem.description, newTaskItem.stateColor)
-        qt_list_item.setBackground(QBrush(QColor("#ff8555")))
+        list_item_widget = TaskListItem(str(new_task_item.id), new_task_item.task_name, str(new_task_item.user_id),
+                                        new_task_item.sequence, new_task_item.shot, new_task_item.take,
+                                        new_task_item.state, str(new_task_item.schema_ver),
+                                        str(new_task_item.queue_ver), new_task_item.options, new_task_item.description)
+        qt_list_item.setBackground(QBrush(QColor("#ff8555")))   # TODO  settings color !
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
-        qt_list_item.setSizeHint(QSize(1,24))
+        qt_list_item.setSizeHint(QSize(1, 24))
         self.list_tasks.addItem(qt_list_item)
-        self.list_tasks.setItemWidget(qt_list_item,list_item_widget)
+        self.list_tasks.setItemWidget(qt_list_item, list_item_widget)
 
     def on_click_add_task(self, new_task_tem):
         if self.batch.p.current_project_id >= 0:
@@ -724,13 +730,10 @@ class TasksUI:
                 self.add_form_state = 0
 
                 self.update_list_of_visible_ids()
-                #####   TODO   duplicate code
-                self.clear_list()
+
                 self.batch.t.clear_all_tasks_data()
                 self.batch.t.load_tasks()
-                self.batch.init_tasks(self.list_tasks)
-                #####   TODO   duplicate code
-
+                self.reset_list()
             else:
                 print " WRN [on_click_add_task] PLEASE SELECT SCHEMA"
                 self.top_ui.set_top_info(" [INF] PLEASE SELECT SCHEMA !", 8)
@@ -744,68 +747,65 @@ class TasksUI:
 
         current_list_index = self.list_tasks.currentRow()
         ed_item = self.list_tasks.item(current_list_index)
-        list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name, edited_task_item.user,
-                                        edited_task_item.shot_A, edited_task_item.shot_B, edited_task_item.shot_C,
+        list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name, edited_task_item.user_id,
+                                        edited_task_item.sequence, edited_task_item.shot, edited_task_item.take,
                                         edited_task_item.state, str(edited_task_item.schema_ver),
-                                        str(edited_task_item.queue_ver), edited_task_item.evolution,
-                                        edited_task_item.options, edited_task_item.description,
-                                        edited_task_item.stateColor)
+                                        str(edited_task_item.queue_ver),edited_task_item.options,
+                                        edited_task_item.description, edited_task_item.state_color)
         self.list_tasks.setItemWidget(ed_item, list_item_widget)
 
         self.qt_form_add.hide()
         self.add_form_state = 0
-        if self.s.deBugLevel >= 1:
+        if self.s.debug_level >= 1:
             print " [INF] task updated"
 
     def on_click_confirm_remove_project(self):
-        if self.s.deBugLevel >= 1:
-            print "  [INF]on_click_confirm_remove_project  ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
+        if self.s.debug_level >= 1:
+            print "  on_click remove_project  ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
         if self.batch.t.current_task_list_index >= 0:
-            takeItemList = self.batch.t.current_task_list_index + 1
+            take_item_list = self.batch.t.current_task_list_index + 1
             self.batch.t.remove_single_task(index=self.batch.t.current_task_index, do_save=True)
             self.batch.t.last_task_list_index = -1
             self.batch.t.current_task_index = -1
             self.batch.t.current_task_list_index = -1
 
-            print "on_click_confirm_remove_project B ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
-            self.list_tasks.takeItem(takeItemList)
+            print "on_click remove_project B ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
+            self.list_tasks.takeItem(take_item_list)
 
-            print "on_click_confirm_remove_project C ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
+            print "on_click remove_project C ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
-
-    def print_form_add (self):
+    def print_form_add(self):
         print "\n\n  print_form_add"
         form_add = self.qt_form_add
         print "\n  actionsCount", form_add.actionsCount
         print "\n  actionsAllArray"
-        self.comfun.print_list ( form_add.actionsAllArray )
+        self.comfun.print_list(form_add.actionsAllArray)
         print "\n  actions_widgets_array"
         for ak in form_add.actions_widgets_array:
             if ak.is_evo == 1:
-                print " is_evo:",ak.is_evo ,  "   scr:",  ak.script_type, ak.script   ###   ,  "  actiType:", ak.actiType, ak.actiSubType
+                print " is_evo:", ak.is_evo,  "   scr:", ak.script_type, ak.script
             else:
-                print " is_evo:",ak.is_evo ,  "   scr:",  ak.script_type, ak.script
+                print " is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script
         print ".... "
         print "  print_form_add END\n\n"
 
     def on_click_add_to_queue(self):
-        formATQ = self.qt_form_add
+        form_atq = self.qt_form_add
         if self.batch.t.current_task_index > -1:
-            ret = formATQ.createDirectories()
+            ret = form_atq.createDirectories()
             if ret:
                 self.batch.t.tasks_data[self.batch.t.current_task_index].queue_ver += 1
                 self.batch.t.tasks_data[self.batch.t.current_task_index].state = "QUEUED"
                 self.batch.t.tasks_data[self.batch.t.current_task_index].state_id = 3
                 self.batch.t.save_tasks()
 
-                self.batch.QueueUI.add_to_queue_and_update_list(formATQ)
+                self.batch.QueueUI.add_to_queue_and_update_list(form_atq)
 
                 self.freeze_list_on_changed = 1
                 self.batch.t.last_task_list_index = -1
-                self.clear_list()
-                self.batch.init_tasks(self.list_tasks)
+                self.reset_list()
 
                 self.freeze_list_on_changed = 0
                 self.qt_form_add.update_add_ui()
@@ -815,8 +815,6 @@ class TasksUI:
         else:
             self.top_ui.set_top_info(" Please select task ", 7)
 
-
-
     def clear_list(self):
         self.freeze_list_on_changed = 1
         while self.list_tasks.count() > 0:
@@ -824,13 +822,13 @@ class TasksUI:
         self.freeze_list_on_changed = 0
 
     def update_all_tasks(self):
-        self.batch.init_tasks(self.list_tasks)
+        self.init_tasks()
         self.update_list_of_visible_ids()
 
     def update_list_of_visible_ids(self):
         array_visible_tasks_ids = []
         for it in range(self.batch.t.total_tasks):
-            if self.batch.t.tasks_data[it].proj_id == self.batch.p.current_project_id:
+            if self.batch.t.tasks_data[it].project_id == self.batch.p.current_project_id:
                 array_visible_tasks_ids.append(self.batch.t.tasks_data[it].id)
         self.batch.t.array_visible_tasks_ids = array_visible_tasks_ids
 
@@ -841,47 +839,51 @@ class TasksUI:
             print " [db] on_change_current_list_task ", self.list_tasks.currentRow()
 
         if self.freeze_list_on_changed == 0:  # on massive action    or   refresh
+            # self.batch.t.last_task_list_index = self.batch.t.current_task_list_index
+            self.last_list_item_index = self.current_list_item_index
             current_list_index = self.list_tasks.currentRow() - 1
-            self.batch.t.last_task_list_index = self.batch.t.current_task_list_index
-            self.batch.t.current_task_list_index = current_list_index
+            self.current_list_item_index = current_list_index
 
-            if self.batch.t.last_task_list_index >= 0 and self.batch.t.last_task_list_index < len(
-                    self.batch.t.tasks_data):
-                item = self.list_tasks.item(self.batch.t.last_task_list_index + 1)
-                lastID = self.batch.t.array_visible_tasks_ids[self.batch.t.last_task_list_index]
-                lastIndex = self.batch.t.get_task_index_from_id(lastID)
-                if not item is None and not lastIndex is None:
-                    item.setBackground(self.batch.s.state_colors[self.batch.t.tasks_data[lastIndex].state_id].color())
+            if self.last_list_item_index is not None:
+                if self.last_list_item_index is not None and self.last_list_item_index < len(self.batch.t.tasks_data):
+                    item = self.list_tasks.item(self.last_list_item_index + 1)
+                    if self.last_list_item_index < len(self.array_visible_tasks_ids):
+                        last_id = self.array_visible_tasks_ids[self.last_list_item_index]
+                        last_index = self.batch.t.get_task_index_from_id(last_id)
+                        if item is not None and last_index is not None:
+                            color_index = self.batch.t.tasks_data[last_index].state_id
+                            item.setBackground(self.batch.s.state_colors[color_index].color())
+                else:
+                    print " [db] WRONG last_task_list_index {} vs {} ".format(self.last_list_item_index,
+                                                                              len(self.batch.t.tasks_data))
             else:
-                print " [db] WRONG last_task_list_index  ", self.batch.t.last_task_list_index, "  vs ", len(
-                    self.batch.t.tasks_data)
-
-            if len(self.batch.t.array_visible_tasks_ids) < current_list_index:
+                print " [db] last_task_list_index is None "
+            if len(self.array_visible_tasks_ids) < current_list_index:
                 self.update_list_of_visible_ids()
-                if len(self.batch.t.array_visible_tasks_ids) < current_list_index:
+                if len(self.array_visible_tasks_ids) < current_list_index:
                     print " [db]  FIXED   array_visible_tasks_ids[] after on_change_current_list_task"
                 else:
                     print " [db]  ERR !  NOT FIXED   array_visible_tasks_ids[] after on_change_current_list_task", len(
-                        self.batch.t.array_visible_tasks_ids), " vs ", current_list_index
+                        self.array_visible_tasks_ids), " vs ", current_list_index
 
-            if current_list_index >= 0 and len(self.batch.t.array_visible_tasks_ids) > current_list_index:
-                current_task_id = self.batch.t.array_visible_tasks_ids[current_list_index]
+            if 0 <= current_list_index < len(self.array_visible_tasks_ids):
+                current_task_id = self.array_visible_tasks_ids[current_list_index]
                 self.batch.t.current_task_id = current_task_id
                 self.batch.t.update_current_from_id(current_task_id)
 
             current_task_index = self.batch.t.current_task_index
 
-            if current_task_index < len(self.batch.t.tasks_data) and current_task_index >= 0:
+            if 0 <= current_task_index < len(self.batch.t.tasks_data):
                 cur_task = self.batch.t.tasks_data[current_task_index]
-                if self.top_ui != None:
+                if self.top_ui is not None:
                     self.top_ui.set_top_info("Current task: [" + str(cur_task.id) + "]    " + cur_task.task_name)
                 else:
                     print "err top_ui T ", self.top_ui
 
                 if current_list_index >= 0:
-                    itemC = self.list_tasks.item(current_list_index + 1)
-                    curColor = self.batch.s.state_colors_up[cur_task.state_id].color()
-                    itemC.setBackground(curColor)
+                    item_c = self.list_tasks.item(current_list_index + 1)
+                    cur_color = self.batch.s.state_colors_up[cur_task.state_id].color()
+                    item_c.setBackground(cur_color)
 
                     # update SCHEMA
                 self.batch.c.lastSchemaIndex = None  # TODO  check it ui
@@ -897,12 +899,5 @@ class TasksUI:
                     self.qt_form_add.update_add_ui()
 
             else:
-                print "[ERR] (on_change_current_list_task)  current_task_index  < len(self.batch.t.tasks_data)   ", current_task_index, "<", len(
-                    self.batch.t.tasks_data)
-
-
-
-
-
-
-
+                print "[ERR] (on_change_current_list_task)  {} < {}   ".format(current_task_index,
+                                                                               self.batch.t.tasks_data)

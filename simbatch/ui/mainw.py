@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
 
         if self.s.store_data_mode == 1:
             if self.comfun.path_exists(self.s.store_data_json_directory):
-                qt_tab_widget.setCurrentIndex(1)  # STANDARD TAB: show tasks
+                qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB: show tasks
             else:
                 qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings
         else:

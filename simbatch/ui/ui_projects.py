@@ -287,7 +287,6 @@ class ProjectsUI:
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
-
         if self.s.ui_brightness_mode == 0:
             qt_list_item.setBackground(self.s.state_colors[0])
         else:
@@ -300,8 +299,8 @@ class ProjectsUI:
             else:
                 color_index = projects[ip].state_id
 
-            cur_color = self.s.state_colors[color_index].color()
-            qt_list_item.setBackground(cur_color)
+            curr_color = self.s.state_colors[color_index].color()
+            qt_list_item.setBackground(curr_color)
             list_item_widget = ProjectListItem(str(projects[ip].id), projects[ip].project_name,
                                                projects[ip].project_directory, projects[ip].description)
 

@@ -10,7 +10,7 @@ from core.schemas import *
 
 
 class SchemaListItem(QWidget):
-    def __init__(self, txt_id, txt_name, txt_desc, txt_schema_version, parent=None):
+    def __init__(self, txt_id, txt_name, txt_desc, txt_schema_version):
         super(SchemaListItem, self).__init__()
         self.qt_widget = QWidget(self)
         self.qt_label_font = QFont()
@@ -425,10 +425,10 @@ class SchemasUI:
     schema_software_id = None
 
     #  schema list
-    current_schema_list_index = None
-    last_schema_list_index = None
+    current_list_item_index = None
+    last_list_item_index = None
     list_visible_schemas_ids = []
-    list_visible_schemas_names =[]
+    list_visible_schemas_names = []
 
     # freeze list update on multi change/remove
     freeze_list_on_changed = 0
@@ -588,7 +588,8 @@ class SchemasUI:
         for schema in self.c.schemas_data:
             if schema.project_id == self.batch.p.current_project_id:
                 qt_list_item = QListWidgetItem(list_schemas)
-                qt_list_item.setBackground(self.s.state_colors[25].color())    # TODO color_index ACTIVE 25  to const
+                curr_color = self.s.state_colors[schema.state_id].color()
+                qt_list_item.setBackground(curr_color)
                 list_item_widget = SchemaListItem(str(schema.id), schema.schema_name,
                                                   schema.description, str(schema.schema_version))
                 list_schemas.addItem(qt_list_item)
@@ -597,7 +598,6 @@ class SchemasUI:
 
                 self.list_visible_schemas_names.append(schema.schema_name)
                 self.list_visible_schemas_ids.append(schema.id)
-
 
     def update_schemas_list(self):
         self.init_schemas()
@@ -612,7 +612,6 @@ class SchemasUI:
                 list_visible_schemas_ids.append(schema.id)
         self.list_visible_schemas_names = list_visible_schemas_names
         self.list_visible_schemas_ids = list_visible_schemas_ids
-
 
     def clear_list(self):
         self.list_visible_schemas_names = []
@@ -634,9 +633,6 @@ class SchemasUI:
         self.c.clear_all_schemas_data()
         self.c.load_schemas()
         self.reset_list()
-
-
-
 
     def menu_set_active(self):
         self.batch.p.projects_data[self.batch.p.current_project_index].state = "ACTIVE"
@@ -828,7 +824,7 @@ class SchemasUI:
         self.c.addSchema(new_schema_item, do_save=True)
         list_item = QListWidgetItem(self.list_schemas)
         list_item_widget = SchemaListItem(str(new_schema_item.id), new_schema_item.schema_name,
-                                          new_schema_item.description, str(new_schema_item.schemaVersion) )
+                                          new_schema_item.description, str(new_schema_item.schemaVersion))
 
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
@@ -873,8 +869,6 @@ class SchemasUI:
                                                                          self.c.list_visible_schemas_ids, 0)
             self.batch.tasksUI.schema_form_edit.updateSchemaNamesCombo(self.c.arraySchemasInCurrentProject,
                                                                        self.c.list_visible_schemas_ids, 0)
-
-
             self.reload_schemas_data_and_refresh_list()
 
     def on_click_update_schema(self, edited_schema_item):
@@ -895,7 +889,6 @@ class SchemasUI:
 
             self.schema_form_edit.hide()
             self.edit_form_state = 0
-
 
     def load_base_setup(self, schema_name, version=1):
         file_to_load = self.batch.d.generate_tuple_base_setup_file_name(schema_name,
@@ -920,9 +913,9 @@ class SchemasUI:
             if self.s.debug_level >= 3:
                 print " [db] list_schemas_current_changed ", self.list_schemas.currentRow()
 
-            if self.current_schema_list_index >= 0:  # TODO fix on DELETE item !!!!
-                item = self.list_schemas.item(self.current_schema_list_index + 1)
-                color_index = 25  # 25;ACTIVE   ;187;222;255;__;195;255;255;      Schema ACTIVE     S     ### TODO const
+            if self.current_list_item_index >= 0:  # TODO fix on DELETE item
+                item = self.list_schemas.item(self.current_list_item_index + 1)
+                color_index = 25  # 25;ACTIVE   ;187;222;255;__;195;255;255;      Schema ACTIVE     S  # TODO const
                 if item is None:
                     # TODO !!!
                     if self.s.debug_level >= 1:
@@ -938,8 +931,8 @@ class SchemasUI:
                 current_schema_index = self.c.current_schema_index
                 self.c.update_current_from_id(self.list_visible_schemas_ids[current_list_index - 1])
 
-                self.last_schema_list_index = self.current_schema_list_index
-                self.current_schema_list_index = current_list_index - 1
+                self.last_list_item_index = self.current_list_item_index
+                self.current_list_item_index = current_list_index - 1
 
                 cur_schema = self.c.schemas_data[current_schema_index]
                 self.c.current_schema_id = cur_schema.id

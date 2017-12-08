@@ -21,7 +21,6 @@ class ProjectListItem(QWidget):
 
         self.qt_label_id = QLabel(txt_id)
         self.qt_label_id.setFont(self.qt_label_font)
-        self.qt_label_id.setStyleSheet("""color:#000;""")
         self.qt_label_id.setMinimumWidth(22)
         self.qt_label_id.setMaximumWidth(22)
         self.qt_lay.addWidget(self.qt_label_id)
@@ -29,15 +28,12 @@ class ProjectListItem(QWidget):
         self.qt_label_name = QLabel(txt_name)
         self.qt_label_name.setStyleSheet("""padding-left:4px;""")
         self.qt_label_name.setFont(self.qt_label_font)
-        self.qt_label_name.setStyleSheet("""color:#000;""")
         self.qt_lay.addWidget(self.qt_label_name)
         self.qt_label_directory = QLabel(working_directory)
         self.qt_label_directory.setFont(self.qt_label_font)
-        self.qt_label_directory.setStyleSheet("""color:#000;""")
         self.qt_lay.addWidget(self.qt_label_directory)
         self.qt_label_description = QLabel(txt_description)
         self.qt_label_description.setFont(self.qt_label_font)
-        self.qt_label_description.setStyleSheet("""color:#000;""")
         self.qt_lay.addWidget(self.qt_label_description)
 
         self.setLayout(self.qt_lay)
@@ -55,8 +51,8 @@ class ProjectsUI:
     qt_form_edit = None
     qt_form_remove = None
 
-    add_form_state = 0   # 0 hidden form, 1 showed form
-    edit_form_state = 0   # 0 hidden form,  1 showed form
+    add_form_state = 0      # 0 hidden form, 1 showed form
+    edit_form_state = 0     # 0 hidden form,  1 showed form
     remove_form_state = 0   # 0 hidden form,  1 showed form
 
     comfun = None
@@ -74,16 +70,12 @@ class ProjectsUI:
         self.top_ui = top
         self.mainw = mainw
 
-        #  self.schUI = batch.schemasUI TODO
-        #  self.tskUI = batch.tasksUI TODO
-        #  self.queUI = batch.QueueUI TODO
-
         qt_list_projects = QListWidget()
-        # qt_list_projects.setSelectionMode(QAbstractItemView.MultiSelection)   TODO MultiSelection
+        # qt_list_projects.setSelectionMode(QAbstractItemView.MultiSelection)   TODO multiselect list item
         qt_list_projects.setSelectionMode(QAbstractItemView.NoSelection)
         qt_list_projects.currentItemChanged.connect(self.on_list_current_changed)
         qt_list_projects.setContextMenuPolicy(Qt.CustomContextMenu)
-        qt_list_projects.customContextMenuRequested.connect(self.on_right_click_show_menu)   #  showRightClickMenu
+        qt_list_projects.customContextMenuRequested.connect(self.on_right_click_show_menu)
 
         qt_list_projects.setFrameShadow(QFrame.Raised)
         qt_list_projects.setSpacing(1)
@@ -111,8 +103,7 @@ class ProjectsUI:
         qt_form_add_layout = QVBoxLayout()
         self.qt_form_add = qt_form_add
 
-        # wfa :  widget form add
-        # fa  :  form add
+        # wfa :  element belongs to widget form add
         wfa_proj_name_label = SimpleLabel("New project name: ")
         wfa_project_name_edit = EditLineWithButtons(" ", label_minimum_size=7)
         self.wfa_project_name_edit = wfa_project_name_edit
@@ -241,11 +232,10 @@ class ProjectsUI:
 
         qt_form_remove_layout = QFormLayout()
 
-        wfr_buttons = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?        ")
+        wfr_buttons = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?")
+        wfr_buttons.button.setStyleSheet("""padding-top:7px;padding-bottom:7px;margin-top:10px;margin-bottom:10px""")
 
-        qt_form_remove_layout.addRow(" ", QLabel("   "))
         qt_form_remove_layout.addRow(" ", wfr_buttons.qt_widget_layout)
-        qt_form_remove_layout.addRow(" ", QLabel("   "))
 
         wfr_buttons.button.clicked.connect(lambda: self.on_click_confirm_remove_project())
 
@@ -295,7 +285,7 @@ class ProjectsUI:
         for ip in range(self.p.total_projects):
             qt_list_item = QListWidgetItem(widget_list)
             if projects[ip].is_default == 1:
-                color_index = 23  # DEFAULT    # TODO  CONST
+                color_index = self.s.INDEX_STATE_DEFAULT
             else:
                 color_index = projects[ip].state_id
 
@@ -335,14 +325,14 @@ class ProjectsUI:
         self.set_as_default()
 
     def menu_set_active(self):
-        self.batch.p.projects_data[self.batch.p.current_project_index].state = "ACTIVE"  # TODO cnst !
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = 22  # TODO cnst !
+        self.batch.p.projects_data[self.batch.p.current_project_index].state = "ACTIVE"
+        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = self.s.INDEX_STATE_ACTIVE
         self.batch.p.save_projects()
         self.reset_list()
 
-    def menu_set_hold(self):
-        self.batch.p.projects_data[self.batch.p.current_project_index].state = "HOLD"  # TODO cnst !
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = 21  # TODO cnst !
+    def menu_set_suspended(self):
+        self.batch.p.projects_data[self.batch.p.current_project_index].state = "SUSPEND"  # TODO SUSPEND or SUSPENDED ?
+        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = self.s.INDEX_STATE_SUSPEND
         self.batch.p.save_projects()
         self.reset_list()
 
@@ -351,7 +341,7 @@ class ProjectsUI:
         qt_menu_right = QMenu()
         qt_menu_right.addAction("Set As Default Project", self.menu_set_def)
         qt_menu_right.addAction("Set ACTIVE", self.menu_set_active)
-        qt_menu_right.addAction("Set HOLD", self.menu_set_hold)
+        qt_menu_right.addAction("Set SUSPEND", self.menu_set_suspended)
         qt_menu_right.exec_(global_pos)
 
     def hide_all_forms(self):
@@ -370,9 +360,10 @@ class ProjectsUI:
 
         ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir)
         if len(ret) > 0:
-            self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, ret + "FX\\")    # TODO param FX
-            self.comfun.if_empty_put_text(self.wfa_cam_dir_edit.qt_edit_line, ret + "cam\\")     # TODO param cam
-            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "ani\\")     # TODO param ani
+            self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, ret + "FX\\")  # TODO user cfg FX
+            self.comfun.if_empty_put_text(self.wfa_cam_dir_edit.qt_edit_line, ret + "cam\\")     # TODO user cfg cam
+            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "ani\\")     # TODO user cfg ani
+            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "env\\")     # TODO user cfg ani
 
     def fa_get_working_directory(self, qt_edit_line):
         return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
@@ -430,9 +421,9 @@ class ProjectsUI:
             if self.batch.p.total_projects == 0:
                 set_default = 1
 
-            new_project = SingleProject(0, new_project_name, set_default, 22, "ACTIVE", project_directory,
-                                        working_directory, cameras_directory, cache_directory, "", "", "", "",
-                                        "generate_directory_patterns=True", description)
+            new_project = SingleProject(0, new_project_name, set_default, self.s.INDEX_STATE_ACTIVE, "ACTIVE",
+                                        project_directory, working_directory, cameras_directory, cache_directory,
+                                        "", "", "", "", "generate_directory_patterns=True", description)
 
             ret_id = self.batch.p.add_project(new_project, do_save=True, generate_directory_patterns=True)
 
@@ -450,7 +441,7 @@ class ProjectsUI:
                 self.add_form_state = 0
 
             self.reset_list(set_active_id=self.batch.p.current_project_id)
-            #  self.schUI.hide_all_forms()  TODO  !!!!!!!
+            self.mainw.sch_ui.hide_all_forms()
         else:
             self.top_ui.set_top_info(" Fill project name !", 8)
 
@@ -475,25 +466,17 @@ class ProjectsUI:
             else:
                 set_active = 0
 
-            # using 'SingleProject' class only fof transfer data. This is temporary object
+            # using 'SingleProject' object only fof transfer data
             mock_project = SingleProject(0, new_project_name, set_active, 1, "MOCK", project_directory,
                                          working_directory, cameras_directory, cache_directory, "", "", "", "",
                                          "MOCK", description)
             self.batch.p.update_project(mock_project, do_save=True)
-            """
-            current_list_index = self.qt_list_projects.currentRow()
-            ed_item = self.qt_list_projects.item(current_list_index)
-
-            list_item_widget = ProjectListItem(str(self.batch.p.projects_data[self.batch.p.current_project_index].id),
-                                               new_project_name, project_directory, description)
-            self.qt_list_projects.setItemWidget(ed_item, list_item_widget)
-            """
 
             if pin_checked is False:
                 self.qt_form_edit.hide()
                 self.edit_form_state = 0
 
-            self.reset_list()
+            self.reset_list()   # TODO update single item list
         else:
             self.top_ui.set_top_info(" Fill project name !", 8)
 
@@ -530,88 +513,79 @@ class ProjectsUI:
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
-    def on_click_confirm_remove_project(self):  # TODO  REMOVE SCHEMAS AND TASKS !!!
-        if self.batch.p.current_project_index >= 0:
+    def on_click_confirm_remove_project(self):                  # TODO remove schemas and task after poj delete !
+        if self.batch.p.current_project_index is not None:
             remove_index = self.batch.p.current_project_index
             self.batch.p.current_project_index = None
             self.last_project_index = None
             self.batch.p.remove_single_project(index=remove_index, do_save=True)
-            self.qt_list_projects.takeItem(remove_index + 1)    # TODO INDEX ON VISIBLE LIST ! (when filter exist)
+            self.qt_list_projects.takeItem(remove_index + 1)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
     def update_sch_after_proj_changed(self):
-        """########### UPDATE SCH ##############"""
         self.mainw.sch_ui.current_of_visible_schema_index = None
         self.mainw.sch_ui.last_schema_list_index = None
         self.mainw.sch_ui.reset_list()
         self.batch.c.update_current_from_index(None)
 
     def update_tsk_after_proj_changed(self):
-        ########### UPDATE TSK  ##############
         self.batch.t.currentTaskID = None
         self.batch.t.currentTaskIndex = None
         self.batch.t.currentTaskListIndex = None
-        #self.tskUI.FormCreate.updateSchemaNamesCombo(self.batch.c.arraySchemasInCurrentProject,
-         #                                            self.batch.c.arraySchemasIDs, 0)
-        #self.tskUI.qt_form_edit.updateSchemaNamesCombo(self.batch.c.arraySchemasInCurrentProject,
-         #                                              self.batch.c.arraySchemasIDs, 0)
-        #self.tskUI.updateAllTasks()
-        #self.tskUI.updateArrOfVisibleIDs()
-
-
+        tsk_ui = self.mainw.tsk_ui
+        tsk_ui.qt_form_create.update_schema_names_combo(combo_current_index=0)
+        tsk_ui.qt_form_edit.update_schema_names_combo(combo_current_index=0)
+        tsk_ui.update_all_tasks()
+        tsk_ui.update_list_of_visible_ids()
 
     def on_list_current_changed(self, x):
         if self.freeze_list_on_changed == 1:
-            print " [db] listProjectsCurrentChanged freeze_list_on_changed", self.qt_list_projects.currentRow()
+            if self.s.debug_level >= 5:
+                print " [db] listProjectsCurrentChanged freeze_list_on_changed", self.qt_list_projects.currentRow()
         else:
-            print " [db] listProjectsCurrentChanged ", self.qt_list_projects.currentRow()
+            if self.s.debug_level >= 3:
+                print " [INF] listProjectsCurrentChanged ", self.qt_list_projects.currentRow()
 
-            current_list_index = self.qt_list_projects.currentRow() - 1
             self.last_project_index = self.batch.p.current_project_index
+            current_list_index = self.qt_list_projects.currentRow() - 1
             self.batch.p.current_project_index = current_list_index
             self.batch.p.update_current_from_index(current_list_index)
 
-            # UI list
-            if self.last_project_index >= 0 and self.batch.p.total_projects > 0:
+            # update color of last item list
+            if self.last_project_index >= 0:
                 last_item = self.qt_list_projects.item(self.last_project_index+1)
                 last_proj_state_id = self.batch.p.projects_data[self.last_project_index].state_id
                 last_proj_def = self.batch.p.projects_data[self.last_project_index].is_default
                 if last_proj_def == 1:
-                    color_index = 23   # DEF TODO  const
+                    color_index = self.s.INDEX_STATE_DEFAULT
                 else:
                     color_index = last_proj_state_id
                 if last_item is not None:
                     last_item.setBackground(self.batch.s.state_colors[color_index].color())
 
-            if current_list_index < len(self.batch.p.projects_data) and self.batch.p.total_projects > 0:
+            # update top info and color of current item list
+            cur_proj = None
+            if 0 <= current_list_index < len(self.batch.p.projects_data):
                 cur_proj = self.batch.p.projects_data[current_list_index]
                 if cur_proj.is_default == 1:
-                    color_index = 23   # DEF  TODO  const
+                    color_index = self.s.INDEX_STATE_DEFAULT
                 else:
                     color_index = cur_proj.state_id
-            else:
-                if self.debug_level >= 2:
-                    print " [WRN] currentListIndex: {} len proj:{}".format(current_list_index,
-                                                                           len(self.batch.p.projects_data))
-                return False
-
-            # UI list
-            if 0 <= current_list_index < self.batch.p.total_projects:
                 item_c = self.qt_list_projects.item(current_list_index + 1)
                 cur_color = self.batch.s.state_colors_up[color_index].color()
                 item_c.setBackground(cur_color)
-
-            if self.batch.p.total_projects > 0:
                 if self.top_ui is not None:
-                    self.top_ui.set_top_info("Current project:    " + cur_proj.project_name)
-                else:
-                    print " [ERR]  top_ui undefined ! ", self.top_ui
+                    self.top_ui.set_top_info("Current project:   " + cur_proj.project_name)
+            else:
+                if self.debug_level >= 2:
+                    print " [WRN] on chng current_list_index: {}".format(current_list_index)
 
             self.update_sch_after_proj_changed()
             self.update_tsk_after_proj_changed()
 
-            if self.edit_form_state == 1:
+            # update form edit project
+            if self.edit_form_state == 1 and cur_proj is not None:
                 self.qt_fe_task_name.setText(cur_proj.project_name)
                 self.qt_fe_proj_dir.setText(cur_proj.project_directory)
                 self.qt_fe_working_dir.setText(cur_proj.working_directory)

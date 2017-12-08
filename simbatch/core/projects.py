@@ -1,5 +1,6 @@
 import os
 from common import CommonFunctions
+from io import *
 
 PROJECT_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
@@ -16,17 +17,13 @@ PROJECT_ITEM_FIELDS_NAMES = [
     ('d_scr', 'scripts_directory'),
     ('d_cust', 'custom_directory'),
     ('pattern', 'seq_shot_take_pattern'),
-    ('desc', 'description')
-]
+    ('desc', 'description')]
 
 
 class SingleProject:
     DEF_STATE_FOR_NEW_PROJ = "ACTIVE"
     DEF_STATE_ID_FOR_NEW_PROJ = 22
     comfun = None
-
-    # project settings
-    zeros_in_version = 3   # TODO  save enable
 
     def __init__(self, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
                  cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
@@ -51,7 +48,7 @@ class SingleProject:
         self.props_directory_absolute = ""
         self.scripts_directory_absolute = ""
         self.custom_directory_absolute = ""
-        # self.framerangeDirectoryAbsolute = self.working_directory_absolute + "\\frame_range\\"  #  TODO  frame range
+        # self.frame_range_directory_absolute = self.working_directory_absolute + "\\frame_range\\"  # TODO frame range
         self.is_default = is_default
         if state_id == 0:
             state_id = self.DEF_STATE_ID_FOR_NEW_PROJ
@@ -144,7 +141,7 @@ class Projects:
                 return i
         return None
 
-    #  update id, inxed and current for fast use by all modules
+    #  update id, index and current for fast use by all modules
     def update_current_from_id(self, id):
         self.current_project_id = id
         self.current_project_index = self.get_index_from_id(id)
@@ -157,9 +154,9 @@ class Projects:
             self.current_project_id = None
             return False
 
-    #  update id, inxed and current for fast use by all modules
+    #  update id, index and current for fast use by all modules
     def update_current_from_index(self, index):
-        if self.total_projects > index and len(self.projects_data) > index and index >= 0 and index is not None:
+        if 0 <= index < self.total_projects:
             self.current_project_index = index
             self.current_project_id = self.projects_data[index].id
             self.current_project = self.projects_data[index]
@@ -168,26 +165,26 @@ class Projects:
             self.current_project_id = None
             self.current_project = None
             if self.debug_level >= 1:
-                print "  [ERR] (update_current_from_index) index:", index
+                print "   dir [ERR] (update_current_from_index) index:", index
                 print "   [db] total:{}  len:{}".format(self.total_projects, len(self.projects_data))
             return False
 
     #  'projects_data' list  for backup or save
-    def format_projects_data(self, json=False, sql=False, backup=False ):
-        if json == sql == backup == False:
+    def format_projects_data(self, json=False, sql=False, backup=False):
+        if json == sql == backup is False:
             if self.s.debug_level >= 1:
                 print " [ERR] (format_projects_data) no format param !"
         else:
             if json or backup:
                 t = self.comfun.get_current_time()
-                formated_data = {"projects": {"meta": {"total": self.total_projects, "timestamp": t}, "data": {}}}
+                json_data = {"projects": {"meta": {"total": self.total_projects, "timestamp": t}, "data": {}}}
                 for i, p in enumerate(self.projects_data):
                     proj = {}
                     for field in PROJECT_ITEM_FIELDS_NAMES:
                         proj[field[0]] = eval('p.'+field[1])
-                    formated_data["projects"]["data"][i] = proj
+                        json_data["projects"]["data"][i] = proj
                     # print PROJECT_ITEM_FIELDS_NAMES[i]
-                return formated_data
+                return json_data
             else:
                 # PRO version with SQL
                 return False
@@ -203,9 +200,11 @@ class Projects:
         if self.max_id == 1:
             project_to_add.is_default = 1
 
+        #  generate_directory_patterns for current project
+        #  pattern is generated basis on directories structure on storage
+        #  used for construct new path, generate path for load
         if generate_directory_patterns:
-            project_to_add.seq_shot_take_pattern = self.get_dir_patterns(project_to_add.cache_directory)
-            #  project_to_add.cameras_shot_directory_pattern = self.get_dir_patterns(project_to_add.cameras_directory)
+            project_to_add.seq_shot_take_pattern = self.batch.i.get_dir_patterns(project_to_add.cache_directory)
 
         self.projects_data.append(project_to_add)
         self.total_projects += 1
@@ -215,7 +214,7 @@ class Projects:
             self.save_projects()
         return project_to_add.id
 
-    def update_project(self, mock_project, do_save=False):   # "mock_project" used only for transfer data from ui
+    def update_project(self, mock_project, do_save=False):   # "mock_project" used for transfer data from ui
         if self.current_project_index is not None:
             up_proj = self.projects_data[self.current_project_index]
             up_proj.project_name = mock_project.project_name
@@ -223,20 +222,20 @@ class Projects:
             up_proj.working_directory = mock_project.working_directory
             up_proj.cameras_directory = mock_project.cameras_directory
             up_proj.cache_directory = mock_project.cache_directory
-            up_proj.is_default = mock_project.is_default
-            if up_proj.is_default == 1:
+            if mock_project.is_default == 1 and up_proj.is_default == 0:
+                up_proj.is_default = mock_project.is_default
                 self.set_proj_as_default(index=self.current_project_index)
             up_proj.description = mock_project.description
             if do_save is True:
                 self.save_projects()
         else:
             if self.s.debug_level >= 1:
-                print " [ERR] (update_project) self.current_project_index is None"
+                print "      [ERR] (update_project) self.current_project_index is None"
 
     #  check is project with index is default
     def check_is_default(self, index=None):
         if index is not None:
-            if self.projects_data[index].is_default == 1:  # TODO  int -> bool
+            if self.projects_data[index].is_default == 1:
                 return True
             else:
                 return False
@@ -292,15 +291,6 @@ class Projects:
                     return False
         return True
 
-    #  get directory pattern for current project
-    #  pattern is generated basis on directories structure on storage
-    #  used for construct new path, generate path for load
-    def get_dir_patterns(self, dir, db=False):  # TODO
-        if db or self.s.debug_level >= 4:
-            print "  [db]  (get_dir_patterns) deep debug start:", dir
-        full_dir_pattern = None
-        return full_dir_pattern
-
     #  example data for beginner users and for tests
     def create_example_project_data(self, do_save=True):
         collect_ids = 0
@@ -349,16 +339,6 @@ class Projects:
                                 print "   [WRN] proj data not consistent:{} {}".format(len(li),
                                                                                        len(PROJECT_ITEM_FIELDS_NAMES))
                     return True
-
-                """ 
-                for i in range (0, json_projects['projects']['meta']['total'] ):
-                    li = json_projects['projects']['data'][str(i)]
-                    new_project = SingleProject(int(li['id']), li['name'], int(li['def']), int(li['state_id']),
-                                                li['state'], li['d_proj'], li['d_wrk'], li['d_cam'],
-                                                li['d_cach'], li['d_env'], li['d_prop'], li['d_scr'],
-                                                li['d_cust'], li['pattern'] , li['desc'] )
-                    self.add_project(new_project)
-            """
             else:
                 if self.s.debug_level >= 2:
                     print " [WRN] no projects data in : ", json_file
@@ -383,11 +363,11 @@ class Projects:
             self.save_projects_to_mysql()
 
     #  save projects data as json
-    def save_projects_to_json(self, file=None):
-        if file is None:
-            file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
+    def save_projects_to_json(self, json_file=None):
+        if json_file is None:
+            json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
         content = self.format_projects_data(json=True)
-        return self.comfun.save_json_file(file, content)
+        return self.comfun.save_json_file(json_file, content)
 
     #  save projects data to sql
     def save_projects_to_mysql(self):
@@ -398,7 +378,7 @@ class Projects:
 
     #  remove single project
     def remove_single_project(self, index=None, id=None, do_save=False):
-        if index == None and id == None:
+        if index is None and id is None:
             return False
         if id > 0:
             for i, q in enumerate(self.projects_data):
@@ -417,11 +397,11 @@ class Projects:
             return self.save_projects()
 
     #  delete json file from storage
-    def delete_json_project_file(self, file=None):
-        if file is None:
-            file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
-        if self.comfun.file_exists(file):
-            return os.remove(file)
+    def delete_json_project_file(self, json_file=None):
+        if json_file is None:
+            json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
+        if self.comfun.file_exists(json_file):
+            return os.remove(json_file)
 
     #  clear project data from sql
     def clear_projects_in_mysql(self):

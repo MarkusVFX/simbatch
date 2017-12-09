@@ -2,20 +2,21 @@ import os
 from common import CommonFunctions
 from io import *
 
+# JSON Name Format, PEP8 Name Format
 PROJECT_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'project_name'),
-    ('state_id', 'state_id'),
+    ('stateId', 'state_id'),
     ('state', 'state'),
-    ('def', 'is_default'),
-    ('d_proj', 'project_directory'),
-    ('d_wrk', 'working_directory'),
-    ('d_cam', 'cameras_directory'),
-    ('d_cach', 'cache_directory'),
-    ('d_env', 'env_directory'),
-    ('d_prop', 'props_directory'),
-    ('d_scr', 'scripts_directory'),
-    ('d_cust', 'custom_directory'),
+    ('isDefault', 'is_default'),
+    ('dirProj', 'project_directory'),
+    ('dirWrk', 'working_directory'),
+    ('dirCam', 'cameras_directory'),
+    ('dirCach', 'cache_directory'),
+    ('dirEnv', 'env_directory'),
+    ('dirProp', 'props_directory'),
+    ('dirScr', 'scripts_directory'),
+    ('dirCust', 'custom_directory'),
     ('pattern', 'seq_shot_take_pattern'),
     ('desc', 'description')]
 
@@ -177,7 +178,10 @@ class Projects:
         else:
             if json or backup:
                 t = self.comfun.get_current_time()
-                json_data = {"projects": {"meta": {"total": self.total_projects, "timestamp": t}, "data": {}}}
+                json_data = {"projects": {"meta": {"total": self.total_projects,
+                                                   "timestamp": t,
+                                                   "jsonFormat": "http://json-schema.org/"},
+                                          "data": {}}}
                 for i, p in enumerate(self.projects_data):
                     proj = {}
                     for field in PROJECT_ITEM_FIELDS_NAMES:
@@ -329,10 +333,10 @@ class Projects:
                 if json_projects['projects']['meta']['total'] > 0:
                     for li in json_projects['projects']['data'].values():
                         if len(li) == len(PROJECT_ITEM_FIELDS_NAMES):
-                            new_project = SingleProject(int(li['id']), li['name'], int(li['def']), int(li['state_id']),
-                                                        li['state'], li['d_proj'], li['d_wrk'], li['d_cam'],
-                                                        li['d_cach'], li['d_env'], li['d_prop'], li['d_scr'],
-                                                        li['d_cust'], li['pattern'], li['desc'])
+                            new_project = SingleProject(int(li['id']), li['name'], int(li['isDefault']), int(li['stateId']),
+                                                        li['state'], li['dirProj'], li['dirWrk'], li['dirCam'],
+                                                        li['dirCach'], li['dirEnv'], li['dirProp'], li['dirScr'],
+                                                        li['dirCust'], li['pattern'], li['desc'])
                             self.add_project(new_project)
                         else:
                             if self.s.debug_level >= 2:

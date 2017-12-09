@@ -1,12 +1,13 @@
 import copy
 import os
 
+# JSON Name Format, PEP8 Name Format
 SCHEMA_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'schema_name'),
-    ('state_id', 'state_id'),
+    ('stateId', 'state_id'),
     ('state', 'state'),
-    ('proj_id', 'project_id'),
+    ('projId', 'project_id'),
     ('definition', 'definition_id'),
     ('version', 'schema_version'),
     ('actions', 'actions_array'),
@@ -21,6 +22,7 @@ ACTION_DATA_FIELDS_NAMES = [
     ('param', 'action_param'),
     ('soft_id', 'soft_id')
     ]
+
 
 class SingleAction:
     def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
@@ -76,12 +78,18 @@ class Schemas:
     sample_data_checksum = None
     sample_data_total = None
 
-    current_project_schemas_ids = []     # used for combo
-    current_project_schemas_names = []
+    current_project_schemas_ids = []     # used for combo cox (add task)
+    current_project_schemas_names = []   # used for combo cox (add task)
+
+    visible_project_schemas_ids = []     # not used now, waiting for filters  # TODO
+    visible_project_schemas_names = []   # not used now, waiting for filters  # TODO
 
     def __init__(self, batch):
         self.s = batch.s
         self.comfun = batch.comfun
+
+    def get_blank_schema(self):
+        return SchemaItem(0, "", 1, "NULL", 1, 1, 1, [], "")
 
     #  print schema data, for debug
     def print_current(self):
@@ -357,7 +365,11 @@ class Schemas:
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
-                formated_data = {"schemas": {"meta": {"total": self.total_schemas, "timestamp": tim}, "data": {}}}
+                formated_data = {"schemas": {"meta": {"total": self.total_schemas,
+                                                      "timestamp": tim,
+                                                      "jsonFormat": "http://json-schema.org/"
+                                                      },
+                                             "data": {}}}
                 for i, sd in enumerate(self.schemas_data):
                     sch = {}
                     for field in SCHEMA_ITEM_FIELDS_NAMES:

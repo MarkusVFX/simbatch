@@ -141,7 +141,7 @@ class TasksFormCreateOrEdit(QWidget):
 
     def __init__(self, batch, mode, top):
         QWidget.__init__(self)
-        self.form_task_item = TaskItem(0, "sample", 1, "NULL", 1, 1, "01", "001", "", 0, 100, 1, 1, 1, "", 1, 50, "")
+        self.form_task_item = TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
 
         if mode == "edit":
             self.form_mode = 2
@@ -151,6 +151,8 @@ class TasksFormCreateOrEdit(QWidget):
         self.s = batch.s
         self.batchSchemas = batch.c
         self.top_ui = top
+
+        #self.schemas_id_array = batch.c.schemas_id_array # mmm
 
     def init_ui_elements(self, sch):
         qt_layout_out_form_create = QVBoxLayout()
@@ -258,15 +260,19 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.qt_fae_schema_description_edit.setText(cur_task.description)
 
-    def update_schemas_id_arr(self, schemas_id_array):
+    def update_schemas_id_arr(self, schemas_id_array):  # TODO check is it necessary / remove
         self.schemas_id_array = schemas_id_array
 
-    def update_schema_names_combo(self, combo_items_arr, schemas_id_array, combo_current_index):
+    # update combo box after project change
+    def update_schema_names_combo(self, combo_current_index=None):
+        combo_items_arr = self.batch.c.current_project_schemas_ids
+        schemas_id_array = self.batch.c.current_project_schemas_ids
         self.qt_schema_name_combo.clear()
         self.update_schemas_id_arr(schemas_id_array)
         for it in combo_items_arr:
             self.qt_schema_name_combo.addItem(it)
-        self.qt_schema_name_combo.setCurrentIndex(combo_current_index)
+        if combo_current_index is not None:
+            self.qt_schema_name_combo.setCurrentIndex(combo_current_index)
 
     def compile_imputs(self):
         self.form_task_item.task_name = self.qt_schema_name_combo.currentText()
@@ -376,10 +382,11 @@ class TasksFormCreateOrEdit(QWidget):
 class TasksUI:
     list_tasks = None
     qt_widget_tasks = None
-    qt_schema_form_create = None
+    qt_form_create = None
+    qt_form_add = None
     qt_form_edit = None
     qt_form_remove = None
-    qt_form_add = None
+
 
     batch = None
     top_ui = None
@@ -433,10 +440,10 @@ class TasksUI:
         # CREATE
         # CREATE CREATE
         # CREATE CREATE CREATE
-        qt_schema_form_create = TasksFormCreateOrEdit(self.batch, "create", top)
-        self.qt_schema_form_create = qt_schema_form_create
-        qt_schema_form_create.execute_button.button.clicked.connect(
-            lambda: self.on_click_add_task(qt_schema_form_create.form_task_item))
+        qt_form_create = TasksFormCreateOrEdit(self.batch, "create", top)
+        self.qt_form_create = qt_form_create
+        qt_form_create.execute_button.button.clicked.connect(
+            lambda: self.on_click_add_task(qt_form_create.form_task_item))
 
         # EDIT
         # EDIT EDIT
@@ -477,7 +484,7 @@ class TasksUI:
         # TAB LAY
         # TAB LAY LAY
         # TAB LAY LAY LAY
-        self.comfun.add_wigdets(qt_lay_tasks_forms, [qt_schema_form_create, qt_form_edit, qt_form_remove, qt_form_add])
+        self.comfun.add_wigdets(qt_lay_tasks_forms, [qt_form_create, qt_form_edit, qt_form_remove, qt_form_add])
 
         self.hide_all_forms()
 
@@ -619,20 +626,20 @@ class TasksUI:
         qt_right_menu.addAction("Open Base Setup ", self.on_click_menu_open_base_setup)
         qt_right_menu.addAction("Open Computed Setup ", self.on_click_menu_open_computed)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
+        qt_right_menu.addAction("Sch Ver Form Schema", self.on_click_menu_sch_ver_from_schema)
+        qt_right_menu.addAction("Sch Ver +1", self.on_click_menu_schema_version_p1)
+        qt_right_menu.addAction("Sch Ver -1", self.on_click_menu_schema_version_m1)
+        qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Set INIT", self.on_click_menu_set_init)
         qt_right_menu.addAction("Set WORKING", self.on_click_menu_set_working)
         qt_right_menu.addAction("Set DONE", self.on_click_menu_set_done)
         qt_right_menu.addAction("Set HOLD", self.on_click_menu_set_hold)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
-        qt_right_menu.addAction("Sch Ver Form Schema", self.on_click_menu_sch_ver_from_schema)
-        qt_right_menu.addAction("Sch Ver +1", self.on_click_menu_schema_version_p1)
-        qt_right_menu.addAction("Sch Ver -1", self.on_click_menu_schema_version_m1)
-        qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Remove Task", self.on_click_menu_schema_remove)
         qt_right_menu.exec_(global_cursor_pos)
 
     def hide_all_forms(self):
-        self.qt_schema_form_create.hide()
+        self.qt_form_create.hide()
         self.qt_form_edit.hide()
         self.qt_form_remove.hide()
         self.qt_form_add.hide()
@@ -646,17 +653,17 @@ class TasksUI:
             self.hide_all_forms()
             if self.batch.t.current_task_index >= 0:
                 curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
-                self.qt_schema_form_create.update_create_ui(curr_task.schema_id)
+                self.qt_form_create.update_create_ui(curr_task.schema_id)
             elif self.batch.c.current_schema_index >= 0:
                 cur_sch = self.batch.c.schemas_data[self.batch.c.curr_schema_index]
-                self.qt_schema_form_create.update_create_ui(schema_id=cur_sch.id)
+                self.qt_form_create.update_create_ui(schema_id=cur_sch.id)
             else:
-                self.qt_schema_form_create.update_create_ui()
-            self.qt_schema_form_create.get_frame_range_from_scene()
-            self.qt_schema_form_create.show()
+                self.qt_form_create.update_create_ui()
+            self.qt_form_create.get_frame_range_from_scene()
+            self.qt_form_create.show()
             self.create_form_state = 1
         else:
-            self.qt_schema_form_create.hide()
+            self.qt_form_create.hide()
             self.create_form_state = 0
 
     def on_click_show_edit(self):
@@ -718,8 +725,8 @@ class TasksUI:
 
     def on_click_add_task(self, new_task_tem):
         if self.batch.p.current_project_id >= 0:
-            if self.qt_schema_form_create.qt_schema_name_combo.currentIndex() >= 0:
-                self.qt_schema_form_create.compile_imputs()
+            if self.qt_form_create.qt_schema_name_combo.currentIndex() >= 0:
+                self.qt_form_create.compile_imputs()
                 if new_task_tem.schema_id < 0:
                     print "   [ERR]  schema_id  ", new_task_tem.schema_id
 
@@ -822,6 +829,7 @@ class TasksUI:
         self.freeze_list_on_changed = 0
 
     def update_all_tasks(self):
+        self.clear_list()
         self.init_tasks()
         self.update_list_of_visible_ids()
 
@@ -892,7 +900,7 @@ class TasksUI:
 
                 # update PROJECT
                 if self.create_form_state == 1:
-                    self.qt_schema_form_create.update_create_ui(cur_task.schema_id)
+                    self.qt_form_create.update_create_ui(cur_task.schema_id)
                 if self.edit_form_state == 1:
                     self.qt_form_edit.update_edit_ui(cur_task)
                 if self.add_form_state == 1:  # add to queue

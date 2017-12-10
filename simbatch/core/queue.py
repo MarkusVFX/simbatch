@@ -1,5 +1,9 @@
 
 
+# JSON Name Format, PEP8 Name Format
+QUEUE_ITEM_FIELDS_NAMES = [
+    ('id', 'id')]
+
 class QueueItem():
     total_items = 0
     max_id = 0

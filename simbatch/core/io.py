@@ -127,8 +127,14 @@ class InOutStorage:
 
 
 
-
-
+    #  get directory pattern for current project
+    #  pattern is generated basis on directories structure on storage
+    #  used for construct new path, generate path for load
+    def get_dir_patterns(self, dir, db=False):
+        if db or self.s.debug_level >= 4:
+            print "  [db]  (get_dir_patterns) deep debug start:", dir
+        full_dir_pattern = None
+        return full_dir_pattern
 
 
 

@@ -1,21 +1,24 @@
 import copy
 import os
 
+# JSON Name Format, PEP8 Name Format
 TASK_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'task_name'),
-    ('state_id', 'state_id'),
+    ('stateId', 'state_id'),
     ('state', 'state'),
     ('project', 'project_id'),
     ('schema', 'schema_id'),
     ('sequence', 'sequence'),
     ('shot', 'shot'),
     ('take', 'take'),
-    ('frame_from', 'frame_from'),
-    ('frame_to', 'frame_to'),
-    ('sch_ver', 'schema_ver'),
-    ('tsk_ver', 'task_ver'),
-    ('que_ver', 'queue_ver'),
+    ('simFrStart', 'sim_frame_start'),
+    ('simFrEnd', 'sim_frame_end'),
+    ('prevFrStart', 'prev_frame_start'),
+    ('prevFrEnd', 'prev_frame_end'),
+    ('schVer', 'schema_ver'),
+    ('tskVer', 'task_ver'),
+    ('queVer', 'queue_ver'),
     ('options', 'options'),
     ('user', 'user_id'),
     ('prior', 'priority'),
@@ -24,7 +27,8 @@ TASK_ITEM_FIELDS_NAMES = [
 
 class TaskItem:
     def __init__(self, task_id, task_name, state_id, state, project_id, schema_id, sequence, shot, take,
-                 frame_from, frame_to, schema_ver, task_ver, queue_ver, options, user_id, priority, description):
+                 sim_frame_start, sim_frame_end, prev_frame_start, prev_frame_end, schema_ver, task_ver, queue_ver,
+                 options, user_id, priority, description):
         self.id = task_id
         self.task_name = task_name
         self.state_id = state_id
@@ -34,8 +38,10 @@ class TaskItem:
         self.sequence = sequence
         self.shot = shot
         self.take = take
-        self.frame_from = frame_from
-        self.frame_to = frame_to
+        self.sim_frame_start = sim_frame_start
+        self.sim_frame_end = sim_frame_end
+        self.prev_frame_start = prev_frame_start
+        self.prev_frame_end = prev_frame_end
         self.schema_ver = schema_ver
         self.task_ver = task_ver
         self.queue_ver = queue_ver
@@ -64,6 +70,9 @@ class Tasks:
         self.s = batch.s
         self.comfun = batch.comfun
 
+    def get_blank_schema(self):
+        return TaskItem(0, "", 1, "NULL", 1, 1, 1, [], "")
+
     #  print project data, mainly for debug
     def print_current(self):
         print "       current task index:{}, id:{}, total:{}".format(self.current_task_index, self.current_task_id,
@@ -81,7 +90,7 @@ class Tasks:
             print "   [INF] no schema loaded"
         for t in self.tasks_data:
             print "\n\n {} {}  schema_id:{}  ".format(t.task_name, t.id, t.schema_id)
-            print "from:{} to:{}  state:{}  sv:{}  tv:{}  qv:{}".format(t.frame_from, t.frame_to, t.state,
+            print "from:{} to:{}  state:{}  sv:{}  tv:{}  qv:{}".format(t.sim_frame_start, t.sim_frame_end, t.state,
                                                                         t.schema_ver, t.task_ver, t.queue_ver)
         print "\n\n"
 
@@ -148,7 +157,7 @@ class Tasks:
 
     def get_task_frame_range(self):
         curr_task = self.tasks_data[self.current_task_index]
-        return [self.comfun.int_or_val(curr_task.frame_from, 1), self.comfun.int_or_val(curr_task.frame_to, 2)]
+        return [self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]
 
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
@@ -266,11 +275,12 @@ class Tasks:
                 if json_tasks['tasks']['meta']['total'] > 0:
                     for li in json_tasks['tasks']['data'].values():
                         if len(li) == len(TASK_ITEM_FIELDS_NAMES):
-                            new_task_item = TaskItem(int(li['id']), li['name'], int(li['state_id']), li['state'],
+                            new_task_item = TaskItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['project']), int(li['schema']), li['sequence'],
                                                          li['shot'], li['take'],
-                                                         int(li['frame_from']), int(li['frame_to']),
-                                                         int(li['sch_ver']), int(li['tsk_ver']), int(li['que_ver']),
+                                                         int(li['simFrStart']), int(li['simFrEnd']),
+                                                         int(li['prevFrStart']), int(li['prevFrEnd']),
+                                                         int(li['schVer']), int(li['tskVer']), int(li['queVer']),
                                                          li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
                         else:
@@ -305,7 +315,11 @@ class Tasks:
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
-                formated_data = {"tasks": {"meta": {"total": self.total_tasks, "timestamp": tim}, "data": {}}}
+                formated_data = {"tasks": {"meta": {"total": self.total_tasks,
+                                                    "timestamp": tim,
+                                                    "jsonFormat": "http://json-schema.org/"
+                                                    },
+                                           "data": {}}}
                 for i, td in enumerate(self.tasks_data):
                     tsk = {}
                     for field in TASK_ITEM_FIELDS_NAMES:

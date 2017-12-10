@@ -24,6 +24,8 @@ class SoftwareConnector():
         pass
 
 
+
+
 class Definitions:
     batch = None
     comfun = None

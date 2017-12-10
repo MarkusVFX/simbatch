@@ -31,6 +31,29 @@ class Settings:
     JSON_QUEUE_FILE_NAME = "data_queue.json"
     JSON_SIMNODES_FILE_NAME = "data_simnodes.json"
 
+    INDEX_STATE_NULL = 0
+    INDEX_STATE_INIT = 1
+    INDEX_STATE_WAITING = 2
+    INDEX_STATE_QUEUED = 3
+    INDEX_STATE_WORKING = 4
+    INDEX_STATE_SIM = 5
+    INDEX_STATE_CACHE = 6
+    INDEX_STATE_RENDER = 7
+    INDEX_STATE_HOLD = 8
+    INDEX_STATE_ERROR = 9
+    INDEX_STATE_OK = 10
+    INDEX_STATE_DONE = 11
+    INDEX_STATE_REVIEW = 12
+    INDEX_STATE_ACCEPTED = 13
+    INDEX_STATE_REJECTED = 14
+
+    INDEX_STATE_CUSTOM = 18
+    INDEX_STATE_OFFLINE = 19
+    INDEX_STATE_INACTIVE = 20
+    INDEX_STATE_SUSPEND = 21
+    INDEX_STATE_ACTIVE = 22
+    INDEX_STATE_DEFAULT = 23
+
     # GUI settings
     current_soft_name = ""  # only for display at this moment
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom

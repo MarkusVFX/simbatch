@@ -79,15 +79,15 @@ class Settings:
                         "debuglevel":
                             {"current": 4, "levels": "1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL "},
                         "storedata":
-                            {"datadirectory": "S:/simbatch/data/",
-                             "backupdirectory": "S:/simbatch/data/backups/",
-                             "definitionsdirectory": "S:/simbatch/simbatch/definitions/"},
+                            {"dataDirectory": "S:/simbatch/data/",
+                             "backupDirectory": "S:/simbatch/data/backups/",
+                             "definitionsDirectory": "S:/simbatch/simbatch/definitions/"},
                         "sql":
                             {"db": "127.0.1.220", "user": "default", "pass": "default", "port": "3306"},
                         "adminuser":
                             {"name": "admin", "sign": "A", "pass": "pass"},
                         "window":
-                            {"posx": 70, "posy": 150, "sizex": 600, "sizey": 800}
+                            {"posX": 70, "posy": 150, "sizex": 600, "sizey": 800}
                         }
 
     def __init__(self, soft_id, ini_file="config.ini"):
@@ -135,14 +135,14 @@ class Settings:
                     self.store_data_mode = self.json_settings_data["datamode"]["current"]
                     self.ui_color_mode = self.json_settings_data["colormode"]["current"]
 
-                    self.store_data_json_directory = self.json_settings_data["storedata"]["datadirectory"]
-                    self.store_data_backup_directory = self.json_settings_data["storedata"]["backupdirectory"]
-                    self.store_data_definitions_directory = self.json_settings_data["storedata"]["definitionsdirectory"]
+                    self.store_data_json_directory = self.json_settings_data["storedata"]["dataDirectory"]
+                    self.store_data_backup_directory = self.json_settings_data["storedata"]["backupDirectory"]
+                    self.store_data_definitions_directory = self.json_settings_data["storedata"]["definitionsDirectory"]
 
                     self.sql = self.json_settings_data["sql"].values()  # TODO order  values()
                     self.admin_user = self.json_settings_data["adminuser"].values()  # TODO order  values()
                     wnd = self.json_settings_data["window"]
-                    self.window = [wnd["posx"], wnd["posy"], wnd["sizex"], wnd["sizey"]]
+                    self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]
 
                     if self.debug_level >= 3:
                         print "\n\n [INF] settings init"

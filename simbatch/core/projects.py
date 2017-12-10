@@ -57,9 +57,9 @@ class SingleProject:
             state = self.DEF_STATE_FOR_NEW_PROJ
         self.state_id = state_id
         self.state = state
-        self.description = description
         self.seq_shot_take_pattern = seq_shot_take_pattern
         self.zeros_in_version = zeros_in_version
+        self.description = description
         self.update_absolute_directories()
 
     def update_absolute_directories(self):

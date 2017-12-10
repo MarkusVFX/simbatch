@@ -50,6 +50,9 @@ class InOutStorage:
             file_ext = ".png"
         return file_ext
 
+    def get_path_from_full(self,full):
+        return os.path.dirname(full)
+
     def get_files_from_dir(self, directory, types=""):
         files = []
         dir_path = self.get_path_from_full(directory)

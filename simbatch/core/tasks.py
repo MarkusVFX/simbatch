@@ -70,7 +70,7 @@ class Tasks:
         self.s = batch.s
         self.comfun = batch.comfun
 
-    def get_blank_schema(self):
+    def get_blank_task(self):
         return TaskItem(0, "", 1, "NULL", 1, 1, 1, [], "")
 
     #  print project data, mainly for debug
@@ -161,11 +161,11 @@ class Tasks:
 
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
-        sample_task_1 = TaskItem(0, "task 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_2 = TaskItem(0, "task 2", 1, "INIT", 1, 1,  "01", "002", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_3 = TaskItem(0, "task 3", 1, "INIT", 2, 1,  "02", "004", "b", 7, 28, 4, 5, 6, "o", 1, 8, "d")
-        sample_task_4 = TaskItem(0, "task 4", 1, "INIT", 3, 1,  "10", "022", "", 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_5 = TaskItem(0, "task 5", 1, "INIT", 3, 1,  "40", "070", "", 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_1 = TaskItem(0, "tsk 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_2 = TaskItem(0, "tsk 2", 1, "INIT", 1, 1,  "01", "002", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_3 = TaskItem(0, "tsk 3", 1, "INIT", 2, 1,  "02", "004", "b", 7, 28, 8, 22, 4, 5, 6, "o", 1, 8, "d")
+        sample_task_4 = TaskItem(0, "tsk 4", 1, "INIT", 3, 1,  "10", "022", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_5 = TaskItem(0, "tsk 5", 1, "INIT", 3, 1,  "40", "070", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
         collect_ids += self.add_task(sample_task_1)
         collect_ids += self.add_task(sample_task_2)
         collect_ids += self.add_task(sample_task_3)

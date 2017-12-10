@@ -85,7 +85,8 @@ def test_update_current_from_index(sib):
     assert sib.p.current_project_index == 2
 
 
-def test_check_is_default(sib):
+def test_is_index2_def_projert(sib):
+    assert sib.p.check_is_default(index=0) is False
     assert sib.p.check_is_default(index=1) is False
     assert sib.p.check_is_default(index=2) is True
 
@@ -104,14 +105,53 @@ def test_by_index_set_proj_as_default(sib):
     assert sib.p.check_is_default(index=0) is True
     assert sib.p.set_proj_as_default(index=1) is True
     assert sib.p.check_is_default(index=1) is True
+    assert sib.p.set_proj_as_default(index=0) is True
+
+
+def test_is_index0_def_projert(sib):
+    assert sib.p.check_is_default(index=0) is True
+    assert sib.p.check_is_default(index=1) is False
+    assert sib.p.check_is_default(index=2) is False
 
 
 def test_init_default_proj(sib):
     assert sib.p.current_project_id == 3
     assert sib.p.current_project_index == 2
     sib.p.init_default_proj()
-    assert sib.p.current_project_id == 2
-    assert sib.p.current_project_index == 1
+    assert sib.p.current_project_id == 1
+    assert sib.p.current_project_index == 0
+
+
+def test_current_project_details(sib):
+    assert sib.p.set_proj_as_default(index=1) is True
+    sib.p.init_default_proj()
+    # sib.p.print_current()
+    cur_proj = sib.p.current_project
+    assert cur_proj.id == 2
+    assert cur_proj.project_name == "Sample Project 2"
+    assert cur_proj.project_directory == "D:\\proj\\"
+    assert cur_proj.working_directory == "fx\\"
+    assert cur_proj.cameras_directory == "cam\\"
+    assert cur_proj.cache_directory == "cache\\"
+    assert cur_proj.env_directory == "env\\"
+    assert cur_proj.props_directory == "props\\"
+    assert cur_proj.scripts_directory == "scripts\\"
+    assert cur_proj.custom_directory == "custom\\"
+
+    assert cur_proj.working_directory_absolute == "D:\\proj\\fx\\"
+    assert cur_proj.cameras_directory_absolute == "D:\\proj\\cam\\"
+    assert cur_proj.cache_directory_absolute == "D:\\proj\\cache\\"
+    assert cur_proj.env_directory_absolute == "D:\\proj\\env\\"
+    assert cur_proj.props_directory_absolute == "D:\\proj\\props\\"
+    assert cur_proj.scripts_directory_absolute == "D:\\proj\\scripts\\"
+    assert cur_proj.custom_directory_absolute == "D:\\proj\\custom\\"
+
+    assert cur_proj.is_default == 1
+    assert cur_proj.state_id == 22
+    assert cur_proj.state == "ACTIVE"
+    assert cur_proj.description == "sample project 2"
+    assert cur_proj.seq_shot_take_pattern == "<seq##>\\<sh###>"
+    assert cur_proj.zeros_in_version == 3
 
 
 def test_remove_single_project(sib):

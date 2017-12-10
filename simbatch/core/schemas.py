@@ -328,8 +328,8 @@ class Schemas:
                                 print " actions "   # TODO
                             # new_schema_actions = [Action()]
                             new_schema_actions = []
-                            new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['state_id']), li['state'],
-                                                         int(li['proj_id']), int(li['definition']), int(li['version']),
+                            new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
+                                                         int(li['projId']), int(li['definition']), int(li['version']),
                                                          new_schema_actions, li['desc'])
                             self.add_schema(new_schema_item)
                         else:

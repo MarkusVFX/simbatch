@@ -18,6 +18,7 @@ PROJECT_ITEM_FIELDS_NAMES = [
     ('dirScr', 'scripts_directory'),
     ('dirCust', 'custom_directory'),
     ('pattern', 'seq_shot_take_pattern'),
+    ('zerosInVersion', 'zeros_in_version'),
     ('desc', 'description')]
 
 
@@ -28,7 +29,7 @@ class SingleProject:
 
     def __init__(self, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
                  cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
-                 custom_directory, seq_shot_take_pattern, description):
+                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
         self.comfun = CommonFunctions()
 
         self.id = project_id
@@ -58,7 +59,7 @@ class SingleProject:
         self.state = state
         self.description = description
         self.seq_shot_take_pattern = seq_shot_take_pattern
-
+        self.zeros_in_version = zeros_in_version
         self.update_absolute_directories()
 
     def update_absolute_directories(self):
@@ -125,14 +126,20 @@ class Projects:
             print "       working_directory ", cur_proj.working_directory
             print "       cameras_directory ", cur_proj.cameras_directory
             print "       cache_directory ", cur_proj.cache_directory
+            print "       seq_shot_take_pattern:{}, zeros:{}, description:{}".format(cur_proj.seq_shot_take_pattern,
+                                                                                     cur_proj.zeros_in_version,
+                                                                                     cur_proj.description)
 
     def print_all(self):
         if self.total_projects == 0:
             print "   [INF] no projects loaded"
         for p in self.projects_data:
             print "\n\n   {} id:{} is_default:{} state:{}".format(p.project_name, p.id, p.is_default, p.state)
-            print "   ", p.project_directory
+            print "   ", p.project_directory,
             print "   ", p.working_directory_absolute
+            print "   seq_shot_take_pattern:{}, zeros:{}, description:{}".format(p.seq_shot_take_pattern,
+                                                                                 p.zeros_in_version,
+                                                                                 p.description)
         print "\n\n"
 
     #  get index from list 'projects_data'  by id of project
@@ -303,10 +310,10 @@ class Projects:
                                          "<seq##>\<seq##>_<sh###>", "sample project 1")
         sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj", "fx",
                                          "cam", "cache", "env", "props", "scripts", "custom",
-                                         "s_<sh##>>", "sample project 2")
+                                         "<seq##>\\<sh###>", "sample project 2")
         sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
-                                         "<seq##>\<sh###>", "sample project 3")
+                                         "s_<sh##>", "sample project 3")
         collect_ids += self.add_project(sample_project_1)
         collect_ids += self.add_project(sample_project_2)
         collect_ids += self.add_project(sample_project_3, do_save=do_save)
@@ -333,14 +340,15 @@ class Projects:
                 if json_projects['projects']['meta']['total'] > 0:
                     for li in json_projects['projects']['data'].values():
                         if len(li) == len(PROJECT_ITEM_FIELDS_NAMES):
-                            new_project = SingleProject(int(li['id']), li['name'], int(li['isDefault']), int(li['stateId']),
-                                                        li['state'], li['dirProj'], li['dirWrk'], li['dirCam'],
-                                                        li['dirCach'], li['dirEnv'], li['dirProp'], li['dirScr'],
-                                                        li['dirCust'], li['pattern'], li['desc'])
+                            new_project = SingleProject(int(li['id']), li['name'], int(li['isDefault']),
+                                                        int(li['stateId']), li['state'], li['dirProj'], li['dirWrk'],
+                                                        li['dirCam'], li['dirCach'], li['dirEnv'], li['dirProp'],
+                                                        li['dirScr'], li['dirCust'], li['pattern'], li['desc'],
+                                                        li['zerosInVersion'])
                             self.add_project(new_project)
                         else:
-                            if self.s.debug_level >= 2:
-                                print "   [WRN] proj data not consistent:{} {}".format(len(li),
+                            if self.s.debug_level >= 1:
+                                print "   [ERR] proj data not consistent:{} {}".format(len(li),
                                                                                        len(PROJECT_ITEM_FIELDS_NAMES))
                     return True
             else:

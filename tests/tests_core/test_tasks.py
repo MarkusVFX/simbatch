@@ -88,7 +88,7 @@ def test_update_current_from_id(sib):
     assert sib.t.update_current_from_id(2) == 1
     assert sib.t.current_task_id == 2
     assert sib.t.current_task_index == 1
-    assert sib.t.current_task.task_name == "task 2"
+    assert sib.t.current_task.task_name == "tsk 2"
 
 
 def test_update_current_from_index(sib):
@@ -97,12 +97,12 @@ def test_update_current_from_index(sib):
     assert sib.t.update_current_from_index(2) == 3
     assert sib.t.current_task_id == 3
     assert sib.t.current_task_index == 2
-    assert sib.t.current_task.task_name == "task 3"
+    assert sib.t.current_task.task_name == "tsk 3"
 
 
 def test_current_task_details(sib):
     assert sib.t.current_task.id == 3
-    assert sib.t.current_task.task_name == "task 3"
+    assert sib.t.current_task.task_name == "tsk 3"
     assert sib.t.current_task.state_id == 1
     assert sib.t.current_task.state == "INIT"
     assert sib.t.current_task.project_id == 2
@@ -110,8 +110,10 @@ def test_current_task_details(sib):
     assert sib.t.current_task.sequence == "02"
     assert sib.t.current_task.shot == "004"
     assert sib.t.current_task.take == "b"
-    assert sib.t.current_task.frame_from == 7
-    assert sib.t.current_task.frame_to == 28
+    assert sib.t.current_task.sim_frame_start == 7
+    assert sib.t.current_task.sim_frame_end == 28
+    assert sib.t.current_task.prev_frame_start == 8
+    assert sib.t.current_task.prev_frame_end == 22
     assert sib.t.current_task.schema_ver == 4
     assert sib.t.current_task.task_ver == 5
     assert sib.t.current_task.queue_ver == 6

@@ -4,26 +4,25 @@
 			"software": "Stand-alone",
 			"total": 2
 		},
-		"data": {
-			"action1":{
+		"actions": {
+			"1":{
 				"id": 1,
+				"type": "single",
 				"name": "Run Script",
 				"desc": "execute python script",
 				"default": "<script_directory>",
 				"template": ["os.system(\"", "<f>", "\")"],
 				"subActions": []
 			},
-			"action2":{
+			"2":{
 				"id": 2,
-				"name": "Run app",
-				"desc": "Run *.exe or *.bat file",
-				"default": "<script_directory>",
-				"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
+				"type": "group",
+				"name": "Run App",
 				"subActions":{
 					"1": {
 						"id": 1,
 						"mode": "EXE",
-						"desc": "executable file",
+						"desc": "run executable file",
 						"default": "<script_directory>",
 						"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
 					},

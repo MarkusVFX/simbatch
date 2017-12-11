@@ -3,15 +3,39 @@
     "meta": {
       "id": 5,
       "software": "Stand-alone",
-      "actions": 4
+      "total": 2
     },
-    "actions": [
+    "data": [
       {"action":
         {
-          "aid": 1,
+          "id": 1,
           "name": "Script",
-          "desc": "execute RF script",
-          "template": ["executor.max_script_py(\"", "<f>", "\")"]
+          "desc": "execute python script",
+          "template": ["os.system(\"", "<f>", "\")"]
+        }
+      },
+      {"action":
+        {
+          "id": 2,
+          "name": "Run app",
+          "desc": "Run *.exe or *.bat file",
+          "template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
+          "subActions":[
+            {
+              "1": {
+                "mode": "EXE",
+                "desc": "executable file",
+                "template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
+                }
+            },
+            {
+              "2": {
+                "mode": "BAT",
+                "desc": "run shell program",
+                "template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
+              }
+            }
+          ]
         }
       }
     ]

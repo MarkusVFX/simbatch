@@ -1,7 +1,6 @@
 {
 	"definition": {
 		"meta": {
-			"id": 5,
 			"software": "Stand-alone",
 			"total": 2
 		},
@@ -10,30 +9,32 @@
 				"id": 1,
 				"name": "Run Script",
 				"desc": "execute python script",
+				"default": "<script_directory>",
 				"template": ["os.system(\"", "<f>", "\")"],
-				"subActions":[]
+				"subActions": []
 			},
 			"action2":{
 				"id": 2,
 				"name": "Run app",
 				"desc": "Run *.exe or *.bat file",
+				"default": "<script_directory>",
 				"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
-				"subActions":[
-					{
-						"1": {
-							"mode": "EXE",
-							"desc": "executable file",
-							"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
-						}
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "EXE",
+						"desc": "executable file",
+						"default": "<script_directory>",
+						"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
 					},
-					{
-						"2": {
-							"mode": "BAT",
-							"desc": "run shell program",
-							"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
-						}
+					"2": {
+						"id": 2,
+						"mode": "BAT",
+						"desc": "run shell program",
+						"default": "<script_directory>",
+						"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
 					}
-				]
+				}
 			}
 		}
 	}

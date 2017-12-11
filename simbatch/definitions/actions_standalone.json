@@ -1,43 +1,40 @@
 {
-  "definition": {
-    "meta": {
-      "id": 5,
-      "software": "Stand-alone",
-      "total": 2
-    },
-    "data": [
-      {"action":
-        {
-          "id": 1,
-          "name": "Script",
-          "desc": "execute python script",
-          "template": ["os.system(\"", "<f>", "\")"]
-        }
-      },
-      {"action":
-        {
-          "id": 2,
-          "name": "Run app",
-          "desc": "Run *.exe or *.bat file",
-          "template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
-          "subActions":[
-            {
-              "1": {
-                "mode": "EXE",
-                "desc": "executable file",
-                "template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
-                }
-            },
-            {
-              "2": {
-                "mode": "BAT",
-                "desc": "run shell program",
-                "template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
-              }
-            }
-          ]
-        }
-      }
-    ]
-  }
+	"definition": {
+		"meta": {
+			"id": 5,
+			"software": "Stand-alone",
+			"total": 2
+		},
+		"data": {
+			"action1":{
+				"id": 1,
+				"name": "Run Script",
+				"desc": "execute python script",
+				"template": ["os.system(\"", "<f>", "\")"],
+				"subActions":[]
+			},
+			"action2":{
+				"id": 2,
+				"name": "Run app",
+				"desc": "Run *.exe or *.bat file",
+				"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"],
+				"subActions":[
+					{
+						"1": {
+							"mode": "EXE",
+							"desc": "executable file",
+							"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
+						}
+					},
+					{
+						"2": {
+							"mode": "BAT",
+							"desc": "run shell program",
+							"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
+						}
+					}
+				]
+			}
+		}
+	}
 }

@@ -19,7 +19,6 @@ def sib():
     return sib
 
 
-
 def test_exist_definitions_data(sib):
     assert sib.comfun.file_exists(sib.s.store_data_definitions_directory) is True
 

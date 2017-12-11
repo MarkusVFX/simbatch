@@ -112,7 +112,12 @@ class Projects:
         self.comfun = batch.comfun
         self.s = batch.s
         self.debug_level = batch.s.debug_level
-        batch.p = self
+
+    def __repr__(self):
+        return "Projects(SimBatch())"
+
+    def __str__(self):
+        return "current_project_id:{}   total_projects:{}".format(self.current_project_id, self.total_projects)
 
     #  print project data, for debug
     def print_current(self):
@@ -129,6 +134,7 @@ class Projects:
             print "       seq_shot_take_pattern:{}, zeros:{}, description:{}".format(cur_proj.seq_shot_take_pattern,
                                                                                      cur_proj.zeros_in_version,
                                                                                      cur_proj.description)
+
 
     def print_all(self):
         if self.total_projects == 0:

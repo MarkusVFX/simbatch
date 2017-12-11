@@ -21,6 +21,11 @@ def test_prepare_data_directory_by_delete_all_files(sib):
     sib.p.clear_all_projects_data(clear_stored_data=True)
 
 
+def test_print_repr_str(sib):
+    print "\n__repr__ ", repr(sib.p)
+    print "__str__ ", sib.p
+
+
 def test_no_proj_data(sib):
     assert sib.comfun.file_exists(sib.s.store_data_json_directory + sib.s.JSON_PROJECTS_FILE_NAME) is False
 

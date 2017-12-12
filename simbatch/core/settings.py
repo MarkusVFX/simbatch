@@ -94,6 +94,9 @@ class Settings:
         self.set_current_soft(soft_id)
         self.ini_file = ini_file
         self.comfun = CommonFunctions(2)
+        self.sql = [None, None, None, None]
+        self.state_colors = []
+        self.state_colors_up = []
 
         self.load_settings()
 

@@ -112,6 +112,7 @@ class Projects:
         self.comfun = batch.comfun
         self.s = batch.s
         self.debug_level = batch.s.debug_level
+        self.projects_data = []
 
     def __repr__(self):
         return "Projects(SimBatch())"

@@ -69,6 +69,7 @@ class Tasks:
         self.batch = batch
         self.s = batch.s
         self.comfun = batch.comfun
+        self.tasks_data = []
 
     def get_blank_task(self):
         return TaskItem(0, "", 1, "NULL", 1, 1, 1, [], "")

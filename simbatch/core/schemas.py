@@ -7,10 +7,10 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ('name', 'schema_name'),
     ('stateId', 'state_id'),
     ('state', 'state'),
-    ('projId', 'project_id'),
-    ('definition', 'definition_id'),
     ('version', 'schema_version'),
+    ('projId', 'project_id'),
     ('actions', 'actions_array'),
+    ('definition', 'definition_id'),
     ('desc', 'description')
     ]
 
@@ -87,6 +87,7 @@ class Schemas:
     def __init__(self, batch):
         self.s = batch.s
         self.comfun = batch.comfun
+        self.schemas_data = []
 
     def get_blank_schema(self):
         return SchemaItem(0, "", 1, "NULL", 1, 1, 1, [], "")

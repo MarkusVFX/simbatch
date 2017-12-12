@@ -1,7 +1,14 @@
 Hey!
 
-Contributors are welcome after alpha release (2017-12-12)
+Contributors are welcome!
 
-At this moment there is refactoring form prototype.
+You can get involved in the project by helping with:
+ - architecture design
+ - creating modules
+ - correcting spelling
+ - creating documentation
+ - testing SimBatch with specific 3D package
+
+At this moment there is refactoring time (form prototype to alpha).
 
 PEP8 standard will be preserved.

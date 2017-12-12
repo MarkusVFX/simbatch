@@ -13,8 +13,9 @@ PROJECT:
 10 STR  props_directory
 11 STR  scripts_directory
 12 STR  custom_directory
-13 STR  description
-14 STR  seq_shot_take_pattern
+13 STR  seq_shot_take_pattern
+14 STR  description
+15 INT  zeros_in_version  [def=3]
 
 
 
@@ -24,10 +25,19 @@ SCHEMA:
 2  INT  state_id
 3  STR  state
 4  INT  project_id
-5  INT  definition_id     1 Houdini   2 Maya  3 max  4 RF  5 Standalone  6 c4D  7 Nuke  8 Mari  9 Blender
+5  INT  definition_id
 6  INT  schema_version 
 7  ARR  actions_array
 8  STR  description
+
+
+DEFINITION:
+0  INT  id
+1  STR  schema_name
+
+8  STR  description
+
+
 
 ACTION:
 

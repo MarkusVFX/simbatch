@@ -1,144 +1,146 @@
 {
-  "definition": {
-    "meta": {
-      "id": 2,
-      "software": "Maya",
-      "actions": 6
-    },
-    "actions": [
-      {"action":
-        {
-          "aid": 1,
-          "name": "Open",
-          "desc": "Open Maya scene",
-          "template": "executor.maya_open_scene(\"|<f>|\");"
-        }
-      },
-      {"action":
-        {
-          "aid": 2,
-          "name": "Import",
-          "desc": "Import object or cache",
-          "template": ["executor.maya_import(", "<o>", ", \"", "<f>", "\" )"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "ANI",
-                "desc": "Animation cache",
-                "template": ["executor.maya_import_ani(", "<o>", ", \"", "<f>", "\" )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "OBJ",
-                "desc": "Geometry object",
-                "template": ["executor.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
-              }
-            },
-            {
-              "approach": {
-                "mode": "Cam",
-                "desc": "Camera",
-                "template": ["executor.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
-                }
-            }
-          ]
-        }
-      },
-      {"action":
-        {
-          "aid": 3,
-          "name": "Param",
-          "desc": "Set value for custom parameter",
-          "template": ["executor.maya_set_param(", "<o>", ", ", "<p>", ")"]
-        }
-      },
-      {"action":
-        {
-          "aid": 4,
-          "name": "Simulate",
-          "desc": "Simulate",
-          "template": ["executor.maya_simulate(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "nCloth",
-                "desc": "nCloth",
-                "template": ["executor.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "nParticle",
-                "desc": "nParticle",
-                "template": ["executor.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-              }
-            },
-            {
-              "approach": {
-                "mode": "FumeFX",
-                "desc": "FumeFX",
-                "template": ["executor.maya_simulate_fumefx(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "FumeFX WT",
-                "desc": "FumeFX Wavelet",
-                "template": ["executor.maya_simulate_fumefxwt(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-                }
-            }
-          ]
-        }
-      },
-      {"action":
-        {
-          "aid": 5,
-          "name": "Render",
-          "desc": "Render frame range",
-          "template": ["executor.maya_render( ", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "BLAST",
-                "desc": "grab screen",
-                "template": ["executor.maya_render_prev( ", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "RND",
-                "desc": "Render curent renderer",
-                "template": ["executor.maya_render_render( ", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
-                }
-            }
-          ]
-        }
-      },
-      {"action":
-        {
-          "aid": 6,
-          "name": "Script",
-          "desc": "execute MEL or Python file",
-          "template": ["executor.maya_script_py(\"", "<f>", "\")"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "PY",
-                "desc": "Python file",
-                "template": ["executor.maya_script_py(\"", "<f>", "\")"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "MEL",
-                "desc": "MEL file",
-                "template": ["executor.maya_script_mxs(\"", "<f>", "\")"]
-                }
-            }
-          ]
-        }
-      }
-    ]
-  }
+	"definition": {
+		"meta": {
+			"software": "Maya",
+			"total": 2
+		},		
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open Maya scene",
+				"default": "<schema_base_setup>",
+				"template": ["executor.maya_open_scene(\"", "<f>", "\")"]
+			},
+			"2":{
+				"id": 2,
+				"type": "group",
+				"name": "Import",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "ANI",
+						"desc": "Animation cache",
+						"default": "<project_cache_dir>",
+						"template": ["executor.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "CAM",
+						"desc": "Camera file",
+						"default": "<project_cam_dir>",
+						"template": ["executor.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
+					},
+					"3": {
+						"id": 2,
+						"mode": "OBJ",
+						"desc": "Geometry file",
+						"default": "<project_props_dir>",
+						"template": ["executor.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
+					}
+				}
+			},
+			"3":{
+				"id": 3,
+				"type": "single",
+				"name": "Set Value",
+				"desc": "Set value for any object properties",
+				"default": "<schema_base_setup>",
+				"template": ["executor.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
+			},
+			"4":{
+				"id": 4,
+				"type": "group",
+				"name": "Simulate", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "nCloth",
+						"desc": "nCloth sim",
+						"default": "<cloth_objects>",
+						"template": ["executor.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "nHair",
+						"desc": "nHair sim",
+						"default": "<hair_objects>",
+						"template": ["executor.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"3": {
+						"id": 2,
+						"mode": "nParticle",
+						"desc": "nParticle sim",
+						"default": "<particle_objects>",
+						"template": ["executor.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"4": {
+						"id": 2,
+						"mode": "FumeFX",
+						"desc": "FumeFX sim",
+						"default": "<fume_container>",
+						"template": ["executor.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
+					},
+					"5": {
+						"id": 2,
+						"mode": "FumeFX WT",
+						"desc": "FumeFX Wavelet",
+						"default": "<fume_container>",
+						"template": ["executor.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
+					}
+				}
+			},
+			"5":{
+				"id": 6,
+				"type": "group",
+				"name": "Render", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "BLAST",
+						"desc": "grab screen",
+						"default": "<shot_prev_dir>",
+						"template": ["executor.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "RENDER",
+						"desc": "render scene",
+						"default": "<shot_prev_dir>",
+						"template": ["executor.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+					}
+				}
+			},
+			"6":{
+				"id": 6,
+				"type": "single",
+				"name": "Save",
+				"desc": "Save Maya Scene",
+				"default": "<copmuted_scenes_dir>",
+				"template": ["executor.maya_save_scene(\"", "<f>", "\")"]
+			},
+			"7":{
+				"id": 7,
+				"type": "group",
+				"name": "Script", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "PY",
+						"desc": "run Python file",
+						"default": "<scripts_dir>",
+						"template": ["executor.maya_script_py(\"", "<f>", "\")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "MEL",
+						"desc": "run MEL file",
+						"default": "<scripts_dir>",
+						"template": ["executor.maya_script_mel(\"", "<f>", "\")"]
+					}
+				}
+			}
+		}
+	}	
 }

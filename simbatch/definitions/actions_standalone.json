@@ -11,8 +11,7 @@
 				"name": "Run Script",
 				"desc": "execute python script",
 				"default": "<script_directory>",
-				"template": ["os.system(\"", "<f>", "\")"],
-				"subActions": []
+				"template": ["os.system(\"", "<f>", "\")"]
 			},
 			"2":{
 				"id": 2,

@@ -33,7 +33,7 @@
 						"template": ["executor.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {
-						"id": 2,
+						"id": 3,
 						"mode": "OBJ",
 						"desc": "Geometry file",
 						"default": "<project_props_dir>",
@@ -69,21 +69,21 @@
 						"template": ["executor.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"3": {
-						"id": 2,
+						"id": 3,
 						"mode": "nParticle",
 						"desc": "nParticle sim",
 						"default": "<particle_objects>",
 						"template": ["executor.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"4": {
-						"id": 2,
+						"id": 4,
 						"mode": "FumeFX",
 						"desc": "FumeFX sim",
 						"default": "<fume_container>",
 						"template": ["executor.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
 					},
 					"5": {
-						"id": 2,
+						"id": 5,
 						"mode": "FumeFX WT",
 						"desc": "FumeFX Wavelet",
 						"default": "<fume_container>",

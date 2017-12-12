@@ -45,8 +45,8 @@
 				"id": 3,
 				"type": "single",
 				"name": "Set Value",
-				"desc": "Set value for any object properties",
-				"default": "<schema_base_setup>",
+				"desc": "Set value for object property",
+				"default": "",
 				"template": ["executor.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
 			"4":{
@@ -92,22 +92,22 @@
 				}
 			},
 			"5":{
-				"id": 6,
+				"id": 5,
 				"type": "group",
 				"name": "Render", 
 				"subActions":{
 					"1": {
 						"id": 1,
 						"mode": "BLAST",
-						"desc": "grab screen",
-						"default": "<shot_prev_dir>",
+						"desc": "grab viewport",
+						"default": "<default_camera><shot_prev_dir>",
 						"template": ["executor.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "RENDER",
 						"desc": "render scene",
-						"default": "<shot_prev_dir>",
+						"default": "<default_camera><shot_prev_dir>",
 						"template": ["executor.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
 				}
@@ -129,14 +129,14 @@
 						"id": 1,
 						"mode": "PY",
 						"desc": "run Python file",
-						"default": "<scripts_dir>",
+						"default": "<scripts_dir>*.py",
 						"template": ["executor.maya_script_py(\"", "<f>", "\")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "MEL",
 						"desc": "run MEL file",
-						"default": "<scripts_dir>",
+						"default": "<scripts_dir>*.mel",
 						"template": ["executor.maya_script_mel(\"", "<f>", "\")"]
 					}
 				}

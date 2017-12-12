@@ -1,43 +1,42 @@
 {
-  "definition": {
-    "meta": {
-      "id": 4,
-      "software": "RealFlow",
-      "actions": 4
-    },
-    "actions": [
-      {"action":
-        {
-          "aid": 1,
-          "name": "Open",
-          "desc": "Open RF scene",
-          "template": "executor.rf_open_scene(\"|<f>|\");"
-        }
-      },
-      {"action":
-        {
-          "aid": 2,
-          "name": "Param",
-          "desc": "Set value for custom parameter",
-          "template": ["executor.rf_set_param(", "<o>", ", ", "<p>", ")"]
-        }
-      },
-      {"action":
-        {
-          "aid": 3,
-          "name": "Simulate",
-          "desc": "Simulate",
-          "template": ["executor.rf_simulate(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-        }
-      },
-      {"action":
-        {
-          "aid": 4,
-          "name": "Script",
-          "desc": "execute RF script",
-          "template": ["executor.max_script_py(\"", "<f>", "\")"]
-        }
-      }
-    ]
-  }
+	"definition": {
+		"meta": {
+			"software": "RealFlow",
+			"total": 4
+		},
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open RF scene",
+				"default": "<base_setup>",
+				"template": ["executor.rf_open_scene(\"", "<f>", "\")"]
+			},
+			"2":{
+				"id": 1,
+				"type": "single",
+				"name": "Set Param",
+				"desc": "Set value for parameter",
+				"default": "",
+				"template": ["executor.rf_set_param(\"", "<o>", ", ", "<p>", ", ", "<v>", "\")"]
+			},
+			"3":{
+				"id": 1,
+				"type": "single",
+				"name": "Simulate",
+				"desc": "Simulate current scene",
+				"default": "",
+				"template": ["executor.rf_simulate(\"",  "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\")"]
+			},
+			"4":{
+				"id": 1,
+				"type": "single",
+				"name": "Script",
+				"desc": "execute RF script",
+				"default": "<script_directory>",
+				"template": ["executor.rf_script(\"", "<f>", "\")"]
+			}
+		}
+	}
 }

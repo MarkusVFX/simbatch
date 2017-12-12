@@ -1,144 +1,139 @@
 {
-  "definition": {
-    "meta": {
-      "id": 3,
-      "software": "3dsMAX",
-      "actions": 6
-    },
-    "actions": [
-      {"action":
-        {
-          "aid": 1,
-          "name": "Open",
-          "desc": "Open 3dsMAX scene",
-          "template": "executor.max_open_scene(\"|<f>|\");"
-        }
-      },
-      {"action":
-        {
-          "aid": 2,
-          "name": "Import",
-          "desc": "Import object or cache",
-          "template": ["executor.max_import(", "<o>", ", \"", "<f>", "\" )"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "ANI",
-                "desc": "Animation cache",
-                "template": ["executor.max_import_ani(", "<o>", ", \"", "<f>", "\" )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "OBJ",
-                "desc": "Geometry object",
-                "template": ["executor.max_import_obj(", "<o>", ", \"", "<f>", "\" )"]
-              }
-            },
-            {
-              "approach": {
-                "mode": "Cam",
-                "desc": "Camera",
-                "template": ["executor.max_import_cam(", "<o>", ", \"", "<f>", "\" )"]
-                }
-            }
-          ]
-        }
-      },
-      {"action":
-        {
-          "aid": 3,
-          "name": "Param",
-          "desc": "Set value for custom parameter",
-          "template": ["executor.max_set_param(", "<o>", ", ", "<p>", ")"]
-        }
-      },
-      {"action":
-        {
-          "aid": 4,
-          "name": "Simulate",
-          "desc": "Simulate",
-          "template": ["executor.max_simulate(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "Cloth",
-                "desc": "Cloth",
-                "template": ["executor.max_simulate_cloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "ParticleFlow",
-                "desc": "ParticleFlow",
-                "template": ["executor.max_simulate_pf(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-              }
-            },
-            {
-              "approach": {
-                "mode": "FumeFX",
-                "desc": "FumeFX",
-                "template": ["executor.max_simulate_fumefx(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "FumeFX WT",
-                "desc": "FumeFX Wavelet",
-                "template": ["executor.max_simulate_fumefxwt(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<f>", "\"  )"]
-                }
-            }
-          ]
-        }
-      },
-      {"action":
-        {
-          "aid": 5,
-          "name": "Render",
-          "desc": "Render frame range",
-          "template": ["executor.max_render( ", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "PREV",
-                "desc": "grab screen",
-                "template": ["executor.max_render_prev( ", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "RND",
-                "desc": "Render curent renderer",
-                "template": ["executor.max_render_render( ", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
-                }
-            }
-          ]
-        }
-      },
-      {"action":
-        {
-          "aid": 6,
-          "name": "Script",
-          "desc": "execute MAXScript or Python file",
-          "template": ["executor.max_script_py(\"", "<f>", "\")"],
-          "approaches":[
-            {
-              "approach": {
-                "mode": "PY",
-                "desc": "Python file",
-                "template": ["executor.max_script_py(\"", "<f>", "\")"]
-                }
-            },
-            {
-              "approach": {
-                "mode": "MXS",
-                "desc": "MAXScript file",
-                "template": ["executor.max_script_mxs(\"", "<f>", "\")"]
-                }
-            }
-          ]
-        }
-      }
-    ]
-  }
+	"definition": {
+		"meta": {
+			"software": "3dsmax",
+			"total": 6
+		},		
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open max scene",
+				"default": "<schema_base_setup>",
+				"template": ["executor.max_open_scene(\"", "<f>", "\")"]
+			},
+			"2":{
+				"id": 2,
+				"type": "group",
+				"name": "Import",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "ANI",
+						"desc": "Animation cache",
+						"default": "<project_cache_dir>",
+						"template": ["executor.max_import_ani(", "<o>", ", \"", "<d>", "\" )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "CAM",
+						"desc": "Camera file",
+						"default": "<project_cam_dir>",
+						"template": ["executor.max_import_cam(", "<o>", ", \"", "<f>", "\" )"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "OBJ",
+						"desc": "Geometry file",
+						"default": "<project_props_dir>",
+						"template": ["executor.max_import_obj(", "<o>", ", \"", "<f>", "\" )"]
+					}
+				}
+			},
+			"3":{
+				"id": 3,
+				"type": "single",
+				"name": "Set Param",
+				"desc": "Set value for object property",
+				"default": "",
+				"template": ["executor.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
+			},
+			"4":{
+				"id": 4,
+				"type": "group",
+				"name": "Simulate", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "nCloth",
+						"desc": "nCloth sim",
+						"default": "<cloth_objects>",
+						"template": ["executor.max_simulate_cloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "ParticleFlow",
+						"desc": "ParticleFlow sim",
+						"default": "<pf_object>",
+						"template": ["executor.max_simulate_pf(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "FumeFX",
+						"desc": "FumeFX sim",
+						"default": "<fume_container>",
+						"template": ["executor.max_simulate_fumefx(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"4": {
+						"id": 4,
+						"mode": "FumeFX WT",
+						"desc": "FumeFX Wavelet",
+						"default": "<fume_container>",
+						"template": ["executor.max_simulate_fumefxwt(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					}
+				}
+			},
+			"5":{
+				"id": 5,
+				"type": "group",
+				"name": "Render", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "VIEWPORT",
+						"desc": "grab viewport",
+						"default": "<default_camera>",
+						"template": ["executor.max_render_prev(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "RENDER",
+						"desc": "scanline render scene",
+						"default": "<default_camera>",
+						"template": ["executor.max_render_render(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+					}
+				}
+			},
+			"6":{
+				"id": 6,
+				"type": "single",
+				"name": "Save",
+				"desc": "Save Current Scene",
+				"default": "<copmuted_scenes_dir>",
+				"template": ["executor.max_save_scene(\"", "<f>", "\")"]
+			},
+			"7":{
+				"id": 7,
+				"type": "group",
+				"name": "Script", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "PY",
+						"desc": "run Python file",
+						"default": "<scripts_dir>*.py",
+						"template": ["executor.max_script_py(\"", "<f>", "\")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "MXS",
+						"desc": "run MaxScript file",
+						"default": "<scripts_dir>*.ms",
+						"template": ["executor.max_script_mxs(\"", "<f>", "\")"]
+					}
+				}
+			}
+		}
+	}	
 }

@@ -1,7 +1,7 @@
 from settings import Settings
 from common import CommonFunctions
 from users import Users
-from definitons import Definitions
+from definitions import Definitions
 from projects import Projects
 from schemas import Schemas
 from tasks import Tasks
@@ -14,8 +14,8 @@ class SimBatch:
     s = None
     comfun = None
 
-    def __init__(self, soft_id, ini_file="config.ini"):
-        self.s = Settings(soft_id, ini_file=ini_file)
+    def __init__(self, runtime_env, ini_file="config.ini"):
+        self.s = Settings(runtime_env, ini_file=ini_file)
         self.comfun = CommonFunctions(debug_level=self.s.debug_level)
 
         self.u = Users(self)
@@ -113,6 +113,8 @@ class SimBatch:
         self.c.clear_all_schemas_data()
 
     def load_data(self):
+        self.d.load_definitions()
+
         if self.p.load_projects():
             self.p.init_default_proj()
             if self.c.load_schemas():

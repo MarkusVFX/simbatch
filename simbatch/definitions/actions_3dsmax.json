@@ -2,7 +2,8 @@
 	"definition": {
 		"meta": {
 			"software": "3dsmax",
-			"total": 6
+			"total": 7,
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},		
 		"actions": {
 			"1":{
@@ -11,7 +12,7 @@
 				"name": "Open",
 				"desc": "Open max scene",
 				"default": "<schema_base_setup>",
-				"template": ["executor.max_open_scene(\"", "<f>", "\")"]
+				"template": ["interaction.max_open_scene(\"", "<f>", "\")"]
 			},
 			"2":{
 				"id": 2,
@@ -23,21 +24,21 @@
 						"mode": "ANI",
 						"desc": "Animation cache",
 						"default": "<project_cache_dir>",
-						"template": ["executor.max_import_ani(", "<o>", ", \"", "<d>", "\" )"]
+						"template": ["interaction.max_import_ani(", "<o>", ", \"", "<d>", "\" )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
 						"default": "<project_cam_dir>",
-						"template": ["executor.max_import_cam(", "<o>", ", \"", "<f>", "\" )"]
+						"template": ["interaction.max_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "OBJ",
 						"desc": "Geometry file",
 						"default": "<project_props_dir>",
-						"template": ["executor.max_import_obj(", "<o>", ", \"", "<f>", "\" )"]
+						"template": ["interaction.max_import_obj(", "<o>", ", \"", "<f>", "\" )"]
 					}
 				}
 			},
@@ -47,7 +48,7 @@
 				"name": "Set Param",
 				"desc": "Set value for object property",
 				"default": "",
-				"template": ["executor.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
+				"template": ["interaction.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
 			"4":{
 				"id": 4,
@@ -59,28 +60,28 @@
 						"mode": "nCloth",
 						"desc": "nCloth sim",
 						"default": "<cloth_objects>",
-						"template": ["executor.max_simulate_cloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.max_simulate_cloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "ParticleFlow",
 						"desc": "ParticleFlow sim",
 						"default": "<pf_object>",
-						"template": ["executor.max_simulate_pf(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.max_simulate_pf(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "FumeFX",
 						"desc": "FumeFX sim",
 						"default": "<fume_container>",
-						"template": ["executor.max_simulate_fumefx(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.max_simulate_fumefx(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"4": {
 						"id": 4,
 						"mode": "FumeFX WT",
 						"desc": "FumeFX Wavelet",
 						"default": "<fume_container>",
-						"template": ["executor.max_simulate_fumefxwt(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.max_simulate_fumefxwt(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					}
 				}
 			},
@@ -94,14 +95,14 @@
 						"mode": "VIEWPORT",
 						"desc": "grab viewport",
 						"default": "<default_camera>",
-						"template": ["executor.max_render_prev(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+						"template": ["interaction.max_render_prev(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "RENDER",
 						"desc": "scanline render scene",
 						"default": "<default_camera>",
-						"template": ["executor.max_render_render(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+						"template": ["interaction.max_render_render(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
 				}
 			},
@@ -111,7 +112,7 @@
 				"name": "Save",
 				"desc": "Save Current Scene",
 				"default": "<copmuted_scenes_dir>",
-				"template": ["executor.max_save_scene(\"", "<f>", "\")"]
+				"template": ["interaction.max_save_scene(\"", "<f>", "\")"]
 			},
 			"7":{
 				"id": 7,
@@ -123,14 +124,14 @@
 						"mode": "PY",
 						"desc": "run Python file",
 						"default": "<scripts_dir>*.py",
-						"template": ["executor.max_script_py(\"", "<f>", "\")"]
+						"template": ["interaction.max_script_py(\"", "<f>", "\")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "MXS",
 						"desc": "run MaxScript file",
 						"default": "<scripts_dir>*.ms",
-						"template": ["executor.max_script_mxs(\"", "<f>", "\")"]
+						"template": ["interaction.max_script_mxs(\"", "<f>", "\")"]
 					}
 				}
 			}

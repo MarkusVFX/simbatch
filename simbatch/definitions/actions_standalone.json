@@ -2,7 +2,8 @@
 	"definition": {
 		"meta": {
 			"software": "Stand-alone",
-			"total": 2
+			"total": 2,
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},
 		"actions": {
 			"1":{

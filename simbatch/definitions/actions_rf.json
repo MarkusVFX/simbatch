@@ -2,7 +2,8 @@
 	"definition": {
 		"meta": {
 			"software": "RealFlow",
-			"total": 4
+			"total": 4,
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},
 		"actions": {
 			"1":{
@@ -11,7 +12,7 @@
 				"name": "Open",
 				"desc": "Open RF scene",
 				"default": "<base_setup>",
-				"template": ["executor.rf_open_scene(\"", "<f>", "\")"]
+				"template": ["interaction.rf_open_scene(\"", "<f>", "\")"]
 			},
 			"2":{
 				"id": 1,
@@ -19,7 +20,7 @@
 				"name": "Set Param",
 				"desc": "Set value for parameter",
 				"default": "",
-				"template": ["executor.rf_set_param(\"", "<o>", ", ", "<p>", ", ", "<v>", "\")"]
+				"template": ["interaction.rf_set_param(\"", "<o>", ", ", "<p>", ", ", "<v>", "\")"]
 			},
 			"3":{
 				"id": 1,
@@ -27,7 +28,7 @@
 				"name": "Simulate",
 				"desc": "Simulate current scene",
 				"default": "",
-				"template": ["executor.rf_simulate(\"",  "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\")"]
+				"template": ["interaction.rf_simulate(\"",  "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\")"]
 			},
 			"4":{
 				"id": 1,
@@ -35,7 +36,7 @@
 				"name": "Script",
 				"desc": "execute RF script",
 				"default": "<script_directory>",
-				"template": ["executor.rf_script(\"", "<f>", "\")"]
+				"template": ["interaction.rf_script(\"", "<f>", "\")"]
 			}
 		}
 	}

@@ -2,7 +2,8 @@
 	"definition": {
 		"meta": {
 			"software": "Maya",
-			"total": 2
+			"total": 7,
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},		
 		"actions": {
 			"1":{
@@ -11,7 +12,7 @@
 				"name": "Open",
 				"desc": "Open Maya scene",
 				"default": "<schema_base_setup>",
-				"template": ["executor.maya_open_scene(\"", "<f>", "\")"]
+				"template": ["interaction.maya_open_scene(\"", "<f>", "\")"]
 			},
 			"2":{
 				"id": 2,
@@ -23,21 +24,23 @@
 						"mode": "ANI",
 						"desc": "Animation cache",
 						"default": "<project_cache_dir>",
-						"template": ["executor.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]
+						"additionalButton" : "Objs"
+						"additionalButtonFunction" : "Objs"
+						"template": ["interaction.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]						
 					},
 					"2": {
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
 						"default": "<project_cam_dir>",
-						"template": ["executor.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
+						"template": ["interaction.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "OBJ",
 						"desc": "Geometry file",
 						"default": "<project_props_dir>",
-						"template": ["executor.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
+						"template": ["interaction.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
 					}
 				}
 			},
@@ -47,7 +50,7 @@
 				"name": "Set Value",
 				"desc": "Set value for object property",
 				"default": "",
-				"template": ["executor.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
+				"template": ["interaction.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
 			"4":{
 				"id": 4,
@@ -59,35 +62,35 @@
 						"mode": "nCloth",
 						"desc": "nCloth sim",
 						"default": "<cloth_objects>",
-						"template": ["executor.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "nHair",
 						"desc": "nHair sim",
 						"default": "<hair_objects>",
-						"template": ["executor.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "nParticle",
 						"desc": "nParticle sim",
 						"default": "<particle_objects>",
-						"template": ["executor.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interaction.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"4": {
 						"id": 4,
 						"mode": "FumeFX",
 						"desc": "FumeFX sim",
 						"default": "<fume_container>",
-						"template": ["executor.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
+						"template": ["interaction.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
 					},
 					"5": {
 						"id": 5,
 						"mode": "FumeFX WT",
 						"desc": "FumeFX Wavelet",
 						"default": "<fume_container>",
-						"template": ["executor.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
+						"template": ["interaction.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
 					}
 				}
 			},
@@ -101,14 +104,14 @@
 						"mode": "BLAST",
 						"desc": "grab viewport",
 						"default": "<default_camera><shot_prev_dir>",
-						"template": ["executor.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+						"template": ["interaction.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "RENDER",
 						"desc": "render scene",
 						"default": "<default_camera><shot_prev_dir>",
-						"template": ["executor.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+						"template": ["interaction.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
 				}
 			},
@@ -118,7 +121,7 @@
 				"name": "Save",
 				"desc": "Save Maya Scene",
 				"default": "<copmuted_scenes_dir>",
-				"template": ["executor.maya_save_scene(\"", "<f>", "\")"]
+				"template": ["interaction.maya_save_scene(\"", "<f>", "\")"]
 			},
 			"7":{
 				"id": 7,
@@ -130,14 +133,14 @@
 						"mode": "PY",
 						"desc": "run Python file",
 						"default": "<scripts_dir>*.py",
-						"template": ["executor.maya_script_py(\"", "<f>", "\")"]
+						"template": ["interaction.maya_script_py(\"", "<f>", "\")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "MEL",
 						"desc": "run MEL file",
 						"default": "<scripts_dir>*.mel",
-						"template": ["executor.maya_script_mel(\"", "<f>", "\")"]
+						"template": ["interaction.maya_script_mel(\"", "<f>", "\")"]
 					}
 				}
 			}

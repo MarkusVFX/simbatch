@@ -12,7 +12,6 @@ class Settings:
     ini_file = None                 # basic config file
     loading_state = 0               # check basic config # TODO data loading and GUI init
     json_settings_data = None       # basic config data
-    soft_id = None                  # current soft mode
 
     # basic config settings (def:config.ini)
     store_data_mode = None                      # 1 json     2 MySQL (PRO version)
@@ -24,7 +23,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.05"   # current version
+    SIMBATCH_VERSION = "v0.2.06"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -55,7 +54,7 @@ class Settings:
     INDEX_STATE_DEFAULT = 23
 
     # GUI settings
-    current_soft_name = ""  # only for display at this moment
+    runtime_env = ""        # runtime environment as software name display on frame and set active definition
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
     ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors
@@ -90,8 +89,8 @@ class Settings:
                             {"posX": 70, "posy": 150, "sizex": 600, "sizey": 800}
                         }
 
-    def __init__(self, soft_id, ini_file="config.ini"):
-        self.set_current_soft(soft_id)
+    def __init__(self, runtime_env, ini_file="config.ini"):
+        self.runtime_env = runtime_env
         self.ini_file = ini_file
         self.comfun = CommonFunctions(2)
         self.sql = [None, None, None, None]
@@ -107,7 +106,7 @@ class Settings:
     def print_all(self):
         print " loading_state: ", self.loading_state
         print " ini_file: ", self.ini_file
-        print " soft_id: ", self.soft_id
+        print " runtime_env: ", self.runtime_env
 
         print " json_settings_data[datamode][current]: ", self.json_settings_data["datamode"]["current"]
         print " json_settings_data[colormode][current]: ", self.json_settings_data["colormode"]["current"]
@@ -121,10 +120,9 @@ class Settings:
         print " store_data_definitions_directory: ", self.store_data_definitions_directory
         print " sql settings: ", self.sql
         print " admin_user: ", self.admin_user
+        print " window:", self.window
 
         print "\n\n"
-
-
 
     def load_settings(self):
         if self.comfun.file_exists(self.ini_file, info="settings init"):
@@ -191,19 +189,6 @@ class Settings:
             if comfun.file_exists(data_path + self.JSON_SIMNODES_FILE_NAME) is False:
                 comfun.create_empty_file(data_path + self.JSON_SIMNODES_FILE_NAME)
 
-    def set_current_soft(self, soft_id):  # 1 Houdini,  2 Maya,  3 3dsmax,  4  RF,  5 standalone,  6 blender, 7 c4d, ...
-        self.soft_id = soft_id
-        if soft_id == 1:
-            self.current_soft_name = "Houdini"
-        elif soft_id == 2:
-            self.current_soft_name = "Maya"
-        elif soft_id == 3:
-            self.current_soft_name = "3dsMAX"
-        elif soft_id == 4:
-            self.current_soft_name = "RealFlow"
-        elif soft_id == 5:
-            self.current_soft_name = ":>"
-
     def check_data_integration(self):
         #  out = json.dumps(self.json_settings_data, indent=2)  TODO cleanup
         jd = self.json_settings_data
@@ -217,22 +202,6 @@ class Settings:
             return True
         else:
             return False
-
-    def print_all(self):
-        print "  ini_file:", self.ini_file
-        print "  loading_state:", self.loading_state
-        print "  len(json_settings_data):", len(self.json_settings_data)
-        print "   ."
-        print "  store_data_mode:", self.store_data_mode
-        print "  debug_level:", self.debug_level
-        print "  store_data_json_directory:", self.store_data_json_directory
-        print "  store_data_backup_directory:", self.store_data_backup_directory
-        print "  store_data_definitions_directory:", self.store_data_definitions_directory
-        print "   ."
-        print "  sql:", self.sql
-        print "  admin_user:", self.admin_user
-        print "  window:", self.window
-        print "   ."
 
     def update_ui_colors(self):
         palette_id = self.ui_color_mode

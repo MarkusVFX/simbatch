@@ -47,7 +47,7 @@ class Queue:
     batch = None
     comfun = None
 
-    queue_data = None
+    queue_data = []
     total_queue_items = 0
 
     current_queue_id = None
@@ -57,6 +57,7 @@ class Queue:
     def __init__(self, batch):
         self.batch = batch
         self.comfun = batch.comfun
+        self.queue_data = []
 
     #  print project data, mainly for debug
     def print_header(self):

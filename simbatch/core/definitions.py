@@ -41,16 +41,21 @@ ACTION_ITEM_FIELDS_NAMES = [
 
 
 class SingleAction:  # SingleDefinition
+    id = None
     name = ""
 
-    def __init__(self, action_id, name, description, default_value, template):
+    def __init__(self, action_id, name, description, default_value, template, mode=None, addi_butt=None, addi_fun=None):
         self.id = action_id
         # self.definition_id = definition_id
         self.name = name
+        self.mode = mode
         # self.type = definition_type
         self.description = description
         self.default_value = default_value
         self.template = template
+
+        self.addional_butt_caption = addi_butt
+        self.addional_funcion_name = addi_fun
 
     def __repr__(self):
         return "SingleAction({},{})".format(self.action_id,self.name)
@@ -69,10 +74,13 @@ class SingleAction:  # SingleDefinition
 
 
 class GroupAction:
+    id = None
     name = ""
     actions = []
 
-    def __init__(self):
+    def __init__(self, action_id, name):
+        self.id = action_id
+        self.name = name
         self.actions = []
         pass
 
@@ -165,6 +173,13 @@ class Definitions:
         if self.s.store_data_mode == 2:
             return self.load_definitions_from_mysql()
 
+
+    def get_additional_button_values(self, li):
+        if "additionalButton" in li:
+            return (li["additionalButton"], li["additionalButtonFunction"])
+        else:
+            return (None,None)
+
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
             definitions_dir = self.s.store_data_definitions_directory
@@ -182,16 +197,22 @@ class Definitions:
                         self.definitions_names.append(json_definition['definition']['meta']["software"])
                         self.add_definition(new_definition)
                         for li in json_definition['definition']['actions'].values():
+
+                            addi_vals = self.get_additional_button_values(li)
+
                             if li['type'] == "single":
                                 new_action = SingleAction(li['id'], li['name'], li['desc'], li['default'],
-                                                          li['template'])
+                                                          li['template'], addi_butt=addi_vals[0], addi_fun=addi_vals[1])
                                 new_definition.add_single_or_group_action(new_action)
+
                             elif li['type'] == "group":
-                                new_group_action = GroupAction()
+                                new_group_action = GroupAction(li['id'], li['name'])
                                 new_group_action.name = li['name']
                                 for ag in li["subActions"].values():
+                                    addi_vals = self.get_additional_button_values(ag)
                                     new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
-                                                              ag['template'])
+                                                              ag['template'], mode=ag['mode'],
+                                                              addi_butt=addi_vals[0], addi_fun=addi_vals[1])
                                     new_group_action.actions.append(new_action)
                                 new_definition.add_single_or_group_action(new_group_action)
             # self.print_all(print_children=True)

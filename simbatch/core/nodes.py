@@ -3,7 +3,7 @@ class SimNodes:
     batch = None
     comfun = None
 
-    nodes_data = None
+    nodes_data = []
     total_nodes = 0
 
     current_node_id = None
@@ -13,6 +13,8 @@ class SimNodes:
     def __init__(self, batch):
         self.batch = batch
         self.comfun = batch.comfun
+        self.nodes_data = []
+
 
     #  print project data, mainly for debug
     def print_current(self):

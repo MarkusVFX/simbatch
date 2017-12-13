@@ -16,7 +16,6 @@ class WizardUI:
     mainw = None
 
     comfun = None
-    current_soft = None
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
@@ -24,7 +23,6 @@ class WizardUI:
         self.top_ui = top
         self.mainw = mainw
         self.init_ui()
-        self.current_soft = batch.s.soft_id
 
     def init_ui(self):
         qt_widget_wizard = QWidget()

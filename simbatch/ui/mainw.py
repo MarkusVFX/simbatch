@@ -155,7 +155,7 @@ class MainWindow(QMainWindow):
                 print "  [INF] set wind pos : ",  x_wnd_pos, y_wnd_pos,  wnd[2],  wnd[3]
             self.setGeometry(x_wnd_pos, y_wnd_pos, wnd[2], wnd[3])
 
-        self.setWindowTitle("SimBatch " + self.s.SIMBATCH_VERSION + "       " + self.s.current_soft_name)
+        self.setWindowTitle("SimBatch " + self.s.SIMBATCH_VERSION + "     " + self.s.runtime_env)
         qt_central_widget = QWidget(self)
         self.setCentralWidget(qt_central_widget)
         qt_lay_central = QVBoxLayout(qt_central_widget)
@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
 
         if self.s.store_data_mode == 1:
             if self.comfun.path_exists(self.s.store_data_json_directory):
-                qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB: show tasks
+                qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB: show tasks
             else:
                 qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings
         else:
@@ -232,7 +232,6 @@ class MainWindow(QMainWindow):
         if self.s.debug_level >= 3:
             print " [INF] but_refresh"
 
-
         self.s.update_ui_colors()
 
         print " [INF] update PROJECTS"
@@ -260,13 +259,6 @@ class MainWindow(QMainWindow):
         print " [INF] update SIMNODES"
         # self.nod_ui
 
-
-
-
-
-
-
-
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)
 
@@ -275,7 +267,7 @@ class MainWindow(QMainWindow):
         self.s.window[2] = new_size.width()
         self.s.window[3] = new_size.height()
 
-    def moveEvent(self, event):             # PySide  moveEvent
+    def moveEvent(self, event):              # PySide  moveEvent
         self.on_move_window(event)
 
     def on_move_window(self, event):

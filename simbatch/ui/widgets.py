@@ -159,73 +159,34 @@ class CheckBoxes:
 class RadioButtons:
     qt_widget_layout = None
     currentActive = None
-    qt_radio_butt_1 = None
-    qt_radio_butt_2 = None
-    qt_radio_butt_3 = None
-    qt_radio_butt_4 = None
-    qt_radio_butt_5 = None
+    qt_radio_butt_arr = []
 
-    def __init__(self, label_text, names_array, checked_index):
-        """ MODE """
+    def __init__(self, label_text, names_array, checked_index, on_radio_change):
+        self.qt_radio_butt_arr = []
         qt_lay = QHBoxLayout()
         qt_label_mode = QLabel(label_text)
         qt_lay.addWidget(qt_label_mode)
         qt_radio_group = QButtonGroup()
         qt_radio_group.setExclusive(True)
 
-        if len(names_array) > 0:
-            qt_radio_butt_1 = QRadioButton(names_array[0])
-            self.qt_radio_butt_1 = qt_radio_butt_1
-            if checked_index == 1:
-                qt_radio_butt_1.setChecked(True)
-            qt_radio_group.addButton(qt_radio_butt_1, 1)
-            qt_lay.addWidget(qt_radio_butt_1)
+        for i, el in enumerate(names_array):
+            qt_radio_butt = QRadioButton(el)
+            # if checked_index == i:
+            #     qt_radio_butt.setChecked(True)
+            qt_radio_group.addButton(qt_radio_butt, i)
+            qt_lay.addWidget(qt_radio_butt)
+            self.qt_radio_butt_arr.append(qt_radio_butt)
+            qt_radio_butt.clicked.connect(lambda i=i: on_radio_change(i))
 
-        if len(names_array) > 1:
-            qt_radio_butt_2 = QRadioButton(names_array[1])
-            self.qt_radio_butt_2 = qt_radio_butt_2
-            if checked_index == 2:
-                qt_radio_butt_2.setChecked(True)
-            qt_radio_group.addButton(qt_radio_butt_2, 2)
-            qt_lay.addWidget(qt_radio_butt_2)
-
-        if len(names_array) > 2:
-            qt_radio_butt_3 = QRadioButton(names_array[2])
-            self.qt_radio_butt_3 = qt_radio_butt_3
-            if checked_index == 3:
-                qt_radio_butt_3.setChecked(True)
-            qt_radio_group.addButton(qt_radio_butt_3, 3)
-            qt_lay.addWidget(qt_radio_butt_3)
-
-        if len(names_array) > 3:
-            qt_radio_butt_4 = QRadioButton(names_array[3])
-            self.qt_radio_butt_4 = qt_radio_butt_4
-            if checked_index == 4:
-                qt_radio_butt_4.setChecked(True)
-            qt_radio_group.addButton(qt_radio_butt_4, 4)
-            qt_lay.addWidget(qt_radio_butt_4)
-
-        if len(names_array) > 4:
-            qt_radio_butt_5 = QRadioButton(names_array[4])
-            self.qt_radio_butt_5 = qt_radio_butt_5
-            if checked_index == 5:
-                qt_radio_butt_5.setChecked(True)
-            qt_radio_group.addButton(qt_radio_butt_5, 5)
-            qt_lay.addWidget(qt_radio_butt_5)
+        print "iii 1 ", checked_index
+        if checked_index is not None and checked_index < len(self.qt_radio_butt_arr):
+            print "iii 2 ", checked_index
+            self.qt_radio_butt_arr[checked_index].setChecked(True)
 
         self.qt_widget_layout = qt_lay
 
-    def set_visual_checked(self, nr):
-        if nr == 1:
-            self.qt_radio_butt_1.setChecked(True)
-        if nr == 2:
-            self.qt_radio_butt_2.setChecked(True)
-        if nr == 3:
-            self.qt_radio_butt_3.setChecked(True)
-        if nr == 4:
-            self.qt_radio_butt_4.setChecked(True)
-        if nr == 5:
-            self.qt_radio_butt_5.setChecked(True)
+    # def set_visual_checkeds(self, nr):
+    #         self.qt_radio_butt_arr[nr-1].setChecked(True)
 
 
 class Action(QWidget):

@@ -1,5 +1,5 @@
 
-class Execution:
+class Interactions:
     def __init__(self):
         pass
         

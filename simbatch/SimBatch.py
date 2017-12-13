@@ -6,7 +6,7 @@ import ui.mainw as ui
 app = QApplication([])
 
 
-sim_batch = core.SimBatch(5)
+sim_batch = core.SimBatch("Stand-alone")
 #sim_batch.clear_all_stored_data()
 #sim_batch.create_example_data()
 sim_batch.load_data()

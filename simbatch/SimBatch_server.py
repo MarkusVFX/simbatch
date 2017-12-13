@@ -3,3 +3,5 @@ import ui.mainw as ui
 
 
 sim_batch = core.SimBatch ( "config.ini" )
+
+sim_batch.run()

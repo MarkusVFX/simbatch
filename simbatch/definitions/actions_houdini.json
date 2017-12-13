@@ -47,7 +47,7 @@
 				"type": "single",
 				"name": "Set Value",
 				"desc": "Set value for object property",
-				"default": "",
+				"default": "<object>.<param>=<value>",
 				"template": ["interaction.hou_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
 			"4":{

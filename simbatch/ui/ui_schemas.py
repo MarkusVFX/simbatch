@@ -253,20 +253,26 @@ class SchemaFormCreateOrEdit(QWidget):
 
         if len(combo_items) > 0:
             action_widget.qt_combo.currentIndexChanged.connect(
-                lambda: self.on_change_combo_action(action_widget.qt_combo.currentText(),
-                                                    single_or_group_action, curr_proj)
+                lambda: self.on_change_combo_action(action_widget, single_or_group_action, curr_proj)
             )
 
-
-    def on_clicked_button_action_2(self, act ):
+    def on_clicked_button_action_2(self, act):
         print "   on_clicked_button_action_2  ",  act
         print "   on_clicked_button_action_2  ",  act
         print "   on_clicked_button_action_2  ",  act
 
-    def on_change_combo_action(self, txt, software_action, curr_project):
-        print "  on_change_combo_action  ",  txt
-        print "  on_change_combo_actionn  ",  software_action
+    def on_change_combo_action(self, action_widget, software_action, curr_project):
+        # action_widget.qt_edit.setText(action_widget.qt_combo.currentText())
+        action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
+
+        # print "  on_change_combo_action  ", index
+        print "  on_change_combo_action  ",  software_action.name
+        print "  on_change_combo_actionn  ",
         print "  on_change_combo_actionnn  ",  curr_project
+
+
+
+
 
     # def on_change_combo_action_X_old(self, software_action, curr_project):
     #     index = software_action.actionWidget.combo.currentIndex()

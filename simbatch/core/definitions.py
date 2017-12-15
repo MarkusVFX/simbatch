@@ -40,16 +40,14 @@ ACTION_ITEM_FIELDS_NAMES = [
 #         pass
 
 
-class SingleAction:  # SingleDefinition
+class SingleAction:
     id = None
     name = ""
 
     def __init__(self, action_id, name, description, default_value, template, mode=None, addi_butt=None, addi_fun=None):
         self.id = action_id
-        # self.definition_id = definition_id
         self.name = name
-        self.mode = mode
-        # self.type = definition_type
+        self.mode = mode  # subaction mode
         self.description = description
         self.default_value = default_value
         self.template = template
@@ -58,7 +56,7 @@ class SingleAction:  # SingleDefinition
         self.addional_funcion_name = addi_fun
 
     def __repr__(self):
-        return "SingleAction({},{})".format(self.action_id,self.name)
+        return "SingleAction({},{})".format(self.action_id, self.name)
 
     def __str__(self):
         return "SingleAction"
@@ -72,11 +70,18 @@ class SingleAction:  # SingleDefinition
                                                                                             self.default_value,
                                                                                             self.template)
 
+    def get_action(self):
+        return self
+
+    def get_action_as_string(self):
+        return
+
 
 class GroupAction:
     id = None
     name = ""
-    actions = []
+    actions = []  # subactions as [SingleAction,...]
+    current_sub_action_index = 0
 
     def __init__(self, action_id, name):
         self.id = action_id
@@ -85,23 +90,35 @@ class GroupAction:
         pass
 
     def __repr__(self):
-        return "GroupAction({},{})".format(self.name,self.name)
+        return "GroupAction({},{})".format(self.name, self.name)
 
     def __str__(self):
         return "GroupAction"
 
+    def get_action(self):
+        return self.actions[self.current_sub_action_index]
+
 
 class SingleDefinition:
-    actions_array = []     # [SingleAction, GroupAction, ...]
-    total_actions = 0
     name = ""
+    prev_ext = ""   # without dot "png"
+    file_ext = ""   # without dot
+    actions_array = []    # SingleAction or GroupAction
+    total_actions = 0
     action_names = []
+    # TODO list supported versions
 
     def __init__(self, software):
         self.software = software
         self.actions_array = []
         self.definitions_names = []
         self.action_names = []
+
+    def __repr__(self):
+        return "SingleDefinition({})".format(self.software)
+
+    def __str__(self):
+        return "SingleDefinition"
 
     def print_total(self, prefix=""):
         print "   [INF] {} total actions:{}".format(prefix, self.total_actions)
@@ -121,6 +138,12 @@ class SingleDefinition:
         self.total_actions += 1
         self.action_names.append(element.name)
 
+    def get_base_setup_ext(self):
+        return self.file_ext
+
+    def get_prev_ext(self):
+        return self.prev_ext
+
 
 class Definitions:
     batch = None
@@ -134,6 +157,7 @@ class Definitions:
 
     # current_software_id = 0
     # soco = None   # software connector
+    current_interact = None
 
     def __init__(self, batch):
         self.batch = batch
@@ -142,6 +166,12 @@ class Definitions:
         self.definitions_array = []
         self.definitions_names = []
         # self.soco = SoftwareConnector(batch.c.current_schema_software_id)
+
+    def __repr__(self):
+        return "Definitions({})".format(self.batch)
+
+    def __str__(self):
+        return "Definitions"
 
     #  print definitions data, for debug
     def print_total(self, print_children=False):
@@ -173,12 +203,12 @@ class Definitions:
         if self.s.store_data_mode == 2:
             return self.load_definitions_from_mysql()
 
-
-    def get_additional_button_values(self, li):
+    @staticmethod
+    def get_additional_button_values(li):
         if "additionalButton" in li:
-            return (li["additionalButton"], li["additionalButtonFunction"])
+            return li["additionalButton"], li["additionalButtonFunction"]
         else:
-            return (None,None)
+            return None, None
 
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
@@ -194,6 +224,10 @@ class Definitions:
                         print " [INF] definition loaded: " + json_file
                     if json_definition['definition']['meta']['total'] > 0:
                         new_definition = SingleDefinition(json_definition['definition']['meta']["software"])
+                        if "setupExt" in json_definition['definition']['meta']:
+                            new_definition.setup_ext = json_definition['definition']['meta']['setupExt']
+                        if "prevExt" in json_definition['definition']['meta']:
+                            new_definition.prev_ext = json_definition['definition']['meta']['prevExt']
                         self.definitions_names.append(json_definition['definition']['meta']["software"])
                         self.add_definition(new_definition)
                         for li in json_definition['definition']['actions'].values():

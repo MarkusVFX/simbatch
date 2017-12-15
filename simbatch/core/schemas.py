@@ -24,14 +24,14 @@ ACTION_DATA_FIELDS_NAMES = [
     ]
 
 
-class SingleAction:
-    def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
-        self.id = action_id
-        self.action_name = action_name
-        self.action_type = action_type
-        self.action_sub_type = action_sub_type
-        self.action_param = action_param
-        self.soft_id = soft_id
+# class SingleAction:    #  goes to definition
+#     def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
+#         self.id = action_id
+#         self.action_name = action_name
+#         self.action_type = action_type
+#         self.action_sub_type = action_sub_type
+#         self.action_param = action_param
+#         self.soft_id = soft_id
 
 
 class SchemaItem:
@@ -46,24 +46,24 @@ class SchemaItem:
         self.definition_id = definition_id
         self.schema_version = schema_version
         self.actions_array = actions_array
-        self.actions_string = ""
+        # self.actions_string = ""
         self.description = description
-        self.actions_to_string()
+        # self.actions_to_string()
 
-    def actions_to_string(self):
-        for a in self.actions_array:
-            self.actions_string += a + "|"
+    # def actions_to_string(self):
+    #     for a in self.actions_array:
+    #         self.actions_string += a + "|"
 
-    def actions_string_to_array(self, stri=""):
-        arr_out = []
-        if len(stri) == 0:
-            stri = self.actions_string
-        arr1 = stri.split('|')
-        for strWew in arr1:
-            if len(strWew) > 0:
-                arr2 = strWew.split(',')
-                arr_out.append(SingleAction(int(arr2[0]), int(arr2[1]), arr2[2], arr2[3], arr2[4]))
-        self.actions_array = arr_out
+    # def actions_string_to_array(self, stri=""):
+    #     arr_out = []
+    #     if len(stri) == 0:
+    #         stri = self.actions_string
+    #     arr1 = stri.split('|')
+    #     for strWew in arr1:
+    #         if len(strWew) > 0:
+    #             arr2 = strWew.split(',')
+    #             arr_out.append(SingleAction(int(arr2[0]), int(arr2[1]), arr2[2], arr2[3], arr2[4]))
+    #     self.actions_array = arr_out
 
 
 class Schemas:
@@ -78,11 +78,7 @@ class Schemas:
     sample_data_checksum = None
     sample_data_total = None
 
-    current_project_schemas_ids = []     # used for combo cox (add task)
-    current_project_schemas_names = []   # used for combo cox (add task)
 
-    visible_project_schemas_ids = []     # not used now, waiting for filters  # TODO
-    visible_project_schemas_names = []   # not used now, waiting for filters  # TODO
 
     def __init__(self, batch):
         self.s = batch.s

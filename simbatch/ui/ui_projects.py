@@ -316,6 +316,13 @@ class ProjectsUI:
             self.p.update_current_from_id(set_active_id)
         self.freeze_list_on_changed = 0
 
+    def reload_projects_data_and_refresh_list(self):
+        curr_p_id = self.batch.p.current_project_id
+        self.batch.p.clear_all_projects_data()
+        self.batch.p.load_projects()
+        self.batch.p.update_current_from_id(curr_p_id)
+        self.reset_list()
+
     def set_as_default(self):
         self.p.set_proj_as_default(index=self.batch.p.current_project_index)
         self.p.save_projects()

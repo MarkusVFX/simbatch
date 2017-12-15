@@ -31,20 +31,32 @@ SCHEMA:
 8  STR  description
 
 
+
 DEFINITION:
-0  INT  id
-1  STR  schema_name
+1  STR  name
+2  ARR  actions_array
+3  INT  total_actions
+4  ARR  action_names
+5  STR  description
 
-8  STR  description
-
-
+GROUPACTION:
+1  INT  id
+2  STR  name
+3  ARR  actions
 
 ACTION:
+1  INT  id
+2  STR  name
+3  STR  mode   # subaction mode
+4  STR  description
+5  STR  default_value
+6  STR  template
+7  STR  addional_butt_caption   # optional addional button
+8  STR  addional_funcion_name   # addional button's function
 
+#old  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
+#old  ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
 
-
-#  STR  actions         |1,2,MaxSimulate,Fume,object|     |id,soft_id,action_type,action_sub_type,edit_val| 
-#  ARR  actionsArray    ARR:   SingleAction  (  id, soft_id,  action_type, action_sub_type, actionParam ] 
 
 
 TASK:
@@ -107,9 +119,6 @@ NODES:
 5 STR  colorUp
 6 STR  state file
 7 STR  description
-
-
-
 
 
 

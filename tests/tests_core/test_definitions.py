@@ -25,3 +25,6 @@ def test_exist_definitions_data(sib):
 
 def test_load_definitions(sib):
     assert sib.d.load_definitions() is True
+
+# def test_load_definitions(sib):
+#     assert sib.d.load_definitions() is True

@@ -34,7 +34,7 @@ class SimBatch:
         self.p.print_all()
 
     def print_important_values(self):
-        print "  \n\n  Current soft: {}", self.s.current_soft_name
+        print "  \n\n  Current runtime_env: {}", self.s.runtime_env
 
         # projects
         print "\n PROJECTS: "
@@ -55,25 +55,23 @@ class SimBatch:
         # nodes
         print "\n NODES: "
         self.n.print_current()
-
-        '''
         
-        print "       currentTaskID:", self.t.currentTaskID, "   currentTaskIndex:", self.t.currentTaskIndex, "   total_projects:", self.p.total_projects
-        if self.t.currentTaskIndex >= 0:
-            curTsk = self.t.tasksData[self.t.currentTaskIndex]
-            print "       current task: ", curTsk.taskName
-            print "       schemaID:", curTsk.schemaID, "       projID:", curTsk.projID  # ,  "       soft_id:", curTsk.projID, 
-            print "       shotDetails ", curTsk.shotA, "   ", curTsk.shotB, "   ", curTsk.shotC
-            print "       frameFrom  frameTo ", curTsk.frameFrom, curTsk.frameTo
-            print "       state  state_id ", curTsk.state, "    ", curTsk.state_id
-
-        
-        print "       currentQueueID:", self.q.currentQueueID, "   currentQueueIndex:", self.q.currentQueueIndex, "   total_projects:", self.p.total_projects
-        if self.q.currentQueueIndex >= 0:
-            curQue = self.q.queueData[self.q.currentQueueIndex]
-            print "       current queueItem: ", curQue.queueItemName, "     version :", curQue.version, "     evolutionNr :", curQue.evolutionNr
-        '''
+        # print "       currentTaskID:", self.t.currentTaskID, "   currentTaskIndex:", self.t.currentTaskIndex, "   total_projects:", self.p.total_projects
+        # if self.t.currentTaskIndex >= 0:
+        #     curTsk = self.t.tasksData[self.t.currentTaskIndex]
+        #     print "       current task: ", curTsk.taskName
+        #     print "       schemaID:", curTsk.schemaID, "       projID:", curTsk.projID  # ,  "       soft_id:", curTsk.projID,
+        #     print "       shotDetails ", curTsk.shotA, "   ", curTsk.shotB, "   ", curTsk.shotC
+        #     print "       frameFrom  frameTo ", curTsk.frameFrom, curTsk.frameTo
+        #     print "       state  state_id ", curTsk.state, "    ", curTsk.state_id
+        #
+        #
+        # print "       currentQueueID:", self.q.currentQueueID, "   currentQueueIndex:", self.q.currentQueueIndex, "   total_projects:", self.p.total_projects
+        # if self.q.currentQueueIndex >= 0:
+        #     curQue = self.q.queueData[self.q.currentQueueIndex]
+        #     print "       current queueItem: ", curQue.queueItemName, "     version :", curQue.version, "     evolutionNr :", curQue.evolutionNr
         print "\n\n"
+
     def print_current_detailed_values(self, index):
         print "  \n\n"
         if index == 0:

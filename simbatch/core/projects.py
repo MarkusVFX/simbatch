@@ -312,13 +312,13 @@ class Projects:
     #  example data for beginner users and for tests
     def create_example_project_data(self, do_save=True):
         collect_ids = 0
-        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:/exampleProj", "exampleWokingDir",
+        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:\\exampleProj\\", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<seq##>_<sh###>", "sample project 1")
-        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj", "fx",
+        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj\\", "fx",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\\<sh###>", "sample project 2")
-        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:/exampleProj", "exampleWokingDir",
+        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:\\exampleProj\\", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "s_<sh##>", "sample project 3")
         collect_ids += self.add_project(sample_project_1)

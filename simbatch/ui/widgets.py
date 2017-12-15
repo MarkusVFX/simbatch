@@ -178,9 +178,7 @@ class RadioButtons:
             self.qt_radio_butt_arr.append(qt_radio_butt)
             qt_radio_butt.clicked.connect(lambda i=i: on_radio_change(i))
 
-        print "iii 1 ", checked_index
         if checked_index is not None and checked_index < len(self.qt_radio_butt_arr):
-            print "iii 2 ", checked_index
             self.qt_radio_butt_arr[checked_index].setChecked(True)
 
         self.qt_widget_layout = qt_lay
@@ -190,9 +188,10 @@ class RadioButtons:
 
 
 class ActionWidget(QWidget):
-    # action_type = ""
-    # action_sub_type = ""
-    id = None
+    # action_name = ""
+    # action_sub_mode = ""
+    action_data = None  # SingleAction   or  GroupAction
+    qt_id = None
     qt_layout = None
     qt_label = None
     qt_edit = None
@@ -204,31 +203,32 @@ class ActionWidget(QWidget):
     cb2 = None
     cb3 = None
 
-    # action_type = "",
-    def __init__(self,  id="", label_txt="", edit_txt="", combo_items="", combo_val="", cb1="", cb2="",
+    def __init__(self, action_data, action_id="", label_txt="", edit_txt="", combo_items="", combo_val="", cb1="", cb2="",
                  cb3="", text_on_button_1="", text_on_button_2="", enabled1=True, enabled2=True):
         QWidget.__init__(self)
-        # self.action_type = action_type
-        self.qt_layout = QHBoxLayout()
-        self.qt_layout.setSpacing(2)
+        # self.action_name = action_name
+        self.action_data = action_data
+        qt_widget_layout = QHBoxLayout()
+        qt_widget_layout.setSpacing(2)
         self.setMaximumHeight(70)
         self.setMinimumHeight(40)
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
+        self.qt_layout = qt_widget_layout  # TODO check this
 
-        if len(id) > 0:
-            self.id = QLabel(id)
+        if len(action_id) > 0:
+            self.qt_id = QLabel(action_id)
 
         if len(label_txt) > 0:
             self.qt_label = QLabel(label_txt)
-            self.qt_layout.addWidget(self.qt_label)
+            qt_widget_layout.addWidget(self.qt_label)
 
         if len(edit_txt) > 0:
             if edit_txt == " ":
                 edit_txt = ""
             self.qt_edit = QLineEdit(edit_txt)
             self.edit_val = edit_txt
-            self.qt_layout.addWidget(self.qt_edit)
+            qt_widget_layout.addWidget(self.qt_edit)
             self.qt_edit.textChanged.connect(self.on_change_line_edit)
 
         if text_on_button_2 is not None and len(text_on_button_2) > 0:
@@ -242,106 +242,17 @@ class ActionWidget(QWidget):
             # combo_items_arr = combo_items.split(",")
             counter = 0
             set_index = 0
-            for it in combo_items:  # combo_items_arr:
+            for it in combo_items:
                 if len(combo_val) > 0 and it == combo_val:
                     set_index = counter
-                    print " SET COMBO val ", set_index, "___", combo_val
+                    if self.s.debug_level >= 4:
+                        print " [db] combo val ", set_index, "___", combo_val
                 self.qt_combo.addItem(it)
                 counter += 1
 
             self.qt_combo.setCurrentIndex(set_index)
-            self.action_sub_type = combo_items[0]
-            print " init action subtype : ", combo_items[0]
-            self.qt_layout.addWidget(self.qt_combo)
-            self.qt_combo.currentIndexChanged.connect(self.on_change_combo)
-
-        if len(cb1) > 0:
-            self.cb1 = QCheckBox(cb1, self)
-            self.qt_layout.addWidget(self.cb1)
-
-        if len(cb2) > 0:
-            self.cb2 = QCheckBox(cb2, self)
-            self.qt_layout.addWidget(self.cb2)
-
-        if len(cb3) > 0:
-            self.cb3 = QCheckBox(cb3, self)
-            self.qt_layout.addWidget(self.cb3)
-
-        if len(text_on_button_1) > 0:
-            self.qt_button_1 = QPushButton(text_on_button_1)
-            if enabled1 is False:
-                self.qt_button_1.setEnabled(False)
-            self.qt_layout.addWidget(self.qt_button_1)
-
-
-        self.setLayout(self.qt_layout)
-
-    def on_change_line_edit(self, txt):
-        print "[db] Action edit chngd: ", txt
-        self.edit_val = txt
-
-    def on_change_combo(self, index):
-        print "[db] Action combo chngd: ", index, "  ", self.qt_combo.currentText()
-
-
-
-class Action(QWidget):
-    action_type = ""
-    action_sub_type = ""
-    id = None
-    qt_layout = None
-    qt_label = None
-    qt_edit = None
-    qt_combo = None
-    text_on_button_1 = None
-    text_on_button_2 = None
-    edit_val = ""
-    cb1 = None
-    cb2 = None
-    cb3 = None
-
-    def __init__(self, action_type="", id="", label_txt="", edit_txt="", combo_items="", combo_val="", cb1="", cb2="",
-                 cb3="", text_on_button_1="", text_on_button_2="", enabled1=True, enabled2=True):
-        QWidget.__init__(self)
-        self.action_type = action_type
-        qt_widget_layout = QHBoxLayout()
-        qt_widget_layout.setSpacing(2)
-        self.setMaximumHeight(70)
-        self.setMinimumHeight(40)
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        self.qt_layout = qt_widget_layout  # TODO check this
-
-        if len(id) > 0:
-            self.id = QLabel(id)
-
-        if len(label_txt) > 0:
-            self.qt_label = QLabel(label_txt[3:])  # TODO check CUT MAX cutmax
-            qt_widget_layout.addWidget(self.qt_label)
-
-        if len(edit_txt) > 0:
-            if edit_txt == " ":
-                edit_txt = ""
-            self.qt_edit = QLineEdit(edit_txt)
-            self.edit_val = edit_txt
-            qt_widget_layout.addWidget(self.qt_edit)
-            self.qt_edit.textChanged.connect(self.on_change_line_edit)
-
-        if len(combo_items) > 0:
-            self.qt_combo = QComboBox()
-            combo_items_arr = combo_items.split(",")
-            counter = 0
-            set_index = 0
-            for it in combo_items_arr:
-                if len(combo_val) > 0 and it == combo_val:
-                    set_index = counter
-                    print " SET COMBO val ", set_index, "___", combo_val
-                self.qt_combo.addItem(it)
-                counter += 1
-
-            self.qt_combo.setCurrentIndex(set_index)
-            self.action_sub_type = combo_items_arr[0]
-            print " init action subtype : ", combo_items_arr[0]
+            # self.action_sub_mode = combo_items_arr[0]
+            # print " init action subtype : ", combo_items_arr[0]
             qt_widget_layout.addWidget(self.qt_combo)
             self.qt_combo.currentIndexChanged.connect(self.on_change_combo)
 
@@ -358,25 +269,21 @@ class Action(QWidget):
             qt_widget_layout.addWidget(self.cb3)
 
         if len(text_on_button_1) > 0:
-            self.text_on_button_1 = QPushButton(text_on_button_1)
+            self.qt_button_1 = QPushButton(text_on_button_1)
             if enabled1 is False:
-                self.text_on_button_1.setEnabled(False)
-            qt_widget_layout.addWidget(self.text_on_button_1)
-
-        if len(text_on_button_2) > 0:
-            self.text_on_button_2 = QPushButton(text_on_button_2)
-            if enabled2 is False:
-                self.text_on_button_2.setEnabled(False)
-            qt_widget_layout.addWidget(self.text_on_button_2)
+                self.qt_button_1.setEnabled(False)
+            self.qt_layout.addWidget(self.qt_button_1)
 
         self.setLayout(qt_widget_layout)
 
     def on_change_line_edit(self, txt):
-        print "[db] Action edit chngd: ", txt
+        if self.s.debug_level >= 4:
+            print "  [db] Action edit chngd: ", txt
         self.edit_val = txt
 
     def on_change_combo(self, index):
-        print "[db] Action combo chngd: ", index, "  ", self.combo.currentText()
+        if self.s.debug_level >= 4:
+            print "  [db] Action combo chngd: ", index, "  ", self.combo.currentText()
 
 
 class WidgetGroup:

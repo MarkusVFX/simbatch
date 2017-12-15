@@ -44,10 +44,10 @@ class AddToQueueForm (QWidget):
     def init_ui_elements(self):
         qt_form_add_layout = QVBoxLayout()
 
-        qt_action_empty = Action(label_txt="    Select Task")
+        # qt_action_empty = ActionWidget(None, label_txt="    Select Task")
         qt_lay_actions = QVBoxLayout()
         self.qt_lay_actions = qt_lay_actions
-        qt_lay_actions.addWidget(qt_action_empty)
+        # qt_lay_actions.addWidget(qt_action_empty)
         qt_lay_actions.setSpacing(0)
         qt_lay_actions.setContentsMargins(0, 0, 0, 0)
         qt_gb_actions = QGroupBox()
@@ -94,3 +94,13 @@ class AddToQueueForm (QWidget):
         # qt_edit_button_sim_to.qt_edit_line.textChanged.connect(self.on_change_sim_to)
         # qt_edit_button_frame_from.qt_edit_line.textChanged.connect(self.on_change_render_from)
         # qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)
+
+    def update_add_ui(self):
+        pass
+
+    def create_directories(self):
+        return True
+
+
+
+

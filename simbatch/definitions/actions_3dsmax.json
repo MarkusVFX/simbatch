@@ -3,6 +3,8 @@
 		"meta": {
 			"software": "3dsmax",
 			"total": 7,
+			"setupExt" : "max",
+			"prevExt" : "jpg",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},		
 		"actions": {

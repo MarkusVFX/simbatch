@@ -84,7 +84,7 @@ class TopMenuUI:
                 txt = txt[:limit] + "  ..."
         self.qt_lbl_info.setText(txt)
         if self.current_top_info_mode != mode:
-            if self.batch.s.soft_id == 2:
+            if self.batch.s.ui_brightness_mode == 1:
                 if mode == 1:
                     self.qt_lbl_info.setStyleSheet("")
                 if mode == 7:
@@ -189,13 +189,13 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
         qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
         qt_tab_widget.addTab(self.que_ui.qt_widget_queue, "Queue")
-        #  qt_tab_widget.addTab(nod.widgetNodes, "Sim Nodes")
+        # qt_tab_widget.addTab(self.nod_ui.qt_widget_nodes, "Sim Nodes")       # PRO version
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         qt_tab_widget.setMinimumSize(220, 400)
 
         if self.s.store_data_mode == 1:
             if self.comfun.path_exists(self.s.store_data_json_directory):
-                qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB: show tasks
+                qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB: show tasks
             else:
                 qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings
         else:
@@ -206,9 +206,9 @@ class MainWindow(QMainWindow):
         qt_central_widget.setLayout(qt_lay_central)
         qt_tab_widget.currentChanged.connect(self.on_tab_change)
 
-    def on_tab_change(self, tab):  # TODO
-        if self.s.debug_level >= 3:
-            print tab
+    def on_tab_change(self, tab):
+        if self.s.debug_level >= 5:
+            print " [INF] tab change: ", tab
 
     def init_lists(self):
         if self.s.debug_level >= 3:
@@ -235,23 +235,13 @@ class MainWindow(QMainWindow):
         self.s.update_ui_colors()
 
         print " [INF] update PROJECTS"
-        curr_p_id = self.batch.p.current_project_id
-        self.batch.p.clear_all_projects_data()
-        self.batch.p.load_projects()
-        self.batch.p.update_current_from_id(curr_p_id)
-        self.pro_ui.reset_list()
+        self.pro_ui.reload_projects_data_and_refresh_list()
 
         print " [INF] update SCHEMAS"
-        self.sch_ui.clear_list()
-        self.batch.c.clear_all_schemas_data()
-        self.batch.c.load_schemas()
-        self.sch_ui.init_schemas()
+        self.sch_ui.reload_schemas_data_and_refresh_list()
 
         print " [INF] update TASKS"
-        self.tsk_ui.clear_list()
-        self.batch.t.clear_all_tasks_data()
-        self.batch.t.load_tasks()
-        self.tsk_ui.init_tasks()
+        self.tsk_ui.reload_tasks_data_and_refresh_list()
 
         print " [INF] update QUEUE"
         # self.que_ui

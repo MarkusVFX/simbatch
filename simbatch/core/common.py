@@ -46,8 +46,11 @@ class CommonFunctions:
                 print " [WRN] (int_or_val) is not int!", in_val, def_val
             return def_val
 
-    @staticmethod
-    def str_with_zeros(number, zeros=3):
+    def str_with_zeros(self, number, zeros=3):
+        if self.is_float(zeros) is False:
+            zeros = 3
+            if self.debug_level >= 1:
+                print " [ERR] not int as zeros in str_with_zeros"
         stri = str(number)
         while len(stri) < zeros:
             stri = "0" + stri

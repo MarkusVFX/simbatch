@@ -574,17 +574,17 @@ class SchemasUI:
         self.reset_list()
         self.update_visible_schemas_ids()
 
-    def menu_set_active(self):
-        self.batch.p.projects_data[self.batch.p.current_project_index].state = "ACTIVE"
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = self.s.INDEX_STATE_ACTIVE
-        self.batch.p.save_projects()
+    def _change_current_schema_state_and_reset_list(self, state_id):
+        self.batch.c.current_schema.state = self.s.states_visible_names[state_id]
+        self.batch.c.current_schema.state_id = state_id
+        self.batch.c.save_schemas()
         self.reset_list()
 
-    def menu_set_hold(self):
-        self.batch.p.projects_data[self.batch.p.current_project_index].state = "HOLD"
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = self.s.INDEX_STATE_HOLD
-        self.batch.p.save_projects()
-        self.reset_list()
+    def on_menu_set_active(self):
+        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_ACTIVE)
+
+    def on_menu_set_hold(self):
+        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_HOLD)
 
     def menu_remove(self):
         # print " [TODO] remove "  # TODO

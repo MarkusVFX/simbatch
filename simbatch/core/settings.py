@@ -30,6 +30,8 @@ class Settings:
     JSON_QUEUE_FILE_NAME = "data_queue.json"
     JSON_SIMNODES_FILE_NAME = "data_simnodes.json"
 
+    states_visible_names={}
+
     INDEX_STATE_NULL = 0
     INDEX_STATE_INIT = 1
     INDEX_STATE_WAITING = 2
@@ -52,6 +54,28 @@ class Settings:
     INDEX_STATE_SUSPEND = 21
     INDEX_STATE_ACTIVE = 22
     INDEX_STATE_DEFAULT = 23
+
+    states_visible_names[INDEX_STATE_NULL]="NULL"
+    states_visible_names[INDEX_STATE_INIT]="INIT"
+    states_visible_names[INDEX_STATE_WAITING]="WAITING"
+    states_visible_names[INDEX_STATE_QUEUED]="QUEUED"
+    states_visible_names[INDEX_STATE_WORKING]="WORKING"
+    states_visible_names[INDEX_STATE_SIM]="SIM"
+    states_visible_names[INDEX_STATE_CACHE]="CACHE"
+    states_visible_names[INDEX_STATE_RENDER]="RENDER"
+    states_visible_names[INDEX_STATE_ERROR]="ERROR"
+    states_visible_names[INDEX_STATE_OK]="OK"
+    states_visible_names[INDEX_STATE_DONE]="DONE"
+    states_visible_names[INDEX_STATE_REVIEW]="REVIEW"
+    states_visible_names[INDEX_STATE_ACCEPTED]="ACCEPTED"
+    states_visible_names[INDEX_STATE_REJECTED]="REJECTED"
+
+    states_visible_names[INDEX_STATE_CUSTOM]="CUSTOM"
+    states_visible_names[INDEX_STATE_OFFLINE]="OFFLINE"
+    states_visible_names[INDEX_STATE_INACTIVE]="INACTIVE"
+    states_visible_names[INDEX_STATE_SUSPEND]="SUSPEND" # TODO SUSPEND or SUSPENDED ?
+    states_visible_names[INDEX_STATE_ACTIVE]="ACTIVE"
+    states_visible_names[INDEX_STATE_DEFAULT]="DEFAULT"
 
     # GUI settings
     runtime_env = ""        # runtime environment as software name display on frame and set active definition

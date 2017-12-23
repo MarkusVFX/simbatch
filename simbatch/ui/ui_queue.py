@@ -145,29 +145,23 @@ class QueueUI():
         self.batch.q.current_queue_id = self.batch.q.queue_data[self.batch.q.current_queue_index].id
         self.freeze_list_on_changed = 0
 
-    def on_click_menu_set_init(self):
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state = "INIT"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 1  # TODO const !
+    def _change_current_queue_item_state_and_reset_list(self, state_id):
+        self.batch.q.current_queue.state = self.s.states_visible_names[state_id]
+        self.batch.q.current_queue.state_id = state_id
         self.batch.q.save_queue()
         self.reset_list()
+
+    def on_click_menu_set_init(self):
+        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_INIT)
 
     def on_click_menu_set_working(self):
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state = "WORKING"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 4  # TODO const !
-        self.batch.q.save_queue()
-        self.reset_list()
+        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_WORKING)
 
     def on_click_menu_set_done(self):
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state = "DONE"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 11  # TODO const !
-        self.batch.q.save_queue()
-        self.reset_list()
+        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_DONE)
 
     def on_click_menu_set_hold(self):
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state = "HOLD"
-        self.batch.q.queue_data[self.batch.q.current_queue_index].state_id = 21  # TODO const !
-        self.batch.q.save_queue()
-        self.reset_list()
+        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_HOLD)
 
     def on_menu_locate_prev(self):
         cur_queue_item = self.batch.q.queue_data[self.batch.q.current_queue_index]

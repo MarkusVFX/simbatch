@@ -564,29 +564,23 @@ class TasksUI:
         self.reset_list()
         self.update_list_of_visible_ids()
 
-    def on_click_menu_set_init(self):
-        self.batch.t.current_task.state = "INIT"
-        self.batch.t.current_task.state_id = self.s.INDEX_STATE_INIT
+    def _change_current_task_state_and_reset_list(self, state_id):
+        self.batch.t.current_task.state = self.s.states_visible_names[state_id]
+        self.batch.t.current_task.state_id = state_id
         self.batch.t.save_tasks()
         self.reset_list()
+
+    def on_click_menu_set_init(self):
+        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_INIT)
 
     def on_click_menu_set_working(self):
-        self.batch.t.current_task.state = "WORKING"
-        self.batch.t.current_task.state_id = self.s.INDEX_STATE_WORKING
-        self.batch.t.save_tasks()
-        self.reset_list()
+        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_WORKING)
 
     def on_click_menu_set_done(self):
-        self.batch.t.current_task.state = "DONE"
-        self.batch.t.current_task.state_id = self.s.INDEX_STATE_DONE
-        self.batch.t.save_tasks()
-        self.reset_list()
+        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_DONE)
 
     def on_click_menu_set_hold(self):
-        self.batch.t.current_task.state = "HOLD"
-        self.batch.t.current_task.state_id = self.s.INDEX_STATE_HOLD
-        self.batch.t.save_tasks()
-        self.reset_list()
+        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_HOLD)
 
     def on_click_menu_schema_remove(self):
         self.on_click_confirm_remove_project()

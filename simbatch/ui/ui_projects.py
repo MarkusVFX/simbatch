@@ -328,27 +328,27 @@ class ProjectsUI:
         self.p.save_projects()
         self.reset_list()
 
-    def menu_set_def(self):
+    def on_menu_set_as_def(self):
         self.set_as_default()
 
-    def menu_set_active(self):
-        self.batch.p.projects_data[self.batch.p.current_project_index].state = "ACTIVE"
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = self.s.INDEX_STATE_ACTIVE
+    def _change_current_project_state_and_reset_list(self, state_id):
+        self.batch.p.current_project.state = self.s.states_visible_names[state_id]
+        self.batch.p.current_project.state_id = state_id
         self.batch.p.save_projects()
         self.reset_list()
 
-    def menu_set_suspended(self):
-        self.batch.p.projects_data[self.batch.p.current_project_index].state = "SUSPEND"  # TODO SUSPEND or SUSPENDED ?
-        self.batch.p.projects_data[self.batch.p.current_project_index].state_id = self.s.INDEX_STATE_SUSPEND
-        self.batch.p.save_projects()
-        self.reset_list()
+    def on_menu_set_active(self):
+        self._change_current_project_state_and_reset_list(self.s.INDEX_STATE_ACTIVE)
+
+    def on_menu_set_suspended(self):
+        self._change_current_project_state_and_reset_list(self.s.INDEX_STATE_SUSPEND)
 
     def on_right_click_show_menu(self, pos):
         global_pos = self.qt_list_projects.mapToGlobal(pos)
         qt_menu_right = QMenu()
-        qt_menu_right.addAction("Set As Default Project", self.menu_set_def)
-        qt_menu_right.addAction("Set ACTIVE", self.menu_set_active)
-        qt_menu_right.addAction("Set SUSPEND", self.menu_set_suspended)
+        qt_menu_right.addAction("Set As Default Project", self.on_menu_set_as_def)
+        qt_menu_right.addAction("Set ACTIVE", self.on_menu_set_active)
+        qt_menu_right.addAction("Set SUSPEND", self.on_menu_set_suspended)
         qt_menu_right.exec_(global_pos)
 
     def hide_all_forms(self):

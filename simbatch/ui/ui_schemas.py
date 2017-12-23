@@ -465,7 +465,7 @@ class SchemasUI:
         qt_form_remove_layout.addRow(" ", QLabel("   "))
         qt_form_remove_layout.addRow(" ", wfr_buttons.qt_widget_layout)
         qt_form_remove_layout.addRow(" ", QLabel("   "))
-        wfr_buttons.button.clicked.connect(self.on_click_confirm_remove_project)
+        wfr_buttons.button.clicked.connect(self.on_click_confirm_remove_schema)
 
         qt_gb_remove = QGroupBox()
         qt_gb_remove.setLayout(qt_form_remove_layout)
@@ -588,7 +588,7 @@ class SchemasUI:
 
     def menu_remove(self):
         # print " [TODO] remove "  # TODO
-        self.on_click_confirm_remove_project()
+        self.on_click_confirm_remove_schema()
 
     def menu_open(self):
         current_schema_id = self.c.list_visible_schemas_ids[self.c.current_schema_list_index]
@@ -742,18 +742,19 @@ class SchemasUI:
             self.schema_form_remove.hide()
             self.remove_form_state = 0
 
-    def on_click_confirm_remove_project(self):
+    def on_click_confirm_remove_schema(self):
         if self.s.debug_level >= 4:
-            print "  [db] on_click_confirm_remove_project", self.c.current_schema_index
+            print "  [db] on_click_confirm_remove_schema index:", self.c.current_schema_index
         if self.c.current_schema_index >= 0:
             remove_index = self.c.current_schema_index
             self.c.lastSchema = None
+            self.c.current_schema_id = None
             self.c.current_schema_index = None
             self.c.remove_single_schema(index=remove_index, do_save=True)
-            self.list_schemas.takeItem(remove_index + 1)
+            # self.list_schemas.takeItem(remove_index + 1)
             self.update_visible_schemas_ids()
+            self.reset_list()
             # list_visible_schemas_ids
-
             self.schema_form_remove.hide()
             self.remove_form_state = 0
 
@@ -863,16 +864,16 @@ class SchemasUI:
 
             # update color of current item list
             if self.current_list_item_nr >= 0:
-                current_schema_index = self.list_visible_schemas_ids[self.current_list_item_nr - 1]
-                color_index = self.c.schemas_data[current_schema_index].state_id
+                print "\n\n __current_list_item_nr ", self.current_list_item_nr
+                print " __current_schema_id ", self.list_visible_schemas_ids[self.current_list_item_nr - 1]
+
+                current_schema_id = self.list_visible_schemas_ids[self.current_list_item_nr - 1]
+                self.c.update_current_from_id(current_schema_id)
+                color_index = self.c.current_schema.state_id
                 current_row.setBackground(self.s.state_colors_up[color_index].color())
 
                 # update current schema variables and top info
-                # if self.current_list_item_nr >= 1:
-                current_schema_id = self.list_visible_schemas_ids[self.current_list_item_nr - 1]
-                self.c.update_current_from_id(current_schema_id)
-                cur_sch_name = self.c.schemas_data[current_schema_index].schema_name
-
+                cur_sch_name = self.c.current_schema.schema_name
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current schema:    " + cur_sch_name)
                 else:

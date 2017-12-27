@@ -534,11 +534,7 @@ class TasksUI:
         for tsk in self.batch.t.tasks_data:
             if tsk.project_id == self.batch.p.current_project_id:
                 qt_list_item = QListWidgetItem(widget_list)
-                if tsk.state_id == 1:
-                    color_index = self.s.INDEX_STATE_ACTIVE
-                else:
-                    color_index = self.s.INDEX_STATE_HOLD
-                cur_color = self.s.state_colors[color_index].color()
+                cur_color = self.s.state_colors[tsk.state_id].color()
                 qt_list_item.setBackground(cur_color)
                 list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
                                                 tsk.sequence, tsk.shot, tsk.take, tsk.state,

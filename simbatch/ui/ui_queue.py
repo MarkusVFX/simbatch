@@ -9,7 +9,74 @@ except ImportError:
 from widgets import *
 from core.queue import *
 
-class QueueUI():
+
+class QueueListItem(QWidget):
+    def __init__(self, txt_id, txt_name, txt_user, txt_prior, txt_state, txt_evo, txt_node, txt_desc):
+        super(QueueListItem, self).__init__()
+        self.qt_widget = QWidget(self)
+        self.qt_label_font = QFont()
+        self.qt_label_font.setPointSize(8)
+
+        self.qt_lay = QHBoxLayout(self.qt_widget)
+        self.qt_lay.setSpacing(0)
+        self.qt_lay.setContentsMargins(0, 0, 0, 0)
+
+        self.qt_label_id = QLabel(txt_id)
+        self.qt_label_id.setFont(self.qt_label_font)
+        self.qt_label_id.setStyleSheet("""color:#000;""")
+        self.qt_label_id.setMinimumWidth(22)
+        self.qt_label_id.setMaximumWidth(22)
+        self.qt_lay.addWidget(self.qt_label_id)
+
+        self.qt_label_name = QLabel(txt_name)
+        self.qt_label_name.setFont(self.qt_label_font)
+        self.qt_label_name.setStyleSheet("""color:#000;""")
+        self.qt_label_name.setMinimumWidth(180)
+        self.qt_label_name.setMaximumWidth(250)
+        self.qt_lay.addWidget(self.qt_label_name)
+
+        self.qt_label_user = QLabel(txt_user)
+        self.qt_label_user.setFont(self.qt_label_font)
+        self.qt_label_user.setStyleSheet("""color:#000;""")
+        self.qt_label_user.setMinimumWidth(22)
+        self.qt_label_user.setMaximumWidth(30)
+        self.qt_lay.addWidget(self.qt_label_user)
+
+        self.qt_label_prior = QLabel(txt_prior)
+        self.qt_label_prior.setFont(self.qt_label_font)
+        self.qt_label_prior.setStyleSheet("""color:#000;""")
+        self.qt_label_prior.setMinimumWidth(22)
+        self.qt_label_prior.setMaximumWidth(30)
+        self.qt_lay.addWidget(self.qt_label_prior)
+
+        self.qt_label_state = QLabel(txt_state)
+        self.qt_label_state.setFont(self.qt_label_font)
+        self.qt_label_state.setStyleSheet("""color:#000;""")
+        self.qt_label_state.setMinimumWidth(55)
+        self.qt_label_state.setMaximumWidth(70)
+        self.qt_lay.addWidget(self.qt_label_state)
+
+        self.qt_label_evo = QLabel(txt_evo)
+        self.qt_label_evo.setFont(self.qt_label_font)
+        self.qt_label_evo.setStyleSheet("""color:#000;""")
+        self.qt_label_evo.setMinimumWidth(70)
+        self.qt_label_evo.setMaximumWidth(170)
+        self.qt_lay.addWidget(self.qt_label_evo)
+
+        self.qt_label_node = QLabel(txt_node)
+        self.qt_label_node.setFont(self.qt_label_font)
+        self.qt_label_node.setStyleSheet("""color:#000;""")
+        self.qt_lay.addWidget(self.qt_label_node)
+
+        self.qt_label_desc = QLabel(txt_desc)
+        self.qt_label_desc.setFont(self.qt_label_font)
+        self.qt_label_desc.setStyleSheet("""color:#000;""")
+        self.qt_lay.addWidget(self.qt_label_desc)
+
+        self.setLayout(self.qt_lay)
+
+
+class QueueUI:
     list_queue = None
     qt_widget_queue = None
 
@@ -54,7 +121,7 @@ class QueueUI():
         qt_widget_queue = QWidget()
         self.qt_widget_queue = qt_widget_queue
         qt_lay_queue_main = QVBoxLayout(qt_widget_queue)
-        qt_lay_queue_main.setContentsMargins(0, 0, 0, 0);
+        qt_lay_queue_main.setContentsMargins(0, 0, 0, 0)
 
         qt_lay_queue_list = QHBoxLayout()
         qt_lay_forms = QVBoxLayout()
@@ -135,6 +202,36 @@ class QueueUI():
         self.comfun.add_wigdets(qt_lay_queue_buttons,
                                 [qt_button_sim_one, qt_button_sim_all, qt_button_queue_edit, qt_button_queue_remove])
         self.comfun.add_layouts(qt_lay_queue_main, [qt_lay_queue_list, qt_lay_forms, qt_lay_queue_buttons])
+
+        self.init_queue_items()
+
+    def init_queue_items(self):
+        widget_list = self.list_queue
+        qt_list_item = QListWidgetItem(widget_list)
+        qt_list_item.setBackground(QBrush(QColor("#ddd")))
+        qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+
+        list_item_widget = QueueListItem("ID", "queue item name", "user", "prior", "state", "evo", "sim node", "desc")
+
+        widget_list.addItem(qt_list_item)
+        widget_list.setItemWidget(qt_list_item, list_item_widget)
+        qt_list_item.setSizeHint(QSize(1, 24))
+        if self.s.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.s.state_colors[0])
+        else:
+            qt_list_item.setBackground(self.s.state_colors_up[0])
+
+        for que in self.batch.q.queue_data:
+            qt_list_item = QListWidgetItem(widget_list)
+            cur_color = self.s.state_colors[que.state_id].color()
+            qt_list_item.setBackground(cur_color)
+            list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, que.prior, que.state,
+                                             que.evolution, que.sim_node, que.description)
+
+            widget_list.addItem(qt_list_item)
+            widget_list.setItemWidget(qt_list_item, list_item_widget)
+            qt_list_item.setSizeHint(QSize(130, 26))
+            qt_list_item.setBackground(self.s.state_colors[que.state_id])
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
@@ -256,20 +353,18 @@ class QueueUI():
         qt_list_item.setBackground(QBrush(QColor("#ddd")))
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
         new_queue_item = new_queue_item
-        color_index = new_queue_item.state_id
-        qItemColor = self.batch.s.state_colors[color_index].color()
         list_item_widget = QueueListItem(str(new_queue_item.id), new_queue_item.queue_item_name, new_queue_item.user,
                                          str(new_queue_item.prior), new_queue_item.state, new_queue_item.evolution,
-                                         new_queue_item.sim_node, new_queue_item.description, qItemColor)
+                                         new_queue_item.sim_node, new_queue_item.description)
 
         wigdet_list.addItem(qt_list_item)
         wigdet_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
 
-    def add_to_queue_and_update_list(self, formATQ):
+    def add_to_queue_and_update_list(self, form_atq):
         pass
 
-    def on_click_save_changes(self, updatedQueueName, updatedPrior, updatedState, updatedDescription):
+    def on_click_save_changes(self, updated_queue_name, updated_prior, updated_state, updated_description):
         pass
 
     def on_click_remove(self):

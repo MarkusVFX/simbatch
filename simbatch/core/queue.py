@@ -72,11 +72,6 @@ class Queue:
         if self.current_queue_index is not None:
             cur_que = self.current_queue
             print "       current queue name:{}".format(cur_que.queue_name)
-            # TODO
-            #print "       schemaID:", cur_tsk.schemaID, "       projID:", cur_tsk.projID
-            #print "       shotDetails ", cur_tsk.shotA, "   ", cur_tsk.shotB, "   ", cur_tsk.shotC
-            #print "       frameFrom  frameTo ", cur_tsk.frameFrom, cur_tsk.frameTo
-            #print "       state  state_id ", cur_tsk.state, "    ", cur_tsk.state_id
 
     def print_all(self):
         if self.total_queue_items == 0:
@@ -85,3 +80,99 @@ class Queue:
             print "\n\n ", q.queue_name
             # TODO
         print "\n\n"
+
+    def get_queue_index_by_id(self, get_id):
+        for i, que in enumerate(self.queue_data):
+            if que.id == get_id:
+                return i
+        print "   [WRN] (get index by )no queue item with ID: ", get_id
+        return None
+
+    def get_first_with_state (self, state_id, soft=0):
+        index = 0
+        for q in self.queue_data :
+            if q.state_id == state_id :
+                # print " [db] state : "+str(q.state_id)+"    q.soft_id: ",  q.soft_id
+                if soft > 0 :
+                    if q.soft_id == soft:
+                        return index, self.queue_data[index].id
+                else:
+                    return index, self.queue_data[index].id
+            index += 1
+        return -1, -1
+
+    def set_state (self, id, state, state_id, server_name="", server_id=-1, set_time=0, add_current_time=False):
+        for i, q in enumerate(self.queue_data):
+            if q.id == id:
+                self.queue_data[i].state = state
+                self.queue_data[i].state_id = state_id
+                self.queue_data[i].sim_node = server_name
+                self.queue_data[i].sim_node_id = server_id
+                if add_current_time:
+                    self.queue_data[i].description = "[{}]  {}".format(self.comfun.get_current_time(only_time=True),
+                                                                       self.queue_data[i].description)
+                elif set_time > 0:
+                    time_string = self.comfun.format_seconds_to_string(set_time)
+                    self.queue_data[i].description = "[{}]  {}".format(time_string,
+                                                                       self.queue_data[i].description)
+                return True
+        return False
+
+
+    def clear_all_queue_items(self):
+        del self.queue_data[:]
+        self.max_id = 0
+        self.total_queue_jobs = 0
+        self.current_queue_index = -1
+        self.current_queue_index = -1
+        self.last_queue_index = -1
+
+    def format_queue_data(self, json=False, sql=False, backup=False):
+        if json == sql == backup == False:
+            if self.s.debug_level >= 1:
+                print " [ERR] (format_queue_data) no format param !"
+        else:
+            return False
+
+
+    def load_queue(self):
+        if self.s.store_data_mode == 1 :
+            self.load_queue_from_json()
+        if self.s.store_data_mode == 2 :
+            self.load_queue_from_mysql()
+
+
+    def load_queue_from_json(self, json_file=""):
+        if len(json_file) == 0:
+            json_file = self.s.store_data_json_directory + self.s.JSON_QUEUE_FILE_NAME
+        if self.comfun.file_exists(json_file, info="queue file"):
+            if self.s.debug_level >= 3:
+                print " [INF] loading queue items: " + json_file
+        return False
+
+    def load_queue_from_mysql(self):
+        ### PRO VERSION
+        return False
+
+    def save_queue(self):
+        if self.s.store_data_mode == 1 :
+            self.save_queue_to_json()
+        if self.s.store_data_mode == 2 :
+            self.save_queue_to_mysql()
+
+    def save_queue_to_json(self, json_file=None):
+        if json_file is None:
+            json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
+        content = self.format_queue_data(json=True)
+        return self.comfun.save_json_file(json_file, content)
+
+    def save_queue_to_mysql(self):
+        ### PRO VERSION
+        return False
+
+
+
+
+
+
+

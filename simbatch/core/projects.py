@@ -184,7 +184,7 @@ class Projects:
                 print "   [db] total:{}  len:{}".format(self.total_projects, len(self.projects_data))
             return False
 
-    #  'projects_data' list  for backup or save
+    #  prepare 'projects_data' for backup or save
     def format_projects_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:
             if self.s.debug_level >= 1:
@@ -370,16 +370,16 @@ class Projects:
     #  load projects data from sql
     def load_projects_from_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 2:
-            print " [WRN] MySQL database needs PRO version"
-        return True
+        if self.s.debug_level >= 1:
+            print "  [MSG] MySQL database available in the PRO version"
+        return None
 
     #  save projects
     def save_projects(self):
         if self.s.store_data_mode == 1:
-            self.save_projects_to_json()
+            return self.save_projects_to_json()
         if self.s.store_data_mode == 2:
-            self.save_projects_to_mysql()
+            return self.save_projects_to_mysql()
 
     #  save projects data as json
     def save_projects_to_json(self, json_file=None):
@@ -391,9 +391,9 @@ class Projects:
     #  save projects data to sql
     def save_projects_to_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 2:
-            print " [WRN] MySQL database needs PRO version"
-        return True
+        if self.s.debug_level >= 1:
+            print "  [MSG] MySQL database available in the PRO version"
+        return None
 
     #  remove single project
     def remove_single_project(self, index=None, id=None, do_save=False):
@@ -421,6 +421,8 @@ class Projects:
             json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
+        else:
+            return True
 
     #  clear project data from sql
     def clear_projects_in_mysql(self):

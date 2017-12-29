@@ -230,7 +230,7 @@ class Schemas:
         else:
             print " [ERR] self.current_schema_index < 0  (none selected ???) "
 
-    def increase_curent_schema_version(self):
+    def increase_current_schema_version(self):
         if self.current_schema is not None:
             cur_sch = self.current_schema
             if self.s.debug_level >= 4:
@@ -239,7 +239,7 @@ class Schemas:
             self.save_schemas()
         else:
             if self.s.debug_level >= 1:
-                print " [ERR] (increase_curent_schema_version) current schema undefined"
+                print " [ERR] (increase_current_schema_version) current schema undefined"
 
     def remove_single_schema(self, index=None, id=None, do_save=False):
         if index is None and id is None:
@@ -265,10 +265,13 @@ class Schemas:
             json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
+        else:
+            return True
 
-    def clear_schemas_in_mysql(self):
+    @staticmethod
+    def clear_schemas_in_mysql():
         # PRO VERSION with sql
-        pass
+        return False
 
     def clear_all_schemas_data(self, clear_stored_data=False):
         del self.schemas_data[:]
@@ -321,10 +324,10 @@ class Schemas:
                 if json_schemas['schemas']['meta']['total'] > 0:
                     for li in json_schemas['schemas']['data'].values():
                         if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
+                            new_schema_actions = []
                             for lia in li['actions']:
                                 print " actions "   # TODO
-                            # new_schema_actions = [Action()]
-                            new_schema_actions = []
+                                new_schema_actions.append( Action(lia) ) # TODO
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), int(li['definition']), int(li['version']),
                                                          new_schema_actions, li['desc'])
@@ -343,10 +346,11 @@ class Schemas:
                 print " [ERR] no schema file: " + json_file
                 return False
 
-    @staticmethod
-    def load_schemas_from_mysql():
-        #  PRO version with sql
-        pass
+    def load_schemas_from_mysql(self):
+        # PRO VERSION
+        if self.s.debug_level >= 1:
+            print "  [MSG] MySQL database available in the PRO version"
+        return None
 
     def save_schemas(self):
         if self.s.store_data_mode == 1:
@@ -354,7 +358,7 @@ class Schemas:
         if self.s.store_data_mode == 2:
             return self.save_schemas_to_mysql()
 
-    # 'projects_data' list  for backup or save
+    #  prepare 'schemas_data' for backup or save
     def format_schemas_data(self, json=False, sql=False, backup=False):
         if json == sql == backup == False:
             if self.s.debug_level >= 1:
@@ -364,8 +368,7 @@ class Schemas:
                 tim = self.comfun.get_current_time()
                 formated_data = {"schemas": {"meta": {"total": self.total_schemas,
                                                       "timestamp": tim,
-                                                      "jsonFormat": "http://json-schema.org/"
-                                                      },
+                                                      "jsonFormat": "http://json-schema.org/"},
                                              "data": {}}}
                 for i, sd in enumerate(self.schemas_data):
                     sch = {}
@@ -384,10 +387,11 @@ class Schemas:
         content = self.format_schemas_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
-    @staticmethod
-    def save_schemas_to_mysql():
-        #  PRO version with sql
-        pass
+    def save_schemas_to_mysql(self):
+        # PRO VERSION
+        if self.s.debug_level >= 1:
+            print "  [MSG] MySQL database available in the PRO version"
+        return None
 
     def get_all_object_from_all_schemas(self, soft_id=0):
         if soft_id <= 0:

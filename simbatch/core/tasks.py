@@ -197,10 +197,12 @@ class Tasks:
         if 0 <= self.current_task_index < len(self.tasks_data):
             self.tasks_data[self.current_task_index] = copy.deepcopy(edited_task_item)
             if do_save is True:
-                self.save_tasks()
+                return self.save_tasks()
+            return True
         else:
             if self.s.debug_level >= 1:
                 print "  [ERR] wrong current_task_id:", self.current_task_index
+            return False
 
     def set_state(self, task_id, state):
         index = 0
@@ -219,25 +221,25 @@ class Tasks:
                     del self.tasks_data[i]
                     self.total_tasks -= 1
                     break
-            if do_save is False:
-                return True
         if index >= 0:
             del self.tasks_data[index]
             self.total_tasks -= 1
-            if do_save is False:
-                return True
         if do_save is True:
             return self.save_tasks()
+        else:
+            return True
 
     def delete_json_tasks_file(self, json_file=None):
         if json_file is None:
             json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
+        else:
+            return True
 
     def clear_tasks_in_mysql(self):
         # PRO VERSION with sql
-        pass
+        return False
 
     def clear_all_tasks_data(self, clear_stored_data=False):
         del self.tasks_data[:]
@@ -300,8 +302,9 @@ class Tasks:
 
     def load_tasks_from_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 3:
-            print "  [INF] relational database available in the PRO version"
+        if self.s.debug_level >= 1:
+            print "  [MSG] MySQL database available in the PRO version"
+        return None
 
     def save_tasks(self):
         if self.s.store_data_mode == 1:
@@ -340,8 +343,9 @@ class Tasks:
 
     def save_tasks_to_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 3:
-            print "  [INF] relational database available in the PRO version"
+        if self.s.debug_level >= 1:
+            print "  [MSG] MySQL database available in the PRO version"
+        return None
 
 
 

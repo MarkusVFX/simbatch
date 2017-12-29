@@ -598,7 +598,7 @@ class SchemasUI:
 
     def menu_save_as_next_version(self):
         cur_sch_index = self.batch.c.current_schema_index
-        self.c.increase_curent_schema_version()
+        self.c.increase_current_schema_version()
 
         self.reload_schemas_data_and_refresh_list()
 

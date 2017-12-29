@@ -32,8 +32,9 @@ class AddToQueueForm (QWidget):
 
     def __init__(self, batch):
         QWidget.__init__(self)
-        self.form_atq_local_item = QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "" ,2 ,"ver" , "evo" ,1 ,"" ,"", 50,
+        self.form_atq_local_item = QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL" ,0 , "ver", "evo" ,0 ,50 ,
                                              " 1 ", "", 0, "", 1, 3)
+
         #self.batch = batch
         #self.s = self.batch.s
         #self.comfun = self.batch.comfun

@@ -127,8 +127,10 @@ class TasksFormCreateOrEdit(QWidget):
     qt_edit_line_priority = None
     qt_edit_line_version = None
 
-    qt_edit_line_frame_start = None
-    qt_edit_line_frame_end = None
+    qt_edit_line_sim_frame_start = None
+    qt_edit_line_sim_frame_end = None
+    qt_edit_line_prev_frame_start = None
+    qt_edit_line_prev_frame_end = None
     execute_button = None
 
     # shAQLine = None
@@ -177,10 +179,15 @@ class TasksFormCreateOrEdit(QWidget):
         qt_edit_buton_version = EditLineWithButtons("Ver ", label_minimum_size=50, align_right=1)
         self.qt_edit_line_version = qt_edit_buton_version.qt_edit_line
 
-        qt_edit_buton_start = EditLineWithButtons("Start ", label_minimum_size=50, align_right=1)
-        self.qt_edit_line_frame_start = qt_edit_buton_start.qt_edit_line
-        qt_edit_buton_end = EditLineWithButtons("End ", label_minimum_size=50, align_right=1)
-        self.qt_edit_line_frame_end = qt_edit_buton_end.qt_edit_line
+        qt_edit_buton_sim_start = EditLineWithButtons("Start ", label_minimum_size=50, align_right=1)
+        self.qt_edit_line_sim_frame_start = qt_edit_buton_sim_start.qt_edit_line
+        qt_edit_buton_sim_end = EditLineWithButtons("End ", label_minimum_size=50, align_right=1)
+        self.qt_edit_line_sim_frame_end = qt_edit_buton_sim_end.qt_edit_line
+
+        qt_edit_buton_prev_start = EditLineWithButtons("Start ", label_minimum_size=50, align_right=1)
+        self.qt_edit_line_prev_frame_start = qt_edit_buton_prev_start.qt_edit_line
+        qt_edit_buton_prev_end = EditLineWithButtons("End ", label_minimum_size=50, align_right=1)
+        self.qt_edit_line_prev_frame_end = qt_edit_buton_prev_end.qt_edit_line
 
         qt_button_lay_detect_framerange = ButtonOnLayout("Detect from cache")
         qt_button_lay_get_framerange = ButtonOnLayout("Get from scene")
@@ -188,11 +195,11 @@ class TasksFormCreateOrEdit(QWidget):
         qt_button_lay_detect_framerange.button.clicked.connect(self.get_frame_range_from_cache)
         qt_button_lay_get_framerange.button.clicked.connect(self.get_frame_range_from_scene)
 
-        qt_widget_group_shot = WidgetGroup(
-            [qt_edit_buton_sequence, qt_edit_buton_shot, qt_edit_buton_take, qt_edit_buton_prior,
-             qt_edit_buton_version])
-        qt_widget_group_time_range = WidgetGroup(
-            [qt_edit_buton_start, qt_edit_buton_end, qt_button_lay_detect_framerange, qt_button_lay_get_framerange])
+        qt_widget_group_shot = WidgetGroup([qt_edit_buton_sequence, qt_edit_buton_shot,
+                                            qt_edit_buton_take, qt_edit_buton_prior, qt_edit_buton_version])
+        qt_widget_group_time_range = WidgetGroup([qt_edit_buton_sim_start, qt_edit_buton_sim_end,
+                                                  qt_edit_buton_prev_start, qt_edit_buton_prev_end,
+                                                  qt_button_lay_detect_framerange, qt_button_lay_get_framerange])
 
         qt_edit_buton_description = EditLineWithButtons("Description ")
         self.qt_fae_schema_description_edit = qt_edit_buton_description.qt_edit_line
@@ -250,14 +257,16 @@ class TasksFormCreateOrEdit(QWidget):
             arr_index += 1
 
         self.form_task_item = cur_task
-        self.qt_edit_line_sequence.setText(cur_task.shot_A)
-        self.qt_edit_line_shot.setText(cur_task.shot_B)
-        self.qt_edit_line_take.setText(cur_task.shot_C)
+        self.qt_edit_line_sequence.setText(cur_task.sequence)
+        self.qt_edit_line_shot.setText(cur_task.shot)
+        self.qt_edit_line_take.setText(cur_task.take)
 
-        self.qt_edit_line_frame_start.setText(str(cur_task.frame_from))
-        self.qt_edit_line_frame_end.setText(str(cur_task.frame_to))
+        self.qt_edit_line_sim_frame_start.setText(str(cur_task.sim_frame_start))
+        self.qt_edit_line_sim_frame_end.setText(str(cur_task.sim_frame_end))
+        self.qt_edit_line_prev_frame_start.setText(str(cur_task.prev_frame_start))
+        self.qt_edit_line_prev_frame_end.setText(str(cur_task.prev_frame_end))
 
-        self.qt_edit_line_priority.setText(str(cur_task.prior))
+        self.qt_edit_line_priority.setText(str(cur_task.priority))
         self.qt_edit_line_version.setText(str(cur_task.schema_ver))
 
         self.qt_fae_schema_description_edit.setText(cur_task.description)
@@ -311,12 +320,14 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item.schema_ver = (self.batch.c.get_schema_by_id(self.form_task_item.schema_id)).schema_version
         self.form_task_item.queue_ver = 0
 
-        self.form_task_item.shot_A = self.qt_edit_line_sequence.text()
-        self.form_task_item.shot_B = self.qt_edit_line_shot.text()
-        self.form_task_item.shot_C = self.qt_edit_line_take.text()
+        self.form_task_item.sequence = self.qt_edit_line_sequence.text()
+        self.form_task_item.shot = self.qt_edit_line_shot.text()
+        self.form_task_item.take = self.qt_edit_line_take.text()
 
-        self.form_task_item.frame_from = self.batch.comfun.int_or_val(self.qt_edit_line_frame_start.text(), 0)
-        self.form_task_item.frame_to = self.batch.comfun.int_or_val(self.qt_edit_line_frame_end.text(), 0)
+        self.form_task_item.sim_frame_start = self.batch.comfun.int_or_val(self.qt_edit_line_sim_frame_start.text(), 0)
+        self.form_task_item.sim_frame_end = self.batch.comfun.int_or_val(self.qt_edit_line_sim_frame_end.text(), 0)
+        self.form_task_item.prev_frame_start = self.batch.comfun.int_or_val(self.qt_edit_line_prev_frame_start.text(), 0)
+        self.form_task_item.prev_frame_end = self.batch.comfun.int_or_val(self.qt_edit_line_prev_frame_end.text(), 0)
 
         if self.qt_edit_line_priority.text().isdigit():
             self.form_task_item.prior = int(self.qt_edit_line_priority.text())
@@ -328,52 +339,22 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item.description = self.qt_fae_schema_description_edit.text()
 
     def get_frame_range_from_cache(self):
-        hack__a = self.qt_edit_line_sequence.text()
-        hack__b = self.qt_edit_line_shot.text()
-
         curr_proj = self.batch.p.projects_data[self.batch.p.current_project_index]
 
         pa_seq = self.batch.p.getSeqPattern(curr_proj.seq_shot_take_pattern)
         pa_sh = self.batch.p.getShPattern(curr_proj.seq_shot_take_pattern)
 
-        if len(pa_sh) > 0:
-            cut_index = pa_sh.find("<sh")
-            pa_sh = pa_sh[cut_index:]
-
-        pa_seq_zeros = pa_seq.count('#')
-        pa_sh_zeros = pa_sh.count('#')
-
-        search__b = ""
-        if len(hack__a) > 0:
-            if self.comfun.is_float(hack__a):
-                search__a = self.comfun.str_with_zeros(hack__a, pa_seq_zeros)
-                self.qt_edit_line_sequence.setText(search__a)
-                if len(hack__b) > 0:
-                    if self.comfun.is_float(hack__b):
-                        search__b = self.comfun.str_with_zeros(hack__b, pa_sh_zeros)
-                        self.qt_edit_line_sh_B.setText(search__b)
-
-                parametric_dir = "<project_cache_dir>" + curr_proj.seq_shot_take_pattern
-                ret_imp_dir = self.batch.d.get_import_dir(parametric_dir, hack_frame_range=True, hack_A=search__a,
-                                                          hack_B=search__b, hack_C="")
-                fr = self.batch.d.get_frame_range_from_dir(ret_imp_dir)
-
-                if fr[0] == 1:
-                    self.qt_edit_line_frame_start.setText(str(fr[1]))
-                    self.qt_edit_line_frame_end.setText(str(fr[2]))
-                    print "   get_frame_range_from_cache  ", fr[1], fr[2]
-                    self.top_ui.set_top_info(" Set frame range:  [" + str(fr[1]) + ":" + str(fr[2]) + "]")
-                else:
-                    print "  cant detect get_frame_range_from_cache  "
-                    self.top_ui.set_top_info(" Cant detect frame range ", 7)
+        #  TODO get frame range from cache or framerange file.
 
     def get_frame_range_from_scene(self):
         # ret = self.batch.o.soft_conn.get_curent_frame_range()
         ret = None  # TODO   .o.  softwares -> definitions
         print "   get_frame_range_from_scene    ", ret
         if ret is not None:
-            self.qt_edit_line_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
-            self.qt_edit_line_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
+            self.qt_edit_line_sim_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
+            self.qt_edit_line_sim_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
+            self.qt_edit_line_prev_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
+            self.qt_edit_line_prev_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
             self.top_ui.set_top_info(" Set frame range:  [" + str(ret[0]) + ":" + str(ret[1]) + "]")
         else:
             self.top_ui.set_top_info(" Can't detect frame range ", 7)
@@ -669,7 +650,7 @@ class TasksUI:
         if self.edit_form_state == 0:
             self.hide_all_forms()
             if self.batch.t.current_task_index >= 0:
-                curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
+                curr_task = self.batch.t.current_task
                 self.qt_form_edit.update_edit_ui(curr_task)
                 self.qt_form_edit.show()
                 self.edit_form_state = 1
@@ -891,12 +872,12 @@ class TasksUI:
                     cur_color = self.batch.s.state_colors_up[cur_task.state_id].color()
                     item_c.setBackground(cur_color)
 
-                    # update SCHEMA
+                # update SCHEMA
                 self.batch.c.lastSchemaIndex = None  # TODO  check it ui
                 self.batch.c.current_schema_id = cur_task.schema_id
                 self.batch.c.update_current_from_id(cur_task.schema_id)
 
-                # update PROJECT
+                # update TASK form
                 if self.create_form_state == 1:
                     self.qt_form_create.update_create_ui(cur_task.schema_id)
                 if self.edit_form_state == 1:

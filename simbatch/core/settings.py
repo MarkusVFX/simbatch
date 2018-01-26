@@ -94,7 +94,7 @@ class Settings:
     COLORS_DARK_FILE_NAME = "colors_dark.ini"
 
     default_settings = {"! json info":
-                        {"config": "this is basic config", "format": "more about json format: http://json.org"},
+                        {"config": "this is fundamental config file", "format": "more about json format: http://json.org"},
                         "dataMode":
                             {"current": 1, "modes": "1-json, 2-MySQL"},
                         "colorMode":

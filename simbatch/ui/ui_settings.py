@@ -1,4 +1,3 @@
-
 try:
     from PySide.QtGui import *
 except ImportError:
@@ -35,25 +34,25 @@ class SettingsUI:
         qt_label_mode = QLabel("Data store mode: ")
         qt_lay_settings_mode.addWidget(qt_label_mode)
         qt_button_group_data.setExclusive(True)
-        qt_radio_mode1 = QRadioButton("text")
-        if settings.store_data_mode == 1:
-            qt_radio_mode1.setChecked(True)
-        qt_button_group_data.addButton(qt_radio_mode1)
-        qt_lay_settings_mode.addWidget(qt_radio_mode1)
+        # qt_radio_mode1 = QRadioButton("text")
+        # if settings.store_data_mode == 1:
+        # qt_radio_mode1.setChecked(True)
+        # qt_button_group_data.addButton(qt_radio_mode1)
+        # qt_lay_settings_mode.addWidget(qt_radio_mode1)
         qt_radio_mode2 = QRadioButton("json")
-        if settings.store_data_mode == 2:
+        if settings.store_data_mode == 1:
             qt_radio_mode2.setChecked(True)
         qt_button_group_data.addButton(qt_radio_mode2)
         qt_lay_settings_mode.addWidget(qt_radio_mode2)
         qt_radio_mode3 = QRadioButton("MySql")
-        if settings.store_data_mode == 3:
+        if settings.store_data_mode == 2:
             qt_radio_mode3.setChecked(True)
         qt_button_group_data.addButton(qt_radio_mode3)
         qt_lay_settings_mode.addWidget(qt_radio_mode3)
 
-        qt_radio_mode1.clicked.connect(lambda: self.on_click_radio_data(1))
-        qt_radio_mode2.clicked.connect(lambda: self.on_click_radio_data(2))
-        qt_radio_mode3.clicked.connect(lambda: self.on_click_radio_data(3))
+        # qt_radio_mode1.clicked.connect(lambda: self.on_click_radio_data(1))
+        qt_radio_mode2.clicked.connect(lambda: self.on_click_radio_data(1))
+        qt_radio_mode3.clicked.connect(lambda: self.on_click_radio_data(2))
 
         ''' DATA '''
         qt_lay_settings_data = QHBoxLayout()
@@ -62,14 +61,28 @@ class SettingsUI:
         qt_settings_data_directory_button = QPushButton("Get")
         qt_settings_data_directory_button.setToolTip('Select directory for store data')
         qt_settings_data_directory_button.clicked.connect(self.on_click_get_data_dir)
+
         self.qt_settings_data_directory_edit = qt_settings_data_directory_edit
         qt_lay_settings_data.addWidget(qt_settings_data_directory_label)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_edit)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_button)
 
+        qt_lay_settings_definitions = QHBoxLayout()
+        qt_settings_definitions_directory_label = QLabel("Definitions directory : ")
+        qt_settings_definitions_directory_edit = QLineEdit(settings.store_definitions_directory)
+        qt_settings_definitions_directory_button = QPushButton("Get")
+        qt_settings_definitions_directory_button.setToolTip('Select definitions directory')
+        qt_settings_definitions_directory_button.clicked.connect(self.on_click_get_definitions_dir)
+
+        self.qt_settings_definitions_directory_edit = qt_settings_definitions_directory_edit
+        qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_label)
+        qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_edit)
+        qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_button)
+
         qt_lay_settings_mode_data = QVBoxLayout()
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_mode)
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_data)
+        qt_lay_settings_mode_data.addLayout(qt_lay_settings_definitions)
 
         qt_radio_group_mode.setLayout(qt_lay_settings_mode_data)
 
@@ -213,6 +226,9 @@ class SettingsUI:
         #  TODO json vs txt
         if self.settings.debug_level <= 4:
             print " [db] on_click_radio_data ", index
+        if index > 1:
+            # PRO version
+            self.top_ui.set_top_info("MySQL only with proversion", 4)
 
     def on_clicked_radio_colors(self, index):
         if self.settings.debug_level <= 4:
@@ -243,21 +259,31 @@ class SettingsUI:
     def on_click_get_data_dir(self):
         self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog)
 
-    def on_click_save_settings(self):
-        dataPath = str(self.qt_settings_data_directory_edit.text())
-        if self.comfun.path_exists(dataPath, info="Data Path"):
-            self.settings.batchDataPath = dataPath
-            self.settings.save_settings()
+    def on_click_get_definitions_dir(self):
+        self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog)
 
-            if self.sample_data_state:
-                batch = self.batch
-                batch.p.create_example_project_data(do_save=True)
-                batch.c.create_example_schemas_data(do_save=True)
-                batch.t.create_example_tasks_data(do_save=True)
-                # batch.q.createSampleData(taskID, projID)  # TODO
-                # batch.n.createSampleData()  # TODO
-                if self.settings.debug_level >= 3:
-                    print " [INF] created sample data: ", dataPath
+    def on_click_save_settings(self):
+        data_path = str(self.qt_settings_data_directory_edit.text())
+        definitions_path = str(self.qt_settings_definitions_directory_edit.text())
+        print " [db  db] ", data_path
+        if self.comfun.path_exists(data_path, info="Data Path"):
+            if self.comfun.path_exists(definitions_path, info="Definitions Path"):
+                self.settings.store_data_json_directory = data_path
+                self.settings.store_data_backup_directory = data_path + "backup\\"
+                self.settings.store_definitions_directory = definitions_path
+                self.settings.save_settings()
+
+                if self.sample_data_state:
+                    batch = self.batch
+                    batch.p.create_example_project_data(do_save=True)
+                    batch.c.create_example_schemas_data(do_save=True)
+                    batch.t.create_example_tasks_data(do_save=True)
+                    # batch.q.createSampleData(taskID, projID)  # TODO
+                    # batch.n.createSampleData()  # TODO
+                    if self.settings.debug_level >= 3:
+                        print " [INF] created sample data: ", data_path
+            else:
+                print " [ERR] wrong definitions path !!!"
         else:
             print " [ERR] wrong data path !!!"
 

@@ -314,9 +314,9 @@ class SchemaFormCreateOrEdit(QWidget):
     def compile_actions(self):
         self.actions_array = []
         for widget_action in self.action_widgets:
-            # print " INF  COMPILE ACTION 3    widget_action   :", widget_action
             single_action = widget_action.action_data.get_action()
             self.actions_array.append(single_action)
+            print " [db] INF  COMPILE ACTION 3    widget_action   :", single_action  # TODO clean
 
 
 class SchemasUI:

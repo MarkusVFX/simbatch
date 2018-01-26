@@ -126,8 +126,8 @@ class MainWindow(QMainWindow):
         self.batch = batch
         self.comfun = batch.comfun
         self.s = batch.s
-        self.init_ui(batch)
         self.debug_level = batch.s.debug_level
+        self.init_ui(batch)
 
     def init_ui(self, batch):
         user32 = ctypes.windll.user32
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
         current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
         current_screen_height = user32.GetSystemMetrics(79)   # SM_CYVIRTUALSCREEN
 
-        if len(wnd) == 4:
+        if wnd is not None and len(wnd) == 4:
             x_wnd_pos = wnd[0]
             y_wnd_pos = wnd[1]
 
@@ -206,13 +206,18 @@ class MainWindow(QMainWindow):
         qt_central_widget.setLayout(qt_lay_central)
         qt_tab_widget.currentChanged.connect(self.on_tab_change)
 
+        # after init main window and load settings and data
+        if self.s.loading_state < 3:
+            top.set_top_info("Settings not loaded properly", 7)
+
+
     def on_tab_change(self, tab):
         if self.s.debug_level >= 5:
             print " [INF] tab change: ", tab
 
-    def init_lists(self):
-        if self.s.debug_level >= 3:
-            print " [INF] init lists"
+    # def init_lists(self):
+    #     if self.s.debug_level >= 3:
+    #         print " [INF] init lists"
 
     def on_clicked_but_print_general(self):
         self.batch.print_important_values()
@@ -254,13 +259,15 @@ class MainWindow(QMainWindow):
 
     def on_resize_window(self, event):
         new_size = event.size()
-        self.s.window[2] = new_size.width()
-        self.s.window[3] = new_size.height()
+        if self.s.window is not None:       # if None settings not loaded
+            self.s.window[2] = new_size.width()
+            self.s.window[3] = new_size.height()
 
     def moveEvent(self, event):              # PySide  moveEvent
         self.on_move_window(event)
 
     def on_move_window(self, event):
         new_pos = event.pos()
-        self.s.window[0] = new_pos.x()
-        self.s.window[1] = new_pos.y()
+        if self.s.window is not None:      # if None settings not loaded
+            self.s.window[0] = new_pos.x()
+            self.s.window[1] = new_pos.y()

@@ -20,6 +20,9 @@ class SimNodes:
         self.comfun = batch.comfun
         self.nodes_data = []
 
+    def print_current(self):
+        print " TODO  node"
+
 #
 # For network work and multi node implementation
 # please ask about PRO version

@@ -1,4 +1,3 @@
-
 try:
     from PySide.QtGui import *
 except ImportError:
@@ -29,12 +28,13 @@ class WizardUI:
         qt_widget_wizard.setContentsMargins(20, 20, 20, 20)
 
         self.qt_widget_wizard = qt_widget_wizard
+
         qt_lay_wizard_main = QVBoxLayout(qt_widget_wizard)
         qt_lay_wizard_main.setContentsMargins(0, 0, 0, 0)
         self.qt_lay_wizard_main = qt_lay_wizard_main
 
-        layWizardForm = QVBoxLayout()
-        layWizardButtons = QVBoxLayout()
+        qt_lay_wizard_form = QVBoxLayout()
+        # qt_lay_wizard_buttons = QVBoxLayout()
 
         ###   STEP 1
         qt_lay_step_1a = QVBoxLayout()
@@ -49,12 +49,12 @@ class WizardUI:
         wizard_but_use_cur_scene = ButtonWithCheckBoxes("Get from current scene", cb2_text="Use current scene",
                                                         cb2_checked=True,
                                                         button_width=150)  # , label_text = "Use label_text"
-        wizard_step_CreateProject = ButtonOnLayout("Create Project", width=180)
-        wizard_step_UseCurScene = ButtonOnLayout("Use Current Project", width=180)
+        wizard_step_create_project = ButtonOnLayout("Create Project", width=180)
+        wizard_step_use_curr_scene = ButtonOnLayout("Use Current Project", width=180)
         qt_lay_step_1b = QHBoxLayout()
-        self.comfun.add_layouts(qt_lay_step_1b, [wizard_step_CreateProject.qt_widget_layout,
+        self.comfun.add_layouts(qt_lay_step_1b, [wizard_step_create_project.qt_widget_layout,
                                                  SimpleLabel("or", label_maximum=10).qt_widget_layout,
-                                                 wizard_step_UseCurScene.qt_widget_layout])
+                                                 wizard_step_use_curr_scene.qt_widget_layout])
 
         ### self s1
         self.s1projNameEL = wizard_step_1a.qt_edit_line
@@ -71,4 +71,6 @@ class WizardUI:
         qt_group_box_step_1 = QGroupBox()
         qt_group_box_step_1.setTitle("1 ) Create  Project")
         qt_group_box_step_1.setLayout(qt_lay_step_1a)
-        layWizardForm.addWidget(qt_group_box_step_1)
+        qt_lay_wizard_form.addWidget(qt_group_box_step_1)
+
+        qt_lay_wizard_main.addWidget(QLabel("Wizard under refactoring !"))

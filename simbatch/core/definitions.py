@@ -212,7 +212,7 @@ class Definitions:
 
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
-            definitions_dir = self.s.store_data_definitions_directory
+            definitions_dir = self.s.store_definitions_directory
 
         if self.comfun.file_exists(definitions_dir):
             for json_file in self.batch.i.get_files_from_dir(definitions_dir, types="json"):

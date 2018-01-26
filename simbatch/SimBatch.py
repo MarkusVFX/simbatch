@@ -18,6 +18,6 @@ if sim_batch.s.debug_level >= 1:
 
 if sim_batch.s.WITH_GUI == 1:
     main_window = ui.MainWindow(sim_batch)
-    main_window.init_lists()
+    # main_window.init_lists()
     main_window.show()
 app.exec_()

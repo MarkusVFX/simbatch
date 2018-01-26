@@ -277,6 +277,7 @@ class ProjectsUI:
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
+
         if self.s.ui_brightness_mode == 0:
             qt_list_item.setBackground(self.s.state_colors[0])
         else:

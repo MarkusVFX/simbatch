@@ -574,29 +574,13 @@ class SchemasUI:
         self.reset_list()
         self.update_visible_schemas_ids()
 
-    def _change_current_schema_state_and_reset_list(self, state_id):
-        self.batch.c.current_schema.state = self.s.states_visible_names[state_id]
-        self.batch.c.current_schema.state_id = state_id
-        self.batch.c.save_schemas()
-        self.reset_list()
-
-    def on_menu_set_active(self):
-        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_ACTIVE)
-
-    def on_menu_set_hold(self):
-        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_HOLD)
-
-    def menu_remove(self):
-        # print " [TODO] remove "  # TODO
-        self.on_click_confirm_remove_schema()
-
-    def menu_open(self):
+    def on_menu_open(self):
         current_schema_id = self.c.list_visible_schemas_ids[self.c.current_schema_list_index]
         print "  list_schemas_double_clicked : ", current_schema_id
         sch = self.c.get_schema_by_id(current_schema_id)
         self.load_base_setup(sch.schema_name, sch.schemaVersion)
 
-    def menu_save_as_next_version(self):
+    def on_menu_save_as_next_version(self):
         cur_sch_index = self.batch.c.current_schema_index
         self.c.increase_current_schema_version()
 
@@ -612,27 +596,53 @@ class SchemasUI:
         print " [db] save as :", ret
         self.batch.d.soco.save_curent_scene_as(ret[1])
 
-    def menu_locate_base_setup(self):
+    def on_menu_locate_base_setup(self):
         import subprocess
         prev_dir = self.batch.d.get_base_setup_dir()
         base_setup_dir = prev_dir[1]
-        if self.comfun.path_exists(base_setup_dir, info="Base Setup"):
-            subprocess.Popen('explorer "' + base_setup_dir + '"')
+        if self.s.current_os == 2:
+            if self.comfun.path_exists(base_setup_dir, info="Base Setup"):
+                subprocess.Popen('explorer "' + base_setup_dir + '"')
+
+    def on_menu_remove(self):
+        # print " [TODO] remove "  # TODO
+        self.on_click_confirm_remove_schema()
 
     @staticmethod
-    def menu_spacer():
+    def on_menu_spacer():
         print "  ____  "
+
+    def _change_current_schema_state_and_reset_list(self, state_id):
+        self.batch.c.current_schema.state = self.s.states_visible_names[state_id]
+        self.batch.c.current_schema.state_id = state_id
+        self.batch.c.save_schemas()
+        self.reset_list()
+
+    def on_menu_set_active(self):
+        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_ACTIVE)
+
+    def on_menu_set_suspended(self):
+        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_SUSPEND)
+
+    def on_menu_set_hold(self):
+        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_HOLD)
+
+
 
     def on_right_click_show_menu(self, pos):
         global_pos = self.list_schemas.mapToGlobal(pos)
-        right_menu = QMenu()
-        right_menu.addAction("Open", self.menu_open)
-        right_menu.addAction("Save current scene as next version", self.menu_save_as_next_version)
-        right_menu.addAction("Remove", self.menu_remove)
-        right_menu.addAction("________", self.menu_spacer)
-        right_menu.addAction("Locate base setup", self.menu_locate_base_setup)
-        right_menu.addAction("________", self.menu_spacer)
-        right_menu.exec_(global_pos)
+        qt_menu_right = QMenu()
+        qt_menu_right.addAction("Open base schema", self.on_menu_open)
+        qt_menu_right.addAction("Save current scene as next version", self.on_menu_save_as_next_version)
+        qt_menu_right.addAction("________", self.on_menu_spacer)
+        qt_menu_right.addAction("Locate base setup", self.on_menu_locate_base_setup)
+        qt_menu_right.addAction("________", self.on_menu_spacer)
+        qt_menu_right.addAction("Set ACTIVE", self.on_menu_set_active)
+        qt_menu_right.addAction("Set SUSPEND", self.on_menu_set_suspended)
+        qt_menu_right.addAction("Set HOLD", self.on_menu_set_hold)
+        qt_menu_right.addAction("________", self.on_menu_spacer)
+        qt_menu_right.addAction("Remove", self.on_menu_remove)
+        qt_menu_right.exec_(global_pos)
 
     def hide_all_forms(self):
         self.schema_form_create.hide()
@@ -805,9 +815,9 @@ class SchemasUI:
             self.update_current_project_schemas()
 
             self.mainw.tsk_ui.qt_form_create.update_schema_names_combo()
-                # self.current_project_schemas_names,              self.current_project_schemas_ids, 0)
+            # self.current_project_schemas_names,              self.current_project_schemas_ids, 0)
             self.mainw.tsk_ui.qt_form_edit.update_schema_names_combo()
-                # self.current_project_schemas_names,          self.current_project_schemas_ids, 0)
+            # self.current_project_schemas_names,          self.current_project_schemas_ids, 0)
             self.reload_schemas_data_and_refresh_list()
 
     def on_click_update_schema(self, edited_schema_item):
@@ -843,7 +853,7 @@ class SchemasUI:
             print " [db] list_schemas_double_clicked ", self.c.current_schema_list_index, item
             if self.s.debug_level >= 7:
                 print "    [db]", item
-        self.menu_open()
+        self.on_menu_open()
 
     def on_list_schemas_current_changed(self, current_row):
         if self.freeze_list_on_changed == 0:

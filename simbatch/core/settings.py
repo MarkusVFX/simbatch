@@ -1,3 +1,4 @@
+import os
 import json
 from common import CommonFunctions
 
@@ -13,7 +14,8 @@ class Settings:
     loading_state = 0               # check basic config # TODO data loading and GUI init
     json_settings_data = None       # basic config data
 
-    # basic config settings (def:config.ini)
+    # fundamental settings (config.ini)
+    current_os = -1
     store_data_mode = None                      # 1 json     2 MySQL (PRO version)
     debug_level = None                          # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
     store_data_json_directory = None            # dir basic config settings (def:config.ini)
@@ -113,7 +115,15 @@ class Settings:
                             {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800}
                         }
 
-    def __init__(self, runtime_env, ini_file="config.ini"):
+    def __init__(self, runtime_env, ini_file="config.ini", force_os=False):
+        if force_os is False:
+            if os.name == "posix":
+                self.current_os = 1
+            else:
+                self.current_os = 2
+        else:
+            self.current_os = force_os
+
         self.runtime_env = runtime_env
         self.ini_file = ini_file
         self.comfun = CommonFunctions(2)

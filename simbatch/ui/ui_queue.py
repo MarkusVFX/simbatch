@@ -269,8 +269,7 @@ class QueueUI:
         prev_dir = self.batch.d.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
                                                   forceQueueVersion=version)
 
-        if self.s.debug_level >= 3:
-            print "  [db] DIR : ", task_id, prev_dir
+        self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
 
         prev_dir = prev_dir + "\\"
         if self.comfun.path_exists(prev_dir, " prev open "):
@@ -285,20 +284,18 @@ class QueueUI:
 
         file_to_load = self.batch.d.get_computed_setup_file(task_id, version, evo_nr)
         if file_to_load[0] == 1:
-            if self.s.debug_level >= 1:
-                print "\n  [INF]   file_to_load: ", file_to_load[1]
+            self.batch.logger.inf(("file_to_load ", file_to_load[1]))
             self.batch.o.soft_conn.load_scene(file_to_load[1])
         else:
-            print "\n  [WRN]   file_to_load not exist: ", file_to_load[1]
+            self.batch.logger.wrn(("file_to_load not exist: ", file_to_load[1]))
 
     def on_click_menu_schema_remove(self):
         self.batch.q.removeQueueItem(index=self.batch.q.current_queue_index, do_save=True)
         self.reset_list()
-        print "  remove "
 
     @staticmethod
     def on_click_menu_spacer():
-        print "  ____  "
+        pass
 
     def on_right_click_show_menu(self, pos):
         global_cursor_pos = self.list_queue.mapToGlobal(pos)
@@ -344,7 +341,7 @@ class QueueUI:
             self.qt_edit_fe_state.setText(curr_queue_item.state)
             self.qt_fe_description.setText(curr_queue_item.description)
         else:
-            print " [WRN] Please Select Queue Item"
+            self.batch.logger.wrn("Please Select Queue Item")
             self.top_ui.set_top_info(" Please Select Queue Item", 7)
 
     def add_queue_item_to_list(self, new_queue_item):

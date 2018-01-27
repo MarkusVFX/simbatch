@@ -289,26 +289,21 @@ class TasksFormCreateOrEdit(QWidget):
     def compile_imputs(self):
         self.form_task_item.task_name = self.qt_schema_name_combo.currentText()
         if self.qt_schema_name_combo.currentIndex() >= 0:
-            if self.s.debug_level >= 5:
-                print "[db sch on tsk a] ", self.qt_schema_name_combo.currentIndex()
-                print "[db sch on tsk c] ", self.schemas_id_array
+            self.batch.logger.db(("comlpile inputs", self.qt_schema_name_combo.currentIndex(), self.schemas_id_array ))
             if len(self.schemas_id_array) > 0:
-                if self.s.debug_level >= 5:
-                    print "[db sch on tsk b] ", self.schemas_id_array[0], len(self.schemas_id_array)
+                self.batch.logger.db(("comlpile ...", self.schemas_id_array[0], len(self.schemas_id_array)))
             if len(self.schemas_id_array) > self.qt_schema_name_combo.currentIndex():
                 self.form_task_item.schema_id = self.schemas_id_array[self.qt_schema_name_combo.currentIndex()]
             else:
                 if self.s.debug_level >= 1:
-                    print "  [ERR74]  compile_imputs   ", len(self.schemas_id_array)
-                    print "  [ERR74]  compile_imputs   ", self.qt_schema_name_combo.currentIndex()
+                    self.batch.logger.err(("comlpile err", len(self.schemas_id_array)))
+                    self.batch.logger.err(("comlpile err", self.qt_schema_name_combo.currentIndex()))
         else:
             self.form_task_item.schema_id = -1
-            if self.s.debug_level >= 1:
-                print "   [WRN] (compile_imputs)  schema_name_combo:", self.qt_schema_name_combo.currentIndex
+            self.batch.logger.wrn(("wrong index, schema_name_combo:", self.qt_schema_name_combo.currentIndex()))
 
         if self.batch.c.current_schema_index is None:   # TODO check it
-            if self.s.debug_level >= 1:
-                print "\n     [ERR] (compile_imputs)  self.sch.curr_schema_index: ", self.batch.c.current_schema_index
+            self.batch.logger.err(("current schema is None! current_schema_index:", self.batch.c.current_schema_index))
 
         if self.batch.p.current_project_id is not None:
             self.form_task_item.project_id = self.batch.p.current_project_id
@@ -349,7 +344,7 @@ class TasksFormCreateOrEdit(QWidget):
     def get_frame_range_from_scene(self):
         # ret = self.batch.o.soft_conn.get_curent_frame_range()
         ret = None  # TODO   .o.  softwares -> definitions
-        print "   get_frame_range_from_scene    ", ret
+        self.batch.logger.db(("get_frame_range_from_scene", ret))
         if ret is not None:
             self.qt_edit_line_sim_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
             self.qt_edit_line_sim_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
@@ -590,15 +585,14 @@ class TasksUI:
         evo_nr = -1
         file_to_load = self.batch.d.getComputedSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
         if file_to_load[0] == 1:
-            if self.s.debug_level >= 1:
-                print "\n  [INF]   loadFile: ", file_to_load[1]
+            self.batch.logger.inf(("file_to_load:", file_to_load[1]))
             self.batch.o.soft_conn.load_scene(file_to_load[1])
         else:
-            print "\n  [WRN]   loadFile not exist: ", file_to_load[1]
+            self.batch.logger.wrn(("file_to_load not exist:", file_to_load[1]))
 
     @staticmethod
     def on_click_menu_spacer():
-        print "  ____  "
+        pass
 
     def on_right_click_show_menu(self, pos):
         global_cursor_pos = self.list_tasks.mapToGlobal(pos)
@@ -655,7 +649,7 @@ class TasksUI:
                 self.qt_form_edit.show()
                 self.edit_form_state = 1
             else:
-                print " [WRN] Please Select Task "
+                self.batch.logger.wrn("(on_click_show_edit) Please Select Task:")
                 self.top_ui.set_top_info(" Please Select Task ", 7)
         else:
             self.qt_form_edit.hide()
@@ -671,17 +665,8 @@ class TasksUI:
             self.remove_form_state = 0
 
     def on_click_show_add_to_queue(self):
-        print " [db] on_click_add_to_queue  proj:  : ", self.batch.p.current_project_id
+        self.batch.logger.db(("on_click_add_to_queue  proj: ", self.batch.p.current_project_id))
         if self.add_form_state == 0:
-            if self.batch.t.current_task_index >= 0:
-                print "[db]  WRN  add2Q CURR TASK ", self.batch.t.current_task_index
-            else:
-                print "[db]  WRN  add2Q CURR TASK -1 !  !!!\n"
-            if self.batch.p.current_project_id >= 0:
-                print "[db]  WRN  add2Q CURR PROJ ", self.batch.p.current_project_id
-            else:
-                print "[db]  WRN  add2Q CURR PROJ -1 !  !!!\n"
-
             self.hide_all_forms()
             self.qt_form_add.show()
             self.qt_form_add.update_add_ui()
@@ -708,7 +693,7 @@ class TasksUI:
             if self.qt_form_create.qt_schema_name_combo.currentIndex() >= 0:
                 self.qt_form_create.compile_imputs()
                 if new_task_tem.schema_id < 0:
-                    print "   [ERR]  schema_id  ", new_task_tem.schema_id
+                    self.batch.logger.err(("(on_click_add_task) wrong schema_id: ", new_task_tem.schema_id))
 
                 self.add_single_task(copy.copy(new_task_tem))
                 self.top_ui.set_top_info(" [INF] Task created, active task:  " + new_task_tem.task_name)
@@ -718,10 +703,10 @@ class TasksUI:
 
                 self.reload_tasks_data_and_refresh_list()
             else:
-                print " WRN [on_click_add_task] PLEASE SELECT SCHEMA"
+                self.batch.logger.err("(on_click_add_task) PLEASE SELECT SCHEMA ")
                 self.top_ui.set_top_info(" [INF] PLEASE SELECT SCHEMA !", 8)
         else:
-            print " WRN [on_click_add_task] current_project_id ", self.batch.p.current_project_id
+            self.batch.logger.wrn(("(on_click_add_task) wrong current_project_id: ", self.batch.p.current_project_id))
             self.top_ui.set_top_info(" [INF] PLEASE SELECT PROJECT !", 8)
 
     def on_click_update_task(self, edited_task_item):
@@ -740,40 +725,28 @@ class TasksUI:
 
         self.qt_form_add.hide()
         self.add_form_state = 0
-        if self.s.debug_level >= 1:
-            print " [INF] task updated"
+        self.batch.logger.inf("task updated")
 
     def on_click_confirm_remove_project(self):
-        if self.s.debug_level >= 1:
-            print "  on_click remove_project  ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
+        self.batch.logger.db(("remove_project", self.batch.t.current_task_index, self.batch.t.current_task_list_index))
         if self.batch.t.current_task_list_index >= 0:
             take_item_list = self.batch.t.current_task_list_index + 1
             self.batch.t.remove_single_task(index=self.batch.t.current_task_index, do_save=True)
             self.batch.t.last_task_list_index = -1
             self.batch.t.current_task_index = -1
             self.batch.t.current_task_list_index = -1
-
-            print "on_click remove_project B ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
             self.list_tasks.takeItem(take_item_list)
-
-            print "on_click remove_project C ", self.batch.t.current_task_index, self.batch.t.current_task_list_index
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
     def print_form_add(self):
-        print "\n\n  print_form_add"
         form_add = self.qt_form_add
-        print "\n  actionsCount", form_add.actionsCount
-        print "\n  actionsAllArray"
         self.comfun.print_list(form_add.actionsAllArray)
-        print "\n  actions_widgets_array"
         for ak in form_add.actions_widgets_array:
             if ak.is_evo == 1:
-                print " is_evo:", ak.is_evo,  "   scr:", ak.script_type, ak.script
+                self.batch.logger.deepdb((" is_evo:", ak.is_evo,  "   scr:", ak.script_type, ak.script))
             else:
-                print " is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script
-        print ".... "
-        print "  print_form_add END\n\n"
+                self.batch.logger.deepdb(("not is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script))
 
     def on_click_add_to_queue(self):
         form_atq = self.qt_form_add
@@ -794,7 +767,7 @@ class TasksUI:
                 self.freeze_list_on_changed = 0
                 self.qt_form_add.update_add_ui()
             else:
-                print " [ERR] Add to queue: cant create directory !"
+                self.batch.logger.err("Add to queue: cant create directory !")
                 self.top_ui.set_top_info(" ERR: cant create directory ", 9)
         else:
             self.top_ui.set_top_info(" Please select task ", 7)
@@ -819,9 +792,9 @@ class TasksUI:
 
     def on_change_current_list_task(self, current_task_item):
         if current_task_item is None:
-            print " [db] on_change_current_list_task (current_task_item is None)   ", self.list_tasks.currentRow()
+            self.batch.logger.db(("chng current task (current_task_item is None) ", self.list_tasks.currentRow()))
         else:
-            print " [db] on_change_current_list_task ", self.list_tasks.currentRow()
+            self.batch.logger.db(("chng current task ", self.list_tasks.currentRow()))
 
         if self.freeze_list_on_changed == 0:  # on massive action    or   refresh
             # self.batch.t.last_task_list_index = self.batch.t.current_task_list_index
@@ -839,19 +812,22 @@ class TasksUI:
                             color_index = self.batch.t.tasks_data[last_index].state_id
                             item.setBackground(self.batch.s.state_colors[color_index].color())
                 else:
-                    print " [db] WRONG last_task_list_index {} vs {} ".format(self.last_list_item_index,
-                                                                              len(self.batch.t.tasks_data))
+                    self.batch.logger.wrn("Wrong last_task_list_index {} vs {} ".format(self.last_list_item_index,
+                                                                                        len(self.batch.t.tasks_data)))
             else:
-                print " [db] last_task_list_index is None "
+                self.batch.logger.db("last_task_list_index is None")
 
             if len(self.array_visible_tasks_ids) <= current_list_index:
                 self.update_list_of_visible_ids()  # TODO move  to init / change list
                 if len(self.array_visible_tasks_ids) > current_list_index:
-                    print " [db] vis ids FIXED: len(array_visible_tasks_ids):{}  vs current_list_index:{}". format(
-                        len(self.array_visible_tasks_ids), current_list_index)
+                    self.batch.logger.deepdb(("vis ids FIXED: len(array_visible_tasks_ids):",
+                                              len(self.array_visible_tasks_ids),
+                                              "vs current_list_index:", current_list_index))
+
                 else:
-                    print " [ERR] vis ids NOT FIXED: array_visible_tasks_ids[] :{}  vs current_list_index:{}". format(
-                        len(self.array_visible_tasks_ids), " vs ", current_list_index)
+                    self.batch.logger.err(("vis ids NOT FIXED: len(array_visible_tasks_ids):",
+                                           len(self.array_visible_tasks_ids),
+                                           "vs current_list_index:", current_list_index))
 
             if 0 <= current_list_index < len(self.array_visible_tasks_ids):
                 current_task_id = self.array_visible_tasks_ids[current_list_index]
@@ -865,7 +841,7 @@ class TasksUI:
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current task: [" + str(cur_task.id) + "]    " + cur_task.task_name)
                 else:
-                    print " [ERR] top_ui None ", self.top_ui
+                    self.batch.logger.err("top_ui is None")
 
                 if current_list_index >= 0:
                     item_c = self.list_tasks.item(current_list_index + 1)
@@ -886,4 +862,4 @@ class TasksUI:
                     self.qt_form_add.update_add_ui()
 
             else:
-                print "[ERR] on chng curr list task {} < {}   ".format(current_task_index, self.batch.t.tasks_data)
+                self.batch.logger.err("on chng list task {} < {}".format(current_task_index, self.batch.t.tasks_data))

@@ -265,7 +265,8 @@ class SettingsUI:
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())
         definitions_path = str(self.qt_settings_definitions_directory_edit.text())
-        print " [db  db] ", data_path
+        if self.settings.debug_level >= 4:
+            print " [db] data_path ", data_path
         if self.comfun.path_exists(data_path, info="Data Path"):
             if self.comfun.path_exists(definitions_path, info="Definitions Path"):
                 self.settings.store_data_json_directory = data_path

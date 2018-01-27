@@ -138,21 +138,17 @@ class MainWindow(QMainWindow):
         if wnd is not None and len(wnd) == 4:
             x_wnd_pos = wnd[0]
             y_wnd_pos = wnd[1]
-
             if self.s.CHECK_SCREEN_RES_ON_START == 1:
                 if wnd[0] > current_screen_width - 130:
                     x_wnd_pos = 40
-                    if self.debug_level >= 3:
-                        print "  [INF] reset window position X "
+                    self.batch.logger.inf("reset window position X")
                 if wnd[1] > current_screen_height - 130:
                     y_wnd_pos = 40
-                    if self.debug_level >= 3:
-                        print "  [INF] reset window position Y "
+                    self.batch.logger.inf("reset window position Y")
             else:
                 x_wnd_pos = wnd[0]
                 y_wnd_pos = wnd[1]
-            if self.debug_level >= 3:
-                print "  [INF] set wind pos : ",  x_wnd_pos, y_wnd_pos,  wnd[2],  wnd[3]
+            self.batch.logger.inf(("set wind pos :", x_wnd_pos, y_wnd_pos,  wnd[2],  wnd[3]))
             self.setGeometry(x_wnd_pos, y_wnd_pos, wnd[2], wnd[3])
 
         self.setWindowTitle("SimBatch " + self.s.SIMBATCH_VERSION + "     " + self.s.runtime_env)
@@ -212,12 +208,7 @@ class MainWindow(QMainWindow):
 
 
     def on_tab_change(self, tab):
-        if self.s.debug_level >= 5:
-            print " [INF] tab change: ", tab
-
-    # def init_lists(self):
-    #     if self.s.debug_level >= 3:
-    #         print " [INF] init lists"
+        self.batch.logger.inf(("tab change: ", tab))
 
     def on_clicked_but_print_general(self):
         self.batch.print_important_values()
@@ -226,16 +217,13 @@ class MainWindow(QMainWindow):
         self.batch.print_current_detailed_values(self.qt_tab_widget.currentIndex())  # valid for: P S T Q N
 
     def on_clicked_but_debug(self):
-        if self.s.debug_level >= 3:
-            print " [INF] but_debug"
+        self.batch.logger.inf("but_debug clicked")
 
     def on_clicked_but_filter(self):
-        if self.s.debug_level >= 3:
-            print " [INF] filter"
+        self.batch.logger.inf("but_filter clicked")
 
     def on_clicked_but_refresh(self):
-        if self.s.debug_level >= 3:
-            print " [INF] but_refresh"
+        self.batch.logger.inf("but_refresh clicked")
 
         self.s.update_ui_colors()
 

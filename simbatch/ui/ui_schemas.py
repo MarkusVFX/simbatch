@@ -164,8 +164,7 @@ class SchemaFormCreateOrEdit(QWidget):
     ##
     ###
     def on_radio_change(self, nr):   # on click definition change
-        if self.s.debug_level >= 3:
-            print " [db] on_radio_change", nr
+        self.batch.logger.db(("on_radio_change", nr))
         self.change_current_definition(nr)
 
     # clear action and
@@ -177,8 +176,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.add_defined_action_buttons(nr)
 
     # def change_current_actions_software__OLD_x(self, runtime_env="", nr=None):
-    #     if self.s.debug_level >= 3:
-    #         print " [db] (on radio) nr ", nr
+    #     self.batch.logger.db(("on_radio_change", nr))
     #
     #     self.remove_all_action_buttons()
     #     self.remove_all_defined_action_buttons()
@@ -210,8 +208,7 @@ class SchemaFormCreateOrEdit(QWidget):
                     b = self.add_defined_action_button(action.name)
                     b.button.clicked.connect(lambda a=action: self.on_click_defined_action_button(a, curr_proj))
         else:
-            if self.s.debug_level >= 2:
-                print " [WRN] Current project undefined !"
+            self.batch.logger.wrn("Current project undefined !")
 
     # on click one of horizontal button add action widget to vertical list of schema actions
     def on_click_defined_action_button(self, single_or_group_action, curr_proj):  # , force_val=0
@@ -255,19 +252,13 @@ class SchemaFormCreateOrEdit(QWidget):
             )
 
     def on_clicked_button_action(self, act):
-        print "   on_clicked_button_action  ",  act
-        print "   on_clicked_button_action  ",  act
-        print "   on_clicked_button_action  ",  act
+        self.batch.logger.db(("on_clicked_button_action", act))
 
-    @staticmethod
-    def on_change_combo_action(action_widget, software_action):
+    def on_change_combo_action(self,action_widget, software_action):
         action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
         action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
-
-        # print "  on_change_combo_action  ", index
-        # print "  on_change_combo_action  ",  software_action.name
-        # print "  on_change_combo_actionn  ",
-        # print "  on_change_combo_actionnn  ",  curr_project
+        self.batch.logger.deepdb(("on_change_combo_action", index))
+        self.batch.logger.deepdb(("on_change_combo_action", curr_project))
 
     # clear helper form object (store schema data)
     def clear_vars(self):
@@ -316,7 +307,8 @@ class SchemaFormCreateOrEdit(QWidget):
         for widget_action in self.action_widgets:
             single_action = widget_action.action_data.get_action()
             self.actions_array.append(single_action)
-            print " [db] INF  COMPILE ACTION 3    widget_action   :", single_action  # TODO clean
+            # TODO  compile acttion
+            self.batch.logger.deepdb(("COMPILE ACTION", single_action))
 
 
 class SchemasUI:
@@ -576,7 +568,7 @@ class SchemasUI:
 
     def on_menu_open(self):
         current_schema_id = self.c.list_visible_schemas_ids[self.c.current_schema_list_index]
-        print "  list_schemas_double_clicked : ", current_schema_id
+        self.batch.logger.db(("list_schemas_double_clicked :", current_schema_id))
         sch = self.c.get_schema_by_id(current_schema_id)
         self.load_base_setup(sch.schema_name, sch.schemaVersion)
 
@@ -592,8 +584,7 @@ class SchemasUI:
         ret = self.batch.d.getSchemaBaseSetupFile(forceSchemaVersion=True)   # TODO  getSchemaBaseSetupFile PEP8
 
         cur_schema = self.c.schemas_data[cur_sch_index]
-        print " [db] save as :", cur_schema.schema_name, cur_schema.id
-        print " [db] save as :", ret
+        self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
         self.batch.d.soco.save_curent_scene_as(ret[1])
 
     def on_menu_locate_base_setup(self):
@@ -605,12 +596,11 @@ class SchemasUI:
                 subprocess.Popen('explorer "' + base_setup_dir + '"')
 
     def on_menu_remove(self):
-        # print " [TODO] remove "  # TODO
         self.on_click_confirm_remove_schema()
 
     @staticmethod
     def on_menu_spacer():
-        print "  ____  "
+        pass
 
     def _change_current_schema_state_and_reset_list(self, state_id):
         self.batch.c.current_schema.state = self.s.states_visible_names[state_id]
@@ -659,10 +649,8 @@ class SchemasUI:
             txt = self.batch.p.projects_data[self.batch.p.current_project_index].project_name
             self.schema_form_create.schema_item_form_object.project_name = txt
             self.schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
-            # print "  [db] (fill_create_form) new : ", txt, "   curr proj index: ", self.batch.p.current_project_index
         else:
-            if self.s.debug_level >= 2:
-                print "  [WRN] current_project_index : ", self.batch.p.current_project_index
+            self.batch.logger.wrn(("Wrong current project index",self.batch.p.current_project_index))
 
     def on_click_show_form_create(self):
         if self.create_form_state == 0:
@@ -711,8 +699,8 @@ class SchemasUI:
 
     def on_changed_copy_name(self, txt):
         self.new_name_on_copy = txt
-        if self.s.debug_level >= 1:
-            print " [INF] on_changed_copy_name ", txt
+        # TODO !!! copy schema
+        self.batch.logger.db(("on_changed_copy_name", txt))
 
     def on_changed_copy_target(self, qt_edit_line):
         el_txt = qt_edit_line.text()
@@ -725,7 +713,7 @@ class SchemasUI:
 
         else:
             self.batch.p.get_index_from_name(qt_edit_line.text(), check_similar=True)
-        print qt_edit_line.text()
+        self.batch.logger.db(("qt_edit_line.text() : ",qt_edit_line.text()))
 
     def on_clicked_copy_as(self):
         if self.batch.c.current_schema_index >= 0:
@@ -753,8 +741,7 @@ class SchemasUI:
             self.remove_form_state = 0
 
     def on_click_confirm_remove_schema(self):
-        if self.s.debug_level >= 4:
-            print "  [db] on_click_confirm_remove_schema index:", self.c.current_schema_index
+        self.batch.logger.db(("on_click_confirm_remove_schema index:", self.c.current_schema_index))
         if self.c.current_schema_index >= 0:
             remove_index = self.c.current_schema_index
             self.c.lastSchema = None
@@ -776,16 +763,12 @@ class SchemasUI:
                                           new_schema_item.description, str(new_schema_item.schema_version))
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
-        if self.s.debug_level >= 4:
-            print "  [db] add schema DIR for proj :", self.batch.p.current_project_id
+        self.batch.logger.db(("add schema DIR for proj :", self.batch.p.current_project_id))
         sch_dir = self.batch.p.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
         self.batch.i.create_schema_directory(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):
-        if self.s.debug_level >= 5:
-            # print "  [db] add sch projectID ", new_schema_item.projectID
-            # print "  [db] add sch project_name ", new_schema_item.project_name
-            print "  [db] add sch schema_name ", new_schema_item.schema_name
+        self.batch.logger.db(("add sch schema_name: ", new_schema_item.schema_name))
 
         self.schema_form_create.compile_actions()  # new_schema_item.soft_id)
         if new_schema_item is None or len(new_schema_item.schema_name) == 0:
@@ -799,13 +782,11 @@ class SchemasUI:
 
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.i.generate_base_setup_file_name(new_schema_item.schema_name)
-                if self.s.debug_level >= 5:
-                    print "\n  [db] with saveAs: ", save_as
+                self.batch.logger.db(("with saveAs:  ", save_as))
                 if self.batch.d.current_interact is not None:
                     self.batch.d.current_interact.save_curent_scene_as(save_as[1])
             else:
-                if self.s.debug_level >= 5:
-                    print "\n  [db]  new_schema_item.save_as_base_state : ", save_as_base
+                self.batch.logger.db(("new_schema_item.save_as_base_state", save_as_base))
 
             self.top_ui.set_top_info(" schema created, active schema:  " + new_schema_item.schema_name)
             # self.new_schema_item = self.batch.c.get_blank_schema()   # TODO  clear UI !!!  if clear var
@@ -824,7 +805,7 @@ class SchemasUI:
         self.schema_form_edit.compile_actions()
         if edited_schema_item is None or len(edited_schema_item.schema_name) == 0:
             self.top_ui.set_top_info(" Insert schema name ! ", 8)
-            print " [WRN] insert schema name : ", edited_schema_item.schema_name
+            self.batch.logger.wrn("insert schema name ! ")
         else:
             self.c.update_schema(edited_schema_item, do_save=True)
 
@@ -841,25 +822,18 @@ class SchemasUI:
         file_to_load = self.batch.d.generate_tuple_base_setup_file_name(schema_name,
                                                                         ver=version)
         if file_to_load[0] == 1:
-            if self.s.debug_level >= 1:
-                print "\n  [INF]   loadFile: ", file_to_load[1]
+            self.batch.logger.inf(("loadFile: ", file_to_load[1]))
             self.batch.d.soco.load_scene(file_to_load[1])
         else:
-            if self.s.debug_level >= 1:
-                print "\n  [ERR]   loadFile: ", file_to_load
+            self.batch.logger.err(("loadFile: ", file_to_load))
 
     def on_list_schemas_double_clicked(self, item):
-        if self.s.debug_level >= 3:
-            print " [db] list_schemas_double_clicked ", self.c.current_schema_list_index, item
-            if self.s.debug_level >= 7:
-                print "    [db]", item
+        self.batch.logger.db(("list_schemas_double_clicked: ", self.c.current_schema_list_index, item))
         self.on_menu_open()
 
     def on_list_schemas_current_changed(self, current_row):
         if self.freeze_list_on_changed == 0:
-            if self.s.debug_level >= 3:
-                print " [INF] list_schemas_current_changed ", self.list_schemas.currentRow()
-                # print " [INF] toolTip ", current_row.toolTip()   # TODO details
+            self.batch.logger.inf(("list_schemas_current_changed: ", self.list_schemas.currentRow()))
 
             self.last_list_item_nr = self.current_list_item_nr
             self.current_list_item_nr = self.list_schemas.currentRow()
@@ -874,8 +848,7 @@ class SchemasUI:
 
             # update color of current item list
             if self.current_list_item_nr >= 0:
-                print "\n\n __current_list_item_nr ", self.current_list_item_nr
-                print " __current_schema_id ", self.list_visible_schemas_ids[self.current_list_item_nr - 1]
+                self.batch.logger.deepdb(("current_list_item_nr: ", self.current_list_item_nr))
 
                 current_schema_id = self.list_visible_schemas_ids[self.current_list_item_nr - 1]
                 self.c.update_current_from_id(current_schema_id)
@@ -887,9 +860,9 @@ class SchemasUI:
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current schema:    " + cur_sch_name)
                 else:
-                    print " [ERR] top_ui undefined ", self.top_ui
+                    self.batch.logger.err("top_ui undefined !")
             else:
-                print "  [WRN] (on sch chng) current_list_item_nr:", self.current_list_item_nr
+                self.batch.logger.wrn(("(on sch chng) current_list_item_nr:", self.current_list_item_nr))
 
             if self.edit_form_state == 1:
                 cur_schema = self.c.current_schema

@@ -549,11 +549,9 @@ class ProjectsUI:
 
     def on_list_current_changed(self, x):
         if self.freeze_list_on_changed == 1:
-            if self.s.debug_level >= 5:
-                print " [db] listProjectsCurrentChanged freeze_list_on_changed", self.qt_list_projects.currentRow()
+            self.batch.logger.deepdb(("proj chngd freeze_list_on_changed", self.qt_list_projects.currentRow()))
         else:
-            if self.s.debug_level >= 3:
-                print " [INF] listProjectsCurrentChanged ", self.qt_list_projects.currentRow()
+            self.batch.logger.inf(("listProjectsCurrentChanged", self.qt_list_projects.currentRow()))
 
             self.last_project_index = self.batch.p.current_project_index
             current_list_index = self.qt_list_projects.currentRow() - 1
@@ -586,8 +584,7 @@ class ProjectsUI:
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current project:   " + cur_proj.project_name)
             else:
-                if self.debug_level >= 2:
-                    print " [WRN] on chng current_list_index: {}".format(current_list_index)
+                self.batch.logger.wrn(("(on chng) Wrong current_list_index: ",current_list_index))
 
             self.update_sch_after_proj_changed()
             self.update_tsk_after_proj_changed()

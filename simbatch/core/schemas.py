@@ -78,15 +78,14 @@ class Schemas:
     sample_data_checksum = None
     sample_data_total = None
 
-
-
     def __init__(self, batch):
         self.s = batch.s
         self.batch = batch
         self.comfun = batch.comfun
         self.schemas_data = []
 
-    def get_blank_schema(self):
+    @staticmethod
+    def get_blank_schema():
         return SchemaItem(0, "", 1, "NULL", 1, 1, 1, [], "")
 
     #  print schema data, for debug
@@ -112,7 +111,7 @@ class Schemas:
                 print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
         print "\n\n"
 
-    def get_schema_names(self, as_string=False, fit=[]):
+    def get_schema_names(self, as_string=False, fit=()):
         schema_names = []
         if len(fit) > 0:
             for sch in self.schemas_data:
@@ -325,13 +324,13 @@ class Schemas:
                             new_schema_actions = []
                             for lia in li['actions']:
                                 self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                new_schema_actions.append( Action(lia) ) # TODO
+                                new_schema_actions.append(Action(lia))      # TODO
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), int(li['definition']), int(li['version']),
                                                          new_schema_actions, li['desc'])
                             self.add_schema(new_schema_item)
                         else:
-                            self.batch.logger.err(("schema json data not consistent:",len(li),
+                            self.batch.logger.err(("schema json data not consistent:", len(li),
                                                    len(SCHEMA_ITEM_FIELDS_NAMES)))
                     return True
             else:
@@ -392,10 +391,9 @@ class Schemas:
             if sch.soft_id == soft_id:
                 for a in sch.actions_array:
                     if a.action_type == "MaxImport" or a.action_type == "MaxSimulate":
-                        #print "       action   : ", a.soft_id, a.action_type, a.action_param
+                        # print "       action   : ", a.soft_id, a.action_type, a.action_param
                         pass
                         # TODO  get_all_object_from_all_schemas
-
 
     def copy_schema(self, source_schema_index, proj_target_id):
         if 0 <= source_schema_index < len(self.schemas_data):

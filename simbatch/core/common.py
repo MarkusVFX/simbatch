@@ -61,19 +61,19 @@ class Logger:
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)
 
-    def err(self, message, add_to_log=True, force_db=False):
+    def err(self, message, force_db=False):
         self.dispatch(1, message)
 
-    def wrn(self, message, add_to_log=True):
+    def wrn(self, message, force_db=True):
         self.dispatch(2, message)
 
-    def inf(self, message, add_to_log=False):
+    def inf(self, message, force_db=False):
         self.dispatch(3, message)
 
-    def db(self, message, add_to_log=False):
+    def db(self, message, force_db=False):
         self.dispatch(4, message)
 
-    def deepdb(self, message, add_to_log=False):
+    def deepdb(self, message, force_db=False):
         self.dispatch(5, message)
 
 
@@ -349,9 +349,6 @@ class CommonFunctions:
 
     @staticmethod
     def save_json_file(file_name, content):
-        json_data = None
-        # if self.file_exists(file_name, file_name): # if self.comfun.file_exists(file, "") :
-
         with open(file_name, 'w') as f:
             json.dump(content, f,  indent=2)
         return True   # TODO  Exception

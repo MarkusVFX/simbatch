@@ -71,6 +71,9 @@ class Queue:
     current_queue_index = None
     current_queue = None
 
+    sample_data_checksum = 0
+    sample_data_total = 0
+
     def __init__(self, batch):
         self.batch = batch
         self.s = batch.s
@@ -220,9 +223,9 @@ class Queue:
         return collect_ids
 
     def load_queue(self):
-        if self.s.store_data_mode == 1 :
+        if self.s.store_data_mode == 1:
             self.load_queue_from_json()
-        if self.s.store_data_mode == 2 :
+        if self.s.store_data_mode == 2:
             self.load_queue_from_mysql()
 
     def load_queue_from_json(self, json_file=""):
@@ -238,9 +241,9 @@ class Queue:
         return None
 
     def save_queue(self):
-        if self.s.store_data_mode == 1 :
+        if self.s.store_data_mode == 1:
             return self.save_queue_to_json()
-        if self.s.store_data_mode == 2 :
+        if self.s.store_data_mode == 2:
             return self.save_queue_to_mysql()
 
     def save_queue_to_json(self, json_file=None):
@@ -249,15 +252,7 @@ class Queue:
         content = self.format_queue_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
-
     def save_queue_to_mysql(self):
         # PRO VERSION
         self.batch.logger.inf("MySQL database available in the PRO version")
-    return None
-
-
-
-
-
-
-
+        return None

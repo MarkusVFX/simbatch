@@ -206,7 +206,6 @@ class MainWindow(QMainWindow):
         if self.s.loading_state < 3:
             top.set_top_info("Settings not loaded properly", 7)
 
-
     def on_tab_change(self, tab):
         self.batch.logger.inf(("tab change: ", tab))
 

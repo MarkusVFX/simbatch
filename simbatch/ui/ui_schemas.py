@@ -254,11 +254,10 @@ class SchemaFormCreateOrEdit(QWidget):
     def on_clicked_button_action(self, act):
         self.batch.logger.db(("on_clicked_button_action", act))
 
-    def on_change_combo_action(self,action_widget, software_action):
+    @staticmethod
+    def on_change_combo_action( action_widget, software_action):
         action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
         action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
-        self.batch.logger.deepdb(("on_change_combo_action", index))
-        self.batch.logger.deepdb(("on_change_combo_action", curr_project))
 
     # clear helper form object (store schema data)
     def clear_vars(self):
@@ -617,8 +616,6 @@ class SchemasUI:
     def on_menu_set_hold(self):
         self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_HOLD)
 
-
-
     def on_right_click_show_menu(self, pos):
         global_pos = self.list_schemas.mapToGlobal(pos)
         qt_menu_right = QMenu()
@@ -650,7 +647,7 @@ class SchemasUI:
             self.schema_form_create.schema_item_form_object.project_name = txt
             self.schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
         else:
-            self.batch.logger.wrn(("Wrong current project index",self.batch.p.current_project_index))
+            self.batch.logger.wrn(("Wrong current project index", self.batch.p.current_project_index))
 
     def on_click_show_form_create(self):
         if self.create_form_state == 0:
@@ -713,7 +710,7 @@ class SchemasUI:
 
         else:
             self.batch.p.get_index_from_name(qt_edit_line.text(), check_similar=True)
-        self.batch.logger.db(("qt_edit_line.text() : ",qt_edit_line.text()))
+        self.batch.logger.db(("qt_edit_line.text() : ", qt_edit_line.text()))
 
     def on_clicked_copy_as(self):
         if self.batch.c.current_schema_index >= 0:

@@ -71,8 +71,9 @@ class Tasks:
         self.comfun = batch.comfun
         self.tasks_data = []
 
-    def get_blank_task(self):
-        return TaskItem(0, "", 1, "NULL", 1, 1, 1, [], "")
+    @staticmethod
+    def get_blank_task():
+        return TaskItem(0, "", 1, "NULL", 1, 1, 1, [], "", 0, 0, 0, 0, 1, 0, 0, "", 0, 50, "")
 
     #  print project data, mainly for debug
     def print_current(self):
@@ -156,7 +157,7 @@ class Tasks:
 
     def get_task_frame_range(self):
         curr_task = self.tasks_data[self.current_task_index]
-        return [self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]
+        return[self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]
 
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
@@ -236,6 +237,7 @@ class Tasks:
 
     def clear_tasks_in_mysql(self):
         # PRO VERSION with sql
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return False
 
     def clear_all_tasks_data(self, clear_stored_data=False):
@@ -275,12 +277,12 @@ class Tasks:
                     for li in json_tasks['tasks']['data'].values():
                         if len(li) == len(TASK_ITEM_FIELDS_NAMES):
                             new_task_item = TaskItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
-                                                         int(li['project']), int(li['schema']), li['sequence'],
-                                                         li['shot'], li['take'],
-                                                         int(li['simFrStart']), int(li['simFrEnd']),
-                                                         int(li['prevFrStart']), int(li['prevFrEnd']),
-                                                         int(li['schVer']), int(li['tskVer']), int(li['queVer']),
-                                                         li['options'], int(li['user']), int(li['prior']), li['desc'])
+                                                     int(li['project']), int(li['schema']), li['sequence'],
+                                                     li['shot'], li['take'],
+                                                     int(li['simFrStart']), int(li['simFrEnd']),
+                                                     int(li['prevFrStart']), int(li['prevFrEnd']),
+                                                     int(li['schVer']), int(li['tskVer']), int(li['queVer']),
+                                                     li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
                         else:
                             self.batch.logger.wrn(("task json data not consistent:", len(li),

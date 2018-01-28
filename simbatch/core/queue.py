@@ -104,13 +104,12 @@ class Queue:
         for i, que in enumerate(self.queue_data):
             if que.id == get_id:
                 return i
-        print "   [WRN] (get index by )no queue item with ID: ", get_id
+        self.batch.logger.wrn(("(get index by ) no queue item with ID: ", get_id))
         return None
 
     def get_first_with_state(self, state_id, soft=0):
         for index, q in enumerate(self.queue_data):
             if q.state_id == state_id:
-                # print " [db] state : "+str(q.state_id)+"    q.soft_id: ",  q.soft_id
                 if soft > 0:
                     if q.soft_id == soft:
                         return index, self.queue_data[index].id
@@ -174,7 +173,6 @@ class Queue:
         else:
             self.max_id += 1
             queue_item.id = self.max_id
-        print "wewe"  , queue_item.id ,  self.max_id
         self.queue_data.append(queue_item)
         self.total_queue_items += 1
 
@@ -188,8 +186,7 @@ class Queue:
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:
-            if self.s.debug_level >= 1:
-                print " [ERR] (format_queue_data) no format param !"
+            self.batch.logger.err("(format_queue_data) no format param !")
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
@@ -216,11 +213,8 @@ class Queue:
         sample_queue_item_3 = QueueItem(0, "queue item 3", 4, "T", 1, "", "", "", 5, 6, "WAITING", 2, 1, "", 0, 40,
                                         "third", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
         collect_ids += self.add_to_queue(sample_queue_item_1)
-        print "cc" , collect_ids
         collect_ids += self.add_to_queue(sample_queue_item_2)
-        print "ccii" , collect_ids
         collect_ids += self.add_to_queue(sample_queue_item_3, do_save=do_save)
-        print "cciii" , collect_ids
         self.sample_data_checksum = 6
         self.sample_data_total = 3
         return collect_ids
@@ -235,14 +229,12 @@ class Queue:
         if len(json_file) == 0:
             json_file = self.s.store_data_json_directory + self.s.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
-            if self.s.debug_level >= 3:
-                print " [INF] loading queue items: " + json_file
+            self.batch.logger.inf(("loading queue items: ", json_file))
         return False
 
     def load_queue_from_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
     def save_queue(self):
@@ -260,9 +252,8 @@ class Queue:
 
     def save_queue_to_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
-        return None
+        self.batch.logger.inf("MySQL database available in the PRO version")
+    return None
 
 
 

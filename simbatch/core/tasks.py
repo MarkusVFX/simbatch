@@ -99,8 +99,7 @@ class Tasks:
         for i, tsk in enumerate(self.tasks_data):
             if tsk.id == get_id:
                 return i
-        if self.s.debug_level >= 2:
-            print "   [WRN] no task with ID: ", get_id
+        self.batch.logger.wrn(("no task with ID: ", get_id))
         return None
 
     def update_current_from_id(self, get_id):
@@ -113,8 +112,7 @@ class Tasks:
         self.current_task_index = None
         self.current_task_id = None
         self.current_task = None
-        if self.s.debug_level >= 2:
-            print "   [WRN] no task with ID: ", get_id
+        self.batch.logger.wrn(("no task with ID: ", get_id))
         return None
 
     def update_current_from_index(self, index):
@@ -200,8 +198,7 @@ class Tasks:
                 return self.save_tasks()
             return True
         else:
-            if self.s.debug_level >= 1:
-                print "  [ERR] wrong current_task_id:", self.current_task_index
+            self.batch.logger.err(("wrong current_task_id:", self.current_task_index))
             return False
 
     def set_state(self, task_id, state):
@@ -271,8 +268,7 @@ class Tasks:
         if len(json_file) == 0:
             json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
         if self.comfun.file_exists(json_file, info="tasks file"):
-            if self.s.debug_level >= 2:
-                print " [INF] loading tasks: " + json_file
+            self.batch.logger.inf(("loading tasks: ", json_file))
             json_tasks = self.comfun.load_json_file(json_file)
             if json_tasks is not None and "tasks" in json_tasks.keys():
                 if json_tasks['tasks']['meta']['total'] > 0:
@@ -287,23 +283,19 @@ class Tasks:
                                                          li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
                         else:
-                            if self.s.debug_level >= 2:
-                                print "   [WRN] task data not consistent: {} {}".format(len(li),
-                                                                                        len(TASK_ITEM_FIELDS_NAMES))
+                            self.batch.logger.wrn(("task json data not consistent:", len(li),
+                                                   len(TASK_ITEM_FIELDS_NAMES)))
                     return True
             else:
-                if self.s.debug_level >= 2:
-                    print "   [WRN] no tasks data in : ", json_file
+                self.batch.logger.wrn(("no tasks data in : ", json_file))
                 return False
         else:
-            if self.s.debug_level >= 1:
-                print " [ERR] no schema file: " + json_file
-                return False
+            self.batch.logger.wrn(("no schema file: ", json_file))
+            return False
 
     def load_tasks_from_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
     def save_tasks(self):
@@ -314,8 +306,7 @@ class Tasks:
 
     def format_tasks_data(self, json=False, sql=False, backup=False):
         if json == sql == backup == False:
-            if self.s.debug_level >= 1:
-                print " [ERR] (format_projects_data) no format param !"
+            self.batch.logger.err("(format_projects_data) no format param !")
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
@@ -343,8 +334,7 @@ class Tasks:
 
     def save_tasks_to_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
 

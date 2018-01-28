@@ -1,6 +1,6 @@
 import os
 import json
-from common import CommonFunctions
+from common import CommonFunctions, Logger
 
 try:
     from PySide.QtGui import *
@@ -126,7 +126,7 @@ class Settings:
 
         self.runtime_env = runtime_env
         self.ini_file = ini_file
-        self.comfun = CommonFunctions(2)
+        self.comfun = CommonFunctions()
         self.sql = [None, None, None, None]
         self.clear_state_colors()
 

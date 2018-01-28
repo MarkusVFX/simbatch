@@ -95,7 +95,7 @@ class InOutStorage:
 
     def generate_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
         if len(self.p.projects_data) < self.p.current_project_index or self.p.current_project_index < 0:
-            print " ERR wrong current proj ID  ", self.p.current_project_index, len(self.p.projects_data)
+            self.batch.logger.err(("Wrong current proj ID  ", self.p.current_project_index, len(self.p.projects_data)))
             return -1, ""
         else:
             proj_working_dir = self.p.current_project.working_directory_absolute
@@ -109,8 +109,7 @@ class InOutStorage:
     #  get directory pattern for current project
     #  pattern is generated basis on directories structure on storage
     #  used for construct new path, generate path for load
-    def get_dir_patterns(self, directory, db=False):
-        if db or self.s.debug_level >= 4:
-            print "  [db]  (get_dir_patterns) deep debug start dir:", directory
+    def get_dir_patterns(self, directory):
+        self.batch.logger.db(("(get_dir_patterns) deep debug start dir:", directory))
         full_dir_pattern = None
         return full_dir_pattern

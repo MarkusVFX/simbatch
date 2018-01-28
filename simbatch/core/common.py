@@ -6,11 +6,89 @@ from collections import OrderedDict
 from datetime import datetime
 
 
-class CommonFunctions:
-    debug_level = None
+class Logger:
+    # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
+    console_level = 0
+    log_file_level = 0
+    log_file_path = ""
+    force_add_to_log = False
 
-    def __init__(self, debug_level=3):
-        self.debug_level = debug_level
+    def __init__(self, log_level=None, console_level=None):
+        if console_level is None or console_level > 4:
+            print "Logger init"
+        self.console_level = console_level
+        self.log_file_level = log_level
+
+    def set_log_level(self, lvl):
+        self.log_file_level = lvl
+
+    def set_console_level(self, lvl):
+        self.console_level = lvl
+
+    def add_to_log(self, prefix, message):
+        pass
+        # TODO !!!
+
+    def dispatch(self, level, message):
+        if self.console_level >= level:
+            console_print = True
+        else:
+            console_print = False
+
+        if self.log_file_level >= level:
+            log_append = True
+        else:
+            log_append = False
+
+        if level == 1:
+            prefix = "ERR"
+        elif level == 2:
+            prefix = "WRN"
+        elif level == 3:
+            prefix = "INF"
+        elif level == 4:
+            prefix = "DB"
+        elif level == 5:
+            prefix = "deep"
+
+        if console_print:
+            if type(message) is tuple:
+                out = "  ".join([str(el) for el in message])
+                print "__   [{}] {}".format(prefix, out)
+            else:
+                print "__   [{}] {}".format(prefix, message)
+
+        if self.force_add_to_log or log_append:
+            self.add_to_log(prefix, message)
+
+    def err(self, message, add_to_log=True, force_db=False):
+        self.dispatch(1, message)
+
+    def wrn(self, message, add_to_log=True):
+        self.dispatch(2, message)
+
+    def inf(self, message, add_to_log=False):
+        self.dispatch(3, message)
+
+    def db(self, message, add_to_log=False):
+        self.dispatch(4, message)
+
+    def deepdb(self, message, add_to_log=False):
+        self.dispatch(5, message)
+
+
+class CommonFunctions:
+    # debug_level = None
+    logger = None
+
+    # def __init__(self, debug_level=3):
+    #     self.debug_level = debug_level
+    def __init__(self, logger=None):
+        if logger is not None:
+            self.logger = logger
+        else:
+            self.logger = Logger(log_level=0, console_level=3)
+
 
     def print_list(self, get_list, check_float=False):
         for index, val in enumerate(get_list):
@@ -38,19 +116,16 @@ class CommonFunctions:
 
     def int_or_val(self, in_val, def_val):
         if self.is_int(in_val):
-            if self.debug_level >= 5:
-                print " [db] (int_or_val) is int", in_val, def_val
+            self.logger.deepdb(("(int_or_val) is int", in_val, def_val))
             return int(in_val)
         else:
-            if self.debug_level >= 3:
-                print " [WRN] (int_or_val) is not int!", in_val, def_val
+            self.logger.deepdb(("(int_or_val) is not int", in_val, def_val))
             return def_val
 
     def str_with_zeros(self, number, zeros=3):
         if self.is_float(zeros) is False:
-            zeros = 3
-            if self.debug_level >= 1:
-                print " [ERR] not int as zeros in str_with_zeros"
+            zeros = 0
+            self.logger.err(("(str_with_zeros) zeros is not number:", zeros))
         stri = str(number)
         while len(stri) < zeros:
             stri = "0" + stri
@@ -91,25 +166,21 @@ class CommonFunctions:
         for index, sa in enumerate(strings_array):
             if exactly:
                 if sa == wanted_string:
-                    if self.debug_level >= 6 or db is True:
-                        print " [db] isStringInArray : exactly ", sa, wanted_string
+                    self.logger.deepdb(("isStringInArray : exactly ", sa, wanted_string), force_db=db)
                     return index
             else:
                 if starting:
                     if sa.startswith(wanted_string):
-                        if self.debug_level >= 6 or db is True:
-                            print " [db] isStringInArray :  starting ", sa, wanted_string
+                        self.logger.deepdb(("isStringInArray : starting ", sa, wanted_string), force_db=db)
                         return index
                 else:
                     ret = sa.find(wanted_string)
                     if ret >= 0:
-                        if self.debug_level >= 6 or db is True:
-                            print " [db] isStringInArray :  substring ", sa, wanted_string
+                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_db=db)
                         return index
                     ret = wanted_string.find(sa)
                     if ret >= 0:
-                        if self.debug_level >= 6 or db is True:
-                            print " [db] isStringInArray :  substring ", sa, wanted_string
+                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_db=db)
                         return index
         return None
 
@@ -151,14 +222,11 @@ class CommonFunctions:
         else:
             if len(check_file) > 0:
                 if len(info) > 0:
-                    if self.debug_level >= 1:
-                        print " [WRN] File {} not exist !  ({})\n".format(check_file, info)
+                    self.logger.wrn("File {} not exist !  ({})\n".format(check_file, info))
                 else:
-                    if self.debug_level >= 4:
-                        print " [WRN] File {} not exist.".format(check_file)
+                    self.logger.wrn("File {} not exist !  ({})\n".format(check_file))
             else:
-                if self.debug_level >= 1:
-                    print " [ERR] File name length is zero! {}".format(info)
+                self.logger.err("File name length is zero! {}".format(info))
             return False
 
     def path_exists(self, check_path, info=""):
@@ -167,12 +235,10 @@ class CommonFunctions:
                 return True
             else:
                 if len(info) > 0:
-                    if self.debug_level >= 1:
-                        print " [ERR] dir (", info, ") dont exist!"
+                    self.logger.err(("Dir ", info, " don't exist!"))
                 return False
         else:
-            if self.debug_level >= 1:
-                print " [ERR] (path_exists) wrong parameter!", check_path, info
+            self.logger.err(("(path_exists) wrong parameter!", check_path, info))
             return False
 
     def get_proper_path(self, get_path, info=""):
@@ -184,16 +250,14 @@ class CommonFunctions:
                 if get_path[-1] != "\\":
                     get_path += "\\"
         else:
-            if self.debug_level >= 1:
-                print " [ERR] (get_proper_path) param len 0 ! ({})".format(info)
+            self.logger.err("(get_proper_path) param len 0 ! ({})".format(info))
         return get_path
 
     @staticmethod
     def get_path_from_full(full):
         return os.path.dirname(full)
 
-    @staticmethod
-    def create_directory(directory):
+    def create_directory(self, directory):
         if len(directory) > 0:
             if not os.path.exists(directory):
                 if directory[1] == ":":
@@ -202,20 +266,19 @@ class CommonFunctions:
                         os.makedirs(directory)
                         return True
                     else:
-                        print "ERR drive: ", directory[0], " NOT EXIST !!!"
+                        self.logger.err(("drive: ", directory[0], " NOT EXIST !!!"))
                         return False
                 else:  # TODO test server \\
                     os.makedirs(directory)
                     return True
             else:
-                print " [INF] directory EXIST, not created:  ", directory, "\n"
+                self.logger.inf(("directory EXIST, not created:  ", directory))
                 return False
         else:
-            print " [WRN] directory null name    ", directory, "\n"
+            self.logger.wrn(("directory null name ", directory))
             return False
 
-    @staticmethod
-    def remove_directory(directory):
+    def remove_directory(self, directory):
         if len(directory) > 0:
             if os.path.exists(directory):
                 if directory[1] == ":":
@@ -224,16 +287,16 @@ class CommonFunctions:
                         os.rmdir(directory)           # TODO shutil.rmtree
                         return True
                     else:
-                        print "ERR drive: ", directory[0], " NOT EXIST !!!"
+                        self.logger.err(("drive: ", directory[0], " NOT EXIST !!!"))
                         return False
                 else:  # TODO test server \\
                     os.rmdir(directory)
                     return True
             else:
-                print " [INF] directory not EXIST, not removed:  ", directory, "\n"
+                self.logger.inf(("directory not EXIST, not removed:  ", directory))
                 return False
         else:
-            print " [WRN] directory null name    ", directory, "\n"
+            self.logger.wrn(("directory null name    ", directory))
             return False
 
     @staticmethod
@@ -247,28 +310,26 @@ class CommonFunctions:
                 return True
         return False
 
-    @staticmethod
-    def create_empty_file(file_name):
+    def create_empty_file(self, file_name):
         try:
             with open(file_name, 'a') as f:
                 f.write("")
             return True
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            self.logger.err("I/O error({0}): {1}".format(e.errno, e.strerror))
         except:
-            print "Unexpected error:", sys.exc_info()[0]
+            self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 
-    @staticmethod
-    def delete_file(file_name):
+    def delete_file(self, file_name):
         try:
             os.remove(file_name)
             return True
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            self.logger.err("I/O error({0}): {1}".format(e.errno, e.strerror))
             return True
         except:
-            print "Unexpected error:", sys.exc_info()[0]
+            self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 
     @staticmethod
@@ -321,8 +382,7 @@ class CommonFunctions:
 
         get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="hymmmm...."
         get_directory = get_directory.replace("/", "\\")
-        if self.debug_level >= 3:
-            print ' [INF] selected_directory:', get_directory
+        self.logger.inf(("selected_directory:", get_directory))
         if len(get_directory) > 0:
             qt_edit_line.setText(get_directory + "\\")
             return get_directory + "\\"
@@ -351,11 +411,11 @@ class CommonFunctions:
         last_not_digit = next((i for i, j in list(enumerate(name_in, 1))[::-1] if not j.isdigit()), -1)
         if db:
             if (len(name_in) - last_not_digit) > 0:
-                print "\n [db] (gin) last ", name_in[-(len(name_in) - last_not_digit):]
-                print " [db] (gin) len ", len(name_in) - last_not_digit
-                print " [db] (gin) head ", name_in[:-(len(name_in) - last_not_digit)]
+                self.logger.deepdb(("(get_incremented_name) (gin) last ", name_in[-(len(name_in) - last_not_digit):]))
+                self.logger.deepdb(("(get_incremented_name) (gin) len ", len(name_in) - last_not_digit))
+                self.logger.deepdb(("(get_incremented_name) (gin) head ", name_in[:-(len(name_in) - last_not_digit)]))
             else:
-                print "\n [db] (gin) empty"
+                self.logger.deepdb("(get_incremented_name) (gin) empty")
         if (len(name_in) - last_not_digit) > 0:
             head = name_in[:-(len(name_in) - last_not_digit)]
             nr = int(name_in[-(len(name_in) - last_not_digit):])
@@ -365,5 +425,5 @@ class CommonFunctions:
             head = name_in
             number = "_02"
         if db:
-            print " [db] (gin) return ", head + number
+            self.logger.deepdb(("(get_incremented_name) (gin) return ", head, number))
         return head + number

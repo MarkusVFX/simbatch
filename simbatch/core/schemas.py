@@ -82,6 +82,7 @@ class Schemas:
 
     def __init__(self, batch):
         self.s = batch.s
+        self.batch = batch
         self.comfun = batch.comfun
         self.schemas_data = []
 
@@ -133,7 +134,7 @@ class Schemas:
         for sch in self.schemas_data:
             if sch.id == get_id:
                 return sch
-        print "   [WRN] no schema with ID: ", get_id
+        self.batch.logger.wrn(("no schema with ID: ", get_id))
         return None
 
     def get_index_by_name(self, schema_name):
@@ -142,7 +143,7 @@ class Schemas:
             if sch.schema_name == schema_name:
                 return counter
             counter += 1
-        print "   [WRN] no schema with name: ", schema_name
+        self.batch.logger.wrn(("no schema with name: ", schema_name))
         return None
 
     def get_index_by_id(self, get_id):
@@ -151,7 +152,7 @@ class Schemas:
             if sch.id == get_id:
                 return counter
             counter += 1
-        print "   [WRN] no schema with ID: ", get_id
+        self.batch.logger.wrn(("no schema with ID: ", get_id))
         return None
 
     def update_current_schema(self, schema_id=-1, index=-1, last=-1):
@@ -162,7 +163,7 @@ class Schemas:
             return 1
         else:
             # TODO
-            print " [WRN] update_current_schema parameter missing !\n"
+            self.batch.logger.wrn("update_current_schema parameter missing !")
 
     def get_current_project_schemas_indexes(self, proj_id):
         counter = 0
@@ -228,18 +229,16 @@ class Schemas:
             if do_save is True:
                 self.save_schemas()
         else:
-            print " [ERR] self.current_schema_index < 0  (none selected ???) "
+            self.batch.logger.err("(update_schema) self.current_schema_index < 0  (none selected ???)")
 
     def increase_current_schema_version(self):
         if self.current_schema is not None:
             cur_sch = self.current_schema
-            if self.s.debug_level >= 4:
-                print "  [db] curent_schema_ver++  ", cur_sch.schema_version, str(int(cur_sch.schema_version) + 1)
+            self.batch.logger.db(("curent_schema_ver++", cur_sch.schema_version, str(int(cur_sch.schema_version) + 1)))
             self.schemas_data[self.current_schema_index].schema_version = str(int(cur_sch.schema_version) + 1)
             self.save_schemas()
         else:
-            if self.s.debug_level >= 1:
-                print " [ERR] (increase_current_schema_version) current schema undefined"
+            self.batch.logger.err("(increase_current_schema_version) current schema undefined")
 
     def remove_single_schema(self, index=None, id=None, do_save=False):
         if index is None and id is None:
@@ -317,8 +316,7 @@ class Schemas:
         if len(json_file) == 0:
             json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file, info="schemas file"):
-            if self.s.debug_level >= 3:
-                print " [INF] loading schemas: " + json_file
+            self.batch.logger.inf(("loading schemas: ", json_file))
             json_schemas = self.comfun.load_json_file(json_file)
             if json_schemas is not None and "schemas" in json_schemas.keys():
                 if json_schemas['schemas']['meta']['total'] > 0:
@@ -326,30 +324,26 @@ class Schemas:
                         if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
                             new_schema_actions = []
                             for lia in li['actions']:
-                                print " actions "   # TODO
+                                self.batch.logger.deepdb(("(lsfj) actions: ", lia))
                                 new_schema_actions.append( Action(lia) ) # TODO
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), int(li['definition']), int(li['version']),
                                                          new_schema_actions, li['desc'])
                             self.add_schema(new_schema_item)
                         else:
-                            if self.s.debug_level >= 2:
-                                print "   [WRN] schema data not consistent: {} {}".format(len(li),
-                                                                                          len(SCHEMA_ITEM_FIELDS_NAMES))
+                            self.batch.logger.err(("schema json data not consistent:",len(li),
+                                                   len(SCHEMA_ITEM_FIELDS_NAMES)))
                     return True
             else:
-                if self.s.debug_level >= 2:
-                    print " [WRN] no projects data in : ", json_file
+                self.batch.logger.wrn(("no projects data in : ", json_file))
                 return False
         else:
-            if self.s.debug_level >= 1:
-                print " [ERR] no schema file: " + json_file
-                return False
+            self.batch.logger.err(("no schema file: ", json_file))
+            return False
 
     def load_schemas_from_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
     def save_schemas(self):
@@ -361,8 +355,7 @@ class Schemas:
     #  prepare 'schemas_data' for backup or save
     def format_schemas_data(self, json=False, sql=False, backup=False):
         if json == sql == backup == False:
-            if self.s.debug_level >= 1:
-                print " [ERR] (format_projects_data) no format param !"
+            self.batch.logger.err("(format_projects_data) no format param !")
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
@@ -389,19 +382,20 @@ class Schemas:
 
     def save_schemas_to_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
     def get_all_object_from_all_schemas(self, soft_id=0):
         if soft_id <= 0:
             soft_id = self.s.current_soft
-        print "     [db] (get_all_object_from_all_schemas) soft_id ", soft_id
         for sch in self.schemas_data:
             if sch.soft_id == soft_id:
                 for a in sch.actions_array:
                     if a.action_type == "MaxImport" or a.action_type == "MaxSimulate":
-                        print "       action   : ", a.soft_id, a.action_type, a.action_param
+                        #print "       action   : ", a.soft_id, a.action_type, a.action_param
+                        pass
+                        # TODO  get_all_object_from_all_schemas
+
 
     def copy_schema(self, source_schema_index, proj_target_id):
         if 0 <= source_schema_index < len(self.schemas_data):
@@ -411,6 +405,6 @@ class Schemas:
             if proj_target_id >= 0:
                 self.add_schema(new_sch, do_save=False)
             else:
-                print " [ERR] proj ID wrong : ", proj_target_id
+                self.batch.logger.err(("wrong proj ID: ", proj_target_id))
         else:
-            print " [ERR] sch nr wrong : ", source_schema_index
+            self.batch.logger.err(("wrong sch nr: ", source_schema_index))

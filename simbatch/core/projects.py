@@ -1,5 +1,5 @@
 import os
-from common import CommonFunctions
+from common import CommonFunctions, Logger
 from io import *
 
 # JSON Name Format, PEP8 Name Format
@@ -136,7 +136,6 @@ class Projects:
                                                                                      cur_proj.zeros_in_version,
                                                                                      cur_proj.description)
 
-
     def print_all(self):
         if self.total_projects == 0:
             print "   [INF] no projects loaded"
@@ -164,8 +163,7 @@ class Projects:
             self.current_project = self.projects_data[self.current_project_index]
             return True
         else:
-            if self.debug_level >= 1:
-                print " [ERR] (update_current_from_id)  no index found:{}".format(id)
+            self.batch.logger.err("(update_current_from_id)  no index found:{}".format(id))
             self.current_project_id = None
             return False
 
@@ -179,16 +177,14 @@ class Projects:
         else:
             self.current_project_id = None
             self.current_project = None
-            if self.debug_level >= 1:
-                print "   dir [ERR] (update_current_from_index) index:", index
-                print "   [db] total:{}  len:{}".format(self.total_projects, len(self.projects_data))
+            self.batch.logger.err(("(update_current_from_index) wrong index:", index))
+            self.batch.logger.err(" total:{}  len:{}".format(self.total_projects, len(self.projects_data)))
             return False
 
     #  prepare 'projects_data' for backup or save
     def format_projects_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:
-            if self.s.debug_level >= 1:
-                print " [ERR] (format_projects_data) no format param !"
+            self.batch.logger.err("(format_projects_data) no format param !")
         else:
             if json or backup:
                 t = self.comfun.get_current_time()
@@ -201,10 +197,10 @@ class Projects:
                     for field in PROJECT_ITEM_FIELDS_NAMES:
                         proj[field[0]] = eval('p.'+field[1])
                         json_data["projects"]["data"][i] = proj
-                    # print PROJECT_ITEM_FIELDS_NAMES[i]
                 return json_data
             else:
                 # PRO version with SQL
+                self.batch.logger.inf("PRO version with SQL")
                 return False
 
     #  add project to 'projects_data' list  on load  and on add by user
@@ -247,8 +243,7 @@ class Projects:
             if do_save is True:
                 self.save_projects()
         else:
-            if self.s.debug_level >= 1:
-                print "      [ERR] (update_project) self.current_project_index is None"
+            self.batch.logger.err("(update_project) self.current_project_index is None")
 
     #  check is project with index is default
     def check_is_default(self, index=None):
@@ -312,13 +307,13 @@ class Projects:
     #  example data for beginner users and for tests
     def create_example_project_data(self, do_save=True):
         collect_ids = 0
-        sample_project_1 = SingleProject(0, "Sample Project 1", 1, 0, "defState", "C:\\exampleProj\\", "exampleWokingDir",
+        sample_project_1 = SingleProject(0, "Sample Proj 1", 1, 0, "defState", "C:\\exampleProj\\", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<seq##>_<sh###>", "sample project 1")
-        sample_project_2 = SingleProject(0, "Sample Project 2", 1, 0, "defState", "D:\\proj\\", "fx",
+        sample_project_2 = SingleProject(0, "Sample Proj 2", 1, 0, "defState", "D:\\proj\\", "fx",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\\<sh###>", "sample project 2")
-        sample_project_3 = SingleProject(0, "Sample Project 3", 1, 0, "defState", "E:\\exampleProj\\", "exampleWokingDir",
+        sample_project_3 = SingleProject(0, "Sample Proj 3", 1, 0, "defState", "E:\\exampleProj\\", "exampleWokingDir",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "s_<sh##>", "sample project 3")
         collect_ids += self.add_project(sample_project_1)
@@ -340,8 +335,7 @@ class Projects:
         if json_file is None:
             json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file, info="projects file"):
-            if self.s.debug_level >= 3:
-                print " [INF] loading projects: " + json_file
+            self.batch.logger.inf(("loading projects: ", json_file))
             json_projects = self.comfun.load_json_file(json_file)
             if json_projects is not None and "projects" in json_projects.keys():
                 if json_projects['projects']['meta']['total'] > 0:
@@ -354,24 +348,19 @@ class Projects:
                                                         li['zerosInVersion'])
                             self.add_project(new_project)
                         else:
-                            if self.s.debug_level >= 1:
-                                print "   [ERR] proj data not consistent:{} {}".format(len(li),
-                                                                                       len(PROJECT_ITEM_FIELDS_NAMES))
+                            self.batch.logger.err(("proj data not consistent", len(li), len(PROJECT_ITEM_FIELDS_NAMES)))
                     return True
             else:
-                if self.s.debug_level >= 2:
-                    print " [WRN] no projects data in : ", json_file
+                self.batch.logger.wrn(("no projects data in : ", json_file))
                 return False
         else:
-            if self.s.debug_level >= 2:
-                print " [WRN] projects file not exists : ", json_file
+            self.batch.logger.wrn(("projects file not exists : ", json_file))
             return False
 
     #  load projects data from sql
     def load_projects_from_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
     #  save projects
@@ -391,8 +380,7 @@ class Projects:
     #  save projects data to sql
     def save_projects_to_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 1:
-            print "  [MSG] MySQL database available in the PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return None
 
     #  remove single project
@@ -427,6 +415,5 @@ class Projects:
     #  clear project data from sql
     def clear_projects_in_mysql(self):
         # PRO VERSION
-        if self.s.debug_level >= 2:
-            print " [WRN] MySQL database needs PRO version"
+        self.batch.logger.inf("MySQL database available in the PRO version")
         return True

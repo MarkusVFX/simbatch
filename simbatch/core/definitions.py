@@ -216,12 +216,10 @@ class Definitions:
 
         if self.comfun.file_exists(definitions_dir):
             for json_file in self.batch.i.get_files_from_dir(definitions_dir, types="json"):
-                if self.s.debug_level >= 3:
-                    print " [INF] loading definition: " + json_file
+                self.batch.logger.inf(("loading definition: ", json_file))
                 json_definition = self.comfun.load_json_file(definitions_dir+json_file)
                 if json_definition is not None and "definition" in json_definition.keys():
-                    if self.s.debug_level >= 6:
-                        print " [INF] definition loaded: " + json_file
+                    self.batch.logger.db(("definition loaded: ", json_file))
                     if json_definition['definition']['meta']['total'] > 0:
                         new_definition = SingleDefinition(json_definition['definition']['meta']["software"])
                         if "setupExt" in json_definition['definition']['meta']:
@@ -250,12 +248,10 @@ class Definitions:
                                     new_group_action.actions.append(new_action)
                                 new_definition.add_single_or_group_action(new_group_action)
             # self.print_all(print_children=True)
-            # print "\n\n"
             # self.print_total(print_children=True)
             return True
         else:
-            if self.s.debug_level >= 1:
-                print " [ERR] Definitions directory not exist: " + definitions_dir
+            self.batch.logger.err(("Definitions directory not exist: ", definitions_dir))
             return False
 
     @staticmethod

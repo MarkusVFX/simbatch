@@ -21,7 +21,7 @@ class SimNodes:
         self.nodes_data = []
 
     def print_current(self):
-        print " TODO  node"
+        print " TODO print node"  # TODO print
 
 #
 # For network work and multi node implementation

@@ -16,8 +16,10 @@ class SimBatch:
     logger = None
 
     def __init__(self, runtime_env, ini_file="config.ini"):
-        self.s = Settings(runtime_env, ini_file=ini_file)
-        self.logger = Logger(log_level=0, console_level=self.s.debug_level)
+        self.logger = Logger(log_level=0, console_level=3)
+        self.s = Settings(self.logger, runtime_env, ini_file=ini_file)
+        self.logger.set_console_level(self.s.debug_level)
+        self.logger.set_log_level(0)
         self.comfun = CommonFunctions(self.logger)
 
         self.u = Users(self)
@@ -93,12 +95,13 @@ class SimBatch:
             print " QUEUE: "
             self.q.print_all()
             self.q.print_current()
-        if index == 5:
-            print " NODES: "
-            self.n.print_all()
-            self.n.print_current()
+        # if index == 5:
+        #     print " TO DO NODES: "
+            # TODO NODES !!!!
+            # self.n.print_all()
+            # self.n.print_current()
 
-        if index == 4:
+        if index == 5:  # TODO NODES  index 4 vs 5 !
             print " SETTINGS: "
             self.s.print_all()
 

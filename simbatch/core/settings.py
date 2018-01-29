@@ -1,6 +1,6 @@
 import os
 import json
-from common import CommonFunctions, Logger
+from common import CommonFunctions
 
 try:
     from PySide.QtGui import *
@@ -10,8 +10,9 @@ except ImportError:
 
 
 class Settings:
-    ini_file = None                 # basic config file
-    loading_state = 0               # check basic config # TODO data loading and GUI init
+    logger = None                   # logger prints errors, warnings, info and db to console and to log file
+    ini_file = None                 # fundamental config file, json format
+    loading_state = 0               # check fundamental config # TODO data loading and GUI init
     json_settings_data = None       # basic config data
 
     # fundamental settings (config.ini)
@@ -25,7 +26,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.06"   # current version
+    SIMBATCH_VERSION = "v0.2.10"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -115,7 +116,8 @@ class Settings:
                             {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800}
                         }
 
-    def __init__(self, runtime_env, ini_file="config.ini", force_os=False):
+    def __init__(self, logger, runtime_env, ini_file="config.ini", force_os=False):
+        self.logger = logger
         if force_os is False:
             if os.name == "posix":
                 self.current_os = 1
@@ -143,10 +145,23 @@ class Settings:
         print " ini_file: ", self.ini_file
         print " runtime_env: ", self.runtime_env
 
-        print " json_settings_data[dataMode][current]: ", self.json_settings_data["dataMode"]["current"]
-        print " json_settings_data[colorMode][current]: ", self.json_settings_data["colorMode"]["current"]
-        print " json_settings_data[debugLevel][current]: ", self.json_settings_data["debugLevel"]["current"]
-        print " json_settings_data[window]: ", self.json_settings_data["window"]
+        if self.json_settings_data is not None:
+            if "dataMode" in self.json_settings_data:
+                print " json_settings_data[dataMode][current]: ", self.json_settings_data["dataMode"]["current"]
+            else:
+                self.logger.err(("MISSING dataMode KEY IN SETTINGS FILE:",self.ini_file))
+            if "colorMode" in self.json_settings_data:
+                print " json_settings_data[colorMode][current]: ", self.json_settings_data["colorMode"]["current"]
+            else:
+                self.logger.err(("MISSING colorMode KEY IN SETTINGS FILE:",self.ini_file))
+            if "debugLevel" in self.json_settings_data:
+                print " json_settings_data[debugLevel][current]: ", self.json_settings_data["debugLevel"]["current"]
+            else:
+                self.logger.err(("MISSING debugLevel KEY IN SETTINGS FILE:",self.ini_file))
+            if "window" in self.json_settings_data:
+                print " json_settings_data[window]: ", self.json_settings_data["window"]
+            else:
+                self.logger.err(("MISSING window KEY IN SETTINGS FILE:",self.ini_file))
 
         print " store_data_mode: ", self.store_data_mode
         print " debug_level: ", self.debug_level

@@ -13,7 +13,7 @@ class Logger:
     log_file_path = ""
     force_add_to_log = False
 
-    def __init__(self, log_level=None, console_level=None):
+    def __init__(self, log_level=0, console_level=3):
         if console_level is None or console_level > 4:
             print "Logger init"
         self.console_level = console_level
@@ -224,7 +224,7 @@ class CommonFunctions:
                 if len(info) > 0:
                     self.logger.wrn("File {} not exist !  ({})\n".format(check_file, info))
                 else:
-                    self.logger.wrn("File {} not exist !  ({})\n".format(check_file))
+                    self.logger.wrn("File {} not exist !\n".format(check_file))
             else:
                 self.logger.err("File name length is zero! {}".format(info))
             return False

@@ -9,6 +9,8 @@ from widgets import *
 from core.schemas import *
 from core.definitions import *
 
+from ui_schemas_form import SchemaFormCreateOrEdit
+
 
 class SchemaListItem(QWidget):
     def __init__(self, txt_id, txt_name, txt_desc, txt_schema_version):
@@ -44,270 +46,6 @@ class SchemaListItem(QWidget):
         self.qt_lay.addWidget(self.qt_label_desc)
 
         self.setLayout(self.qt_lay)
-
-
-class SchemaFormCreateOrEdit(QWidget):
-    schema_item_form_object = None
-    save_as_base_state = 1
-
-    form_mode = 1  # 1 create    2 edit
-
-    # actions
-    actionsCount = 0
-    actions_array = []
-    action_widgets = []
-    actions_string = ""
-    
-    # ui
-    execute_button = None
-    top_ui = None
-    qt_bg_schema_top = None
-    qt_fae_schema_name_edit = None
-    qt_fae_schema_version_edit = None
-    qt_fae_schema_description_edit = None
-    qt_radio_buttons_fc_software = None
-    qt_lay_fae_actions = None
-    qt_lay_fae_actions_buttons = None
-    active_definition_index = None
-
-    def __init__(self, batch, mode, top):
-        QWidget.__init__(self)
-        self.actions_array = []
-        self.action_widgets = []
-        self.batch = batch
-        self.schema_item_form_object = batch.c.get_blank_schema()
-        self.s = self.batch.s
-        if mode == "edit":
-            self.form_mode = 2
-        self.init_ui_elements()
-        self.add_defined_action_buttons()
-        self.top_ui = top
-
-    def init_ui_elements(self):
-        qt_lay_outer_schema_form = QVBoxLayout()
-
-        # fae   form add/edit
-        qt_fae_schema_name = EditLineWithButtons("Name: ", label_minimum_size=60)
-        self.qt_fae_schema_name_edit = qt_fae_schema_name.qt_edit_line
-        qt_fae_schema_description = EditLineWithButtons("Description:  ", label_minimum_size=60)
-        self.qt_fae_schema_description_edit = qt_fae_schema_description.qt_edit_line
-        qt_fae_schema_version = EditLineWithButtons("Version:  ",
-                                                    label_minimum_size=55)  # edit_maximum_size, widgetMaximum = 40
-        self.qt_fae_schema_version_edit = qt_fae_schema_version.qt_edit_line
-        qt_fae_schema_as_base = QCheckBox("Copy Current Scene As Base Setup")
-        qt_fae_schema_as_base.setStyleSheet("""padding-left:130px;""")
-        if self.form_mode == 2:
-            qt_fae_schema_as_base.hide()
-        for i, n in enumerate(self.batch.d.definitions_names):
-            if n == self.s.runtime_env:
-                self.active_definition_index = i
-        qt_radio_buttons_fc_software = RadioButtons("Definitons:", self.batch.d.definitions_names,
-                                                    self.active_definition_index, self.on_radio_change)
-
-        self.qt_radio_buttons_fc_software = qt_radio_buttons_fc_software
-
-        if self.form_mode == 1:
-            schema_form_buttons = ButtonWithCheckBoxes("Create schema", pin_text="pin", cb2_text="Crowd mode",
-                                                       cb3_text="Save as base setup", cb3_checked=True)
-            schema_form_buttons.third_check_box.stateChanged.connect(self.on_changed_save_as_base_setup)
-        else:
-            schema_form_buttons = ButtonWithCheckBoxes("Save schema", pin_text="pin", cb2_text="Crowd mode")
-
-        fae_widget_group = WidgetGroup([qt_fae_schema_name, qt_fae_schema_version, qt_fae_schema_description])
-
-        qt_lay_fae = QVBoxLayout()
-        qt_lay_fae.addLayout(fae_widget_group.qt_widget_layout)
-
-        qt_bg_schema_top = QGroupBox()
-        if self.form_mode == 1:
-            qt_bg_schema_top.setTitle("Create Schema :")
-        else:
-            qt_bg_schema_top.setTitle("Edit Schema :")
-        qt_bg_schema_top.setLayout(qt_lay_fae)
-        qt_lay_outer_schema_form.addWidget(qt_bg_schema_top)
-        self.qt_bg_schema_top = qt_bg_schema_top
-
-        qt_lay_fae_actions = QVBoxLayout()
-        self.qt_lay_fae_actions = qt_lay_fae_actions
-        qt_lay_fae_actions.setSpacing(0)
-        qt_lay_fae_actions.setContentsMargins(0, 10, 0, 10)
-
-        qt_gb_fae_actions = QGroupBox()
-        qt_gb_fae_actions.setTitle("Actions")
-        qt_gb_fae_actions.setLayout(qt_lay_fae_actions)
-        qt_lay_outer_schema_form.addWidget(qt_gb_fae_actions)
-
-        # SOFT BUTTONS
-        qt_lay_fae_actions_buttons = QHBoxLayout()
-        self.qt_lay_fae_actions_buttons = qt_lay_fae_actions_buttons
-        qt_lay_fae_actions_soft = QVBoxLayout()
-        qt_lay_fae_actions_soft.addLayout(qt_lay_fae_actions_buttons)
-        qt_lay_fae_actions_soft.addLayout(qt_radio_buttons_fc_software.qt_widget_layout)
-
-        qt_gb_fae_add_actions = QGroupBox()
-        qt_gb_fae_add_actions.setTitle("Add actions to schema")
-        qt_gb_fae_add_actions.setLayout(qt_lay_fae_actions_soft)
-        qt_lay_outer_schema_form.addWidget(qt_gb_fae_add_actions)
-
-        qt_lay_fae_save = QVBoxLayout()
-        qt_lay_fae_save.addLayout(schema_form_buttons.qt_widget_layout)
-        qt_lay_outer_schema_form.addLayout(qt_lay_fae_save)
-
-        qt_fae_schema_name.qt_edit_line.textChanged.connect(self.on_edit_schema_name)
-        qt_fae_schema_description.qt_edit_line.textChanged.connect(self.on_edit_schema_description)
-        qt_fae_schema_version.qt_edit_line.textChanged.connect(self.on_edit_schema_version)
-
-        self.execute_button = schema_form_buttons
-        self.setLayout(qt_lay_outer_schema_form)
-
-    #
-    ##
-    ###
-    def on_radio_change(self, nr):   # on click definition change
-        self.batch.logger.db(("on_radio_change", nr))
-        self.change_current_definition(nr)
-
-    # clear action and
-    def change_current_definition(self, nr=None):
-        self.remove_all_action_buttons()
-        self.remove_all_defined_action_buttons()
-        if nr is None:
-            nr = self.active_definition_index
-        self.add_defined_action_buttons(nr)
-
-    # def change_current_actions_software__OLD_x(self, runtime_env="", nr=None):
-    #     self.batch.logger.db(("on_radio_change", nr))
-    #
-    #     self.remove_all_action_buttons()
-    #     self.remove_all_defined_action_buttons()
-    #
-    #     if nr is not None and nr < len(self.batch.d.definitions_array):
-    #         for a in self.batch.d.definitions_array[nr]:
-    #             b = self.add_software_button(a.action_sub_type)
-    #             if self.batch.p.current_project_index >= 0:
-    #                 curr_proj = self.batch.p.projects_data[self.batch.p.current_project_index]
-    #                 b.button.clicked.connect(
-    #                     lambda a=a: self.on_click_add_button(a, self.qt_lay_fae_actions, self.action_widgets,
-    #                                                          curr_proj))
-
-    def add_defined_action_button(self, button_txt, disabled=True):
-        b = ButtonOnLayout(button_txt)
-        self.qt_lay_fae_actions_buttons.addLayout(b.qt_widget_layout)
-        if disabled == "disabled":
-            b.button.setEnabled(False)
-        return b
-
-    # add horizontal row of defined action buttons
-    def add_defined_action_buttons(self, nr=None):
-        if nr is None:
-            nr = self.active_definition_index
-        curr_proj = self.batch.p.current_project
-        if curr_proj is not None:
-            if nr is not None and nr < len(self.batch.d.definitions_array):
-                for action in self.batch.d.definitions_array[nr].actions_array:
-                    b = self.add_defined_action_button(action.name)
-                    b.button.clicked.connect(lambda a=action: self.on_click_defined_action_button(a, curr_proj))
-        else:
-            self.batch.logger.wrn("Current project undefined !")
-
-    # on click one of horizontal button add action widget to vertical list of schema actions
-    def on_click_defined_action_button(self, single_or_group_action, curr_proj):  # , force_val=0
-        combo_items = []
-        combo_val = []
-
-        qt_lay = self.qt_lay_fae_actions
-        if isinstance(single_or_group_action, SingleAction):
-            button_2 = single_or_group_action.addional_butt_caption
-            action_widget = ActionWidget(single_or_group_action, action_id=str(single_or_group_action.id) + "  ",
-                                         label_txt=single_or_group_action.name,
-                                         edit_txt=single_or_group_action.default_value,
-                                         text_on_button_1="Get", text_on_button_2=button_2)
-        else:  # GroupAction
-            for i, a in enumerate(single_or_group_action.actions):
-                combo_items.append(a.mode)
-                combo_val.append(a.default_value)
-            button_2 = single_or_group_action.actions[0].addional_butt_caption
-            action_widget = ActionWidget(single_or_group_action.actions[0], action_id=str(single_or_group_action.id),
-                                         label_txt=single_or_group_action.name,
-                                         text_on_button_1="Get", text_on_button_2=button_2,
-                                         edit_txt=combo_val[0], combo_items=combo_items, combo_val=combo_val)
-
-        qt_lay.addWidget(action_widget)
-        self.action_widgets.append(action_widget)
-
-        action_widget.qt_button_1.clicked.connect(
-            lambda: single_or_group_action.get_get_file(single_or_group_action.actionWidget.edit,
-                                                        curr_proj.working_directory,
-                                                        action_type, QFileDialog)
-        )
-
-        if button_2 is not None and len(button_2) > 0:
-            action_widget.qt_button_2.clicked.connect(
-                lambda: self.on_clicked_button_action(single_or_group_action)
-            )
-
-        if len(combo_items) > 0:
-            action_widget.qt_combo.currentIndexChanged.connect(
-                lambda: self.on_change_combo_action(action_widget, single_or_group_action)
-            )
-
-    def on_clicked_button_action(self, act):
-        self.batch.logger.db(("on_clicked_button_action", act))
-
-    @staticmethod
-    def on_change_combo_action( action_widget, software_action):
-        action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
-        action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
-
-    # clear helper form object (store schema data)
-    def clear_vars(self):
-        self.schema_item_form_object = self.batch.c.get_blank_schema()
-
-    # remove horizontal row of defined actions buttons
-    def remove_all_defined_action_buttons(self):
-        while self.qt_lay_fae_actions_buttons.count() > 0:
-            b = self.qt_lay_fae_actions_buttons.itemAt(0)
-            c = b.takeAt(0)
-            c.widget().deleteLater()
-            self.qt_lay_fae_actions_buttons.takeAt(0)
-
-    def remove_all_action_buttons(self):
-        self.action_widgets = []
-        while self.qt_lay_fae_actions.count() > 0:
-            b = self.qt_lay_fae_actions.itemAt(0)
-            b.widget().deleteLater()
-            self.qt_lay_fae_actions.takeAt(0)
-        self.actionsCount = 0
-
-    #
-    ##
-    ###
-    def on_edit_schema_name(self, txt):
-        self.schema_item_form_object.schema_name = txt
-        if self.form_mode == 1:
-            self.qt_bg_schema_top.setTitle("Create Schema : " + txt)
-        else:
-            self.qt_bg_schema_top.setTitle("Edit Schema : " + txt)
-
-    def on_edit_schema_description(self, txt):
-        self.schema_item_form_object.description = txt
-
-    def on_edit_schema_version(self, txt):
-        self.schema_item_form_object.schemaVersion = int(txt)
-
-    def on_changed_save_as_base_setup(self, state):
-        if state:
-            self.save_as_base_state = 1
-        else:
-            self.save_as_base_state = 0
-
-    def compile_actions(self):
-        self.actions_array = []
-        for widget_action in self.action_widgets:
-            single_action = widget_action.action_data.get_action()
-            self.actions_array.append(single_action)
-            # TODO  compile acttion
-            self.batch.logger.deepdb(("COMPILE ACTION", single_action))
 
 
 class SchemasUI:
@@ -556,7 +294,7 @@ class SchemasUI:
         self.init_schemas_list()
         if index is not None and index > self.c.total_schemas:
             self.c.current_schema_index = index
-            self.c.current_project_id = self.c.schemas_data[self.c.current_schema_index].id
+            self.c.current_project_id = self.c.current_schema.id
         self.freeze_list_on_changed = 0
 
     def reload_schemas_data_and_refresh_list(self):
@@ -641,11 +379,15 @@ class SchemasUI:
         self.edit_form_state = 0
         self.remove_form_state = 0
 
-    def fill_create_form(self):
+    def update_form_create(self):
         if self.batch.p.current_project_index >= 0:
-            txt = self.batch.p.projects_data[self.batch.p.current_project_index].project_name
-            self.schema_form_create.schema_item_form_object.project_name = txt
-            self.schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
+            # txt = self.batch.p.projects_data[self.batch.p.current_project_index].project_name
+            # self.schema_form_create.schema_item_form_object.project_name = txt
+            # self.schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
+            new_schema = self.c.get_blank_schema()
+            new_schema.project_id = self.batch.p.current_project_id
+            new_schema.project_id = self.batch.p.current_project_id
+            self.schema_form_create.update_form_data(new_schema)
         else:
             self.batch.logger.wrn(("Wrong current project index", self.batch.p.current_project_index))
 
@@ -653,13 +395,13 @@ class SchemasUI:
         if self.create_form_state == 0:
             self.hide_all_forms()
             self.schema_form_create.show()
-            self.fill_create_form()
+            self.update_form_create()
             self.create_form_state = 1
         else:
             self.schema_form_create.hide()
             self.create_form_state = 0
 
-    def on_click_form_edit_fill(self):
+    def form_edit_update_ui(self):
         if self.c.current_schema_index >= 0:
             cur_schema = self.c.schemas_data[self.c.current_schema_index]
             self.schema_form_edit.qt_fae_schema_name_edit.setText(cur_schema.schema_name)
@@ -670,10 +412,11 @@ class SchemasUI:
         if self.edit_form_state == 0:
             self.hide_all_forms()
             self.schema_form_edit.show()
-            self.on_click_form_edit_fill()
+            self.form_edit_update_ui()
+            self.form_edit_update_ui()
+
             if self.c.current_schema_index >= 0:
-                cur_schema = self.c.schemas_data[self.c.current_schema_index]
-                self.schema_form_edit.update_actions_ui(cur_schema)
+                self.schema_form_edit.update_form_data(self.c.current_schema)
             self.edit_form_state = 1
         else:
             self.schema_form_edit.hide()
@@ -760,7 +503,7 @@ class SchemasUI:
                                           new_schema_item.description, str(new_schema_item.schema_version))
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
-        self.batch.logger.db(("add schema DIR for proj :", self.batch.p.current_project_id))
+        self.batch.logger.db(("add schema:", new_schema_item.schema_name,"   to proj :", self.batch.p.current_project_id))
         sch_dir = self.batch.p.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
         self.batch.i.create_schema_directory(sch_dir)
 
@@ -862,8 +605,7 @@ class SchemasUI:
                 self.batch.logger.wrn(("(on sch chng) current_list_item_nr:", self.current_list_item_nr))
 
             if self.edit_form_state == 1:
-                cur_schema = self.c.current_schema
-                self.schema_form_edit.update_actions_ui(cur_schema)
+                self.schema_form_edit.update_form_data(self.c.current_schema)
 
             if self.copy_form_state == 1:
                 self.update_copy_form()

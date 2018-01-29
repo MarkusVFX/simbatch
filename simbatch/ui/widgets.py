@@ -87,6 +87,7 @@ class EditLineWithButtons:
             if button_width > 0:
                 self.text_on_button_2.setFixedWidth(button_width)
 
+
     def get_txt(self):
         return self.qt_edit_line.text()
 

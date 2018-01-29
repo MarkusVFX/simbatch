@@ -1,8 +1,10 @@
 {
 	"definition": {
 		"meta": {
+			"name": "Houdini",
+			"version": 1,
 			"software": "Houdini",
-			"total": 6,
+			"totalActions": 6,
 			"setupExt" : "hipnc",
 			"prevExt" : "jpg",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"

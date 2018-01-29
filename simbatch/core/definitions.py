@@ -61,8 +61,12 @@ class SingleAction:
     def __str__(self):
         return "SingleAction"
 
-    def print_minimum(self):
-        print "   action: {}   id:{}   default_value:{}".format(self.name, self.id, self.default_value)
+    def print_minimum(self,group=False):
+        if group:
+            prefix = "_"
+        else:
+            prefix=""
+        print "   {}action: {}   id:{}   default_value:{}".format(prefix,self.name, self.id, self.default_value)
 
     def print_action(self):
         print "   action: {}   id:{}   description:{} default_value:{}, template:{}".format(self.name, self.id,
@@ -130,7 +134,7 @@ class SingleDefinition:
             else:  # GroupAction
                 if 'actions' in dir(a):
                     for ai in a.actions:
-                        ai.print_minimum()
+                        ai.print_minimum(group=True)
         self.print_total()
 
     def add_single_or_group_action(self, element):
@@ -215,12 +219,16 @@ class Definitions:
             definitions_dir = self.s.store_definitions_directory
 
         if self.comfun.file_exists(definitions_dir):
-            for json_file in self.batch.i.get_files_from_dir(definitions_dir, types="json"):
+            for file_nr, json_file in enumerate(self.batch.i.get_files_from_dir(definitions_dir, types="json")):
                 self.batch.logger.inf(("loading definition: ", json_file))
                 json_definition = self.comfun.load_json_file(definitions_dir+json_file)
                 if json_definition is not None and "definition" in json_definition.keys():
                     self.batch.logger.db(("definition loaded: ", json_file))
-                    if json_definition['definition']['meta']['total'] > 0:
+
+                    if self.s.runtime_env == json_definition['definition']['meta']['name']:
+                        self.batch.d.current_definition = file_nr + 1
+
+                    if json_definition['definition']['meta']['totalActions'] > 0:
                         new_definition = SingleDefinition(json_definition['definition']['meta']["software"])
                         if "setupExt" in json_definition['definition']['meta']:
                             new_definition.setup_ext = json_definition['definition']['meta']['setupExt']

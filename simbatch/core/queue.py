@@ -99,8 +99,8 @@ class Queue:
             print "   [INF] no queu items loaded"
         for q in self.queue_data:
             print "\n\n {}  {}  {} state:{}   evo:{}   simnode:{}   desc:{}".format(q.id, q.queue_item_name, q.prior,
-                                                                                    q.state, q.evo, q.sim_node,
-                                                                                    q.description)
+                                                                                    q.state, "q.evo", q.sim_node,
+                                                                                    q.description)   # TODO "q.evo"
         print "\n\n"
 
     def get_queue_index_by_id(self, get_id):

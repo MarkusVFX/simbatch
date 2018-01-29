@@ -54,9 +54,9 @@ class Logger:
         if console_print:
             if type(message) is tuple:
                 out = "  ".join([str(el) for el in message])
-                print "__   [{}] {}".format(prefix, out)
+                print "   [{}] {}".format(prefix, out)
             else:
-                print "__   [{}] {}".format(prefix, message)
+                print "   [{}] {}".format(prefix, message)
 
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)

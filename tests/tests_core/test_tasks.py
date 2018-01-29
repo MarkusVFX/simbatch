@@ -106,7 +106,7 @@ def test_current_task_details(sib):
     assert sib.t.current_task.state_id == 1
     assert sib.t.current_task.state == "INIT"
     assert sib.t.current_task.project_id == 2
-    assert sib.t.current_task.schema_id == 1
+    assert sib.t.current_task.schema_id == 3
     assert sib.t.current_task.sequence == "02"
     assert sib.t.current_task.shot == "004"
     assert sib.t.current_task.take == "b"
@@ -134,4 +134,9 @@ def test_remove_single_schema_by_index(sib):
     assert len(sib.t.tasks_data) == 3
 
 
+def test_print_current(sib):
+    sib.t.print_current()
 
+
+def test_print_all(sib):
+    sib.t.print_all()

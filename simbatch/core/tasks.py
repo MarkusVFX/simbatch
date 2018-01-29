@@ -82,9 +82,10 @@ class Tasks:
         if self.current_task_id is not None:
             cur_tsk = self.current_task
             print "       current task name:{}".format(cur_tsk.task_name)
-            print "       schemaID:", cur_tsk.schemaID, "       projID:", cur_tsk.projID
-            print "       shotDetails ", cur_tsk.shotA, "   ", cur_tsk.shotB, "   ", cur_tsk.shotC
-            print "       frameFrom  frameTo ", cur_tsk.frameFrom, cur_tsk.frameTo
+            print "       schemaID:", cur_tsk.schema_id, "       projID:", cur_tsk.project_id
+            print "       shotDetails ", cur_tsk.sequence, "   ", cur_tsk.shot, "   ", cur_tsk.take
+            print "       sim framerange  ", cur_tsk.sim_frame_start, cur_tsk.sim_frame_end
+            print "       prev framerange  ", cur_tsk.prev_frame_start, cur_tsk.prev_frame_end
             print "       state  state_id ", cur_tsk.state, "    ", cur_tsk.state_id
 
     def print_all(self):
@@ -162,10 +163,10 @@ class Tasks:
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
         sample_task_1 = TaskItem(0, "tsk 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_2 = TaskItem(0, "tsk 2", 1, "INIT", 1, 1,  "01", "002", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_3 = TaskItem(0, "tsk 3", 1, "INIT", 2, 1,  "02", "004", "b", 7, 28, 8, 22, 4, 5, 6, "o", 1, 8, "d")
-        sample_task_4 = TaskItem(0, "tsk 4", 1, "INIT", 3, 1,  "10", "022", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
-        sample_task_5 = TaskItem(0, "tsk 5", 1, "INIT", 3, 1,  "40", "070", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_2 = TaskItem(0, "tsk 2", 1, "INIT", 1, 2,  "01", "002", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_3 = TaskItem(0, "tsk 3", 1, "INIT", 2, 3,  "02", "004", "b", 7, 28, 8, 22, 4, 5, 6, "o", 1, 8, "d")
+        sample_task_4 = TaskItem(0, "tsk 4", 1, "INIT", 3, 4,  "10", "022", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
+        sample_task_5 = TaskItem(0, "tsk 5", 1, "INIT", 3, 4,  "40", "070", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
         collect_ids += self.add_task(sample_task_1)
         collect_ids += self.add_task(sample_task_2)
         collect_ids += self.add_task(sample_task_3)

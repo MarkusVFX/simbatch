@@ -1,8 +1,10 @@
 {
 	"definition": {
 		"meta": {
+			"name": "Stand-alone",
+			"version": 1,
 			"software": "Stand-alone",
-			"total": 2,
+			"totalActions": 2,
 			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},
 		"actions": {

@@ -1,8 +1,10 @@
 {
 	"definition": {
 		"meta": {
+			"name": "Maya",
+			"version": 1,
 			"software": "Maya",
-			"total": 7,
+			"totalActions": 7,
 			"setupExt" : "mb",
 			"prevExt" : "jpg",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"

@@ -10,7 +10,7 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ('version', 'schema_version'),
     ('projId', 'project_id'),
     ('actions', 'actions_array'),
-    ('definition', 'definition_id'),
+    ('definition', 'definition_name'),
     ('desc', 'description')
     ]
 
@@ -35,20 +35,35 @@ ACTION_DATA_FIELDS_NAMES = [
 
 
 class SchemaItem:
-    def __init__(self, schema_id, schema_name, state_id, state, project_id, definition_id, schema_version,
-                 actions_array, description):
+    def __init__(self, schema_id, schema_name, state_id, state, project_id, definition_name,
+                 schema_version, actions_array, description):
 
         self.id = schema_id
         self.schema_name = schema_name
         self.state_id = state_id
         self.state = state
         self.project_id = project_id
-        self.definition_id = definition_id
+        self.definition_name = definition_name
         self.schema_version = schema_version
         self.actions_array = actions_array
         # self.actions_string = ""
         self.description = description
         # self.actions_to_string()
+
+    def basic_print(self):
+        print "\n [INF] basic print: "
+        print "       schema name: ", self.schema_name
+        print "       definition id:{}   project id:{}".format(self.definition_id, self.project_id)
+
+    def detailed_print(self):
+        print "\n [INF] detailed print: "
+        print "       schema id:{}   name:{} ".format(self.id, self.schema_name)
+        print "       state id:{}   state:{} ".format(self.state_id, self.state)
+        print "       proj id:{}   definition:{}".format(self.project_id, self.definition_name)
+        print "       schema_version {}   description:{}".format(self.schema_version, self.description)
+        print "       actions count:{}".format(len(self.actions_array))
+        for i, act in enumerate(self.actions_array):
+            print "           {}  {}".format(i,act)
 
     # def actions_to_string(self):
     #     for a in self.actions_array:
@@ -96,7 +111,7 @@ class Schemas:
         if self.current_schema_id is not None:
             cur_sch = self.current_schema
             print "       current schema name: ", cur_sch.schema_name
-            print "       definition id:{}   project id:{}".format(cur_sch.definition_id, cur_sch.project_id)
+            print "       definition id:{}   project id:{}".format(cur_sch.definition_name, cur_sch.project_id)
             for i, a in enumerate(cur_sch.actions_array):
                 print "        a:{}  soft:{}   type:{}  sub type:{} ".format(i, a.soft_id, a.action_type, a.actionParam)
 
@@ -106,7 +121,7 @@ class Schemas:
         for c in self.schemas_data:
             print "\n\n   {}   id:{}   state:{}".format(c.schema_name, c.id, c.state)
             print "   sch ver:", c.schema_version
-            print "   proj id:{},  definition:{} ".format(c.project_id, c.definition_id)
+            print "   proj id:{},  definition:{} ".format(c.project_id, c.definition_name)
             for a in c.actions_array:
                 print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
         print "\n\n"
@@ -293,10 +308,10 @@ class Schemas:
 
     def create_example_schemas_data(self, do_save=True):
         collect_ids = 0
-        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, 1, 1, [], "first schema")
-        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 1, 2, 3, [], "fire by FumeFx")
-        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 2, 2, 5, [], "fire with smoke")
-        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 3, 3, 4, [], "cloth with fire")
+        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, "sample_definition", 1, [], "first schema")
+        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 1, "sample_definition", 3, [], "fire by FumeFx")
+        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 2, "sample_definition", 5, [], "fire with smoke")
+        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 3, "sample_definition", 4, [], "cloth with fire")
         collect_ids += self.add_schema(sample_schema_item_1)
         collect_ids += self.add_schema(sample_schema_item_2)
         collect_ids += self.add_schema(sample_schema_item_3)
@@ -326,7 +341,7 @@ class Schemas:
                                 self.batch.logger.deepdb(("(lsfj) actions: ", lia))
                                 new_schema_actions.append(Action(lia))      # TODO
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
-                                                         int(li['projId']), int(li['definition']), int(li['version']),
+                                                         int(li['projId']), li['definition'], int(li['version']),
                                                          new_schema_actions, li['desc'])
                             self.add_schema(new_schema_item)
                         else:

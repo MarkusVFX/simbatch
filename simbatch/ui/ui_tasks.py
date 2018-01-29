@@ -9,7 +9,7 @@ except ImportError:
 
 from widgets import *
 from core.tasks import *
-from ui_tasks_atqf import AddToQueueForm
+from ui_tasks_form import AddToQueueForm
 
 
 class TaskListItem(QWidget):

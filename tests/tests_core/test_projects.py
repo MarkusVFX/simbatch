@@ -178,3 +178,12 @@ def test_save_projects_to_json(sib):
     pass
 
 # def test_get_dir_patterns(sib):   # TODO
+
+
+def test_print_current(sib):
+    sib.p.print_current()
+
+
+def test_print_all(sib):
+    sib.p.print_all()
+

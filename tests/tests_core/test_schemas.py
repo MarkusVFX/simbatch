@@ -107,7 +107,7 @@ def test_current_schema_details(sib):
     assert sib.c.current_schema.state == "ACTIVE"
     assert sib.c.current_schema.schema_version == 5
     assert sib.c.current_schema.project_id == 2
-    assert sib.c.current_schema.definition_id == 2
+    assert sib.c.current_schema.definition_name == "sample_definition"
     assert len(sib.c.current_schema.actions_array) == 0
     assert sib.c.current_schema.description == "fire with smoke"
 
@@ -117,7 +117,16 @@ def test_remove_single_schema_by_id(sib):
     assert sib.c.total_schemas == 3
     assert len(sib.c.schemas_data) == 3
 
+
 def test_remove_single_schema_by_index(sib):
     assert sib.c.remove_single_schema(index=1) is True
     assert sib.c.total_schemas == 2
     assert len(sib.c.schemas_data) == 2
+
+
+def test_print_current(sib):
+    sib.c.print_current()
+
+
+def test_print_all(sib):
+    sib.c.print_all()

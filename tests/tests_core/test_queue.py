@@ -27,3 +27,11 @@ def test_create_example_queue_data(sib):
     # assert sib.c.sample_data_checksum is not None
     # assert sib.c.sample_data_total is not None
     # assert sib.c.total_schemas == sib.c.sample_data_total
+
+
+def test_print_current(sib):
+    sib.q.print_current()
+
+
+def test_print_all(sib):
+    sib.q.print_all()

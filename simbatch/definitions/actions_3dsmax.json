@@ -1,8 +1,10 @@
 {
 	"definition": {
 		"meta": {
+			"name": "3dsmax",
+			"version": 1,
 			"software": "3dsmax",
-			"total": 7,
+			"totalActions": 6,
 			"setupExt" : "max",
 			"prevExt" : "jpg",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"

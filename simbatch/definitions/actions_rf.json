@@ -1,8 +1,10 @@
 {
 	"definition": {
 		"meta": {
+			"name": "RealFlow",
+			"version": 1,
 			"software": "RealFlow",
-			"total": 4,
+			"totalActions": 4,
 			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},
 		"actions": {

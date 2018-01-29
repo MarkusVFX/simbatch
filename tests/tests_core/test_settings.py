@@ -17,3 +17,7 @@ def test_update_ui_colors(settings):
 
 def test_check_data_integration(settings):
     assert settings.check_data_integration() is True
+
+
+def test_print_all(settings):
+    settings.print_all()

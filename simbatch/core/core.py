@@ -124,11 +124,11 @@ class SimBatch:
                 if self.t.load_tasks():
                     return True
                 else:
-                    return False
+                    return -1
             else:
-                return False
+                return -2
         else:
-            return False
+            return -3
 
     def create_example_data(self):
         self.p.create_example_project_data()

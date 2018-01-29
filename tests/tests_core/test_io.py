@@ -6,6 +6,7 @@ import pytest
 # TODO check dir on prepare tests
 TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 
+
 @pytest.fixture(scope="module")
 def io():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
@@ -24,7 +25,7 @@ def test_get_flat_name(io):
 
 def test_loaded_sample_project(io):
     assert io.batch.p.total_projects == 3
-    assert io.batch.p.projects_data[1].project_name == "Sample Project 2"
+    assert io.batch.p.projects_data[1].project_name == "Sample Proj 2"
 
 
 def test_generate_base_setup_file_name(io):
@@ -32,8 +33,3 @@ def test_generate_base_setup_file_name(io):
     assert  tuple_base_setup[0] == 1
     # assert  tuple_base_setup[1] == "D:\\proj\\fx\\test_schema\\base_setup\\test_schema_v001.null"
     # TODO12
-
-
-
-
-

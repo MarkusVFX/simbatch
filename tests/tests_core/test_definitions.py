@@ -9,7 +9,7 @@ TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 
 
 @pytest.fixture(scope="module")
-def sib():
+def simbatch():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
     sib = core.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
     sib.clear_all_memory_data()
@@ -19,12 +19,12 @@ def sib():
     return sib
 
 
-def test_exist_definitions_data(sib):
-    assert sib.comfun.file_exists(sib.s.store_data_definitions_directory) is True
+def test_exist_definitions_data(simbatch):
+    assert simbatch.comfun.file_exists(simbatch.s.store_definitions_directory) is True
 
 
-def test_load_definitions(sib):
-    assert sib.d.load_definitions() is True
+def test_load_definitions(simbatch):
+    assert simbatch.d.load_definitions() is True
 
 # def test_load_definitions(sib):
 #     assert sib.d.load_definitions() is True

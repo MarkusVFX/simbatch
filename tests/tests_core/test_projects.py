@@ -133,7 +133,7 @@ def test_current_project_details(sib):
     # sib.p.print_current()
     cur_proj = sib.p.current_project
     assert cur_proj.id == 2
-    assert cur_proj.project_name == "Sample Project 2"
+    assert cur_proj.project_name == "Sample Proj 2"
     assert cur_proj.project_directory == "D:\\proj\\"
     assert cur_proj.working_directory == "fx\\"
     assert cur_proj.cameras_directory == "cam\\"

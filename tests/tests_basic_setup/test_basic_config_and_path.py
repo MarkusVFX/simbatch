@@ -1,18 +1,29 @@
 from simbatch.core import settings
+from simbatch.core.common import Logger
 import pytest
+
 
 @pytest.fixture(scope="module")
 def sett():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    #return core.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
-    return settings.Settings(5, ini_file="S:/simbatch/tests/config_tests.ini")
+    # return core.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
+    return settings.Settings(Logger(), 5, ini_file="S:/simbatch/tests/config_tests.ini")
 
 
 def test_settings_file(sett):
     assert sett.comfun.file_exists(sett.ini_file) is True
 
 
+def test_loading_state(sett):
+    assert sett.loading_state == 3
+
+
+def test_settings_data(sett):
+    assert sett.json_settings_data is not None
+
+
 def test_settings_mode(sett):
+    sett.print_all()
     assert sett.store_data_mode is not None
 
 

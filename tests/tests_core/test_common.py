@@ -13,7 +13,7 @@ random_file = None
 
 @pytest.fixture
 def comfun():
-    return common.CommonFunctions(5)
+    return common.CommonFunctions()
 
 def test_prepare_env():
     if path.exists(TESTING_AREA_DIR+TEST_DIR) is True: # clear TESTING_AREA_DIR

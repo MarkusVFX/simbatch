@@ -8,6 +8,7 @@ app = QApplication([])
 
 # sim_batch = core.SimBatch("Maya")
 sim_batch = core.SimBatch("Stand-alone")
+# sim_batch = core.SimBatch("xxx")
 # sim_batch.clear_all_stored_data()
 # sim_batch.create_example_data()
 sim_batch.load_data()

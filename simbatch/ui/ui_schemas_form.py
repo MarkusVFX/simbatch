@@ -28,7 +28,6 @@ class SchemaFormCreateOrEdit(QWidget):
     qt_radio_buttons_fc_software = None
     qt_lay_fae_actions = None
     qt_lay_fae_actions_buttons = None
-    active_definition_index = None
 
     def __init__(self, batch, mode, top):
         QWidget.__init__(self)
@@ -43,8 +42,11 @@ class SchemaFormCreateOrEdit(QWidget):
         self.add_defined_action_buttons()
         self.top_ui = top
 
-    # def print_form_object(self):
-    #     print self.schema_item_form_object
+    def proxy_basic_print(self):
+        self.schema_item_form_object.basic_print()
+
+    def proxy_detailed_print(self):
+        self.schema_item_form_object.detailed_print()
 
     def init_ui_elements(self):
         qt_lay_outer_schema_form = QVBoxLayout()
@@ -56,8 +58,8 @@ class SchemaFormCreateOrEdit(QWidget):
             qt_debug_buttons = WidgetGroup([SimpleLabel("debug buttons"), db_b1, db_b2])
             db_buttons_group.setLayout(qt_debug_buttons.qt_widget_layout)
             qt_lay_outer_schema_form.addWidget(db_buttons_group)
-            db_b1.button.clicked.connect(self.schema_item_form_object.basic_print)
-            db_b2.button.clicked.connect(self.schema_item_form_object.detailed_print)
+            db_b1.button.clicked.connect(self.proxy_basic_print)
+            db_b2.button.clicked.connect(self.proxy_detailed_print)
 
         # fae   form add/edit
         qt_fae_schema_name = EditLineWithButtons("Name: ", label_minimum_size=60)
@@ -71,11 +73,9 @@ class SchemaFormCreateOrEdit(QWidget):
         qt_fae_schema_as_base.setStyleSheet("""padding-left:130px;""")
         if self.form_mode == 2:
             qt_fae_schema_as_base.hide()
-        for i, n in enumerate(self.batch.d.definitions_names):
-            if n == self.s.runtime_env:
-                self.active_definition_index = i
+
         qt_radio_buttons_fc_software = RadioButtons("Definitons:", self.batch.d.definitions_names,
-                                                    self.active_definition_index, self.on_radio_change)
+                                                    self.batch.d.current_definition_index, self.on_radio_change)
         self.qt_radio_buttons_fc_software = qt_radio_buttons_fc_software
 
         if self.form_mode == 1:
@@ -133,8 +133,8 @@ class SchemaFormCreateOrEdit(QWidget):
         self.execute_button = schema_form_buttons
         self.setLayout(qt_lay_outer_schema_form)
 
-        if self.batch.d.current_definition is not None:
-            self.change_current_definition(self.batch.d.current_definition)
+        if self.batch.d.current_definition_index is not None:
+            self.change_current_definition(self.batch.d.current_definition_index)
 
     #
     ##
@@ -146,7 +146,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.remove_all_action_widgets()
         self.remove_all_defined_action_buttons()
         if nr is None:
-            nr = self.active_definition_index
+            nr = self.batch.d.current_definition
         self.add_defined_action_buttons(nr)
 
     def on_radio_change(self, nr):  # on click definition change
@@ -174,7 +174,7 @@ class SchemaFormCreateOrEdit(QWidget):
     # add horizontal row of defined action buttons
     def add_defined_action_buttons(self, nr=None):
         if nr is None:
-            nr = self.active_definition_index
+            nr = self.batch.d.current_definition
         curr_proj = self.batch.p.current_project
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.d.definitions_array):

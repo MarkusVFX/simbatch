@@ -386,7 +386,8 @@ class SchemasUI:
             # self.schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
             new_schema = self.c.get_blank_schema()
             new_schema.project_id = self.batch.p.current_project_id
-            new_schema.project_id = self.batch.p.current_project_id
+
+            new_schema.definition_name = self.batch.d.current_definition
             self.schema_form_create.update_form_data(new_schema)
         else:
             self.batch.logger.wrn(("Wrong current project index", self.batch.p.current_project_index))
@@ -403,7 +404,7 @@ class SchemasUI:
 
     def form_edit_update_ui(self):
         if self.c.current_schema_index >= 0:
-            cur_schema = self.c.schemas_data[self.c.current_schema_index]
+            cur_schema = self.c.current_schema
             self.schema_form_edit.qt_fae_schema_name_edit.setText(cur_schema.schema_name)
             self.schema_form_edit.qt_fae_schema_version_edit.setText(str(cur_schema.schema_version))
             self.schema_form_edit.qt_fae_schema_description_edit.setText(cur_schema.description)
@@ -412,7 +413,6 @@ class SchemasUI:
         if self.edit_form_state == 0:
             self.hide_all_forms()
             self.schema_form_edit.show()
-            self.form_edit_update_ui()
             self.form_edit_update_ui()
 
             if self.c.current_schema_index >= 0:

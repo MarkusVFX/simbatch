@@ -53,7 +53,7 @@ class SchemaItem:
     def basic_print(self):
         print "\n [INF] basic print: "
         print "       schema name: ", self.schema_name
-        print "       definition id:{}   project id:{}".format(self.definition_id, self.project_id)
+        print "       project id:{}   definition:{}".format(self.project_id, self.definition_name)
 
     def detailed_print(self):
         print "\n [INF] detailed print: "

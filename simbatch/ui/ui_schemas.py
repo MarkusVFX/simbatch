@@ -605,7 +605,9 @@ class SchemasUI:
                 self.batch.logger.wrn(("(on sch chng) current_list_item_nr:", self.current_list_item_nr))
 
             if self.edit_form_state == 1:
+                self.form_edit_update_ui()
                 self.schema_form_edit.update_form_data(self.c.current_schema)
+                self.batch.logger.db(("update edit form: ", self.c.current_schema.schema_name))
 
             if self.copy_form_state == 1:
                 self.update_copy_form()

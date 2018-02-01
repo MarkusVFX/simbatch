@@ -2,7 +2,7 @@ import os
 import re
 
 
-class InOutStorage:
+class StorageInOut:
     batch = None
     comfun = None
 

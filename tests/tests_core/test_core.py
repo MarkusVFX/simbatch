@@ -14,7 +14,7 @@ def test_init_simbatch(sib):
     assert sib.prj.total_projects == 0
     assert sib.sch.total_schemas == 0
     assert sib.tsk.total_tasks == 0
-    assert sib.q.total_queue_items == 0
+    assert sib.que.total_queue_items == 0
     assert sib.n.total_nodes == 0
 
 

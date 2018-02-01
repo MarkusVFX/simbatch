@@ -26,7 +26,7 @@ class SimBatch:
         self.prj = Projects(self)      # prj
         self.sch = Schemas(self)       # sch
         self.tsk = Tasks(self)         # tsk
-        self.q = Queue(self)         # que
+        self.que = Queue(self)         # que
         self.n = SimNodes(self)      # nod
         self.d = Definitions(self)   # dfn
         self.i = InOutStorage(self)  # ios
@@ -58,7 +58,7 @@ class SimBatch:
 
         # queue
         print "\n QUEUE: "
-        self.q.print_current()
+        self.que.print_current()
 
         # nodes
         print "\n NODES: "
@@ -74,9 +74,9 @@ class SimBatch:
         #     print "       state  state_id ", curTsk.state, "    ", curTsk.state_id
         #
         #
-        # print "       currentQueueID:", self.q.currentQueueID, "   currentQueueIndex:", self.q.currentQueueIndex, "   total_projects:", self.prj.total_projects
-        # if self.q.currentQueueIndex >= 0:
-        #     curQue = self.q.queueData[self.q.currentQueueIndex]
+        # print "       currentQueueID:", self.que.currentQueueID, "   currentQueueIndex:", self.que.currentQueueIndex, "   total_projects:", self.prj.total_projects
+        # if self.que.currentQueueIndex >= 0:
+        #     curQue = self.que.queueData[self.que.currentQueueIndex]
         #     print "       current queueItem: ", curQue.queueItemName, "     version :", curQue.version, "     evolutionNr :", curQue.evolutionNr
         print "\n\n"
 
@@ -97,8 +97,8 @@ class SimBatch:
             self.tsk.print_current()
         if index == 4:
             print " QUEUE: "
-            self.q.print_all()
-            self.q.print_current()
+            self.que.print_all()
+            self.que.print_current()
         # if index == 5:
         #     print " TO DO NODES: "
             # TODO NODES !!!!

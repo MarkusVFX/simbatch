@@ -99,7 +99,7 @@ class QueueUI:
     def __init__(self, batch, mainw, top):
         self.batch = batch
         self.s = batch.s
-        self.q = batch.q
+        self.que = batch.que
         self.comfun = batch.comfun
         self.top_ui = top
         self.mainw = mainw
@@ -221,7 +221,7 @@ class QueueUI:
         else:
             qt_list_item.setBackground(self.s.state_colors_up[0])
 
-        for que in self.batch.q.queue_data:
+        for que in self.batch.que.queue_data:
             qt_list_item = QListWidgetItem(widget_list)
             cur_color = self.s.state_colors[que.state_id].color()
             qt_list_item.setBackground(cur_color)
@@ -235,17 +235,17 @@ class QueueUI:
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
-        index = self.batch.q.current_queue_index
+        index = self.batch.que.current_queue_index
         self.clear_list()
         self.batch.init_queue(self.list_queue)
-        self.batch.q.current_queue_index = index
-        self.batch.q.current_queue_id = self.batch.q.queue_data[self.batch.q.current_queue_index].id
+        self.batch.que.current_queue_index = index
+        self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
         self.freeze_list_on_changed = 0
 
     def _change_current_queue_item_state_and_reset_list(self, state_id):
-        self.batch.q.current_queue.state = self.s.states_visible_names[state_id]
-        self.batch.q.current_queue.state_id = state_id
-        self.batch.q.save_queue()
+        self.batch.que.current_queue.state = self.s.states_visible_names[state_id]
+        self.batch.que.current_queue.state_id = state_id
+        self.batch.que.save_queue()
         self.reset_list()
 
     def on_click_menu_set_init(self):
@@ -261,7 +261,7 @@ class QueueUI:
         self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_HOLD)
 
     def on_menu_locate_prev(self):
-        cur_queue_item = self.batch.q.queue_data[self.batch.q.current_queue_index]
+        cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
         evo_nr = cur_queue_item.evolution_nr
@@ -276,7 +276,7 @@ class QueueUI:
             subprocess.Popen('explorer "' + prev_dir + '"')
 
     def on_menu_open_computed_scene(self):
-        cur_queue_item = self.batch.q.queue_data[self.batch.q.current_queue_index]
+        cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         # proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
         evo_nr = cur_queue_item.evolution_nr
@@ -290,7 +290,7 @@ class QueueUI:
             self.batch.logger.wrn(("file_to_load not exist: ", file_to_load[1]))
 
     def on_click_menu_schema_remove(self):
-        self.batch.q.removeQueueItem(index=self.batch.q.current_queue_index, do_save=True)
+        self.batch.que.removeQueueItem(index=self.batch.que.current_queue_index, do_save=True)
         self.reset_list()
 
     @staticmethod
@@ -334,8 +334,8 @@ class QueueUI:
             self.edit_form_state = 0
 
     def on_click_form_edit_fill(self):
-        if self.batch.q.current_queue_index >= 0:
-            curr_queue_item = self.batch.q.queue_data[self.batch.q.current_queue_index]
+        if self.batch.que.current_queue_index >= 0:
+            curr_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
             self.qt_edit_fe_name.setText(curr_queue_item.queue_item_name)
             self.qt_edit_fe_pror.setText(str(curr_queue_item.prior))
             self.qt_edit_fe_state.setText(curr_queue_item.state)

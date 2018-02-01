@@ -15,7 +15,7 @@ def test_init_simbatch(sib):
     assert sib.sch.total_schemas == 0
     assert sib.tsk.total_tasks == 0
     assert sib.que.total_queue_items == 0
-    assert sib.n.total_nodes == 0
+    assert sib.nod.total_nodes == 0
 
 
 def test_clear_all_memory_data(sib):

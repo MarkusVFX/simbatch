@@ -583,7 +583,7 @@ class TasksUI:
         tsk_id = self.batch.tsk.current_task.id
         version = self.batch.tsk.current_task.queue_ver
         evo_nr = -1
-        file_to_load = self.batch.d.getComputedSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
+        file_to_load = self.batch.dfn.getComputedSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
         if file_to_load[0] == 1:
             self.batch.logger.inf(("file_to_load:", file_to_load[1]))
             self.batch.o.soft_conn.load_scene(file_to_load[1])

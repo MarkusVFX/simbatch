@@ -24,7 +24,7 @@ def test_exist_definitions_data(simbatch):
 
 
 def test_load_definitions(simbatch):
-    assert simbatch.d.load_definitions() is True
+    assert simbatch.dfn.load_definitions() is True
 
 # def test_load_definitions(sib):
-#     assert sib.d.load_definitions() is True
+#     assert sib.dfn.load_definitions() is True

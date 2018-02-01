@@ -280,7 +280,7 @@ class SettingsUI:
                     batch.sch.create_example_schemas_data(do_save=True)
                     batch.tsk.create_example_tasks_data(do_save=True)
                     # batch.que.createSampleData(taskID, projID)  # TODO
-                    # batch.n.createSampleData()  # TODO
+                    # batch.nod.createSampleData()  # TODO
                     if self.settings.debug_level >= 3:
                         print " [INF] created sample data: ", data_path
             else:

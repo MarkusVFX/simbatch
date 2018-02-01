@@ -266,7 +266,7 @@ class QueueUI:
         task_id = cur_queue_item.task_id
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
-        prev_dir = self.batch.d.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
+        prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
                                                   forceQueueVersion=version)
 
         self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
@@ -282,7 +282,7 @@ class QueueUI:
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
 
-        file_to_load = self.batch.d.get_computed_setup_file(task_id, version, evo_nr)
+        file_to_load = self.batch.dfn.get_computed_setup_file(task_id, version, evo_nr)
         if file_to_load[0] == 1:
             self.batch.logger.inf(("file_to_load ", file_to_load[1]))
             self.batch.o.soft_conn.load_scene(file_to_load[1])

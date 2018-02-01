@@ -27,8 +27,8 @@ class SimBatch:
         self.sch = Schemas(self)       # sch
         self.tsk = Tasks(self)         # tsk
         self.que = Queue(self)         # que
-        self.n = SimNodes(self)      # nod
-        self.d = Definitions(self)   # dfn
+        self.nod = SimNodes(self)      # nod
+        self.dfn = Definitions(self)   # dfn
         self.i = InOutStorage(self)  # ios
 
         # one place abbreviation for variables
@@ -62,7 +62,7 @@ class SimBatch:
 
         # nodes
         print "\n NODES: "
-        self.n.print_current()
+        self.nod.print_current()
         
         # print "       currentTaskID:", self.tsk.currentTaskID, "   currentTaskIndex:", self.tsk.currentTaskIndex, "   total_projects:", self.prj.total_projects
         # if self.tsk.currentTaskIndex >= 0:
@@ -102,8 +102,8 @@ class SimBatch:
         # if index == 5:
         #     print " TO DO NODES: "
             # TODO NODES !!!!
-            # self.n.print_all()
-            # self.n.print_current()
+            # self.nod.print_all()
+            # self.nod.print_current()
 
         if index == 5:  # TODO NODES  index 4 vs 5 !
             print " SETTINGS: "
@@ -120,7 +120,7 @@ class SimBatch:
         self.sch.clear_all_schemas_data()
 
     def load_data(self):
-        self.d.load_definitions()
+        self.dfn.load_definitions()
 
         if self.prj.load_projects():
             self.prj.init_default_proj()

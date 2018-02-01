@@ -74,8 +74,8 @@ class SchemaFormCreateOrEdit(QWidget):
         if self.form_mode == 2:
             qt_fae_schema_as_base.hide()
 
-        qt_radio_buttons_fc_software = RadioButtons("Definitons:", self.batch.d.definitions_names,
-                                                    self.batch.d.current_definition_index, self.on_radio_change)
+        qt_radio_buttons_fc_software = RadioButtons("Definitons:", self.batch.dfn.definitions_names,
+                                                    self.batch.dfn.current_definition_index, self.on_radio_change)
         self.qt_radio_buttons_fc_software = qt_radio_buttons_fc_software
 
         if self.form_mode == 1:
@@ -133,8 +133,8 @@ class SchemaFormCreateOrEdit(QWidget):
         self.execute_button = schema_form_buttons
         self.setLayout(qt_lay_outer_schema_form)
 
-        if self.batch.d.current_definition_index is not None:
-            self.change_current_definition(self.batch.d.current_definition_index)
+        if self.batch.dfn.current_definition_index is not None:
+            self.change_current_definition(self.batch.dfn.current_definition_index)
 
     #
     ##
@@ -146,7 +146,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.remove_all_action_widgets()
         self.remove_all_defined_action_buttons()
         if nr is None:
-            nr = self.batch.d.current_definition
+            nr = self.batch.dfn.current_definition
         self.add_defined_action_buttons(nr)
 
     def on_radio_change(self, nr):  # on click definition change
@@ -174,11 +174,11 @@ class SchemaFormCreateOrEdit(QWidget):
     # add horizontal row of defined action buttons
     def add_defined_action_buttons(self, nr=None):
         if nr is None:
-            nr = self.batch.d.current_definition
+            nr = self.batch.dfn.current_definition
         curr_proj = self.batch.prj.current_project
         if curr_proj is not None:
-            if nr is not None and nr < len(self.batch.d.definitions_array):
-                for action in self.batch.d.definitions_array[nr].actions_array:
+            if nr is not None and nr < len(self.batch.dfn.definitions_array):
+                for action in self.batch.dfn.definitions_array[nr].actions_array:
                     b = self.add_defined_action_button(action.name)
                     b.button.clicked.connect(lambda a=action: self.on_click_defined_action_button(a, curr_proj))
         else:

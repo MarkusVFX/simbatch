@@ -318,15 +318,15 @@ class SchemasUI:
         self.sch.current_schema_index = cur_sch_index
         self.sch.update_current_from_index(cur_sch_index)
 
-        ret = self.batch.d.getSchemaBaseSetupFile(forceSchemaVersion=True)   # TODO  getSchemaBaseSetupFile PEP8
+        ret = self.batch.dfn.getSchemaBaseSetupFile(forceSchemaVersion=True)   # TODO  getSchemaBaseSetupFile PEP8
 
         cur_schema = self.sch.schemas_data[cur_sch_index]
         self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
-        self.batch.d.soco.save_curent_scene_as(ret[1])
+        self.batch.dfn.soco.save_curent_scene_as(ret[1])
 
     def on_menu_locate_base_setup(self):
         import subprocess
-        prev_dir = self.batch.d.get_base_setup_dir()
+        prev_dir = self.batch.dfn.get_base_setup_dir()
         base_setup_dir = prev_dir[1]
         if self.s.current_os == 2:
             if self.comfun.path_exists(base_setup_dir, info="Base Setup"):
@@ -387,7 +387,7 @@ class SchemasUI:
             new_schema = self.sch.get_blank_schema()
             new_schema.project_id = self.batch.prj.current_project_id
 
-            new_schema.definition_name = self.batch.d.current_definition
+            new_schema.definition_name = self.batch.dfn.current_definition
             self.schema_form_create.update_form_data(new_schema)
         else:
             self.batch.logger.wrn(("Wrong current project index", self.batch.prj.current_project_index))
@@ -523,8 +523,8 @@ class SchemasUI:
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.i.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.db(("with saveAs:  ", save_as))
-                if self.batch.d.current_interact is not None:
-                    self.batch.d.current_interact.save_curent_scene_as(save_as[1])
+                if self.batch.dfn.current_interact is not None:
+                    self.batch.dfn.current_interact.save_curent_scene_as(save_as[1])
             else:
                 self.batch.logger.db(("new_schema_item.save_as_base_state", save_as_base))
 
@@ -559,11 +559,11 @@ class SchemasUI:
             self.edit_form_state = 0
 
     def load_base_setup(self, schema_name, version=1):
-        file_to_load = self.batch.d.generate_tuple_base_setup_file_name(schema_name,
+        file_to_load = self.batch.dfn.generate_tuple_base_setup_file_name(schema_name,
                                                                         ver=version)
         if file_to_load[0] == 1:
             self.batch.logger.inf(("loadFile: ", file_to_load[1]))
-            self.batch.d.soco.load_scene(file_to_load[1])
+            self.batch.dfn.soco.load_scene(file_to_load[1])
         else:
             self.batch.logger.err(("loadFile: ", file_to_load))
 

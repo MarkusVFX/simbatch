@@ -305,8 +305,8 @@ class TasksFormCreateOrEdit(QWidget):
         if self.batch.c.current_schema_index is None:   # TODO check it
             self.batch.logger.err(("current schema is None! current_schema_index:", self.batch.c.current_schema_index))
 
-        if self.batch.p.current_project_id is not None:
-            self.form_task_item.project_id = self.batch.p.current_project_id
+        if self.batch.prj.current_project_id is not None:
+            self.form_task_item.project_id = self.batch.prj.current_project_id
 
         self.form_task_item.state_color = "3478b8"
         self.form_task_item.state = self.qt_combo_state_names.currentText()
@@ -334,10 +334,10 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item.description = self.qt_fae_schema_description_edit.text()
 
     def get_frame_range_from_cache(self):
-        curr_proj = self.batch.p.projects_data[self.batch.p.current_project_index]
+        curr_proj = self.batch.prj.projects_data[self.batch.prj.current_project_index]
 
-        pa_seq = self.batch.p.getSeqPattern(curr_proj.seq_shot_take_pattern)
-        pa_sh = self.batch.p.getShPattern(curr_proj.seq_shot_take_pattern)
+        pa_seq = self.batch.prj.getSeqPattern(curr_proj.seq_shot_take_pattern)
+        pa_sh = self.batch.prj.getShPattern(curr_proj.seq_shot_take_pattern)
 
         #  TODO get frame range from cache or framerange file.
 
@@ -508,7 +508,7 @@ class TasksUI:
             qt_list_item.setBackground(self.s.state_colors_up[0])
 
         for tsk in self.batch.t.tasks_data:
-            if tsk.project_id == self.batch.p.current_project_id:
+            if tsk.project_id == self.batch.prj.current_project_id:
                 qt_list_item = QListWidgetItem(widget_list)
                 cur_color = self.s.state_colors[tsk.state_id].color()
                 qt_list_item.setBackground(cur_color)
@@ -665,7 +665,7 @@ class TasksUI:
             self.remove_form_state = 0
 
     def on_click_show_add_to_queue(self):
-        self.batch.logger.db(("on_click_add_to_queue  proj: ", self.batch.p.current_project_id))
+        self.batch.logger.db(("on_click_add_to_queue  proj: ", self.batch.prj.current_project_id))
         if self.add_form_state == 0:
             self.hide_all_forms()
             self.qt_form_add.show()
@@ -689,7 +689,7 @@ class TasksUI:
         self.list_tasks.setItemWidget(qt_list_item, list_item_widget)
 
     def on_click_add_task(self, new_task_tem):
-        if self.batch.p.current_project_id >= 0:
+        if self.batch.prj.current_project_id >= 0:
             if self.qt_form_create.qt_schema_name_combo.currentIndex() >= 0:
                 self.qt_form_create.compile_imputs()
                 if new_task_tem.schema_id < 0:
@@ -706,7 +706,7 @@ class TasksUI:
                 self.batch.logger.err("(on_click_add_task) PLEASE SELECT SCHEMA ")
                 self.top_ui.set_top_info(" [INF] PLEASE SELECT SCHEMA !", 8)
         else:
-            self.batch.logger.wrn(("(on_click_add_task) wrong current_project_id: ", self.batch.p.current_project_id))
+            self.batch.logger.wrn(("(on_click_add_task) wrong current_project_id: ", self.batch.prj.current_project_id))
             self.top_ui.set_top_info(" [INF] PLEASE SELECT PROJECT !", 8)
 
     def on_click_update_task(self, edited_task_item):
@@ -786,7 +786,7 @@ class TasksUI:
     def update_list_of_visible_ids(self):
         array_visible_tasks_ids = []
         for task in self.batch.t.tasks_data:
-            if task.project_id == self.batch.p.current_project_id:
+            if task.project_id == self.batch.prj.current_project_id:
                 array_visible_tasks_ids.append(task.id)
         self.array_visible_tasks_ids = array_visible_tasks_ids
 

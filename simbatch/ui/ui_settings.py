@@ -276,7 +276,7 @@ class SettingsUI:
 
                 if self.sample_data_state:
                     batch = self.batch
-                    batch.p.create_example_project_data(do_save=True)
+                    batch.prj.create_example_project_data(do_save=True)
                     batch.c.create_example_schemas_data(do_save=True)
                     batch.t.create_example_tasks_data(do_save=True)
                     # batch.q.createSampleData(taskID, projID)  # TODO

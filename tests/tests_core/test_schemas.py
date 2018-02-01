@@ -85,7 +85,7 @@ def test_update_current_from_id(sib):
     assert sib.c.current_schema_id is None
     assert sib.c.current_schema_index is None
     assert sib.c.update_current_from_id(2) == 1
-    # sib.p.print_all()
+    # sib.prj.print_all()
     assert sib.c.current_schema_id == 2
     assert sib.c.current_schema_index == 1
     assert sib.c.current_schema.schema_name == "schema 2"

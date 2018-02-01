@@ -175,7 +175,7 @@ class SchemaFormCreateOrEdit(QWidget):
     def add_defined_action_buttons(self, nr=None):
         if nr is None:
             nr = self.batch.d.current_definition
-        curr_proj = self.batch.p.current_project
+        curr_proj = self.batch.prj.current_project
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.d.definitions_array):
                 for action in self.batch.d.definitions_array[nr].actions_array:

@@ -17,32 +17,36 @@ class SimBatch:
 
     def __init__(self, runtime_env, ini_file="config.ini"):
         self.logger = Logger(log_level=0, console_level=3)
-        self.s = Settings(self.logger, runtime_env, ini_file=ini_file)
+        self.s = Settings(self.logger, runtime_env, ini_file=ini_file)   # sts
         self.logger.set_console_level(self.s.debug_level)
         self.logger.set_log_level(0)
         self.comfun = CommonFunctions(self.logger)
 
-        self.u = Users(self)
-        self.p = Projects(self)
-        self.c = Schemas(self)
-        self.t = Tasks(self)
-        self.q = Queue(self)
-        self.n = SimNodes(self)
-        self.d = Definitions(self)
-        self.i = InOutStorage(self)
-        #  self.o = Softwares(self)  <- Definitions
-        #  self.s.load_definitions()
+        self.u = Users(self)         # usr
+        self.prj = Projects(self)      # prj
+        self.c = Schemas(self)       # sch
+        self.t = Tasks(self)         # tsk
+        self.q = Queue(self)         # que
+        self.n = SimNodes(self)      # nod
+        self.d = Definitions(self)   # dfn
+        self.i = InOutStorage(self)  # ios
+
+        # one place abbreviation for variables
+        # reasons:
+        # - repeated use
+        # - identification of the main modules
+
         self.logger.inf("SimBatch started")
 
     def print_data(self):
-        self.p.print_all()
+        self.prj.print_all()
 
     def print_important_values(self):
         print "  \n\n  Current runtime_env: {}", self.s.runtime_env
 
         # projects
         print "\n PROJECTS: "
-        self.p.print_current()
+        self.prj.print_current()
 
         # schemas
         print "\n SCHEMAS: "
@@ -60,7 +64,7 @@ class SimBatch:
         print "\n NODES: "
         self.n.print_current()
         
-        # print "       currentTaskID:", self.t.currentTaskID, "   currentTaskIndex:", self.t.currentTaskIndex, "   total_projects:", self.p.total_projects
+        # print "       currentTaskID:", self.t.currentTaskID, "   currentTaskIndex:", self.t.currentTaskIndex, "   total_projects:", self.prj.total_projects
         # if self.t.currentTaskIndex >= 0:
         #     curTsk = self.t.tasksData[self.t.currentTaskIndex]
         #     print "       current task: ", curTsk.taskName
@@ -70,7 +74,7 @@ class SimBatch:
         #     print "       state  state_id ", curTsk.state, "    ", curTsk.state_id
         #
         #
-        # print "       currentQueueID:", self.q.currentQueueID, "   currentQueueIndex:", self.q.currentQueueIndex, "   total_projects:", self.p.total_projects
+        # print "       currentQueueID:", self.q.currentQueueID, "   currentQueueIndex:", self.q.currentQueueIndex, "   total_projects:", self.prj.total_projects
         # if self.q.currentQueueIndex >= 0:
         #     curQue = self.q.queueData[self.q.currentQueueIndex]
         #     print "       current queueItem: ", curQue.queueItemName, "     version :", curQue.version, "     evolutionNr :", curQue.evolutionNr
@@ -81,8 +85,8 @@ class SimBatch:
         if index == 0:
             print " WIZARD: "
         if index == 1:
-            self.p.print_all()
-            self.p.print_current()
+            self.prj.print_all()
+            self.prj.print_current()
         if index == 2:
             print " SCHEMAS: "
             self.c.print_all()
@@ -108,18 +112,18 @@ class SimBatch:
         print "\n\n"
 
     def clear_all_stored_data(self):
-        self.p.clear_all_projects_data(clear_stored_data=True)
+        self.prj.clear_all_projects_data(clear_stored_data=True)
         self.c.clear_all_schemas_data(clear_stored_data=True)
 
     def clear_all_memory_data(self):
-        self.p.clear_all_projects_data()
+        self.prj.clear_all_projects_data()
         self.c.clear_all_schemas_data()
 
     def load_data(self):
         self.d.load_definitions()
 
-        if self.p.load_projects():
-            self.p.init_default_proj()
+        if self.prj.load_projects():
+            self.prj.init_default_proj()
             if self.c.load_schemas():
                 if self.t.load_tasks():
                     return True
@@ -131,7 +135,7 @@ class SimBatch:
             return -3
 
     def create_example_data(self):
-        self.p.create_example_project_data()
+        self.prj.create_example_project_data()
 
 
 if __name__ == "__main__":

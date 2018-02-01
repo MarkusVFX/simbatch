@@ -9,7 +9,7 @@ class InOutStorage:
     def __init__(self, batch):
         self.batch = batch
         self.comfun = batch.comfun
-        self.p = batch.p
+        self.prj = batch.prj
         self.s = batch.s
 
     @staticmethod
@@ -94,14 +94,14 @@ class InOutStorage:
             return [0, 0, 0]
 
     def generate_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
-        if len(self.p.projects_data) < self.p.current_project_index or self.p.current_project_index < 0:
-            self.batch.logger.err(("Wrong current proj ID  ", self.p.current_project_index, len(self.p.projects_data)))
+        if len(self.prj.projects_data) < self.prj.current_project_index or self.prj.current_project_index < 0:
+            self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index, len(self.prj.projects_data)))
             return -1, ""
         else:
-            proj_working_dir = self.p.current_project.working_directory_absolute
+            proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
             directory = proj_working_dir + schema_flat_name + "\\base_setup\\"
-            file_version = "_v" + self.comfun.str_with_zeros(ver, self.p.current_project.zeros_in_version)
+            file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             # file_ext = self.batch.d.get_base_setup_ext(self.s.runtime_env)
             file_ext = "TODO12"
             return 1, directory + schema_flat_name + file_version + file_ext

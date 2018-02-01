@@ -12,8 +12,8 @@ def io():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
     sib = core.SimBatch("Stand-alone", ini_file="S:/simbatch/tests/config_tests.ini")
     sib.clear_all_memory_data()
-    sib.p.create_example_project_data(do_save=False)
-    sib.p.update_current_from_index(1)
+    sib.prj.create_example_project_data(do_save=False)
+    sib.prj.update_current_from_index(1)
     return sib.i
 
 
@@ -24,8 +24,8 @@ def test_get_flat_name(io):
 
 
 def test_loaded_sample_project(io):
-    assert io.batch.p.total_projects == 3
-    assert io.batch.p.projects_data[1].project_name == "Sample Proj 2"
+    assert io.batch.prj.total_projects == 3
+    assert io.batch.prj.projects_data[1].project_name == "Sample Proj 2"
 
 
 def test_generate_base_setup_file_name(io):

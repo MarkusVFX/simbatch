@@ -63,7 +63,7 @@ class ProjectsUI:
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
-        self.p = batch.p
+        self.prj = batch.prj
         self.s = batch.s
         self.comfun = batch.comfun
         self.debug_level = batch.s.debug_level
@@ -266,7 +266,7 @@ class ProjectsUI:
         self.init_projects()
 
     def init_projects(self):
-        projects = self.p.projects_data
+        projects = self.prj.projects_data
         widget_list = self.qt_list_projects
         qt_list_item = QListWidgetItem(widget_list)
         qt_list_item.setBackground(QBrush(QColor("#ddd")))
@@ -283,7 +283,7 @@ class ProjectsUI:
         else:
             qt_list_item.setBackground(self.s.state_colors_up[0])
 
-        for ip in range(self.p.total_projects):
+        for ip in range(self.prj.total_projects):
             qt_list_item = QListWidgetItem(widget_list)
             if projects[ip].is_default == 1:
                 color_index = self.s.INDEX_STATE_DEFAULT
@@ -305,37 +305,37 @@ class ProjectsUI:
 
     def reset_list(self, set_active_id=None):
         self.freeze_list_on_changed = 1
-        index = self.batch.p.current_project_index
+        index = self.batch.prj.current_project_index
         self.clear_list()
         self.init_projects()
         if set_active_id is None:
-            if index > self.p.total_projects - 1:
-                index = self.p.total_projects - 1
-            self.p.current_project_index = index
-            self.p.update_current_from_index(index)
+            if index > self.prj.total_projects - 1:
+                index = self.prj.total_projects - 1
+            self.prj.current_project_index = index
+            self.prj.update_current_from_index(index)
         else:
-            self.p.update_current_from_id(set_active_id)
+            self.prj.update_current_from_id(set_active_id)
         self.freeze_list_on_changed = 0
 
     def reload_projects_data_and_refresh_list(self):
-        curr_p_id = self.batch.p.current_project_id
-        self.batch.p.clear_all_projects_data()
-        self.batch.p.load_projects()
-        self.batch.p.update_current_from_id(curr_p_id)
+        curr_p_id = self.batch.prj.current_project_id
+        self.batch.prj.clear_all_projects_data()
+        self.batch.prj.load_projects()
+        self.batch.prj.update_current_from_id(curr_p_id)
         self.reset_list()
 
     def set_as_default(self):
-        self.p.set_proj_as_default(index=self.batch.p.current_project_index)
-        self.p.save_projects()
+        self.prj.set_proj_as_default(index=self.batch.prj.current_project_index)
+        self.prj.save_projects()
         self.reset_list()
 
     def on_menu_set_as_def(self):
         self.set_as_default()
 
     def _change_current_project_state_and_reset_list(self, state_id):
-        self.batch.p.current_project.state = self.s.states_visible_names[state_id]
-        self.batch.p.current_project.state_id = state_id
-        self.batch.p.save_projects()
+        self.batch.prj.current_project.state = self.s.states_visible_names[state_id]
+        self.batch.prj.current_project.state_id = state_id
+        self.batch.prj.save_projects()
         self.reset_list()
 
     def on_menu_set_active(self):
@@ -363,8 +363,8 @@ class ProjectsUI:
 
     def fa_get_project_directory(self, qt_edit_line):
         force_start_dir = ""
-        if self.batch.p.current_project_index >= 0:
-            force_start_dir = self.batch.p.projects_data[self.batch.p.current_project_index].project_directory
+        if self.batch.prj.current_project_index >= 0:
+            force_start_dir = self.batch.prj.projects_data[self.batch.prj.current_project_index].project_directory
 
         ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir)
         if len(ret) > 0:
@@ -426,16 +426,16 @@ class ProjectsUI:
             cameras_directory = self.batch.comfun.get_proper_path(cameras_directory)
             cache_directory = self.batch.comfun.get_proper_path(cache_directory)
 
-            if self.batch.p.total_projects == 0:
+            if self.batch.prj.total_projects == 0:
                 set_default = 1
 
             new_project = SingleProject(0, new_project_name, set_default, self.s.INDEX_STATE_ACTIVE, "ACTIVE",
                                         project_directory, working_directory, cameras_directory, cache_directory,
                                         "", "", "", "", "generate_directory_patterns=True", description)
 
-            ret_id = self.batch.p.add_project(new_project, do_save=True, generate_directory_patterns=True)
+            ret_id = self.batch.prj.add_project(new_project, do_save=True, generate_directory_patterns=True)
 
-            self.batch.p.current_project_id = ret_id
+            self.batch.prj.current_project_id = ret_id
 
             list_item = QListWidgetItem(self.qt_list_projects)
             list_item_widget = ProjectListItem(str(new_project.id), new_project_name, working_directory, description)
@@ -448,7 +448,7 @@ class ProjectsUI:
                 self.qt_form_add.hide()
                 self.add_form_state = 0
 
-            self.reset_list(set_active_id=self.batch.p.current_project_id)
+            self.reset_list(set_active_id=self.batch.prj.current_project_id)
             self.mainw.sch_ui.hide_all_forms()
         else:
             self.top_ui.set_top_info(" Fill project name !", 8)
@@ -478,7 +478,7 @@ class ProjectsUI:
             mock_project = SingleProject(0, new_project_name, set_active, 1, "MOCK", project_directory,
                                          working_directory, cameras_directory, cache_directory, "", "", "", "",
                                          "MOCK", description)
-            self.batch.p.update_project(mock_project, do_save=True)
+            self.batch.prj.update_project(mock_project, do_save=True)
 
             if pin_checked is False:
                 self.qt_form_edit.hide()
@@ -495,8 +495,8 @@ class ProjectsUI:
         self.set_as_default()
 
     def on_click_form_edit_fill(self):
-        if self.batch.p.current_project_index >= 0:
-            curr_proj = self.batch.p.projects_data[self.batch.p.current_project_index]
+        if self.batch.prj.current_project_index >= 0:
+            curr_proj = self.batch.prj.projects_data[self.batch.prj.current_project_index]
             self.qt_fe_task_name.setText(curr_proj.project_name)
             self.qt_fe_proj_dir.setText(curr_proj.project_directory)
             self.qt_fe_working_dir.setText(curr_proj.working_directory)
@@ -522,11 +522,11 @@ class ProjectsUI:
             self.remove_form_state = 0
 
     def on_click_confirm_remove_project(self):                  # TODO remove schemas and task after poj delete !
-        if self.batch.p.current_project_index is not None:
-            remove_index = self.batch.p.current_project_index
-            self.batch.p.current_project_index = None
+        if self.batch.prj.current_project_index is not None:
+            remove_index = self.batch.prj.current_project_index
+            self.batch.prj.current_project_index = None
             self.last_project_index = None
-            self.batch.p.remove_single_project(index=remove_index, do_save=True)
+            self.batch.prj.remove_single_project(index=remove_index, do_save=True)
             self.qt_list_projects.takeItem(remove_index + 1)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
@@ -553,16 +553,16 @@ class ProjectsUI:
         else:
             self.batch.logger.inf(("listProjectsCurrentChanged", self.qt_list_projects.currentRow()))
 
-            self.last_project_index = self.batch.p.current_project_index
+            self.last_project_index = self.batch.prj.current_project_index
             current_list_index = self.qt_list_projects.currentRow() - 1
-            self.batch.p.current_project_index = current_list_index
-            self.batch.p.update_current_from_index(current_list_index)
+            self.batch.prj.current_project_index = current_list_index
+            self.batch.prj.update_current_from_index(current_list_index)
 
             # update color of last item list
             if self.last_project_index >= 0:
                 last_item = self.qt_list_projects.item(self.last_project_index+1)
-                last_proj_state_id = self.batch.p.projects_data[self.last_project_index].state_id
-                last_proj_def = self.batch.p.projects_data[self.last_project_index].is_default
+                last_proj_state_id = self.batch.prj.projects_data[self.last_project_index].state_id
+                last_proj_def = self.batch.prj.projects_data[self.last_project_index].is_default
                 if last_proj_def == 1:
                     color_index = self.s.INDEX_STATE_DEFAULT
                 else:
@@ -572,8 +572,8 @@ class ProjectsUI:
 
             # update top info and color of current item list
             cur_proj = None
-            if 0 <= current_list_index < len(self.batch.p.projects_data):
-                cur_proj = self.batch.p.projects_data[current_list_index]
+            if 0 <= current_list_index < len(self.batch.prj.projects_data):
+                cur_proj = self.batch.prj.projects_data[current_list_index]
                 if cur_proj.is_default == 1:
                     color_index = self.s.INDEX_STATE_DEFAULT
                 else:

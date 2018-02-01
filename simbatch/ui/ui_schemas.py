@@ -134,10 +134,10 @@ class SchemasUI:
         # CREATE CREATE CREATE
         schema_form_create = SchemaFormCreateOrEdit(self.batch, "create", self.top_ui)
         self.schema_form_create = schema_form_create
-        if self.batch.p.current_project_index >= 0:
-            schema_form_create.schema_item_form_object.project_name = self.batch.p.projects_data[
-                self.batch.p.current_project_index].project_name
-            schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
+        if self.batch.prj.current_project_index >= 0:
+            schema_form_create.schema_item_form_object.project_name = self.batch.prj.projects_data[
+                self.batch.prj.current_project_index].project_name
+            schema_form_create.schema_item_form_object.projectID = self.batch.prj.current_project_id
         schema_form_create.execute_button.button.clicked.connect(
             lambda: self.on_click_add_schema(schema_form_create.schema_item_form_object,
                                              save_as_base=schema_form_create.save_as_base_state))
@@ -247,7 +247,7 @@ class SchemasUI:
             qt_list_item.setBackground(self.s.state_colors_up[0])
 
         for schema in self.c.schemas_data:
-            if schema.project_id == self.batch.p.current_project_id:
+            if schema.project_id == self.batch.prj.current_project_id:
                 qt_list_item = QListWidgetItem(list_schemas)
                 curr_color = self.s.state_colors[schema.state_id].color()
                 qt_list_item.setBackground(curr_color)
@@ -268,7 +268,7 @@ class SchemasUI:
         # self.list_visible_schemas_names = []
         # self.list_visible_schemas_ids = []
         # for schema in self.c.schemas_data:
-        #     if schema.project_id == self.batch.p.current_project_id:
+        #     if schema.project_id == self.batch.prj.current_project_id:
         #         self.list_visible_schemas_names.append(schema.schema_name)
         #         self.list_visible_schemas_ids.append(schema.id)
         self.update_current_project_schemas()
@@ -277,7 +277,7 @@ class SchemasUI:
         self.current_project_schemas_ids = []
         self.current_project_schemas_names = []
         for schema in self.batch.c.schemas_data:
-            if schema.project_id == self.batch.p.current_project_id:
+            if schema.project_id == self.batch.prj.current_project_id:
                 self.current_project_schemas_names.append(schema.schema_name)
                 self.current_project_schemas_ids.append(schema.id)
 
@@ -380,17 +380,17 @@ class SchemasUI:
         self.remove_form_state = 0
 
     def update_form_create(self):
-        if self.batch.p.current_project_index >= 0:
-            # txt = self.batch.p.projects_data[self.batch.p.current_project_index].project_name
+        if self.batch.prj.current_project_index >= 0:
+            # txt = self.batch.prj.projects_data[self.batch.prj.current_project_index].project_name
             # self.schema_form_create.schema_item_form_object.project_name = txt
-            # self.schema_form_create.schema_item_form_object.projectID = self.batch.p.current_project_id
+            # self.schema_form_create.schema_item_form_object.projectID = self.batch.prj.current_project_id
             new_schema = self.c.get_blank_schema()
-            new_schema.project_id = self.batch.p.current_project_id
+            new_schema.project_id = self.batch.prj.current_project_id
 
             new_schema.definition_name = self.batch.d.current_definition
             self.schema_form_create.update_form_data(new_schema)
         else:
-            self.batch.logger.wrn(("Wrong current project index", self.batch.p.current_project_index))
+            self.batch.logger.wrn(("Wrong current project index", self.batch.prj.current_project_index))
 
     def on_click_show_form_create(self):
         if self.create_form_state == 0:
@@ -445,14 +445,14 @@ class SchemasUI:
     def on_changed_copy_target(self, qt_edit_line):
         el_txt = qt_edit_line.text()
         if self.comfun.is_float(el_txt):
-            index = self.batch.p.get_index_from_id(int(el_txt))
+            index = self.batch.prj.get_index_from_id(int(el_txt))
             if index >= 0:
-                qt_edit_line.setText(self.batch.p.projects_data[index].project_name)
+                qt_edit_line.setText(self.batch.prj.projects_data[index].project_name)
             else:
                 qt_edit_line.setText("[ERR] Wrong index: " + qt_edit_line.text())
 
         else:
-            self.batch.p.get_index_from_name(qt_edit_line.text(), check_similar=True)
+            self.batch.prj.get_index_from_name(qt_edit_line.text(), check_similar=True)
         self.batch.logger.db(("qt_edit_line.text() : ", qt_edit_line.text()))
 
     def on_clicked_copy_as(self):
@@ -503,8 +503,8 @@ class SchemasUI:
                                           new_schema_item.description, str(new_schema_item.schema_version))
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
-        self.batch.logger.db(("add schema:", new_schema_item.schema_name,"   to proj :", self.batch.p.current_project_id))
-        sch_dir = self.batch.p.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
+        self.batch.logger.db(("add schema:", new_schema_item.schema_name,"   to proj :", self.batch.prj.current_project_id))
+        sch_dir = self.batch.prj.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
         self.batch.i.create_schema_directory(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):

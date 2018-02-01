@@ -25,7 +25,7 @@ class SimBatch:
         self.u = Users(self)         # usr
         self.prj = Projects(self)      # prj
         self.sch = Schemas(self)       # sch
-        self.t = Tasks(self)         # tsk
+        self.tsk = Tasks(self)         # tsk
         self.q = Queue(self)         # que
         self.n = SimNodes(self)      # nod
         self.d = Definitions(self)   # dfn
@@ -54,7 +54,7 @@ class SimBatch:
 
         # tasks
         print "\n TASKS: "
-        self.t.print_current()
+        self.tsk.print_current()
 
         # queue
         print "\n QUEUE: "
@@ -64,9 +64,9 @@ class SimBatch:
         print "\n NODES: "
         self.n.print_current()
         
-        # print "       currentTaskID:", self.t.currentTaskID, "   currentTaskIndex:", self.t.currentTaskIndex, "   total_projects:", self.prj.total_projects
-        # if self.t.currentTaskIndex >= 0:
-        #     curTsk = self.t.tasksData[self.t.currentTaskIndex]
+        # print "       currentTaskID:", self.tsk.currentTaskID, "   currentTaskIndex:", self.tsk.currentTaskIndex, "   total_projects:", self.prj.total_projects
+        # if self.tsk.currentTaskIndex >= 0:
+        #     curTsk = self.tsk.tasksData[self.tsk.currentTaskIndex]
         #     print "       current task: ", curTsk.taskName
         #     print "       schemaID:", curTsk.schemaID, "       projID:", curTsk.projID  # ,  "       soft_id:", curTsk.projID,
         #     print "       shotDetails ", curTsk.shotA, "   ", curTsk.shotB, "   ", curTsk.shotC
@@ -93,8 +93,8 @@ class SimBatch:
             self.sch.print_current()
         if index == 3:
             print " TASKS: "
-            self.t.print_all()
-            self.t.print_current()
+            self.tsk.print_all()
+            self.tsk.print_current()
         if index == 4:
             print " QUEUE: "
             self.q.print_all()
@@ -125,7 +125,7 @@ class SimBatch:
         if self.prj.load_projects():
             self.prj.init_default_proj()
             if self.sch.load_schemas():
-                if self.t.load_tasks():
+                if self.tsk.load_tasks():
                     return True
                 else:
                     return -1

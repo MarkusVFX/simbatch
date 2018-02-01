@@ -13,7 +13,7 @@ def test_init_simbatch(sib):
     assert sib.s.runtime_env == "Stand-alone"
     assert sib.prj.total_projects == 0
     assert sib.sch.total_schemas == 0
-    assert sib.t.total_tasks == 0
+    assert sib.tsk.total_tasks == 0
     assert sib.q.total_queue_items == 0
     assert sib.n.total_nodes == 0
 
@@ -40,10 +40,10 @@ def test_sample_schemas(sib):
 
 
 def test_sample_tasks(sib):
-    assert sib.t.create_example_tasks_data(do_save=False) == sib.t.sample_data_checksum
-    assert sib.t.sample_data_checksum is not None
-    assert sib.t.sample_data_total is not None
-    assert sib.t.total_tasks == sib.t.sample_data_total
+    assert sib.tsk.create_example_tasks_data(do_save=False) == sib.tsk.sample_data_checksum
+    assert sib.tsk.sample_data_checksum is not None
+    assert sib.tsk.sample_data_total is not None
+    assert sib.tsk.total_tasks == sib.tsk.sample_data_total
 
 def test_check_loaded_data(sib):
     assert sib.prj.total_projects > 0
@@ -52,8 +52,8 @@ def test_check_loaded_data(sib):
     assert sib.sch.total_schemas > 0
     assert sib.sch.total_schemas == len(sib.sch.schemas_data)
 
-    assert sib.t.total_tasks > 0
-    assert sib.t.total_tasks == len(sib.t.tasks_data)
+    assert sib.tsk.total_tasks > 0
+    assert sib.tsk.total_tasks == len(sib.tsk.tasks_data)
 
 def test_load_data(sib):
     assert sib.load_data() is True

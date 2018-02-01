@@ -507,7 +507,7 @@ class TasksUI:
         else:
             qt_list_item.setBackground(self.s.state_colors_up[0])
 
-        for tsk in self.batch.t.tasks_data:
+        for tsk in self.batch.tsk.tasks_data:
             if tsk.project_id == self.batch.prj.current_project_id:
                 qt_list_item = QListWidgetItem(widget_list)
                 cur_color = self.s.state_colors[tsk.state_id].color()
@@ -524,22 +524,22 @@ class TasksUI:
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
-        index = self.batch.t.current_task_index
+        index = self.batch.tsk.current_task_index
         self.clear_list()
         self.init_tasks()
-        self.batch.t.update_current_from_index(index)
+        self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
 
     def reload_tasks_data_and_refresh_list(self):
-        self.batch.t.clear_all_tasks_data()
-        self.batch.t.load_tasks()
+        self.batch.tsk.clear_all_tasks_data()
+        self.batch.tsk.load_tasks()
         self.reset_list()
         self.update_list_of_visible_ids()
 
     def _change_current_task_state_and_reset_list(self, state_id):
-        self.batch.t.current_task.state = self.s.states_visible_names[state_id]
-        self.batch.t.current_task.state_id = state_id
-        self.batch.t.save_tasks()
+        self.batch.tsk.current_task.state = self.s.states_visible_names[state_id]
+        self.batch.tsk.current_task.state_id = state_id
+        self.batch.tsk.save_tasks()
         self.reset_list()
 
     def on_click_menu_set_init(self):
@@ -558,30 +558,30 @@ class TasksUI:
         self.on_click_confirm_remove_project()
 
     def on_click_menu_sch_ver_from_schema(self):
-        cur_sch = self.batch.sch.get_schema_by_id(self.batch.t.current_task.schema_id)
-        self.batch.t.current_task.schema_ver = cur_sch.schemaVersion
-        self.batch.t.save_tasks()
+        cur_sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
+        self.batch.tsk.current_task.schema_ver = cur_sch.schemaVersion
+        self.batch.tsk.save_tasks()
         self.reset_list()
 
     def on_click_menu_schema_version_p1(self):
-        self.batch.t.current_task.schema_ver = 1 + int(
-            self.batch.t.current_task.schema_ver)
-        self.batch.t.save_tasks()
+        self.batch.tsk.current_task.schema_ver = 1 + int(
+            self.batch.tsk.current_task.schema_ver)
+        self.batch.tsk.save_tasks()
         self.reset_list()
 
     def on_click_menu_schema_version_m1(self):
-        self.batch.t.current_task.schema_ver = -1 + int(
-            self.batch.t.current_task.schema_ver)
-        self.batch.t.save_tasks()
+        self.batch.tsk.current_task.schema_ver = -1 + int(
+            self.batch.tsk.current_task.schema_ver)
+        self.batch.tsk.save_tasks()
         self.reset_list()
 
     def on_click_menu_open_base_setup(self):
-        sch = self.batch.sch.get_schema_by_id(self.batch.t.current_task.schema_id)
-        self.batch.schemasUI.loadSchemaFile(sch.schema_name, self.batch.t.current_task.schema_ver)
+        sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
+        self.batch.schemasUI.loadSchemaFile(sch.schema_name, self.batch.tsk.current_task.schema_ver)
 
     def on_click_menu_open_computed(self):
-        tsk_id = self.batch.t.current_task.id
-        version = self.batch.t.current_task.queue_ver
+        tsk_id = self.batch.tsk.current_task.id
+        version = self.batch.tsk.current_task.queue_ver
         evo_nr = -1
         file_to_load = self.batch.d.getComputedSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
         if file_to_load[0] == 1:
@@ -625,8 +625,8 @@ class TasksUI:
     def on_click_show_create(self):
         if self.create_form_state == 0:
             self.hide_all_forms()
-            if self.batch.t.current_task_index >= 0:
-                curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
+            if self.batch.tsk.current_task_index >= 0:
+                curr_task = self.batch.tsk.tasks_data[self.batch.tsk.current_task_index]
                 self.qt_form_create.update_create_ui(curr_task.schema_id)
             elif self.batch.sch.current_schema_index >= 0:
                 cur_sch = self.batch.sch.schemas_data[self.batch.sch.curr_schema_index]
@@ -643,8 +643,8 @@ class TasksUI:
     def on_click_show_edit(self):
         if self.edit_form_state == 0:
             self.hide_all_forms()
-            if self.batch.t.current_task_index >= 0:
-                curr_task = self.batch.t.current_task
+            if self.batch.tsk.current_task_index >= 0:
+                curr_task = self.batch.tsk.current_task
                 self.qt_form_edit.update_edit_ui(curr_task)
                 self.qt_form_edit.show()
                 self.edit_form_state = 1
@@ -676,7 +676,7 @@ class TasksUI:
             self.add_form_state = 0
 
     def add_single_task(self, new_task_item):
-        self.batch.t.add_task(new_task_item, do_save=True)
+        self.batch.tsk.add_task(new_task_item, do_save=True)
         qt_list_item = QListWidgetItem(self.list_tasks)
         list_item_widget = TaskListItem(str(new_task_item.id), new_task_item.task_name, str(new_task_item.user_id),
                                         new_task_item.sequence, new_task_item.shot, new_task_item.take,
@@ -711,7 +711,7 @@ class TasksUI:
 
     def on_click_update_task(self, edited_task_item):
         self.qt_form_edit.compile_imputs()
-        self.batch.t.update_task(copy.copy(edited_task_item), do_save=True)
+        self.batch.tsk.update_task(copy.copy(edited_task_item), do_save=True)
 
         current_list_index = self.list_tasks.currentRow()
         ed_item = self.list_tasks.item(current_list_index)
@@ -728,13 +728,13 @@ class TasksUI:
         self.batch.logger.inf("task updated")
 
     def on_click_confirm_remove_project(self):
-        self.batch.logger.db(("remove_project", self.batch.t.current_task_index, self.batch.t.current_task_list_index))
-        if self.batch.t.current_task_list_index >= 0:
-            take_item_list = self.batch.t.current_task_list_index + 1
-            self.batch.t.remove_single_task(index=self.batch.t.current_task_index, do_save=True)
-            self.batch.t.last_task_list_index = -1
-            self.batch.t.current_task_index = -1
-            self.batch.t.current_task_list_index = -1
+        self.batch.logger.db(("remove_project", self.batch.tsk.current_task_index, self.batch.tsk.current_task_list_index))
+        if self.batch.tsk.current_task_list_index >= 0:
+            take_item_list = self.batch.tsk.current_task_list_index + 1
+            self.batch.tsk.remove_single_task(index=self.batch.tsk.current_task_index, do_save=True)
+            self.batch.tsk.last_task_list_index = -1
+            self.batch.tsk.current_task_index = -1
+            self.batch.tsk.current_task_list_index = -1
             self.list_tasks.takeItem(take_item_list)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
@@ -750,18 +750,18 @@ class TasksUI:
 
     def on_click_add_to_queue(self):
         form_atq = self.qt_form_add
-        if self.batch.t.current_task_index > -1:
+        if self.batch.tsk.current_task_index > -1:
             ret = form_atq.create_directories()
             if ret:
-                self.batch.t.tasks_data[self.batch.t.current_task_index].queue_ver += 1
-                self.batch.t.tasks_data[self.batch.t.current_task_index].state = "QUEUED"
-                self.batch.t.tasks_data[self.batch.t.current_task_index].state_id = 3
-                self.batch.t.save_tasks()
+                self.batch.tsk.tasks_data[self.batch.tsk.current_task_index].queue_ver += 1
+                self.batch.tsk.tasks_data[self.batch.tsk.current_task_index].state = "QUEUED"
+                self.batch.tsk.tasks_data[self.batch.tsk.current_task_index].state_id = 3
+                self.batch.tsk.save_tasks()
 
                 self.batch.que_ui.add_to_queue_and_update_list(form_atq)
 
                 self.freeze_list_on_changed = 1
-                self.batch.t.last_task_list_index = -1
+                self.batch.tsk.last_task_list_index = -1
                 self.reset_list()
 
                 self.freeze_list_on_changed = 0
@@ -785,7 +785,7 @@ class TasksUI:
 
     def update_list_of_visible_ids(self):
         array_visible_tasks_ids = []
-        for task in self.batch.t.tasks_data:
+        for task in self.batch.tsk.tasks_data:
             if task.project_id == self.batch.prj.current_project_id:
                 array_visible_tasks_ids.append(task.id)
         self.array_visible_tasks_ids = array_visible_tasks_ids
@@ -797,23 +797,23 @@ class TasksUI:
             self.batch.logger.db(("chng current task ", self.list_tasks.currentRow()))
 
         if self.freeze_list_on_changed == 0:  # on massive action    or   refresh
-            # self.batch.t.last_task_list_index = self.batch.t.current_task_list_index
+            # self.batch.tsk.last_task_list_index = self.batch.tsk.current_task_list_index
             self.last_list_item_index = self.current_list_item_index
             current_list_index = self.list_tasks.currentRow() - 1
             self.current_list_item_index = current_list_index
 
             if self.last_list_item_index is not None:
-                if self.last_list_item_index is not None and self.last_list_item_index < len(self.batch.t.tasks_data):
+                if self.last_list_item_index is not None and self.last_list_item_index < len(self.batch.tsk.tasks_data):
                     item = self.list_tasks.item(self.last_list_item_index + 1)
                     if self.last_list_item_index < len(self.array_visible_tasks_ids):
                         last_id = self.array_visible_tasks_ids[self.last_list_item_index]
-                        last_index = self.batch.t.get_index_by_id(last_id)
+                        last_index = self.batch.tsk.get_index_by_id(last_id)
                         if item is not None and last_index is not None:
-                            color_index = self.batch.t.tasks_data[last_index].state_id
+                            color_index = self.batch.tsk.tasks_data[last_index].state_id
                             item.setBackground(self.batch.s.state_colors[color_index].color())
                 else:
                     self.batch.logger.wrn("Wrong last_task_list_index {} vs {} ".format(self.last_list_item_index,
-                                                                                        len(self.batch.t.tasks_data)))
+                                                                                        len(self.batch.tsk.tasks_data)))
             else:
                 self.batch.logger.db("last_task_list_index is None")
 
@@ -831,13 +831,13 @@ class TasksUI:
 
             if 0 <= current_list_index < len(self.array_visible_tasks_ids):
                 current_task_id = self.array_visible_tasks_ids[current_list_index]
-                self.batch.t.current_task_id = current_task_id
-                self.batch.t.update_current_from_id(current_task_id)
+                self.batch.tsk.current_task_id = current_task_id
+                self.batch.tsk.update_current_from_id(current_task_id)
 
-            current_task_index = self.batch.t.current_task_index
+            current_task_index = self.batch.tsk.current_task_index
 
-            if 0 <= current_task_index < len(self.batch.t.tasks_data):
-                cur_task = self.batch.t.tasks_data[current_task_index]
+            if 0 <= current_task_index < len(self.batch.tsk.tasks_data):
+                cur_task = self.batch.tsk.tasks_data[current_task_index]
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current task: [" + str(cur_task.id) + "]    " + cur_task.task_name)
                 else:
@@ -862,4 +862,4 @@ class TasksUI:
                     self.qt_form_add.update_add_ui()
 
             else:
-                self.batch.logger.err("on chng list task {} < {}".format(current_task_index, self.batch.t.tasks_data))
+                self.batch.logger.err("on chng list task {} < {}".format(current_task_index, self.batch.tsk.tasks_data))

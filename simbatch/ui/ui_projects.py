@@ -538,9 +538,9 @@ class ProjectsUI:
         self.batch.sch.update_current_from_index(None)
 
     def update_tsk_after_proj_changed(self):
-        self.batch.t.currentTaskID = None
-        self.batch.t.currentTaskIndex = None
-        self.batch.t.currentTaskListIndex = None
+        self.batch.tsk.currentTaskID = None
+        self.batch.tsk.currentTaskIndex = None
+        self.batch.tsk.currentTaskListIndex = None
         tsk_ui = self.mainw.tsk_ui
         tsk_ui.qt_form_create.update_schema_names_combo(combo_current_index=0)
         tsk_ui.qt_form_edit.update_schema_names_combo(combo_current_index=0)

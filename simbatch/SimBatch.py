@@ -15,7 +15,7 @@ sim_batch.load_data()
 # sim_batch.print_data()
 
 
-if sim_batch.s.WITH_GUI == 1:
+if sim_batch.sts.WITH_GUI == 1:
     main_window = ui.MainWindow(sim_batch)
     # main_window.init_lists()
     main_window.show()

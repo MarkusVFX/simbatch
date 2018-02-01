@@ -67,7 +67,7 @@ class Tasks:
 
     def __init__(self, batch):
         self.batch = batch
-        self.s = batch.s
+        self.sts = batch.sts
         self.comfun = batch.comfun
         self.tasks_data = []
 
@@ -230,7 +230,7 @@ class Tasks:
 
     def delete_json_tasks_file(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_TASKS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -249,12 +249,12 @@ class Tasks:
         self.current_task_index = None
         # TODO check clear UI val (last current...)
         if clear_stored_data:
-            if self.s.store_data_mode == 1:
+            if self.sts.store_data_mode == 1:
                 if self.delete_json_tasks_file():
                     return True
                 else:
                     return False
-            if self.s.store_data_mode == 2:
+            if self.sts.store_data_mode == 2:
                 if self.clear_tasks_in_mysql():
                     return True
                 else:
@@ -262,14 +262,14 @@ class Tasks:
         return True
 
     def load_tasks(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.load_tasks_from_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.load_tasks_from_mysql()
 
     def load_tasks_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_TASKS_FILE_NAME
         if self.comfun.file_exists(json_file, info="tasks file"):
             self.batch.logger.inf(("loading tasks: ", json_file))
             json_tasks = self.comfun.load_json_file(json_file)
@@ -302,9 +302,9 @@ class Tasks:
         return None
 
     def save_tasks(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.save_tasks_to_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.save_tasks_to_mysql()
 
     def format_tasks_data(self, json=False, sql=False, backup=False):
@@ -331,7 +331,7 @@ class Tasks:
     # save tasks data as json
     def save_tasks_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_TASKS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_TASKS_FILE_NAME
         content = self.format_tasks_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 

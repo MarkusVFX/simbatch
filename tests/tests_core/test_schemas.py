@@ -10,9 +10,9 @@ def sib():
 
 
 def test_prepare_data_directory_by_delete_all_files(sib):
-    assert sib.s.store_data_mode is not None
-    if sib.s.store_data_mode == 1:
-        assert sib.comfun.path_exists(sib.s.store_data_json_directory) is True
+    assert sib.sts.store_data_mode is not None
+    if sib.sts.store_data_mode == 1:
+        assert sib.comfun.path_exists(sib.sts.store_data_json_directory) is True
     else:
         # PRO version with sql
         pass
@@ -20,9 +20,9 @@ def test_prepare_data_directory_by_delete_all_files(sib):
 
 
 def test_no_schema_data(sib):
-    assert len(sib.s.store_data_json_directory) > 0
-    assert len(sib.s.JSON_SCHEMAS_FILE_NAME) > 0
-    assert sib.comfun.file_exists(sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME) is False
+    assert len(sib.sts.store_data_json_directory) > 0
+    assert len(sib.sts.JSON_SCHEMAS_FILE_NAME) > 0
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_SCHEMAS_FILE_NAME) is False
 
 
 def test_create_example_schemas_data(sib):
@@ -33,7 +33,7 @@ def test_create_example_schemas_data(sib):
 
 
 def test_exist_proj_data(sib):
-    assert sib.comfun.file_exists(sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME) is True
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_SCHEMAS_FILE_NAME) is True
 
 
 def test_clear_all_schemas_data(sib):
@@ -43,9 +43,9 @@ def test_clear_all_schemas_data(sib):
 
 
 def test_json_schemas_data(sib):
-    assert sib.s.store_data_mode is not None
-    if sib.s.store_data_mode == 1:
-        json_file = sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME
+    assert sib.sts.store_data_mode is not None
+    if sib.sts.store_data_mode == 1:
+        json_file = sib.sts.store_data_json_directory + sib.sts.JSON_SCHEMAS_FILE_NAME
         json_schemas = sib.comfun.load_json_file(json_file)
         json_keys = json_schemas.keys()
         assert ("schemas" in json_keys) is True
@@ -56,7 +56,7 @@ def test_get_none_index_from_id(sib):
 
 
 def test_load_schemas_from_json(sib):
-    json_file = sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME
+    json_file = sib.sts.store_data_json_directory + sib.sts.JSON_SCHEMAS_FILE_NAME
     assert sib.comfun.file_exists(json_file) is True
     assert sib.sch.load_schemas_from_json(json_file=json_file) is True
     assert sib.sch.total_schemas == sib.sch.sample_data_total

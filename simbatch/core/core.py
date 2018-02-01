@@ -7,7 +7,7 @@ from schemas import Schemas
 from tasks import Tasks
 from queue import Queue
 from nodes import SimNodes
-from io import InOutStorage
+from io import StorageInOut
 
 
 class SimBatch:
@@ -17,8 +17,8 @@ class SimBatch:
 
     def __init__(self, runtime_env, ini_file="config.ini"):
         self.logger = Logger(log_level=0, console_level=3)
-        self.s = Settings(self.logger, runtime_env, ini_file=ini_file)   # sts
-        self.logger.set_console_level(self.s.debug_level)
+        self.sts = Settings(self.logger, runtime_env, ini_file=ini_file)   # sts
+        self.logger.set_console_level(self.sts.debug_level)
         self.logger.set_log_level(0)
         self.comfun = CommonFunctions(self.logger)
 
@@ -29,7 +29,7 @@ class SimBatch:
         self.que = Queue(self)         # que
         self.nod = SimNodes(self)      # nod
         self.dfn = Definitions(self)   # dfn
-        self.i = InOutStorage(self)  # ios
+        self.sio = StorageInOut(self)  # ios
 
         # one place abbreviation for variables
         # reasons:
@@ -42,7 +42,7 @@ class SimBatch:
         self.prj.print_all()
 
     def print_important_values(self):
-        print "  \n\n  Current runtime_env: {}", self.s.runtime_env
+        print "  \n\n  Current runtime_env: {}", self.sts.runtime_env
 
         # projects
         print "\n PROJECTS: "
@@ -107,7 +107,7 @@ class SimBatch:
 
         if index == 5:  # TODO NODES  index 4 vs 5 !
             print " SETTINGS: "
-            self.s.print_all()
+            self.sts.print_all()
 
         print "\n\n"
 

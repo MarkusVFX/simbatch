@@ -246,7 +246,7 @@ class ActionWidget(QWidget):
             for it in combo_items:
                 if len(combo_val) > 0 and it == combo_val:
                     set_index = counter
-                    if self.s.debug_level >= 4:
+                    if self.sts.debug_level >= 4:
                         print " [db] combo val ", set_index, "___", combo_val
                 self.qt_combo.addItem(it)
                 counter += 1
@@ -278,12 +278,12 @@ class ActionWidget(QWidget):
         self.setLayout(qt_widget_layout)
 
     def on_change_line_edit(self, txt):
-        if self.s.debug_level >= 4:
+        if self.sts.debug_level >= 4:
             print "  [db] Action edit chngd: ", txt
         self.edit_val = txt
 
     def on_change_combo(self, index):
-        if self.s.debug_level >= 4:
+        if self.sts.debug_level >= 4:
             print "  [db] Action combo chngd: ", index, "  ", self.combo.currentText()
 
 

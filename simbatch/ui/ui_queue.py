@@ -98,7 +98,7 @@ class QueueUI:
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
-        self.s = batch.s
+        self.sts = batch.sts
         self.que = batch.que
         self.comfun = batch.comfun
         self.top_ui = top
@@ -216,14 +216,14 @@ class QueueUI:
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
-        if self.s.ui_brightness_mode == 0:
-            qt_list_item.setBackground(self.s.state_colors[0])
+        if self.sts.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.sts.state_colors[0])
         else:
-            qt_list_item.setBackground(self.s.state_colors_up[0])
+            qt_list_item.setBackground(self.sts.state_colors_up[0])
 
         for que in self.batch.que.queue_data:
             qt_list_item = QListWidgetItem(widget_list)
-            cur_color = self.s.state_colors[que.state_id].color()
+            cur_color = self.sts.state_colors[que.state_id].color()
             qt_list_item.setBackground(cur_color)
             list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, que.prior, que.state,
                                              que.evolution, que.sim_node, que.description)
@@ -231,7 +231,7 @@ class QueueUI:
             widget_list.addItem(qt_list_item)
             widget_list.setItemWidget(qt_list_item, list_item_widget)
             qt_list_item.setSizeHint(QSize(130, 26))
-            qt_list_item.setBackground(self.s.state_colors[que.state_id])
+            qt_list_item.setBackground(self.sts.state_colors[que.state_id])
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
@@ -243,22 +243,22 @@ class QueueUI:
         self.freeze_list_on_changed = 0
 
     def _change_current_queue_item_state_and_reset_list(self, state_id):
-        self.batch.que.current_queue.state = self.s.states_visible_names[state_id]
+        self.batch.que.current_queue.state = self.sts.states_visible_names[state_id]
         self.batch.que.current_queue.state_id = state_id
         self.batch.que.save_queue()
         self.reset_list()
 
     def on_click_menu_set_init(self):
-        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_INIT)
+        self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_INIT)
 
     def on_click_menu_set_working(self):
-        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_WORKING)
+        self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_WORKING)
 
     def on_click_menu_set_done(self):
-        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_DONE)
+        self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_DONE)
 
     def on_click_menu_set_hold(self):
-        self._change_current_queue_item_state_and_reset_list(self.s.INDEX_STATE_HOLD)
+        self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
 
     def on_menu_locate_prev(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]

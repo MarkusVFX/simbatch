@@ -10,7 +10,7 @@ def sib():
 
 
 def test_init_simbatch(sib):
-    assert sib.s.runtime_env == "Stand-alone"
+    assert sib.sts.runtime_env == "Stand-alone"
     assert sib.prj.total_projects == 0
     assert sib.sch.total_schemas == 0
     assert sib.tsk.total_tasks == 0

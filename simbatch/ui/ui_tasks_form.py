@@ -36,7 +36,7 @@ class AddToQueueForm (QWidget):
                                              " 1 ", "", 0, "", 1, 3)
 
         #self.batch = batch
-        #self.s = self.batch.s
+        #self.sts = self.batch.sts
         #self.comfun = self.batch.comfun
         self.init_ui_elements()
 

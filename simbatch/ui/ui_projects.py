@@ -64,9 +64,9 @@ class ProjectsUI:
     def __init__(self, batch, mainw, top):
         self.batch = batch
         self.prj = batch.prj
-        self.s = batch.s
+        self.sts = batch.sts
         self.comfun = batch.comfun
-        self.debug_level = batch.s.debug_level
+        self.debug_level = batch.sts.debug_level
         self.top_ui = top
         self.mainw = mainw
 
@@ -278,19 +278,19 @@ class ProjectsUI:
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
 
-        if self.s.ui_brightness_mode == 0:
-            qt_list_item.setBackground(self.s.state_colors[0])
+        if self.sts.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.sts.state_colors[0])
         else:
-            qt_list_item.setBackground(self.s.state_colors_up[0])
+            qt_list_item.setBackground(self.sts.state_colors_up[0])
 
         for ip in range(self.prj.total_projects):
             qt_list_item = QListWidgetItem(widget_list)
             if projects[ip].is_default == 1:
-                color_index = self.s.INDEX_STATE_DEFAULT
+                color_index = self.sts.INDEX_STATE_DEFAULT
             else:
                 color_index = projects[ip].state_id
 
-            curr_color = self.s.state_colors[color_index].color()
+            curr_color = self.sts.state_colors[color_index].color()
             qt_list_item.setBackground(curr_color)
             list_item_widget = ProjectListItem(str(projects[ip].id), projects[ip].project_name,
                                                projects[ip].project_directory, projects[ip].description)
@@ -333,16 +333,16 @@ class ProjectsUI:
         self.set_as_default()
 
     def _change_current_project_state_and_reset_list(self, state_id):
-        self.batch.prj.current_project.state = self.s.states_visible_names[state_id]
+        self.batch.prj.current_project.state = self.sts.states_visible_names[state_id]
         self.batch.prj.current_project.state_id = state_id
         self.batch.prj.save_projects()
         self.reset_list()
 
     def on_menu_set_active(self):
-        self._change_current_project_state_and_reset_list(self.s.INDEX_STATE_ACTIVE)
+        self._change_current_project_state_and_reset_list(self.sts.INDEX_STATE_ACTIVE)
 
     def on_menu_set_suspended(self):
-        self._change_current_project_state_and_reset_list(self.s.INDEX_STATE_SUSPEND)
+        self._change_current_project_state_and_reset_list(self.sts.INDEX_STATE_SUSPEND)
 
     def on_right_click_show_menu(self, pos):
         global_pos = self.qt_list_projects.mapToGlobal(pos)
@@ -429,7 +429,7 @@ class ProjectsUI:
             if self.batch.prj.total_projects == 0:
                 set_default = 1
 
-            new_project = SingleProject(0, new_project_name, set_default, self.s.INDEX_STATE_ACTIVE, "ACTIVE",
+            new_project = SingleProject(0, new_project_name, set_default, self.sts.INDEX_STATE_ACTIVE, "ACTIVE",
                                         project_directory, working_directory, cameras_directory, cache_directory,
                                         "", "", "", "", "generate_directory_patterns=True", description)
 
@@ -441,7 +441,7 @@ class ProjectsUI:
             list_item_widget = ProjectListItem(str(new_project.id), new_project_name, working_directory, description)
             self.qt_list_projects.addItem(list_item)
             self.qt_list_projects.setItemWidget(list_item, list_item_widget)
-            self.batch.i.create_project_working_directory(new_project.working_directory_absolute)
+            self.batch.sio.create_project_working_directory(new_project.working_directory_absolute)
 
             if pin_checked is False:
                 self.clear_form_add()
@@ -564,22 +564,22 @@ class ProjectsUI:
                 last_proj_state_id = self.batch.prj.projects_data[self.last_project_index].state_id
                 last_proj_def = self.batch.prj.projects_data[self.last_project_index].is_default
                 if last_proj_def == 1:
-                    color_index = self.s.INDEX_STATE_DEFAULT
+                    color_index = self.sts.INDEX_STATE_DEFAULT
                 else:
                     color_index = last_proj_state_id
                 if last_item is not None:
-                    last_item.setBackground(self.batch.s.state_colors[color_index].color())
+                    last_item.setBackground(self.batch.sts.state_colors[color_index].color())
 
             # update top info and color of current item list
             cur_proj = None
             if 0 <= current_list_index < len(self.batch.prj.projects_data):
                 cur_proj = self.batch.prj.projects_data[current_list_index]
                 if cur_proj.is_default == 1:
-                    color_index = self.s.INDEX_STATE_DEFAULT
+                    color_index = self.sts.INDEX_STATE_DEFAULT
                 else:
                     color_index = cur_proj.state_id
                 item_c = self.qt_list_projects.item(current_list_index + 1)
-                cur_color = self.batch.s.state_colors_up[color_index].color()
+                cur_color = self.batch.sts.state_colors_up[color_index].color()
                 item_c.setBackground(cur_color)
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current project:   " + cur_proj.project_name)

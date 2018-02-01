@@ -35,7 +35,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.action_widgets = []
         self.batch = batch
         self.schema_item_form_object = batch.sch.get_blank_schema()
-        self.s = self.batch.s
+        self.sts = self.batch.sts
         if mode == "edit":
             self.form_mode = 2
         self.init_ui_elements()
@@ -51,7 +51,7 @@ class SchemaFormCreateOrEdit(QWidget):
     def init_ui_elements(self):
         qt_lay_outer_schema_form = QVBoxLayout()
 
-        if self.s.debug_level > 3:  # debug proxy SchemaItem object (used when adding or editing schema)
+        if self.sts.debug_level > 3:  # debug proxy SchemaItem object (used when adding or editing schema)
             db_buttons_group = QGroupBox()
             db_b1 = ButtonOnLayout("basic print", width=140)
             db_b2 = ButtonOnLayout("detailed print", width=170)

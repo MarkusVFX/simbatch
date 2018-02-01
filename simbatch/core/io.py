@@ -10,7 +10,7 @@ class StorageInOut:
         self.batch = batch
         self.comfun = batch.comfun
         self.prj = batch.prj
-        self.s = batch.s
+        self.sts = batch.sts
 
     @staticmethod
     def get_flat_name(name):
@@ -102,7 +102,7 @@ class StorageInOut:
             schema_flat_name = self.get_flat_name(schema_name)
             directory = proj_working_dir + schema_flat_name + "\\base_setup\\"
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
-            # file_ext = self.batch.dfn.get_base_setup_ext(self.s.runtime_env)
+            # file_ext = self.batch.dfn.get_base_setup_ext(self.sts.runtime_env)
             file_ext = "TODO12"
             return 1, directory + schema_flat_name + file_version + file_ext
 

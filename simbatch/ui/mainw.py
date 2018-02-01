@@ -84,7 +84,7 @@ class TopMenuUI:
                 txt = txt[:limit] + "  ..."
         self.qt_lbl_info.setText(txt)
         if self.current_top_info_mode != mode:
-            if self.batch.s.ui_brightness_mode == 1:
+            if self.batch.sts.ui_brightness_mode == 1:
                 if mode == 1:
                     self.qt_lbl_info.setStyleSheet("")
                 if mode == 7:
@@ -125,20 +125,20 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         self.batch = batch
         self.comfun = batch.comfun
-        self.s = batch.s
-        self.debug_level = batch.s.debug_level
+        self.sts = batch.sts
+        self.debug_level = batch.sts.debug_level
         self.init_ui(batch)
 
     def init_ui(self, batch):
         user32 = ctypes.windll.user32
-        wnd = self.s.window
+        wnd = self.sts.window
         current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
         current_screen_height = user32.GetSystemMetrics(79)   # SM_CYVIRTUALSCREEN
 
         if wnd is not None and len(wnd) == 4:
             x_wnd_pos = wnd[0]
             y_wnd_pos = wnd[1]
-            if self.s.CHECK_SCREEN_RES_ON_START == 1:
+            if self.sts.CHECK_SCREEN_RES_ON_START == 1:
                 if wnd[0] > current_screen_width - 130:
                     x_wnd_pos = 40
                     self.batch.logger.inf("reset window position X")
@@ -151,7 +151,7 @@ class MainWindow(QMainWindow):
             self.batch.logger.inf(("set wind pos :", x_wnd_pos, y_wnd_pos,  wnd[2],  wnd[3]))
             self.setGeometry(x_wnd_pos, y_wnd_pos, wnd[2], wnd[3])
 
-        self.setWindowTitle("SimBatch " + self.s.SIMBATCH_VERSION + "     " + self.s.runtime_env)
+        self.setWindowTitle("SimBatch " + self.sts.SIMBATCH_VERSION + "     " + self.sts.runtime_env)
         qt_central_widget = QWidget(self)
         self.setCentralWidget(qt_central_widget)
         qt_lay_central = QVBoxLayout(qt_central_widget)
@@ -189,8 +189,8 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         qt_tab_widget.setMinimumSize(220, 400)
 
-        if self.s.store_data_mode == 1:
-            if self.comfun.path_exists(self.s.store_data_json_directory):
+        if self.sts.store_data_mode == 1:
+            if self.comfun.path_exists(self.sts.store_data_json_directory):
                 qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB: show tasks
             else:
                 qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings
@@ -203,7 +203,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget.currentChanged.connect(self.on_tab_change)
 
         # after init main window and load settings and data
-        if self.s.loading_state < 3:
+        if self.sts.loading_state < 3:
             top.set_top_info("Settings not loaded properly", 7)
 
     def on_tab_change(self, tab):
@@ -224,7 +224,7 @@ class MainWindow(QMainWindow):
     def on_clicked_but_refresh(self):
         self.batch.logger.inf("but_refresh clicked")
 
-        self.s.update_ui_colors()
+        self.sts.update_ui_colors()
 
         print " [INF] update PROJECTS"
         self.pro_ui.reload_projects_data_and_refresh_list()
@@ -246,15 +246,15 @@ class MainWindow(QMainWindow):
 
     def on_resize_window(self, event):
         new_size = event.size()
-        if self.s.window is not None:       # if None settings not loaded
-            self.s.window[2] = new_size.width()
-            self.s.window[3] = new_size.height()
+        if self.sts.window is not None:       # if None settings not loaded
+            self.sts.window[2] = new_size.width()
+            self.sts.window[3] = new_size.height()
 
     def moveEvent(self, event):              # PySide  moveEvent
         self.on_move_window(event)
 
     def on_move_window(self, event):
         new_pos = event.pos()
-        if self.s.window is not None:      # if None settings not loaded
-            self.s.window[0] = new_pos.x()
-            self.s.window[1] = new_pos.y()
+        if self.sts.window is not None:      # if None settings not loaded
+            self.sts.window[0] = new_pos.x()
+            self.sts.window[1] = new_pos.y()

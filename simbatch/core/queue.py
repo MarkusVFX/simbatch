@@ -76,7 +76,7 @@ class Queue:
 
     def __init__(self, batch):
         self.batch = batch
-        self.s = batch.s
+        self.sts = batch.sts
         self.comfun = batch.comfun
         self.queue_data = []
 
@@ -139,7 +139,7 @@ class Queue:
 
     def delete_json_queue_file(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_QUEUE_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -158,12 +158,12 @@ class Queue:
         self.current_queue_index = None
         # TODO check clear UI val (last current...)
         if clear_stored_data:
-            if self.s.store_data_mode == 1:
+            if self.sts.store_data_mode == 1:
                 if self.delete_json_queue_file():
                     return True
                 else:
                     return False
-            if self.s.store_data_mode == 2:
+            if self.sts.store_data_mode == 2:
                 if self.clear_queue_items_in_mysql():
                     return True
                 else:
@@ -223,14 +223,14 @@ class Queue:
         return collect_ids
 
     def load_queue(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             self.load_queue_from_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             self.load_queue_from_mysql()
 
     def load_queue_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.s.store_data_json_directory + self.s.JSON_QUEUE_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
             self.batch.logger.inf(("loading queue items: ", json_file))
         return False
@@ -241,14 +241,14 @@ class Queue:
         return None
 
     def save_queue(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.save_queue_to_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.save_queue_to_mysql()
 
     def save_queue_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_QUEUE_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         content = self.format_queue_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 

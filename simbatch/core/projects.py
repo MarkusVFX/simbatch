@@ -110,8 +110,8 @@ class Projects:
     def __init__(self, batch):
         self.batch = batch
         self.comfun = batch.comfun
-        self.s = batch.s
-        self.debug_level = batch.s.debug_level
+        self.sts = batch.sts
+        self.debug_level = batch.sts.debug_level
         self.projects_data = []
 
     def __repr__(self):
@@ -218,7 +218,7 @@ class Projects:
         #  pattern is generated basis on directories structure on storage
         #  used for construct new path, generate path for load
         if generate_directory_patterns:
-            project_to_add.seq_shot_take_pattern = self.batch.i.get_dir_patterns(project_to_add.cache_directory)
+            project_to_add.seq_shot_take_pattern = self.batch.sio.get_dir_patterns(project_to_add.cache_directory)
 
         self.projects_data.append(project_to_add)
         self.total_projects += 1
@@ -292,12 +292,12 @@ class Projects:
         self.current_project_id = None
         self.current_project_index = None
         if clear_stored_data:
-            if self.s.store_data_mode == 1:
+            if self.sts.store_data_mode == 1:
                 if self.delete_json_project_file():
                     return True
                 else:
                     return False
-            if self.s.store_data_mode == 2:
+            if self.sts.store_data_mode == 2:
                 if self.clear_projects_in_mysql():
                     return True
                 else:
@@ -325,15 +325,15 @@ class Projects:
 
     #  load projects data after startup or after reload
     def load_projects(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.load_projects_from_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.load_projects_from_mysql()
 
     #  load projects data form json
     def load_projects_from_json(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file, info="projects file"):
             self.batch.logger.inf(("loading projects: ", json_file))
             json_projects = self.comfun.load_json_file(json_file)
@@ -365,15 +365,15 @@ class Projects:
 
     #  save projects
     def save_projects(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.save_projects_to_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.save_projects_to_mysql()
 
     #  save projects data as json
     def save_projects_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
         content = self.format_projects_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
@@ -406,7 +406,7 @@ class Projects:
     #  delete json file from storage
     def delete_json_project_file(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:

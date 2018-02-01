@@ -16,8 +16,8 @@ class SettingsUI:
     top_ui = None
 
     def __init__(self, batch, top_ui):
-        settings = batch.s
-        self.settings = batch.s
+        settings = batch.sts
+        self.settings = batch.sts
         self.batch = batch
         self.top_ui = top_ui
         self.comfun = batch.comfun

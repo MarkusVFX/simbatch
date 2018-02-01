@@ -147,7 +147,7 @@ class TasksFormCreateOrEdit(QWidget):
         self.batch = batch
         self.mainw = mainw
         self.top_ui = mainw.top_ui
-        self.s = batch.s
+        self.sts = batch.sts
         if mode == "edit":
             self.form_mode = 2
 
@@ -295,7 +295,7 @@ class TasksFormCreateOrEdit(QWidget):
             if len(self.schemas_id_array) > self.qt_schema_name_combo.currentIndex():
                 self.form_task_item.schema_id = self.schemas_id_array[self.qt_schema_name_combo.currentIndex()]
             else:
-                if self.s.debug_level >= 1:
+                if self.sts.debug_level >= 1:
                     self.batch.logger.err(("comlpile err", len(self.schemas_id_array)))
                     self.batch.logger.err(("comlpile err", self.qt_schema_name_combo.currentIndex()))
         else:
@@ -388,9 +388,9 @@ class TasksUI:
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
-        self.s = batch.s
+        self.sts = batch.sts
         self.comfun = batch.comfun
-        self.debug_level = batch.s.debug_level
+        self.debug_level = batch.sts.debug_level
         self.top_ui = top
         self.mainw = mainw
 
@@ -502,15 +502,15 @@ class TasksUI:
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
-        if self.s.ui_brightness_mode == 0:
-            qt_list_item.setBackground(self.s.state_colors[0])
+        if self.sts.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.sts.state_colors[0])
         else:
-            qt_list_item.setBackground(self.s.state_colors_up[0])
+            qt_list_item.setBackground(self.sts.state_colors_up[0])
 
         for tsk in self.batch.tsk.tasks_data:
             if tsk.project_id == self.batch.prj.current_project_id:
                 qt_list_item = QListWidgetItem(widget_list)
-                cur_color = self.s.state_colors[tsk.state_id].color()
+                cur_color = self.sts.state_colors[tsk.state_id].color()
                 qt_list_item.setBackground(cur_color)
                 list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
                                                 tsk.sequence, tsk.shot, tsk.take, tsk.state,
@@ -520,7 +520,7 @@ class TasksUI:
                 widget_list.addItem(qt_list_item)
                 widget_list.setItemWidget(qt_list_item, list_item_widget)
                 qt_list_item.setSizeHint(QSize(130, 26))
-                qt_list_item.setBackground(self.s.state_colors[tsk.state_id])
+                qt_list_item.setBackground(self.sts.state_colors[tsk.state_id])
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
@@ -537,22 +537,22 @@ class TasksUI:
         self.update_list_of_visible_ids()
 
     def _change_current_task_state_and_reset_list(self, state_id):
-        self.batch.tsk.current_task.state = self.s.states_visible_names[state_id]
+        self.batch.tsk.current_task.state = self.sts.states_visible_names[state_id]
         self.batch.tsk.current_task.state_id = state_id
         self.batch.tsk.save_tasks()
         self.reset_list()
 
     def on_click_menu_set_init(self):
-        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_INIT)
+        self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_INIT)
 
     def on_click_menu_set_working(self):
-        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_WORKING)
+        self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_WORKING)
 
     def on_click_menu_set_done(self):
-        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_DONE)
+        self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_DONE)
 
     def on_click_menu_set_hold(self):
-        self._change_current_task_state_and_reset_list(self.s.INDEX_STATE_HOLD)
+        self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
 
     def on_click_menu_schema_remove(self):
         self.on_click_confirm_remove_project()
@@ -810,7 +810,7 @@ class TasksUI:
                         last_index = self.batch.tsk.get_index_by_id(last_id)
                         if item is not None and last_index is not None:
                             color_index = self.batch.tsk.tasks_data[last_index].state_id
-                            item.setBackground(self.batch.s.state_colors[color_index].color())
+                            item.setBackground(self.batch.sts.state_colors[color_index].color())
                 else:
                     self.batch.logger.wrn("Wrong last_task_list_index {} vs {} ".format(self.last_list_item_index,
                                                                                         len(self.batch.tsk.tasks_data)))
@@ -845,7 +845,7 @@ class TasksUI:
 
                 if current_list_index >= 0:
                     item_c = self.list_tasks.item(current_list_index + 1)
-                    cur_color = self.batch.s.state_colors_up[cur_task.state_id].color()
+                    cur_color = self.batch.sts.state_colors_up[cur_task.state_id].color()
                     item_c.setBackground(cur_color)
 
                 # update SCHEMA

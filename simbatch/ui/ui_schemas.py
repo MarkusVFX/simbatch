@@ -91,7 +91,7 @@ class SchemasUI:
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
-        self.s = batch.s
+        self.sts = batch.sts
         self.sch = batch.sch
         self.comfun = batch.comfun
         self.top_ui = top
@@ -241,15 +241,15 @@ class SchemasUI:
         list_schemas.addItem(qt_list_item)
         list_schemas.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
-        if self.s.ui_brightness_mode == 0:
-            qt_list_item.setBackground(self.s.state_colors[0])
+        if self.sts.ui_brightness_mode == 0:
+            qt_list_item.setBackground(self.sts.state_colors[0])
         else:
-            qt_list_item.setBackground(self.s.state_colors_up[0])
+            qt_list_item.setBackground(self.sts.state_colors_up[0])
 
         for schema in self.sch.schemas_data:
             if schema.project_id == self.batch.prj.current_project_id:
                 qt_list_item = QListWidgetItem(list_schemas)
-                curr_color = self.s.state_colors[schema.state_id].color()
+                curr_color = self.sts.state_colors[schema.state_id].color()
                 qt_list_item.setBackground(curr_color)
                 list_item_widget = SchemaListItem(str(schema.id), schema.schema_name,
                                                   schema.description, str(schema.schema_version))
@@ -328,7 +328,7 @@ class SchemasUI:
         import subprocess
         prev_dir = self.batch.dfn.get_base_setup_dir()
         base_setup_dir = prev_dir[1]
-        if self.s.current_os == 2:
+        if self.sts.current_os == 2:
             if self.comfun.path_exists(base_setup_dir, info="Base Setup"):
                 subprocess.Popen('explorer "' + base_setup_dir + '"')
 
@@ -340,19 +340,19 @@ class SchemasUI:
         pass
 
     def _change_current_schema_state_and_reset_list(self, state_id):
-        self.batch.sch.current_schema.state = self.s.states_visible_names[state_id]
+        self.batch.sch.current_schema.state = self.sts.states_visible_names[state_id]
         self.batch.sch.current_schema.state_id = state_id
         self.batch.sch.save_schemas()
         self.reset_list()
 
     def on_menu_set_active(self):
-        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_ACTIVE)
+        self._change_current_schema_state_and_reset_list(self.sts.INDEX_STATE_ACTIVE)
 
     def on_menu_set_suspended(self):
-        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_SUSPEND)
+        self._change_current_schema_state_and_reset_list(self.sts.INDEX_STATE_SUSPEND)
 
     def on_menu_set_hold(self):
-        self._change_current_schema_state_and_reset_list(self.s.INDEX_STATE_HOLD)
+        self._change_current_schema_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
 
     def on_right_click_show_menu(self, pos):
         global_pos = self.list_schemas.mapToGlobal(pos)
@@ -505,7 +505,7 @@ class SchemasUI:
         self.list_schemas.setItemWidget(list_item, list_item_widget)
         self.batch.logger.db(("add schema:", new_schema_item.schema_name,"   to proj :", self.batch.prj.current_project_id))
         sch_dir = self.batch.prj.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
-        self.batch.i.create_schema_directory(sch_dir)
+        self.batch.sio.create_schema_directory(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):
         self.batch.logger.db(("add sch schema_name: ", new_schema_item.schema_name))
@@ -514,14 +514,14 @@ class SchemasUI:
         if new_schema_item is None or len(new_schema_item.schema_name) == 0:
             self.top_ui.set_top_info(" Insert schema name ", 8)
         else:
-            new_schema_item.state_id = self.s.INDEX_STATE_ACTIVE
+            new_schema_item.state_id = self.sts.INDEX_STATE_ACTIVE
             new_schema_item.state = "ACTIVE"
             if self.comfun.is_float(new_schema_item.schema_version) is False:
                 new_schema_item.schema_version = 1
             self.add_single_schema(copy.copy(new_schema_item))
 
             if save_as_base == 1:  # save as base setup
-                save_as = self.batch.i.generate_base_setup_file_name(new_schema_item.schema_name)
+                save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.db(("with saveAs:  ", save_as))
                 if self.batch.dfn.current_interact is not None:
                     self.batch.dfn.current_interact.save_curent_scene_as(save_as[1])
@@ -584,7 +584,7 @@ class SchemasUI:
                 last_schema_index = self.sch.get_index_by_id(last_schema_id)
                 last_item = self.list_schemas.item(self.last_list_item_nr)
                 color_index = self.sch.schemas_data[last_schema_index].state_id
-                last_item.setBackground(self.s.state_colors[color_index].color())
+                last_item.setBackground(self.sts.state_colors[color_index].color())
 
             # update color of current item list
             if self.current_list_item_nr >= 0:
@@ -593,7 +593,7 @@ class SchemasUI:
                 current_schema_id = self.list_visible_schemas_ids[self.current_list_item_nr - 1]
                 self.sch.update_current_from_id(current_schema_id)
                 color_index = self.sch.current_schema.state_id
-                current_row.setBackground(self.s.state_colors_up[color_index].color())
+                current_row.setBackground(self.sts.state_colors_up[color_index].color())
 
                 # update current schema variables and top info
                 cur_sch_name = self.sch.current_schema.schema_name

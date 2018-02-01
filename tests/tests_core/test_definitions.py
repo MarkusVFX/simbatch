@@ -20,7 +20,7 @@ def simbatch():
 
 
 def test_exist_definitions_data(simbatch):
-    assert simbatch.comfun.file_exists(simbatch.s.store_definitions_directory) is True
+    assert simbatch.comfun.file_exists(simbatch.sts.store_definitions_directory) is True
 
 
 def test_load_definitions(simbatch):

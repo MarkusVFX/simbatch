@@ -167,7 +167,7 @@ class Definitions:
 
     def __init__(self, batch):
         self.batch = batch
-        self.s = batch.s
+        self.sts = batch.sts
         self.comfun = batch.comfun
         self.definitions_array = []
         self.definitions_names = []
@@ -204,9 +204,9 @@ class Definitions:
         self.total_definitions += 1
 
     def load_definitions(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             ret = self.load_definitions_from_jsons()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             ret = self.load_definitions_from_mysql()
 
         if self.current_definition is None:
@@ -226,17 +226,17 @@ class Definitions:
 
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
-            definitions_dir = self.s.store_definitions_directory
+            definitions_dir = self.sts.store_definitions_directory
 
         if self.comfun.file_exists(definitions_dir):
-            for file_nr, json_file in enumerate(self.batch.i.get_files_from_dir(definitions_dir, types="json")):
+            for file_nr, json_file in enumerate(self.batch.sio.get_files_from_dir(definitions_dir, types="json")):
                 self.batch.logger.inf(("loading definition: ", json_file))
                 json_definition = self.comfun.load_json_file(definitions_dir+json_file)
                 if json_definition is not None and "definition" in json_definition.keys():
                     self.batch.logger.db(("definition loaded: ", json_file))
 
-                    if self.s.runtime_env == json_definition['definition']['meta']['name']:
-                        self.current_definition = self.s.runtime_env
+                    if self.sts.runtime_env == json_definition['definition']['meta']['name']:
+                        self.current_definition = self.sts.runtime_env
                         self.current_definition_index = file_nr
 
                     if json_definition['definition']['meta']['totalActions'] > 0:

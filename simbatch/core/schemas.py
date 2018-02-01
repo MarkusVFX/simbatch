@@ -94,7 +94,7 @@ class Schemas:
     sample_data_total = None
 
     def __init__(self, batch):
-        self.s = batch.s
+        self.sts = batch.sts
         self.batch = batch
         self.comfun = batch.comfun
         self.schemas_data = []
@@ -275,7 +275,7 @@ class Schemas:
 
     def delete_json_schema_file(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -294,12 +294,12 @@ class Schemas:
         self.current_schema_index = None
         # TODO check clear UI val (last current...)
         if clear_stored_data:
-            if self.s.store_data_mode == 1:
+            if self.sts.store_data_mode == 1:
                 if self.delete_json_schema_file():
                     return True
                 else:
                     return False
-            if self.s.store_data_mode == 2:
+            if self.sts.store_data_mode == 2:
                 if self.clear_schemas_in_mysql():
                     return True
                 else:
@@ -321,14 +321,14 @@ class Schemas:
         return collect_ids
 
     def load_schemas(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.load_schemas_from_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.load_schemas_from_mysql()
 
     def load_schemas_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file, info="schemas file"):
             self.batch.logger.inf(("loading schemas: ", json_file))
             json_schemas = self.comfun.load_json_file(json_file)
@@ -361,9 +361,9 @@ class Schemas:
         return None
 
     def save_schemas(self):
-        if self.s.store_data_mode == 1:
+        if self.sts.store_data_mode == 1:
             return self.save_schemas_to_json()
-        if self.s.store_data_mode == 2:
+        if self.sts.store_data_mode == 2:
             return self.save_schemas_to_mysql()
 
     #  prepare 'schemas_data' for backup or save
@@ -390,7 +390,7 @@ class Schemas:
     #  save projects data as json
     def save_schemas_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.s.store_data_json_directory + self.s.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
         content = self.format_schemas_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
@@ -401,7 +401,7 @@ class Schemas:
 
     def get_all_object_from_all_schemas(self, soft_id=0):
         if soft_id <= 0:
-            soft_id = self.s.current_soft
+            soft_id = self.sts.current_soft
         for sch in self.schemas_data:
             if sch.soft_id == soft_id:
                 for a in sch.actions_array:

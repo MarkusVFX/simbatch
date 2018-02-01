@@ -14,7 +14,7 @@ def io():
     sib.clear_all_memory_data()
     sib.prj.create_example_project_data(do_save=False)
     sib.prj.update_current_from_index(1)
-    return sib.i
+    return sib.sio
 
 
 def test_get_flat_name(io):

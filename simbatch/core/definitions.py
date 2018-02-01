@@ -171,7 +171,7 @@ class Definitions:
         self.comfun = batch.comfun
         self.definitions_array = []
         self.definitions_names = []
-        # self.soco = SoftwareConnector(batch.c.current_schema_software_id)
+        # self.soco = SoftwareConnector(batch.sch.current_schema_software_id)
 
     def __repr__(self):
         return "Definitions({})".format(self.batch)

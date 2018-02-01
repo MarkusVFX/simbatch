@@ -24,9 +24,9 @@ def test_no_queue_data(sib):
 
 def test_create_example_queue_data(sib):
     assert sib.q.create_example_queue_data(do_save=True) == sib.q.sample_data_checksum
-    # assert sib.c.sample_data_checksum is not None
-    # assert sib.c.sample_data_total is not None
-    # assert sib.c.total_schemas == sib.c.sample_data_total
+    # assert sib.sch.sample_data_checksum is not None
+    # assert sib.sch.sample_data_total is not None
+    # assert sib.sch.total_schemas == sib.sch.sample_data_total
 
 
 def test_print_current(sib):

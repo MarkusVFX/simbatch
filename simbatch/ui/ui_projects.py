@@ -535,7 +535,7 @@ class ProjectsUI:
         self.mainw.sch_ui.current_of_visible_schema_index = None
         self.mainw.sch_ui.last_schema_list_index = None
         self.mainw.sch_ui.reset_list()
-        self.batch.c.update_current_from_index(None)
+        self.batch.sch.update_current_from_index(None)
 
     def update_tsk_after_proj_changed(self):
         self.batch.t.currentTaskID = None

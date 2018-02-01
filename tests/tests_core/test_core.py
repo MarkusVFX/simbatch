@@ -12,7 +12,7 @@ def sib():
 def test_init_simbatch(sib):
     assert sib.s.runtime_env == "Stand-alone"
     assert sib.prj.total_projects == 0
-    assert sib.c.total_schemas == 0
+    assert sib.sch.total_schemas == 0
     assert sib.t.total_tasks == 0
     assert sib.q.total_queue_items == 0
     assert sib.n.total_nodes == 0
@@ -22,8 +22,8 @@ def test_clear_all_memory_data(sib):
     sib.clear_all_memory_data()
     assert sib.prj.total_projects == 0
     assert len(sib.prj.projects_data) == 0
-    assert sib.c.total_schemas == 0
-    assert len(sib.c.schemas_data) == 0
+    assert sib.sch.total_schemas == 0
+    assert len(sib.sch.schemas_data) == 0
 
 
 def test_sample_projects(sib):
@@ -33,10 +33,10 @@ def test_sample_projects(sib):
     assert sib.prj.total_projects == sib.prj.sample_data_total
 
 def test_sample_schemas(sib):
-    assert sib.c.create_example_schemas_data(do_save=False) == sib.c.sample_data_checksum
-    assert sib.c.sample_data_checksum is not None
-    assert sib.c.sample_data_total is not None
-    assert sib.c.total_schemas == sib.c.sample_data_total
+    assert sib.sch.create_example_schemas_data(do_save=False) == sib.sch.sample_data_checksum
+    assert sib.sch.sample_data_checksum is not None
+    assert sib.sch.sample_data_total is not None
+    assert sib.sch.total_schemas == sib.sch.sample_data_total
 
 
 def test_sample_tasks(sib):
@@ -49,8 +49,8 @@ def test_check_loaded_data(sib):
     assert sib.prj.total_projects > 0
     assert sib.prj.total_projects == len(sib.prj.projects_data)
 
-    assert sib.c.total_schemas > 0
-    assert sib.c.total_schemas == len(sib.c.schemas_data)
+    assert sib.sch.total_schemas > 0
+    assert sib.sch.total_schemas == len(sib.sch.schemas_data)
 
     assert sib.t.total_tasks > 0
     assert sib.t.total_tasks == len(sib.t.tasks_data)

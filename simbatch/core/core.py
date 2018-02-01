@@ -24,7 +24,7 @@ class SimBatch:
 
         self.u = Users(self)         # usr
         self.prj = Projects(self)      # prj
-        self.c = Schemas(self)       # sch
+        self.sch = Schemas(self)       # sch
         self.t = Tasks(self)         # tsk
         self.q = Queue(self)         # que
         self.n = SimNodes(self)      # nod
@@ -50,7 +50,7 @@ class SimBatch:
 
         # schemas
         print "\n SCHEMAS: "
-        self.c.print_current()
+        self.sch.print_current()
 
         # tasks
         print "\n TASKS: "
@@ -89,8 +89,8 @@ class SimBatch:
             self.prj.print_current()
         if index == 2:
             print " SCHEMAS: "
-            self.c.print_all()
-            self.c.print_current()
+            self.sch.print_all()
+            self.sch.print_current()
         if index == 3:
             print " TASKS: "
             self.t.print_all()
@@ -113,18 +113,18 @@ class SimBatch:
 
     def clear_all_stored_data(self):
         self.prj.clear_all_projects_data(clear_stored_data=True)
-        self.c.clear_all_schemas_data(clear_stored_data=True)
+        self.sch.clear_all_schemas_data(clear_stored_data=True)
 
     def clear_all_memory_data(self):
         self.prj.clear_all_projects_data()
-        self.c.clear_all_schemas_data()
+        self.sch.clear_all_schemas_data()
 
     def load_data(self):
         self.d.load_definitions()
 
         if self.prj.load_projects():
             self.prj.init_default_proj()
-            if self.c.load_schemas():
+            if self.sch.load_schemas():
                 if self.t.load_tasks():
                     return True
                 else:

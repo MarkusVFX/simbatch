@@ -16,7 +16,7 @@ def test_prepare_data_directory_by_delete_all_files(sib):
     else:
         # PRO version with sql
         pass
-    sib.c.clear_all_schemas_data(clear_stored_data=True)
+    sib.sch.clear_all_schemas_data(clear_stored_data=True)
 
 
 def test_no_schema_data(sib):
@@ -26,10 +26,10 @@ def test_no_schema_data(sib):
 
 
 def test_create_example_schemas_data(sib):
-    assert sib.c.create_example_schemas_data(do_save=True) == sib.c.sample_data_checksum
-    assert sib.c.sample_data_checksum is not None
-    assert sib.c.sample_data_total is not None
-    assert sib.c.total_schemas == sib.c.sample_data_total
+    assert sib.sch.create_example_schemas_data(do_save=True) == sib.sch.sample_data_checksum
+    assert sib.sch.sample_data_checksum is not None
+    assert sib.sch.sample_data_total is not None
+    assert sib.sch.total_schemas == sib.sch.sample_data_total
 
 
 def test_exist_proj_data(sib):
@@ -37,9 +37,9 @@ def test_exist_proj_data(sib):
 
 
 def test_clear_all_schemas_data(sib):
-    assert sib.c.clear_all_schemas_data() is True
-    assert sib.c.total_schemas == 0
-    assert len(sib.c.schemas_data) == 0
+    assert sib.sch.clear_all_schemas_data() is True
+    assert sib.sch.total_schemas == 0
+    assert len(sib.sch.schemas_data) == 0
 
 
 def test_json_schemas_data(sib):
@@ -52,81 +52,81 @@ def test_json_schemas_data(sib):
 
 
 def test_get_none_index_from_id(sib):
-    assert sib.c.get_index_by_id(2) is None
+    assert sib.sch.get_index_by_id(2) is None
 
 
 def test_load_schemas_from_json(sib):
     json_file = sib.s.store_data_json_directory + sib.s.JSON_SCHEMAS_FILE_NAME
     assert sib.comfun.file_exists(json_file) is True
-    assert sib.c.load_schemas_from_json(json_file=json_file) is True
-    assert sib.c.total_schemas == sib.c.sample_data_total
+    assert sib.sch.load_schemas_from_json(json_file=json_file) is True
+    assert sib.sch.total_schemas == sib.sch.sample_data_total
 
 
 def test_get2_index_from_id(sib):
-    assert sib.c.get_index_by_id(2) == 1
+    assert sib.sch.get_index_by_id(2) == 1
 
 
 def test_load_schemas(sib):
-    assert sib.c.clear_all_schemas_data() is True
-    assert sib.c.total_schemas == 0
-    assert sib.c.load_schemas() is True
+    assert sib.sch.clear_all_schemas_data() is True
+    assert sib.sch.total_schemas == 0
+    assert sib.sch.load_schemas() is True
 
 
 def test_get3_index_from_id(sib):
-    assert sib.c.get_index_by_id(3) == 2
+    assert sib.sch.get_index_by_id(3) == 2
 
 
 def test_total_schemas(sib):
-    assert sib.c.total_schemas == sib.c.sample_data_total
-    assert len(sib.c.schemas_data) == sib.c.sample_data_total
+    assert sib.sch.total_schemas == sib.sch.sample_data_total
+    assert len(sib.sch.schemas_data) == sib.sch.sample_data_total
 
 
 def test_update_current_from_id(sib):
-    assert sib.c.current_schema_id is None
-    assert sib.c.current_schema_index is None
-    assert sib.c.update_current_from_id(2) == 1
+    assert sib.sch.current_schema_id is None
+    assert sib.sch.current_schema_index is None
+    assert sib.sch.update_current_from_id(2) == 1
     # sib.prj.print_all()
-    assert sib.c.current_schema_id == 2
-    assert sib.c.current_schema_index == 1
-    assert sib.c.current_schema.schema_name == "schema 2"
+    assert sib.sch.current_schema_id == 2
+    assert sib.sch.current_schema_index == 1
+    assert sib.sch.current_schema.schema_name == "schema 2"
 
 
 def test_update_current_from_index(sib):
-    sib.c.current_schema_id = None
-    sib.c.current_schema_index = None
-    assert sib.c.update_current_from_index(2) == 3
-    assert sib.c.current_schema_id == 3
-    assert sib.c.current_schema_index == 2
-    assert sib.c.current_schema.schema_name == "schema 3"
+    sib.sch.current_schema_id = None
+    sib.sch.current_schema_index = None
+    assert sib.sch.update_current_from_index(2) == 3
+    assert sib.sch.current_schema_id == 3
+    assert sib.sch.current_schema_index == 2
+    assert sib.sch.current_schema.schema_name == "schema 3"
 
 
 def test_current_schema_details(sib):
-    assert sib.c.current_schema.id == 3
-    assert sib.c.current_schema.schema_name == "schema 3"
-    assert sib.c.current_schema.state_id == 22
-    assert sib.c.current_schema.state == "ACTIVE"
-    assert sib.c.current_schema.schema_version == 5
-    assert sib.c.current_schema.project_id == 2
-    assert sib.c.current_schema.definition_name == "sample_definition"
-    assert len(sib.c.current_schema.actions_array) == 0
-    assert sib.c.current_schema.description == "fire with smoke"
+    assert sib.sch.current_schema.id == 3
+    assert sib.sch.current_schema.schema_name == "schema 3"
+    assert sib.sch.current_schema.state_id == 22
+    assert sib.sch.current_schema.state == "ACTIVE"
+    assert sib.sch.current_schema.schema_version == 5
+    assert sib.sch.current_schema.project_id == 2
+    assert sib.sch.current_schema.definition_name == "sample_definition"
+    assert len(sib.sch.current_schema.actions_array) == 0
+    assert sib.sch.current_schema.description == "fire with smoke"
 
 
 def test_remove_single_schema_by_id(sib):
-    assert sib.c.remove_single_schema(id=1) is True
-    assert sib.c.total_schemas == 3
-    assert len(sib.c.schemas_data) == 3
+    assert sib.sch.remove_single_schema(id=1) is True
+    assert sib.sch.total_schemas == 3
+    assert len(sib.sch.schemas_data) == 3
 
 
 def test_remove_single_schema_by_index(sib):
-    assert sib.c.remove_single_schema(index=1) is True
-    assert sib.c.total_schemas == 2
-    assert len(sib.c.schemas_data) == 2
+    assert sib.sch.remove_single_schema(index=1) is True
+    assert sib.sch.total_schemas == 2
+    assert len(sib.sch.schemas_data) == 2
 
 
 def test_print_current(sib):
-    sib.c.print_current()
+    sib.sch.print_current()
 
 
 def test_print_all(sib):
-    sib.c.print_all()
+    sib.sch.print_all()

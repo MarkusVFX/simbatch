@@ -92,7 +92,7 @@ class SchemasUI:
     def __init__(self, batch, mainw, top):
         self.batch = batch
         self.s = batch.s
-        self.c = batch.c
+        self.sch = batch.sch
         self.comfun = batch.comfun
         self.top_ui = top
         self.mainw = mainw
@@ -246,7 +246,7 @@ class SchemasUI:
         else:
             qt_list_item.setBackground(self.s.state_colors_up[0])
 
-        for schema in self.c.schemas_data:
+        for schema in self.sch.schemas_data:
             if schema.project_id == self.batch.prj.current_project_id:
                 qt_list_item = QListWidgetItem(list_schemas)
                 curr_color = self.s.state_colors[schema.state_id].color()
@@ -267,7 +267,7 @@ class SchemasUI:
     def update_visible_schemas_ids(self):        # TODO list filters
         # self.list_visible_schemas_names = []
         # self.list_visible_schemas_ids = []
-        # for schema in self.c.schemas_data:
+        # for schema in self.sch.schemas_data:
         #     if schema.project_id == self.batch.prj.current_project_id:
         #         self.list_visible_schemas_names.append(schema.schema_name)
         #         self.list_visible_schemas_ids.append(schema.id)
@@ -276,7 +276,7 @@ class SchemasUI:
     def update_current_project_schemas(self):  # all current project's schemas used for drop box in create task form
         self.current_project_schemas_ids = []
         self.current_project_schemas_names = []
-        for schema in self.batch.c.schemas_data:
+        for schema in self.batch.sch.schemas_data:
             if schema.project_id == self.batch.prj.current_project_id:
                 self.current_project_schemas_names.append(schema.schema_name)
                 self.current_project_schemas_ids.append(schema.id)
@@ -289,38 +289,38 @@ class SchemasUI:
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
-        index = self.c.current_schema_index
+        index = self.sch.current_schema_index
         self.clear_list()
         self.init_schemas_list()
-        if index is not None and index > self.c.total_schemas:
-            self.c.current_schema_index = index
-            self.c.current_project_id = self.c.current_schema.id
+        if index is not None and index > self.sch.total_schemas:
+            self.sch.current_schema_index = index
+            self.sch.current_project_id = self.sch.current_schema.id
         self.freeze_list_on_changed = 0
 
     def reload_schemas_data_and_refresh_list(self):
-        self.c.clear_all_schemas_data()
-        self.c.load_schemas()
+        self.sch.clear_all_schemas_data()
+        self.sch.load_schemas()
         self.reset_list()
         self.update_visible_schemas_ids()
 
     def on_menu_open(self):
-        current_schema_id = self.c.list_visible_schemas_ids[self.c.current_schema_list_index]
+        current_schema_id = self.sch.list_visible_schemas_ids[self.sch.current_schema_list_index]
         self.batch.logger.db(("list_schemas_double_clicked :", current_schema_id))
-        sch = self.c.get_schema_by_id(current_schema_id)
+        sch = self.sch.get_schema_by_id(current_schema_id)
         self.load_base_setup(sch.schema_name, sch.schemaVersion)
 
     def on_menu_save_as_next_version(self):
-        cur_sch_index = self.batch.c.current_schema_index
-        self.c.increase_current_schema_version()
+        cur_sch_index = self.batch.sch.current_schema_index
+        self.sch.increase_current_schema_version()
 
         self.reload_schemas_data_and_refresh_list()
 
-        self.c.current_schema_index = cur_sch_index
-        self.c.update_current_from_index(cur_sch_index)
+        self.sch.current_schema_index = cur_sch_index
+        self.sch.update_current_from_index(cur_sch_index)
 
         ret = self.batch.d.getSchemaBaseSetupFile(forceSchemaVersion=True)   # TODO  getSchemaBaseSetupFile PEP8
 
-        cur_schema = self.c.schemas_data[cur_sch_index]
+        cur_schema = self.sch.schemas_data[cur_sch_index]
         self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
         self.batch.d.soco.save_curent_scene_as(ret[1])
 
@@ -340,9 +340,9 @@ class SchemasUI:
         pass
 
     def _change_current_schema_state_and_reset_list(self, state_id):
-        self.batch.c.current_schema.state = self.s.states_visible_names[state_id]
-        self.batch.c.current_schema.state_id = state_id
-        self.batch.c.save_schemas()
+        self.batch.sch.current_schema.state = self.s.states_visible_names[state_id]
+        self.batch.sch.current_schema.state_id = state_id
+        self.batch.sch.save_schemas()
         self.reset_list()
 
     def on_menu_set_active(self):
@@ -384,7 +384,7 @@ class SchemasUI:
             # txt = self.batch.prj.projects_data[self.batch.prj.current_project_index].project_name
             # self.schema_form_create.schema_item_form_object.project_name = txt
             # self.schema_form_create.schema_item_form_object.projectID = self.batch.prj.current_project_id
-            new_schema = self.c.get_blank_schema()
+            new_schema = self.sch.get_blank_schema()
             new_schema.project_id = self.batch.prj.current_project_id
 
             new_schema.definition_name = self.batch.d.current_definition
@@ -403,8 +403,8 @@ class SchemasUI:
             self.create_form_state = 0
 
     def form_edit_update_ui(self):
-        if self.c.current_schema_index >= 0:
-            cur_schema = self.c.current_schema
+        if self.sch.current_schema_index >= 0:
+            cur_schema = self.sch.current_schema
             self.schema_form_edit.qt_fae_schema_name_edit.setText(cur_schema.schema_name)
             self.schema_form_edit.qt_fae_schema_version_edit.setText(str(cur_schema.schema_version))
             self.schema_form_edit.qt_fae_schema_description_edit.setText(cur_schema.description)
@@ -415,17 +415,17 @@ class SchemasUI:
             self.schema_form_edit.show()
             self.form_edit_update_ui()
 
-            if self.c.current_schema_index >= 0:
-                self.schema_form_edit.update_form_data(self.c.current_schema)
+            if self.sch.current_schema_index >= 0:
+                self.schema_form_edit.update_form_data(self.sch.current_schema)
             self.edit_form_state = 1
         else:
             self.schema_form_edit.hide()
             self.edit_form_state = 0
 
     def update_copy_form(self):
-        if self.c.current_schema_index >= 0:
+        if self.sch.current_schema_index >= 0:
             self.wfa_copy_schema.qt_edit_line.setText(
-                self.c.schemas_data[self.c.current_schema_index].schema_name)
+                self.sch.schemas_data[self.sch.current_schema_index].schema_name)
 
     def on_click_show_form_copy(self):
         if self.copy_form_state == 0:
@@ -456,10 +456,10 @@ class SchemasUI:
         self.batch.logger.db(("qt_edit_line.text() : ", qt_edit_line.text()))
 
     def on_clicked_copy_as(self):
-        if self.batch.c.current_schema_index >= 0:
+        if self.batch.sch.current_schema_index >= 0:
             new_name = self.new_name_on_copy
             if len(new_name) > 0:
-                curr = self.batch.c.schemas_data[self.batch.c.current_schema_index]
+                curr = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
                 copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, curr.schema_version,
                                                 curr.project_id, curr.project_name, curr.definition_id,
                                                 curr.actions, curr.description)
@@ -481,13 +481,13 @@ class SchemasUI:
             self.remove_form_state = 0
 
     def on_click_confirm_remove_schema(self):
-        self.batch.logger.db(("on_click_confirm_remove_schema index:", self.c.current_schema_index))
-        if self.c.current_schema_index >= 0:
-            remove_index = self.c.current_schema_index
-            self.c.lastSchema = None
-            self.c.current_schema_id = None
-            self.c.current_schema_index = None
-            self.c.remove_single_schema(index=remove_index, do_save=True)
+        self.batch.logger.db(("on_click_confirm_remove_schema index:", self.sch.current_schema_index))
+        if self.sch.current_schema_index >= 0:
+            remove_index = self.sch.current_schema_index
+            self.sch.lastSchema = None
+            self.sch.current_schema_id = None
+            self.sch.current_schema_index = None
+            self.sch.remove_single_schema(index=remove_index, do_save=True)
             # self.list_schemas.takeItem(remove_index + 1)
             self.update_visible_schemas_ids()
             self.reset_list()
@@ -497,7 +497,7 @@ class SchemasUI:
 
     def add_single_schema(self, new_schema_item):
         new_schema_item.id = -1  # TODO check -1
-        self.c.add_schema(new_schema_item, do_save=True)
+        self.sch.add_schema(new_schema_item, do_save=True)
         list_item = QListWidgetItem(self.list_schemas)
         list_item_widget = SchemaListItem(str(new_schema_item.id), new_schema_item.schema_name,
                                           new_schema_item.description, str(new_schema_item.schema_version))
@@ -529,7 +529,7 @@ class SchemasUI:
                 self.batch.logger.db(("new_schema_item.save_as_base_state", save_as_base))
 
             self.top_ui.set_top_info(" schema created, active schema:  " + new_schema_item.schema_name)
-            # self.new_schema_item = self.batch.c.get_blank_schema()   # TODO  clear UI !!!  if clear var
+            # self.new_schema_item = self.batch.sch.get_blank_schema()   # TODO  clear UI !!!  if clear var
             self.schema_form_create.clear_vars()
             self.schema_form_create.hide()
             self.create_form_state = 0
@@ -547,7 +547,7 @@ class SchemasUI:
             self.top_ui.set_top_info(" Insert schema name ! ", 8)
             self.batch.logger.wrn("insert schema name ! ")
         else:
-            self.c.update_schema(edited_schema_item, do_save=True)
+            self.sch.update_schema(edited_schema_item, do_save=True)
 
             current_list_index = self.list_schemas.currentRow()
             ed_item = self.list_schemas.item(current_list_index)
@@ -568,7 +568,7 @@ class SchemasUI:
             self.batch.logger.err(("loadFile: ", file_to_load))
 
     def on_list_schemas_double_clicked(self, item):
-        self.batch.logger.db(("list_schemas_double_clicked: ", self.c.current_schema_list_index, item))
+        self.batch.logger.db(("list_schemas_double_clicked: ", self.sch.current_schema_list_index, item))
         self.on_menu_open()
 
     def on_list_schemas_current_changed(self, current_row):
@@ -581,9 +581,9 @@ class SchemasUI:
             # update color of last item list
             if self.last_list_item_nr is not None:
                 last_schema_id = self.list_visible_schemas_ids[self.last_list_item_nr - 1]
-                last_schema_index = self.c.get_index_by_id(last_schema_id)
+                last_schema_index = self.sch.get_index_by_id(last_schema_id)
                 last_item = self.list_schemas.item(self.last_list_item_nr)
-                color_index = self.c.schemas_data[last_schema_index].state_id
+                color_index = self.sch.schemas_data[last_schema_index].state_id
                 last_item.setBackground(self.s.state_colors[color_index].color())
 
             # update color of current item list
@@ -591,12 +591,12 @@ class SchemasUI:
                 self.batch.logger.deepdb(("current_list_item_nr: ", self.current_list_item_nr))
 
                 current_schema_id = self.list_visible_schemas_ids[self.current_list_item_nr - 1]
-                self.c.update_current_from_id(current_schema_id)
-                color_index = self.c.current_schema.state_id
+                self.sch.update_current_from_id(current_schema_id)
+                color_index = self.sch.current_schema.state_id
                 current_row.setBackground(self.s.state_colors_up[color_index].color())
 
                 # update current schema variables and top info
-                cur_sch_name = self.c.current_schema.schema_name
+                cur_sch_name = self.sch.current_schema.schema_name
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current schema:    " + cur_sch_name)
                 else:
@@ -606,8 +606,8 @@ class SchemasUI:
 
             if self.edit_form_state == 1:
                 self.form_edit_update_ui()
-                self.schema_form_edit.update_form_data(self.c.current_schema)
-                self.batch.logger.db(("update edit form: ", self.c.current_schema.schema_name))
+                self.schema_form_edit.update_form_data(self.sch.current_schema)
+                self.batch.logger.db(("update edit form: ", self.sch.current_schema.schema_name))
 
             if self.copy_form_state == 1:
                 self.update_copy_form()

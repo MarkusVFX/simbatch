@@ -34,7 +34,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.actions_array = []
         self.action_widgets = []
         self.batch = batch
-        self.schema_item_form_object = batch.c.get_blank_schema()
+        self.schema_item_form_object = batch.sch.get_blank_schema()
         self.s = self.batch.s
         if mode == "edit":
             self.form_mode = 2
@@ -280,7 +280,7 @@ class SchemaFormCreateOrEdit(QWidget):
 
     # clear helper form object (store schema data)
     def clear_vars(self):
-        self.schema_item_form_object = self.batch.c.get_blank_schema()
+        self.schema_item_form_object = self.batch.sch.get_blank_schema()
 
     def update_form_data(self, schema_item):   # old update_actions_ui
         self.clear_vars()

@@ -155,8 +155,8 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.form_task_item = TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
 
-        self.init_ui_elements(batch.c)
-        #self.schemas_id_array = batch.c.schemas_id_array # TODO  visible isd  VS proj's schemas
+        self.init_ui_elements(batch.sch)
+        #self.schemas_id_array = batch.sch.schemas_id_array # TODO  visible isd  VS proj's schemas
 
     def init_ui_elements(self, sch):
         qt_layout_out_form_create = QVBoxLayout()
@@ -302,8 +302,8 @@ class TasksFormCreateOrEdit(QWidget):
             self.form_task_item.schema_id = -1
             self.batch.logger.wrn(("wrong index, schema_name_combo:", self.qt_schema_name_combo.currentIndex()))
 
-        if self.batch.c.current_schema_index is None:   # TODO check it
-            self.batch.logger.err(("current schema is None! current_schema_index:", self.batch.c.current_schema_index))
+        if self.batch.sch.current_schema_index is None:   # TODO check it
+            self.batch.logger.err(("current schema is None! current_schema_index:", self.batch.sch.current_schema_index))
 
         if self.batch.prj.current_project_id is not None:
             self.form_task_item.project_id = self.batch.prj.current_project_id
@@ -312,7 +312,7 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item.state = self.qt_combo_state_names.currentText()
         self.form_task_item.state_id = self.qt_combo_state_names.currentIndex()
 
-        self.form_task_item.schema_ver = (self.batch.c.get_schema_by_id(self.form_task_item.schema_id)).schema_version
+        self.form_task_item.schema_ver = (self.batch.sch.get_schema_by_id(self.form_task_item.schema_id)).schema_version
         self.form_task_item.queue_ver = 0
 
         self.form_task_item.sequence = self.qt_edit_line_sequence.text()
@@ -558,7 +558,7 @@ class TasksUI:
         self.on_click_confirm_remove_project()
 
     def on_click_menu_sch_ver_from_schema(self):
-        cur_sch = self.batch.c.get_schema_by_id(self.batch.t.current_task.schema_id)
+        cur_sch = self.batch.sch.get_schema_by_id(self.batch.t.current_task.schema_id)
         self.batch.t.current_task.schema_ver = cur_sch.schemaVersion
         self.batch.t.save_tasks()
         self.reset_list()
@@ -576,7 +576,7 @@ class TasksUI:
         self.reset_list()
 
     def on_click_menu_open_base_setup(self):
-        sch = self.batch.c.get_schema_by_id(self.batch.t.current_task.schema_id)
+        sch = self.batch.sch.get_schema_by_id(self.batch.t.current_task.schema_id)
         self.batch.schemasUI.loadSchemaFile(sch.schema_name, self.batch.t.current_task.schema_ver)
 
     def on_click_menu_open_computed(self):
@@ -628,8 +628,8 @@ class TasksUI:
             if self.batch.t.current_task_index >= 0:
                 curr_task = self.batch.t.tasks_data[self.batch.t.current_task_index]
                 self.qt_form_create.update_create_ui(curr_task.schema_id)
-            elif self.batch.c.current_schema_index >= 0:
-                cur_sch = self.batch.c.schemas_data[self.batch.c.curr_schema_index]
+            elif self.batch.sch.current_schema_index >= 0:
+                cur_sch = self.batch.sch.schemas_data[self.batch.sch.curr_schema_index]
                 self.qt_form_create.update_create_ui(schema_id=cur_sch.id)
             else:
                 self.qt_form_create.update_create_ui()
@@ -849,9 +849,9 @@ class TasksUI:
                     item_c.setBackground(cur_color)
 
                 # update SCHEMA
-                self.batch.c.lastSchemaIndex = None  # TODO  check it ui
-                self.batch.c.current_schema_id = cur_task.schema_id
-                self.batch.c.update_current_from_id(cur_task.schema_id)
+                self.batch.sch.lastSchemaIndex = None  # TODO  check it ui
+                self.batch.sch.current_schema_id = cur_task.schema_id
+                self.batch.sch.update_current_from_id(cur_task.schema_id)
 
                 # update TASK form
                 if self.create_form_state == 1:

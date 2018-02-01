@@ -27,7 +27,7 @@ def test_std_list_as_string(comfun):
 
 
 def test_dot_list_as_string(comfun):
-    assert comfun.list_as_string(["a", "b", "c"], separator=".") == "a.b.c"
+    assert comfun.list_as_string(["a", "b", "c"], separator=".") == "a.b.sch"
 
 
 def test_first_list_as_string(comfun):

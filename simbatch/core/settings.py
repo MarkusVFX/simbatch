@@ -266,14 +266,14 @@ class Settings:
         if self.store_definitions_directory is not None:
             palette_id = self.ui_color_mode
             if palette_id == 1:
-                color_file = self.store_definitions_directory + self.COLORS_GRAY_FILE_NAME
+                color_file = self.store_definitions_directory + "colors/" + self.COLORS_GRAY_FILE_NAME
             elif palette_id == 2:
-                color_file = self.store_definitions_directory + self.COLORS_PASTEL_FILE_NAME
+                color_file = self.store_definitions_directory + "colors/" + self.COLORS_PASTEL_FILE_NAME
             elif palette_id == 3:
-                color_file = self.store_definitions_directory + self.COLORS_DARK_FILE_NAME
+                color_file = self.store_definitions_directory + "colors/" + self.COLORS_DARK_FILE_NAME
             else:
                 #  palette_id == 4:
-                color_file = self.store_definitions_directory + self.COLORS_CUSTOM_FILE_NAME
+                color_file = self.store_definitions_directory + "colors/" + self.COLORS_CUSTOM_FILE_NAME
 
             if self.debug_level >= 3:
                 print " [INF] loading colors: ", color_file

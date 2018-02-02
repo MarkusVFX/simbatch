@@ -332,7 +332,7 @@ class Schemas:
                     for li in json_schemas['schemas']['data'].values():
                         if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
                             new_schema_actions = []
-                            if "actions" in li:  
+                            if "actions" in li:
                                 for lia in li['actions']:
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
                                     new_schema_actions.append(Action(lia))      # TODO

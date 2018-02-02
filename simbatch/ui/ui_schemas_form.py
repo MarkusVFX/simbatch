@@ -5,6 +5,7 @@ except ImportError:
     print "PySide.QtGui ERR"
 
 from widgets import *
+# from core.schemas import SingleAction
 
 class SchemaFormCreateOrEdit(QWidget):
     schema_item_form_object = None
@@ -158,11 +159,14 @@ class SchemaFormCreateOrEdit(QWidget):
     # ACTIONS
     def compile_actions(self):
         self.actions_array = []
-        for widget_action in self.action_widgets:
-            single_action = widget_action.action_data.get_action()
-            self.actions_array.append(single_action)
-            # TODO  compile acttion
-            self.batch.logger.deepdb(("COMPILE ACTION", single_action))
+        for i, action_widget in enumerate(self.action_widgets):
+            single_action = action_widget.get_current_action()
+            if single_action is not None:
+                self.actions_array.append(single_action)
+                # TODO  compile acttion
+                self.batch.logger.deepdb(("COMPILE ACTION", single_action))
+            else:
+                self.batch.logger.wrn(("(compile_actions)  None ACTION : ", i))
 
     def add_defined_action_button(self, button_txt, disabled=False):
         b = ButtonOnLayout(button_txt)
@@ -178,61 +182,57 @@ class SchemaFormCreateOrEdit(QWidget):
         curr_proj = self.batch.prj.current_project
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.dfn.definitions_array):
-                for action in self.batch.dfn.definitions_array[nr].actions_array:
-                    b = self.add_defined_action_button(action.name)
-                    b.button.clicked.connect(lambda a=action: self.on_click_defined_action_button(a, curr_proj))
+                for action_group in self.batch.dfn.definitions_array[nr].grouped_actions_array:
+                    b = self.add_defined_action_button(action_group.name)
+                    b.button.clicked.connect(lambda a=action_group: self.on_click_defined_action_button(a, curr_proj))
         else:
             self.batch.logger.wrn("Current project undefined !")
 
     # on click one of horizontal button add action widget to vertical list of schema actions
-    def on_click_defined_action_button(self, single_or_group_action, curr_proj):  # , force_val=0
+    def on_click_defined_action_button(self, group_of_actions, curr_proj):  # , force_val=0
         combo_items = []
         combo_val = []
 
         qt_lay = self.qt_lay_fae_actions
-        if isinstance(single_or_group_action, SingleAction):
-            button_2 = single_or_group_action.addional_butt_caption
-            action_widget = ActionWidget(single_or_group_action, action_id=str(single_or_group_action.id) + "  ",
-                                         label_txt=single_or_group_action.name,
-                                         edit_txt=single_or_group_action.default_value,
-                                         text_on_button_1="Get", text_on_button_2=button_2)
-        else:  # GroupAction
-            for i, a in enumerate(single_or_group_action.actions):
+        button_2 = group_of_actions.actions[0].addional_butt_caption
+        if group_of_actions.actions_count == 1:   # single action, no combo
+            action_widget = ActionWidget(group_of_actions.group_id, group_of_actions.name, group_of_actions,
+                                         text_on_button_2=button_2)
+        else:  # grouped actions :  import ANI,CAM,ENV
+            for i, a in enumerate(group_of_actions.actions):
                 combo_items.append(a.mode)
                 combo_val.append(a.default_value)
-            button_2 = single_or_group_action.actions[0].addional_butt_caption
-            action_widget = ActionWidget(single_or_group_action.actions[0], action_id=str(single_or_group_action.id),
-                                         label_txt=single_or_group_action.name,
-                                         text_on_button_1="Get", text_on_button_2=button_2,
+            action_widget = ActionWidget(group_of_actions.group_id, group_of_actions.name, group_of_actions,
+                                         text_on_button_2=button_2,
                                          edit_txt=combo_val[0], combo_items=combo_items, combo_val=combo_val)
 
         qt_lay.addWidget(action_widget)
         self.action_widgets.append(action_widget)
 
-        action_widget.qt_button_1.clicked.connect(
-            lambda: single_or_group_action.get_get_file(single_or_group_action.actionWidget.edit,
-                                                        curr_proj.working_directory,
-                                                        action_type, QFileDialog)
-        )
+        # action_widget.qt_button_1.clicked.connect(
+        #     lambda: group_of_actions.get_get_file(group_of_actions.actionWidget.edit,
+        #                                           curr_proj.working_directory,
+        #                                           action_type, QFileDialog)
+        # )
 
-        if button_2 is not None and len(button_2) > 0:
-            action_widget.qt_button_2.clicked.connect(
-                lambda: self.on_clicked_addional_action_button(single_or_group_action)
-            )
+        # if button_2 is not None and len(button_2) > 0:
+        #     action_widget.qt_button_2.clicked.connect(
+        #         lambda: self.on_clicked_addional_action_button(group_of_actions)
+        #     )
 
-        if len(combo_items) > 0:
-            action_widget.qt_combo.currentIndexChanged.connect(
-                lambda: self.on_change_combo_action(action_widget, single_or_group_action)
-            )
+        # if len(combo_items) > 0:
+        #     action_widget.qt_combo.currentIndexChanged.connect(
+        #         lambda: self.on_change_combo_action(action_widget, group_of_actions)
+        #     )
 
     def on_clicked_addional_action_button(self, act):
         self.batch.logger.db(("on_clicked_addional_action_button", act))
         # TODO
 
-    @staticmethod
-    def on_change_combo_action(action_widget, software_action):
-        action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
-        action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
+    # @staticmethod
+    # def on_change_combo_action(action_widget, software_action):
+    #     action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
+    #     action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
 
 
     # remove horizontal row of defined actions buttons

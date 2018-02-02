@@ -391,7 +391,7 @@ class CommonFunctions:
             qt_edit_line.setText(text)
 
     @staticmethod
-    def get_get_file(qt_edit_line, qt_file_dialog, init_dir):
+    def file_dialog_to_edit_line(qt_edit_line, qt_file_dialog, init_dir):
         get_directory = qt_file_dialog.getOpenFileName(dir=init_dir)
         get_dir = get_directory[0].replace("/", "\\")
         if len(get_dir) > 0:

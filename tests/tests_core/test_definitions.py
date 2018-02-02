@@ -1,4 +1,5 @@
 from simbatch.core import core
+from simbatch.core.definitions import SingleAction
 import pytest
 
 
@@ -28,3 +29,8 @@ def test_load_definitions(simbatch):
 
 # def test_load_definitions(sib):
 #     assert sib.dfn.load_definitions() is True
+
+
+# def test_action_create(simbatch):
+#     sa = SingleAction()
+    # assert sa.

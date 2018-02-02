@@ -1,6 +1,8 @@
 import copy
 import os
 
+import actions
+
 # JSON Name Format, PEP8 Name Format
 SCHEMA_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
@@ -10,42 +12,35 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ('version', 'schema_version'),
     ('projId', 'project_id'),
     ('actions', 'actions_array'),
-    ('definition', 'definition_name'),
+    ('definition', 'based_on_definition'),
     ('desc', 'description')
     ]
 
-ACTION_DATA_FIELDS_NAMES = [
-    ('id', 'id'),
-    ('name', 'action_name'),
-    ('type', 'action_type'),
-    ('sub_type', 'action_sub_type'),
-    ('param', 'action_param'),
-    ('soft_id', 'soft_id')
-    ]
 
 
-# class SingleAction:    #  goes to definition
+#  this class definition goes to definition
+# class SingleAction:
 #     def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
 #         self.id = action_id
 #         self.action_name = action_name
-#         self.action_type = action_type
+#         self.action_type = action_type    # "single" or "group"
 #         self.action_sub_type = action_sub_type
 #         self.action_param = action_param
 #         self.soft_id = soft_id
 
 
 class SchemaItem:
-    def __init__(self, schema_id, schema_name, state_id, state, project_id, definition_name,
-                 schema_version, actions_array, description):
+    def __init__(self, schema_id, schema_name, state_id, state, project_id, based_on_definition,
+                 actions_array, schema_version, description):  # actions_array
 
         self.id = schema_id
         self.schema_name = schema_name
         self.state_id = state_id
         self.state = state
         self.project_id = project_id
-        self.definition_name = definition_name
-        self.schema_version = schema_version
+        self.based_on_definition = based_on_definition   # definition_name
         self.actions_array = actions_array
+        self.schema_version = schema_version
         # self.actions_string = ""
         self.description = description
         # self.actions_to_string()
@@ -101,7 +96,7 @@ class Schemas:
 
     @staticmethod
     def get_blank_schema():
-        return SchemaItem(0, "", 1, "NULL", 1, 1, 1, [], "")
+        return SchemaItem(0, "", 1, "NULL", 1, "defi", [], 1, "")
 
     #  print schema data, for debug
     def print_current(self):
@@ -111,18 +106,18 @@ class Schemas:
         if self.current_schema_id is not None:
             cur_sch = self.current_schema
             print "       current schema name: ", cur_sch.schema_name
-            print "       definition id:{}   project id:{}".format(cur_sch.definition_name, cur_sch.project_id)
+            print "       definition id:{}   project id:{}".format(cur_sch.based_on_definition, cur_sch.project_id)
             for i, a in enumerate(cur_sch.actions_array):
                 print "        a:{}  soft:{}   type:{}  sub type:{} ".format(i, a.soft_id, a.action_type, a.actionParam)
 
     def print_all(self):
         if self.total_schemas == 0:
             print "   [INF] no schema loaded"
-        for c in self.schemas_data:
-            print "\n\n   {}   id:{}   state:{}".format(c.schema_name, c.id, c.state)
-            print "   sch ver:", c.schema_version
-            print "   proj id:{},  definition:{} ".format(c.project_id, c.definition_name)
-            for a in c.actions_array:
+        for sch in self.schemas_data:
+            print "\n\n   {}   id:{}   state:{}".format(sch.schema_name, sch.id, sch.state)
+            print "   sch ver:", sch.schema_version
+            print "   proj id:{},  definition:{} ".format(sch.project_id, sch.based_on_definition)
+            for a in sch.actions_array:
                 print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
         print "\n\n"
 
@@ -308,10 +303,10 @@ class Schemas:
 
     def create_example_schemas_data(self, do_save=True):
         collect_ids = 0
-        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, "sample_definition", 1, [], "first schema")
-        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 1, "sample_definition", 3, [], "fire by FumeFx")
-        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 2, "sample_definition", 5, [], "fire with smoke")
-        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 3, "sample_definition", 4, [], "cloth with fire")
+        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, "sample_definition", [], 1, "first schema")
+        sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 1, "sample_definition", [], 3, "fire by FumeFx")
+        sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 2, "sample_definition", [], 5, "fire with smoke")
+        sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 3, "sample_definition", [], 4, "cloth with fire")
         collect_ids += self.add_schema(sample_schema_item_1)
         collect_ids += self.add_schema(sample_schema_item_2)
         collect_ids += self.add_schema(sample_schema_item_3)
@@ -337,12 +332,13 @@ class Schemas:
                     for li in json_schemas['schemas']['data'].values():
                         if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
                             new_schema_actions = []
-                            for lia in li['actions']:
-                                self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                new_schema_actions.append(Action(lia))      # TODO
+                            if "actions" in li:  
+                                for lia in li['actions']:
+                                    self.batch.logger.deepdb(("(lsfj) actions: ", lia))
+                                    new_schema_actions.append(Action(lia))      # TODO
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
-                                                         int(li['projId']), li['definition'], int(li['version']),
-                                                         new_schema_actions, li['desc'])
+                                                         int(li['projId']), li['definition'], new_schema_actions,
+                                                         int(li['version']), li['desc'])
                             self.add_schema(new_schema_item)
                         else:
                             self.batch.logger.err(("schema json data not consistent:", len(li),

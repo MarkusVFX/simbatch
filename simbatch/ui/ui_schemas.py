@@ -516,6 +516,7 @@ class SchemasUI:
         else:
             new_schema_item.state_id = self.sts.INDEX_STATE_ACTIVE
             new_schema_item.state = "ACTIVE"
+            print "erererzzzz", new_schema_item.schema_version
             if self.comfun.is_float(new_schema_item.schema_version) is False:
                 new_schema_item.schema_version = 1
             self.add_single_schema(copy.copy(new_schema_item))

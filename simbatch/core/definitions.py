@@ -8,7 +8,10 @@ try:
 except ImportError:
     pass
 
+from actions import GroupedActions, SingleAction
+
 # import os
+
 
 # JSON Name Format, PEP8 Name Format
 DEFINITION_ITEM_FIELDS_NAMES = [
@@ -40,67 +43,8 @@ ACTION_ITEM_FIELDS_NAMES = [
 #         pass
 
 
-class SingleAction:
-    id = None
-    name = ""
-
-    def __init__(self, action_id, name, description, default_value, template, mode=None, addi_butt=None, addi_fun=None):
-        self.id = action_id
-        self.name = name
-        self.mode = mode  # subaction mode
-        self.description = description
-        self.default_value = default_value
-        self.template = template
-
-        self.addional_butt_caption = addi_butt
-        self.addional_funcion_name = addi_fun
-
-    def __repr__(self):
-        return "SingleAction({},{})".format(self.action_id, self.name)
-
-    def __str__(self):
-        return "SingleAction"
-
-    def print_minimum(self,group=False):
-        if group:
-            prefix = "_"
-        else:
-            prefix=""
-        print "   {}action: {}   id:{}   default_value:{}".format(prefix,self.name, self.id, self.default_value)
-
-    def print_action(self):
-        print "   action: {}   id:{}   description:{} default_value:{}, template:{}".format(self.name, self.id,
-                                                                                            self.description,
-                                                                                            self.default_value,
-                                                                                            self.template)
-
-    def get_action(self):
-        return self
-
-    def get_action_as_string(self):
-        return
 
 
-class GroupAction:
-    id = None
-    name = ""
-    actions = []  # subactions as [SingleAction,...]
-    current_sub_action_index = 0
-
-    def __init__(self, action_id, name):
-        self.id = action_id
-        self.name = name
-        self.actions = []
-        pass
-
-    def __repr__(self):
-        return "GroupAction({},{})".format(self.name, self.name)
-
-    def __str__(self):
-        return "GroupAction"
-
-    def get_action(self):
-        return self.actions[self.current_sub_action_index]
 
 
 class SingleDefinition:
@@ -108,15 +52,15 @@ class SingleDefinition:
     software = ""
     prev_ext = ""   # without dot "png"
     file_ext = ""   # without dot
-    actions_array = []    # SingleAction or GroupAction
+    # actions_array = []    # SingleAction or GroupAction
+    grouped_actions_array = []    # GroupAction array
     total_actions = 0
     action_names = []
     # TODO list supported versions
 
-    def __init__(self, name, software):
+    def __init__(self, name):
         self.name = name
-        self.software = software
-        self.actions_array = []
+        self.grouped_actions_array = []
         self.action_names = []
 
     def __repr__(self):
@@ -129,17 +73,13 @@ class SingleDefinition:
         print "   [INF] {} total actions:{}".format(prefix, self.total_actions)
 
     def print_all(self):
-        for a in self.actions_array:
-            if isinstance(a, SingleAction):
-                a.print_minimum()
-            else:  # GroupAction
-                if 'actions' in dir(a):
-                    for ai in a.actions:
-                        ai.print_minimum(group=True)
+        for action_group in self.grouped_actions_array:
+            for ai in action_group.actions:
+                ai.print_minimum()
         self.print_total()
 
-    def add_single_or_group_action(self, element):
-        self.actions_array.append(element)
+    def add_group_action(self, element):
+        self.grouped_actions_array.append(element)
         self.total_actions += 1
         self.action_names.append(element.name)
 
@@ -242,35 +182,38 @@ class Definitions:
                     if json_definition['definition']['meta']['totalActions'] > 0:
                         if "name" in json_definition['definition']['meta']:
                             definition_name = json_definition['definition']['meta']["name"]
+                            new_definition = SingleDefinition(definition_name)
                             if "software" in json_definition['definition']['meta']:
-                                definition_software = json_definition['definition']['meta']["software"]
-
-                                new_definition = SingleDefinition(definition_name, definition_software)
-                                if "setupExt" in json_definition['definition']['meta']:
-                                    new_definition.setup_ext = json_definition['definition']['meta']['setupExt']
-                                if "prevExt" in json_definition['definition']['meta']:
-                                    new_definition.prev_ext = json_definition['definition']['meta']['prevExt']
+                                new_definition.software = json_definition['definition']['meta']["software"]
+                            if "setupExt" in json_definition['definition']['meta']:
+                                new_definition.setup_ext = json_definition['definition']['meta']['setupExt']
+                            if "prevExt" in json_definition['definition']['meta']:
+                                new_definition.prev_ext = json_definition['definition']['meta']['prevExt']
                             self.definitions_names.append(json_definition['definition']['meta']["name"])
                             self.add_definition(new_definition)
 
-                            for li in json_definition['definition']['actions'].values():
-                                addi_vals = self.get_additional_button_values(li)
-                                if li['type'] == "single":
-                                    new_action = SingleAction(li['id'], li['name'], li['desc'], li['default'],
-                                                              li['template'], addi_butt=addi_vals[0],
-                                                              addi_fun=addi_vals[1])
-                                    new_definition.add_single_or_group_action(new_action)
+                            if "actions" in json_definition['definition']:
+                                for li in json_definition['definition']['actions'].values():
+                                    addi_vals = self.get_additional_button_values(li)
 
-                                elif li['type'] == "group":
-                                    new_group_action = GroupAction(li['id'], li['name'])
-                                    new_group_action.name = li['name']
-                                    for ag in li["subActions"].values():
-                                        addi_vals = self.get_additional_button_values(ag)
-                                        new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
-                                                                  ag['template'], mode=ag['mode'],
-                                                                  addi_butt=addi_vals[0], addi_fun=addi_vals[1])
+                                    new_group_action = GroupedActions(li['id'], li['name'])
+
+                                    if li['type'] == "single":   # id:1  for all single SingleAction in group
+                                        new_action = SingleAction( 1, li['name'], li['desc'], li['default'],
+                                                                  li['template'], addi_butt=addi_vals[0],
+                                                                  addi_fun=addi_vals[1])
                                         new_group_action.actions.append(new_action)
-                                    new_definition.add_single_or_group_action(new_group_action)
+
+                                    elif li['type'] == "group":
+                                        for ag in li["subActions"].values():
+                                            addi_vals = self.get_additional_button_values(ag)
+                                            new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
+                                                                      ag['template'], mode=ag['mode'],
+                                                                      addi_butt=addi_vals[0], addi_fun=addi_vals[1])
+                                            new_group_action.actions.append(new_action)
+                                    new_definition.add_group_action(new_group_action)
+                            else:
+                                self.batch.logger.wrn(("No actions defined in : ", json_file, " dir:", definitions_dir))
             # self.print_all(print_children=True)
             # self.print_total(print_children=True)
             return True

@@ -107,8 +107,8 @@ def test_current_schema_details(sib):
     assert sib.sch.current_schema.state == "ACTIVE"
     assert sib.sch.current_schema.schema_version == 5
     assert sib.sch.current_schema.project_id == 2
-    assert sib.sch.current_schema.based_on_definition == "sample_definition"
-    assert len(sib.sch.current_schema.actions_array) == 0
+    assert sib.sch.current_schema.based_on_definition == "virtual_definition"
+    assert len(sib.sch.current_schema.actions_array) > 0   # TODO precise
     assert sib.sch.current_schema.description == "fire with smoke"
 
 

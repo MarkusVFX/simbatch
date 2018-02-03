@@ -18,7 +18,7 @@ DEFINITION_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'definition_name'),
     ('version', 'definition_version'),
-    ('actions', 'actions_array'),
+    ('actions', 'actions_groups_array'),
     ('desc', 'description')]
 
 
@@ -164,6 +164,12 @@ class Definitions:
         else:
             return None, None
 
+    def get_example_definition(self):
+        example_defi = SingleDefinition("example_defi")
+        example_group_actions = GroupedActions()
+        example_defi.add_group_action()
+        return example_defi
+
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
             definitions_dir = self.sts.store_definitions_directory
@@ -199,7 +205,7 @@ class Definitions:
                                     new_group_action = GroupedActions(li['id'], li['name'])
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
-                                        new_action = SingleAction( 1, li['name'], li['desc'], li['default'],
+                                        new_action = SingleAction(1, li['name'], li['desc'], li['default'],
                                                                   li['template'], addi_butt=addi_vals[0],
                                                                   addi_fun=addi_vals[1])
                                         new_group_action.actions.append(new_action)

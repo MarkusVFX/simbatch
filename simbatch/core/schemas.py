@@ -1,7 +1,8 @@
 import copy
 import os
 
-import actions
+from actions import SingleAction
+
 
 # JSON Name Format, PEP8 Name Format
 SCHEMA_ITEM_FIELDS_NAMES = [
@@ -17,7 +18,6 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ]
 
 
-
 #  this class definition goes to definition
 # class SingleAction:
 #     def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
@@ -30,6 +30,17 @@ SCHEMA_ITEM_FIELDS_NAMES = [
 
 
 class SchemaItem:
+    """ Single schema """
+    id = None
+    schema_name = None
+    state_id = None
+    state = None
+    project_id = None
+    based_on_definition = None
+    actions_array = []
+    schema_version = None
+    description = None
+
     def __init__(self, schema_id, schema_name, state_id, state, project_id, based_on_definition,
                  actions_array, schema_version, description):  # actions_array
 
@@ -38,8 +49,8 @@ class SchemaItem:
         self.state_id = state_id
         self.state = state
         self.project_id = project_id
-        self.based_on_definition = based_on_definition   # definition_name
-        self.actions_array = actions_array
+        self.based_on_definition = based_on_definition     # OLD definition_name
+        self.actions_array = actions_array                 # OLD actions_groups_array   TODO add grops for edit action
         self.schema_version = schema_version
         # self.actions_string = ""
         self.description = description
@@ -48,17 +59,25 @@ class SchemaItem:
     def basic_print(self):
         print "\n [INF] basic print: "
         print "       schema name: ", self.schema_name
-        print "       project id:{}   definition:{}".format(self.project_id, self.definition_name)
+        print "       project id:{}   definition:{}".format(self.project_id, self.actions_array)
 
     def detailed_print(self):
         print "\n [INF] detailed print: "
         print "       schema id:{}   name:{} ".format(self.id, self.schema_name)
         print "       state id:{}   state:{} ".format(self.state_id, self.state)
-        print "       proj id:{}   definition:{}".format(self.project_id, self.definition_name)
+        print "       proj id:{}   definition:{}".format(self.project_id, self.based_on_definition)
         print "       schema_version {}   description:{}".format(self.schema_version, self.description)
         print "       actions count:{}".format(len(self.actions_array))
         for i, act in enumerate(self.actions_array):
-            print "           {}  {}".format(i,act)
+            print "           {}  {}".format(i, act)
+
+    def add_example_actions_to_schema(self):
+        # print "\n write  aaaaa" , self.based_on_definition
+        self.based_on_definition = "virtual_definition"
+        self.actions_array.append(SingleAction(-1, "virtual action", "descr", "abc", "template <f>") )
+
+        # print "\n write  zzzzz" , self.based_on_definition
+        return True
 
     # def actions_to_string(self):
     #     for a in self.actions_array:
@@ -77,6 +96,7 @@ class SchemaItem:
 
 
 class Schemas:
+    """ All schemas from all projects, TODO project schemas for PRO """
     schemas_data = []
     max_id = 0
     total_schemas = 0
@@ -107,8 +127,8 @@ class Schemas:
             cur_sch = self.current_schema
             print "       current schema name: ", cur_sch.schema_name
             print "       definition id:{}   project id:{}".format(cur_sch.based_on_definition, cur_sch.project_id)
-            for i, a in enumerate(cur_sch.actions_array):
-                print "        a:{}  soft:{}   type:{}  sub type:{} ".format(i, a.soft_id, a.action_type, a.actionParam)
+            for a in cur_sch.actions_array:
+                print "       __a: id{}  name:{}   description:{}".format(a.id, a.name, a.description)
 
     def print_all(self):
         if self.total_schemas == 0:
@@ -117,8 +137,9 @@ class Schemas:
             print "\n\n   {}   id:{}   state:{}".format(sch.schema_name, sch.id, sch.state)
             print "   sch ver:", sch.schema_version
             print "   proj id:{},  definition:{} ".format(sch.project_id, sch.based_on_definition)
+            print "   actions count: ", len(sch.actions_array)
             for a in sch.actions_array:
-                print "       action   : ", a.soft_id, a.action_type, a.action_sub_type, a.action_param
+                print "   __action: {} {} {} {}".format(a.id, a.name, a.default_value, a.template)
         print "\n\n"
 
     def get_schema_names(self, as_string=False, fit=()):
@@ -301,18 +322,24 @@ class Schemas:
                     return False
         return True
 
+    def add_examples_actions_to_all_schemas(self):
+        for sch in self.schemas_data:
+            sch.add_example_actions_to_schema()
+
     def create_example_schemas_data(self, do_save=True):
         collect_ids = 0
-        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, "sample_definition", [], 1, "first schema")
+        sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, "sample_definition_1", [], 1, "first schema")
         sample_schema_item_2 = SchemaItem(0, "schema 2", 22, "ACTIVE", 1, "sample_definition", [], 3, "fire by FumeFx")
         sample_schema_item_3 = SchemaItem(0, "schema 3", 22, "ACTIVE", 2, "sample_definition", [], 5, "fire with smoke")
         sample_schema_item_4 = SchemaItem(0, "schema 4", 22, "ACTIVE", 3, "sample_definition", [], 4, "cloth with fire")
         collect_ids += self.add_schema(sample_schema_item_1)
         collect_ids += self.add_schema(sample_schema_item_2)
         collect_ids += self.add_schema(sample_schema_item_3)
-        collect_ids += self.add_schema(sample_schema_item_4, do_save=do_save)
+        collect_ids += self.add_schema(sample_schema_item_4)
         self.sample_data_checksum = 10
         self.sample_data_total = 4
+        self.add_examples_actions_to_all_schemas()
+        self.save_schemas()
         return collect_ids
 
     def load_schemas(self):
@@ -335,7 +362,9 @@ class Schemas:
                             if "actions" in li:
                                 for lia in li['actions']:
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                    new_schema_actions.append(Action(lia))      # TODO
+                                    new_action = SingleAction(-1, "acti read", "descr", "abc", "template <f>")
+                                    new_action.name = lia
+                                    new_schema_actions.append(new_action)
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), li['definition'], new_schema_actions,
                                                          int(li['version']), li['desc'])
@@ -376,7 +405,15 @@ class Schemas:
                 for i, sd in enumerate(self.schemas_data):
                     sch = {}
                     for field in SCHEMA_ITEM_FIELDS_NAMES:
-                        sch[field[0]] = eval('sd.'+field[1])
+                        if field[0] == "actions":
+                            print " db db db bdb " ,  sd.actions_array
+                            for i, a in enumerate(sd.actions_array):
+                                new_action = ((data["name"], data["number"]) for data in json.loads(some_list)[::-1])
+                            # sch["actions"] = { dict(acti) for acti in sd.actions_array }
+                            new_action = ((data["name"], data["number"]) for data in json.loads(some_list)[::-1])
+                            sch["actions"] = dict(new_action)
+                        else:
+                            sch[field[0]] = eval('sd.'+field[1])
                     formated_data["schemas"]["data"][i] = sch
                 return formated_data
             else:
@@ -401,7 +438,7 @@ class Schemas:
         for sch in self.schemas_data:
             if sch.soft_id == soft_id:
                 for a in sch.actions_array:
-                    if a.action_type == "MaxImport" or a.action_type == "MaxSimulate":
+                    if a.user_value == a.default_value:
                         # print "       action   : ", a.soft_id, a.action_type, a.action_param
                         pass
                         # TODO  get_all_object_from_all_schemas

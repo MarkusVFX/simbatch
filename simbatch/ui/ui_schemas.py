@@ -157,7 +157,7 @@ class SchemasUI:
         wfa_target_proj = EditLineWithButtons("Target Proj  (id or name) ... ", text_on_button_1="test")
         wfa_buttons = ButtonWithCheckBoxes("Copy schema", pin_text="pin")
 
-        wfa_target_proj.text_on_button_1.clicked.connect(
+        wfa_target_proj.button_1.clicked.connect(
             lambda: self.on_changed_copy_target(wfa_target_proj.qt_edit_line))
         wfa_buttons.button.clicked.connect(self.on_clicked_copy_as)
         wfa_copy_schema.qt_edit_line.textChanged.connect(self.on_changed_copy_name)

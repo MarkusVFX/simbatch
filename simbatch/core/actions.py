@@ -58,7 +58,8 @@ class SingleAction:
         print "   {}action: {}   id:{}   default_value:{}".format(prefix, self.name, self.id, self.default_value)
 
     def print_action(self):
-        print "   action: {}   id:{}   description:{} default_value:{}, template:{}".format(self.name, self.id,
+        print "   action: {}   id:{}   description:{} default_value:{}, template:{}".format(self.name,
+                                                                                            self.id,
                                                                                             self.description,
                                                                                             self.default_value,
                                                                                             self.template)
@@ -90,6 +91,7 @@ class GroupedActions:
     def __init__(self, group_id, name):
         self.group_id = group_id
         self.name = name
+        self.actions = []
 
     def __repr__(self):
         return "GroupedActions({},{})".format(self.name, self.name)

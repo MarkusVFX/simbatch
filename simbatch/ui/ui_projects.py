@@ -123,13 +123,13 @@ class ProjectsUI:
         self.wfa_descr_edit = wfa_descr_edit
 
         wfa_buttons = ButtonWithCheckBoxes("Add project", pin_text="pin", cb2_text="Set as default project")
-        wfa_project_dir_edit.text_on_button_1.clicked.connect(
+        wfa_project_dir_edit.button_1.clicked.connect(
             lambda: self.fa_get_project_directory(wfa_project_dir_edit.qt_edit_line))
-        wfa_working_dir_edit.text_on_button_1.clicked.connect(
+        wfa_working_dir_edit.button_1.clicked.connect(
             lambda: self.fa_get_working_directory(wfa_working_dir_edit.qt_edit_line))
-        wfa_cam_dir_edit.text_on_button_1.clicked.connect(
+        wfa_cam_dir_edit.button_1.clicked.connect(
             lambda: self.fa_get_cam_directory(wfa_cam_dir_edit.qt_edit_line))
-        wfa_ani_dir_edit.text_on_button_1.clicked.connect(
+        wfa_ani_dir_edit.button_1.clicked.connect(
             lambda: self.fa_get_cache_directory(wfa_ani_dir_edit.qt_edit_line))
         wfa_buttons.button.clicked.connect(
             lambda: self.on_click_add_project(wfa_project_name_edit.get_txt(), wfa_project_dir_edit.get_txt(),
@@ -182,16 +182,16 @@ class ProjectsUI:
         self.qt_fe_task_name = wfe_project_name_edit.qt_edit_line
 
         self.qt_fe_proj_dir = wfe_project_dir_edit.qt_edit_line
-        wfe_project_dir_edit.text_on_button_1.clicked.connect(
+        wfe_project_dir_edit.button_1.clicked.connect(
             lambda: self.get_dialog_project_directory(wfe_project_dir_edit.qt_edit_line))
         self.qt_fe_working_dir = wfe_project_working_dir_edit.qt_edit_line
-        wfe_project_working_dir_edit.text_on_button_1.clicked.connect(
+        wfe_project_working_dir_edit.button_1.clicked.connect(
             lambda: self.get_dialog_working_directory(wfe_project_working_dir_edit.qt_edit_line))
         self.qt_fe_cam_dir = wfe_project_cam_dir_edit.qt_edit_line
-        wfe_project_cam_dir_edit.text_on_button_1.clicked.connect(
+        wfe_project_cam_dir_edit.button_1.clicked.connect(
             lambda: self.get_dialog_cam_directory(wfe_project_cam_dir_edit.qt_edit_line))
         self.qt_fe_anicache_dir = wfe_project_anicache_dir_edit.qt_edit_line
-        wfe_project_anicache_dir_edit.text_on_button_1.clicked.connect(
+        wfe_project_anicache_dir_edit.button_1.clicked.connect(
             lambda: self.get_dialog_anicache_directory(wfe_project_anicache_dir_edit.qt_edit_line))
         wfe_buttons.button.clicked.connect(
             lambda: self.save_project_changes(wfe_project_name_edit.get_txt(), wfe_project_dir_edit.get_txt(),

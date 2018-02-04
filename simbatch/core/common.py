@@ -29,8 +29,8 @@ class Logger:
         pass
         # TODO !!!
 
-    def dispatch(self, level, message):
-        if self.console_level >= level:
+    def dispatch(self, level, message, force_print=False, raw=False):
+        if self.console_level >= level or force_print:
             console_print = True
         else:
             console_print = False
@@ -50,8 +50,12 @@ class Logger:
             prefix = "DB"
         elif level == 5:
             prefix = "deep"
+        else:
+            prefix = "_"
 
-        if console_print:
+        if raw:
+            print message
+        elif console_print:
             if type(message) is tuple:
                 out = "  ".join([str(el) for el in message])
                 print "   [{}] {}".format(prefix, out)
@@ -61,20 +65,23 @@ class Logger:
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)
 
-    def err(self, message, force_db=False):
-        self.dispatch(1, message)
+    def err(self, message, force_print=False):
+        self.dispatch(1, message, force_print=force_print)
 
-    def wrn(self, message, force_db=True):
-        self.dispatch(2, message)
+    def wrn(self, message, force_print=True):
+        self.dispatch(2, message, force_print=force_print)
 
-    def inf(self, message, force_db=False):
-        self.dispatch(3, message)
+    def inf(self, message, force_print=False):
+        self.dispatch(3, message, force_print=force_print)
 
-    def db(self, message, force_db=False):
-        self.dispatch(4, message)
+    def db(self, message, force_print=False):
+        self.dispatch(4, message, force_print=force_print)
 
-    def deepdb(self, message, force_db=False):
-        self.dispatch(5, message)
+    def deepdb(self, message, force_print=False):
+        self.dispatch(5, message, force_print=force_print)
+
+    def raw(self, message):
+        self.dispatch(5, message, raw=True)
 
 
 class CommonFunctions:
@@ -88,7 +95,6 @@ class CommonFunctions:
             self.logger = logger
         else:
             self.logger = Logger(log_level=0, console_level=3)
-
 
     def print_list(self, get_list, check_float=False):
         for index, val in enumerate(get_list):
@@ -166,21 +172,21 @@ class CommonFunctions:
         for index, sa in enumerate(strings_array):
             if exactly:
                 if sa == wanted_string:
-                    self.logger.deepdb(("isStringInArray : exactly ", sa, wanted_string), force_db=db)
+                    self.logger.deepdb(("isStringInArray : exactly ", sa, wanted_string), force_print=db)
                     return index
             else:
                 if starting:
                     if sa.startswith(wanted_string):
-                        self.logger.deepdb(("isStringInArray : starting ", sa, wanted_string), force_db=db)
+                        self.logger.deepdb(("isStringInArray : starting ", sa, wanted_string), force_print=db)
                         return index
                 else:
                     ret = sa.find(wanted_string)
                     if ret >= 0:
-                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_db=db)
+                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_print=db)
                         return index
                     ret = wanted_string.find(sa)
                     if ret >= 0:
-                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_db=db)
+                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_print=db)
                         return index
         return None
 
@@ -317,7 +323,7 @@ class CommonFunctions:
             return True
         except IOError as e:
             self.logger.err("I/O error({0}): {1}".format(e.errno, e.strerror))
-        except:
+        except RuntimeError:
             self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 
@@ -328,7 +334,7 @@ class CommonFunctions:
         except IOError as e:
             self.logger.err("I/O error({0}): {1}".format(e.errno, e.strerror))
             return True
-        except:
+        except RuntimeError:
             self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 

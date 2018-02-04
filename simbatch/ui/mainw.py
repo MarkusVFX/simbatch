@@ -12,6 +12,7 @@ from ui_schemas import SchemasUI
 from ui_tasks import TasksUI
 from ui_queue import QueueUI
 from ui_settings import SettingsUI
+from ui_definitions import DefinitionsUI
 
 
 class TopMenuUI:
@@ -118,6 +119,7 @@ class MainWindow(QMainWindow):
     que_ui = None
     nod_ui = None
     set_ui = None
+    dfn_ui = None
 
     qt_tab_widget = None
 
@@ -173,6 +175,7 @@ class MainWindow(QMainWindow):
         # self.nod_ui = NodesUI(batch, self, top)
 
         self.set_ui = SettingsUI(batch, top)
+        self.dfn_ui = DefinitionsUI(batch, self, top)
 
         #  TABs
         #  TABs   TABs
@@ -187,6 +190,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.que_ui.qt_widget_queue, "Queue")
         # qt_tab_widget.addTab(self.nod_ui.qt_widget_nodes, "Sim Nodes")       # PRO version
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
+        qt_tab_widget.addTab(self.dfn_ui.qt_widget_definitions, "Definitions")
         qt_tab_widget.setMinimumSize(220, 400)
 
         if self.sts.store_data_mode == 1:

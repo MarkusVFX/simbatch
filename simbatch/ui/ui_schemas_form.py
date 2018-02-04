@@ -6,6 +6,8 @@ except ImportError:
 
 from widgets import *
 # from core.schemas import SingleAction
+from core.actions import GroupedActions
+
 
 class SchemaFormCreateOrEdit(QWidget):
     schema_item_form_object = None
@@ -15,7 +17,7 @@ class SchemaFormCreateOrEdit(QWidget):
 
     # actions
     actionsCount = 0
-    actions_array = []
+    # actions_array = []
     action_widgets = []
     actions_string = ""
 
@@ -32,7 +34,7 @@ class SchemaFormCreateOrEdit(QWidget):
 
     def __init__(self, batch, mode, top):
         QWidget.__init__(self)
-        self.actions_array = []
+        # self.actions_array = []
         self.action_widgets = []
         self.batch = batch
         self.schema_item_form_object = batch.sch.get_blank_schema()
@@ -43,10 +45,11 @@ class SchemaFormCreateOrEdit(QWidget):
         self.add_defined_action_buttons()
         self.top_ui = top
 
-    def proxy_basic_print(self):
+    def form_basic_print(self):
         self.schema_item_form_object.basic_print()
+        self.batch.logger.prnt((" action_widgets count:", len(self.action_widgets)))
 
-    def proxy_detailed_print(self):
+    def form_detailed_print(self):
         self.schema_item_form_object.detailed_print()
 
     def init_ui_elements(self):
@@ -59,8 +62,8 @@ class SchemaFormCreateOrEdit(QWidget):
             qt_debug_buttons = WidgetGroup([SimpleLabel("debug buttons"), db_b1, db_b2])
             db_buttons_group.setLayout(qt_debug_buttons.qt_widget_layout)
             qt_lay_outer_schema_form.addWidget(db_buttons_group)
-            db_b1.button.clicked.connect(self.proxy_basic_print)
-            db_b2.button.clicked.connect(self.proxy_detailed_print)
+            db_b1.button.clicked.connect(self.form_basic_print)
+            db_b2.button.clicked.connect(self.form_detailed_print)
 
         # fae   form add/edit
         qt_fae_schema_name = EditLineWithButtons("Name: ", label_minimum_size=60)
@@ -178,11 +181,12 @@ class SchemaFormCreateOrEdit(QWidget):
     # add horizontal row of defined action buttons
     def add_defined_action_buttons(self, nr=None):
         if nr is None:
-            nr = self.batch.dfn.current_definition
+            nr = self.batch.dfn.current_definition_name
         curr_proj = self.batch.prj.current_project
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.dfn.definitions_array):
                 for action_group in self.batch.dfn.definitions_array[nr].grouped_actions_array:
+                    print " eeeeeeee eeee e e ", action_group, len(action_group.actions)
                     b = self.add_defined_action_button(action_group.name)
                     b.button.clicked.connect(lambda a=action_group: self.on_click_defined_action_button(a, curr_proj))
         else:
@@ -194,19 +198,38 @@ class SchemaFormCreateOrEdit(QWidget):
         combo_val = []
 
         qt_lay = self.qt_lay_fae_actions
-        if len(group_of_actions.actions[0].ui) > 0:
-            button_2 = group_of_actions.actions[0].ui
-        else:
-            button_2 = None
-        if group_of_actions.actions_count == 1:   # single action, no combo
-            action_widget = ActionWidget(group_of_actions.group_id, group_of_actions.name, group_of_actions,
-                                         text_on_button_2=button_2)
+        button_1_caption = None
+        button_2_caption = None
+        button_1_function_str = None
+        button_2_function_str = None
+        if group_of_actions.actions[0].ui is not None:
+            if len(group_of_actions.actions[0].ui) > 0:
+                button_1_caption = group_of_actions.actions[0].ui[0][0]
+                button_1_function_str = group_of_actions.actions[0].ui[0][1]
+            if len(group_of_actions.actions[0].ui) > 1:
+                button_2_caption = group_of_actions.actions[0].ui[1][0]
+                button_2_function_str = group_of_actions.actions[0].ui[1][1]
+
+        print "zzzz z z z ", group_of_actions.actions[0].ui
+        print "zzzz z z z ", len(self.action_widgets) , self.action_widgets
+        print "zzzz z z z ", len(group_of_actions.actions), group_of_actions.actions
+        print "zzzz z z z ", group_of_actions
+
+        logger = self.batch.logger
+        if group_of_actions.actions_count == 0:   # incorrectly defined action
+            action_widget = ActionWidget(logger, -1, "incorrectly defined action", GroupedActions(-1,"empty action") )
+        elif group_of_actions.actions_count == 1:   # single action, no combo
+            action_widget = ActionWidget(logger, group_of_actions.actions[0].id,
+                                         group_of_actions.actions[0].name, group_of_actions,
+                                         button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
+                                         button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
         else:  # grouped actions :  import ANI,CAM,ENV
             for i, a in enumerate(group_of_actions.actions):
                 combo_items.append(a.mode)
                 combo_val.append(a.default_value)
-            action_widget = ActionWidget(group_of_actions.group_id, group_of_actions.name, group_of_actions,
-                                         text_on_button_2=button_2,
+            action_widget = ActionWidget(logger, group_of_actions.group_id, group_of_actions.name, group_of_actions,
+                                         button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
+                                         button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
                                          edit_txt=combo_val[0], combo_items=combo_items, combo_val=combo_val)
 
         qt_lay.addWidget(action_widget)

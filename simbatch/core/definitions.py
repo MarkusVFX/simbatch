@@ -98,7 +98,7 @@ class Definitions:
     definitions_names = []
 
     total_definitions = 0
-    current_definition = None          # current definition name  (unique name)
+    current_definition_name = None     # current definition name  (unique name)
     current_definition_index = None    # current definition index (array index)
 
     # current_software_id = 0
@@ -149,9 +149,9 @@ class Definitions:
         if self.sts.store_data_mode == 2:
             ret = self.load_definitions_from_mysql()
 
-        if self.current_definition is None:
+        if self.current_definition_name is None:
             if self.total_definitions > 0:
-                self.current_definition = self.definitions_names[0]  #   self.definitions_array[0].name
+                self.current_definition_name = self.definitions_names[0]  #   self.definitions_array[0].name
                 self.current_definition_index = 0
             else:
                 self.batch.logger.wrn("No definition loaded!")
@@ -192,7 +192,7 @@ class Definitions:
                     self.batch.logger.db(("definition loaded: ", json_file))
 
                     if self.sts.runtime_env == json_definition['definition']['meta']['name']:
-                        self.current_definition = self.sts.runtime_env
+                        self.current_definition_name = self.sts.runtime_env
                         self.current_definition_index = file_nr
 
                     if json_definition['definition']['meta']['totalActions'] > 0:
@@ -210,8 +210,9 @@ class Definitions:
 
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():
-                                    # addi_vals = self.get_additional_button_values(li)
 
+                                    # print "\n loaddd",  file_nr ,  li
+                                    # addi_vals = self.get_additional_button_values(li)
                                     new_group_action = GroupedActions(li['id'], li['name'])
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
@@ -221,7 +222,7 @@ class Definitions:
                                         li_ui = self.get_ui_values(li)
                                         new_action = SingleAction(1, li['name'], li['desc'], li['default'],
                                                                   li['template'], ui=li_ui)
-                                        new_group_action.actions.append(new_action)
+                                        new_group_action.add_single_action(new_action)
 
                                     elif li['type'] == "group":
                                         for ag in li["subActions"].values():
@@ -232,8 +233,9 @@ class Definitions:
                                             #                           addi_butt=addi_vals[0], addi_fun=addi_vals[1])
                                             new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
                                                                       ag['template'], mode=ag['mode'], ui=ag_ui)
-                                            new_group_action.actions.append(new_action)
+                                            new_group_action.add_single_action(new_action)
                                     new_definition.add_group_action(new_group_action)
+                                    # print "\n new_group_action: ", new_group_action
                             else:
                                 self.batch.logger.wrn(("No actions defined in : ", json_file, " dir:", definitions_dir))
             # self.print_all(print_children=True)

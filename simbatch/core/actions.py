@@ -1,33 +1,48 @@
 
-ACTION_DATA_FIELDS_NAMES = [
+ACTION_DATA_FIELDS_NAMES = (
     ('id', 'id'),
-    ('name', 'action_name'),
-    ('type', 'action_type'),            # "single" or "group",
-    ('sub_mode', 'action_sub_mode'),    # "ANI", "CAM", "OBJ"  for import action
+    ('name', 'name'),
+    ('type', 'type'),            # "single" or "group",
+    ('mode', 'mode'),        # "ANI", "CAM", "OBJ" for 'Import' action
+    ('ui', 'ui'),        # array [["1","2"],["3","4"]]  1 primary button caption 2 function 3 secondary butt 4 sec fun
     ('default', 'default_value'),
     ('template', 'template'),
     ('desc', 'description')
-
-    ]
+)
 
 
 class SingleAction:
     """ Single action is class for store template"""
     id = None
     name = ""
-    user_value = ""
+    type = None
+    mode = None
     default_value = ""
+    json_FIELDS_NAMES = ACTION_DATA_FIELDS_NAMES
+    ui = None                       # store ui for quick save
+    # standard_butt_caption = None    # store ui for ui forms
+    # standard_funcion_str = None     # store ui for ui forms
+    # addional_butt_caption = None    # store ui for ui forms
+    # addional_funcion_str = None     # store ui for ui forms
 
-    def __init__(self, action_id, name, description, default_value, template, mode=None, addi_butt=None, addi_fun=None):
+    user_value = ""   # var set by user for generate action_script using template
+
+    def __init__(self, action_id, name, description, default_value, template, type=None, mode=None, ui=None):
         self.id = action_id
         self.name = name
+        self.type = type
         self.mode = mode  # subaction mode
+        self.ui = ui
         self.description = description
         self.default_value = default_value
         self.template = template
 
-        self.addional_butt_caption = addi_butt
-        self.addional_funcion_name = addi_fun
+        # if len(ui) > 0:
+        #     self.standard_butt_caption = ui[0][0]
+        #     self.standard_funcion_str = ui[0][1]
+        # if len(ui) > 1:
+        #     self.addional_butt_caption = ui[1][0]
+        #     self.addional_funcion_str = ui[1][1]
 
     def __repr__(self):
         return "SingleAction({},{})".format(self.id, self.name)
@@ -37,7 +52,7 @@ class SingleAction:
 
     def print_minimum(self, group=False):
         if group:
-            prefix = "_"     # obsollette
+            prefix = "_"     # obsollette  # TODO cleanup
         else:
             prefix = ""
         print "   {}action: {}   id:{}   default_value:{}".format(prefix, self.name, self.id, self.default_value)

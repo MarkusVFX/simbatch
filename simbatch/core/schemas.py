@@ -10,10 +10,10 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ('name', 'schema_name'),
     ('stateId', 'state_id'),
     ('state', 'state'),
-    ('version', 'schema_version'),
     ('projId', 'project_id'),
-    ('actions', 'actions_array'),
     ('definition', 'based_on_definition'),
+    ('actions', 'actions_array'),
+    ('version', 'schema_version'),
     ('desc', 'description')
     ]
 
@@ -72,11 +72,9 @@ class SchemaItem:
             print "           {}  {}".format(i, act)
 
     def add_example_actions_to_schema(self):
-        # print "\n write  aaaaa" , self.based_on_definition
         self.based_on_definition = "virtual_definition"
-        self.actions_array.append(SingleAction(-1, "virtual action", "descr", "abc", "template <f>") )
-
-        # print "\n write  zzzzz" , self.based_on_definition
+        self.actions_array.append(SingleAction(len(self.actions_array ), "virtual action", "virt descr", "<val>",
+                                               "template <f>", type = "single", ui=(("ui", "interaction.ui_fun()"))))
         return True
 
     # def actions_to_string(self):
@@ -139,7 +137,7 @@ class Schemas:
             print "   proj id:{},  definition:{} ".format(sch.project_id, sch.based_on_definition)
             print "   actions count: ", len(sch.actions_array)
             for a in sch.actions_array:
-                print "   __action: {} {} {} {}".format(a.id, a.name, a.default_value, a.template)
+                print "   __action: {}__{}__{}__{}".format(a.id, a.name, a.default_value, a.template)
         print "\n\n"
 
     def get_schema_names(self, as_string=False, fit=()):
@@ -360,10 +358,12 @@ class Schemas:
                         if len(li) == len(SCHEMA_ITEM_FIELDS_NAMES):
                             new_schema_actions = []
                             if "actions" in li:
-                                for lia in li['actions']:
+                                for lia in li['actions'].values():
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                    new_action = SingleAction(-1, "acti read", "descr", "abc", "template <f>")
-                                    new_action.name = lia
+                                    new_action = SingleAction(lia["id"], lia["name"], lia["desc"], lia["default"],
+                                                              lia["template"])
+                                    # print "\n\nloolo",  lia
+                                    # print "loololololololol",  li['actions']["0"]
                                     new_schema_actions.append(new_action)
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), li['definition'], new_schema_actions,
@@ -406,12 +406,17 @@ class Schemas:
                     sch = {}
                     for field in SCHEMA_ITEM_FIELDS_NAMES:
                         if field[0] == "actions":
-                            print " db db db bdb " ,  sd.actions_array
-                            for i, a in enumerate(sd.actions_array):
-                                new_action = ((data["name"], data["number"]) for data in json.loads(some_list)[::-1])
-                            # sch["actions"] = { dict(acti) for acti in sd.actions_array }
-                            new_action = ((data["name"], data["number"]) for data in json.loads(some_list)[::-1])
-                            sch["actions"] = dict(new_action)
+                            schema_actions = {}
+                            for j, a in enumerate(sd.actions_array):
+                                new_action={}
+                                for field_a in  a.json_FIELDS_NAMES:
+                                    new_action[field_a[0]] = eval('a.' + field_a[1])
+                                # schema_actions.append(new_action)
+                                schema_actions[j] = (new_action)
+                            # # sch["actions"] = { dict(acti) for acti in sd.actions_array }
+                            # new_action = ((data["name"], data["number"]) for data in json.loads(some_list)[::-1])
+                            # new_action=(sd.actions_array)
+                            sch["actions"] = dict(schema_actions)
                         else:
                             sch[field[0]] = eval('sd.'+field[1])
                     formated_data["schemas"]["data"][i] = sch

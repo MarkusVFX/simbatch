@@ -194,7 +194,10 @@ class SchemaFormCreateOrEdit(QWidget):
         combo_val = []
 
         qt_lay = self.qt_lay_fae_actions
-        button_2 = group_of_actions.actions[0].addional_butt_caption
+        if len(group_of_actions.actions[0].ui) > 0:
+            button_2 = group_of_actions.actions[0].ui
+        else:
+            button_2 = None
         if group_of_actions.actions_count == 1:   # single action, no combo
             action_widget = ActionWidget(group_of_actions.group_id, group_of_actions.name, group_of_actions,
                                          text_on_button_2=button_2)

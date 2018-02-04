@@ -105,9 +105,9 @@ class Settings:
                         "debugLevel":
                             {"current": 4, "levels": "1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL "},
                         "storeData":
-                            {"dataDirectory": "\\simbatch\\dataDir\\",
-                             "backupDirectory": "\\simbatch\\backups\\",
-                             "definitionsDirectory": "\\simbatch\\definitions\\"},
+                            {"dataDirectory": "\\\\simbatch\\dataDir\\",
+                             "backupDirectory": "\\\\simbatch\\backups\\",
+                             "definitionsDirectory": "\\\\simbatch\\definitions\\"},
                         "sql":
                             {"db": "127.0.1.220", "user": "default", "pass": "default", "port": "3306"},
                         "adminUser":

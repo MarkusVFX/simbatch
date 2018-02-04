@@ -15,6 +15,7 @@
 				"type": "single",
 				"name": "Open",
 				"desc": "Open Maya scene",
+				"ui" : [["Get file","[ui_get_file]"]],
 				"default": "<schema_base_setup>",
 				"template": ["interaction.maya_open_scene(\"", "<f>", "\")"]
 			},
@@ -28,8 +29,7 @@
 						"mode": "ANI",
 						"desc": "Animation cache",
 						"default": "<project_cache_dir>",
-						"additionalButton" : "Objs",
-						"additionalButtonFunction" : "interaction.maya_get_scene_objects()",
+						"ui" : [["Get dir","[ui_get_directory]"],["Objs","interaction.maya_get_scene_objects()"]],
 						"template": ["interaction.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]						
 					},
 					"2": {
@@ -37,13 +37,19 @@
 						"mode": "CAM",
 						"desc": "Camera file",
 						"default": "<project_cam_dir>",
+						"ui" : [["Get dir","[ui_get_directory]"],["Get file","[ui_get_file]"]],
 						"template": ["interaction.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "OBJ",
 						"desc": "Geometry file",
+						"primaryCaption" : "Get dir",
+						"primaryFunction" : "[ui_get_directory]",
+						"additionalCaption" : "Get file",
+						"additionalFunction" : "[ui_get_file]",
 						"default": "<project_props_dir>",
+						"ui" : [["Get dir","[ui_get_directory]"],["Get file","[ui_get_file]"]],
 						"template": ["interaction.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
 					}
 				}
@@ -53,6 +59,7 @@
 				"type": "single",
 				"name": "Set Value",
 				"desc": "Set value for object property",
+				"ui" : null,
 				"default": "<object>.<param>=<value>",
 				"template": ["interaction.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
@@ -65,6 +72,7 @@
 						"id": 1,
 						"mode": "nCloth",
 						"desc": "nCloth sim",
+						"ui" : null,
 						"default": "<cloth_objects>",
 						"template": ["interaction.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
@@ -72,6 +80,7 @@
 						"id": 2,
 						"mode": "nHair",
 						"desc": "nHair sim",
+						"ui" : null,
 						"default": "<hair_objects>",
 						"template": ["interaction.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
@@ -79,6 +88,7 @@
 						"id": 3,
 						"mode": "nParticle",
 						"desc": "nParticle sim",
+						"ui" : null,
 						"default": "<particle_objects>",
 						"template": ["interaction.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
@@ -86,6 +96,7 @@
 						"id": 4,
 						"mode": "FumeFX",
 						"desc": "FumeFX sim",
+						"ui" : null,
 						"default": "<fume_container>",
 						"template": ["interaction.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
 					},
@@ -93,6 +104,7 @@
 						"id": 5,
 						"mode": "FumeFX WT",
 						"desc": "FumeFX Wavelet",
+						"ui" : null,
 						"default": "<fume_container>",
 						"template": ["interaction.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
 					}
@@ -107,6 +119,7 @@
 						"id": 1,
 						"mode": "BLAST",
 						"desc": "grab viewport",
+						"ui" : null,
 						"default": "<default_camera><shot_prev_dir>",
 						"template": ["interaction.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
@@ -114,6 +127,7 @@
 						"id": 2,
 						"mode": "RENDER",
 						"desc": "render scene",
+						"ui" : null,
 						"default": "<default_camera><shot_prev_dir>",
 						"template": ["interaction.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
@@ -124,6 +138,7 @@
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Maya Scene",
+				"ui" : null,
 				"default": "<copmuted_scenes_dir>",
 				"template": ["interaction.maya_save_scene(\"", "<f>", "\")"]
 			},
@@ -136,6 +151,7 @@
 						"id": 1,
 						"mode": "PY",
 						"desc": "run Python file",
+						"ui" : null,
 						"default": "<scripts_dir>*.py",
 						"template": ["interaction.maya_script_py(\"", "<f>", "\")"]
 					},
@@ -143,6 +159,7 @@
 						"id": 2,
 						"mode": "MEL",
 						"desc": "run MEL file",
+						"ui" : null,
 						"default": "<scripts_dir>*.mel",
 						"template": ["interaction.maya_script_mel(\"", "<f>", "\")"]
 					}

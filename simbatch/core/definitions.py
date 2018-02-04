@@ -157,12 +157,22 @@ class Definitions:
                 self.batch.logger.wrn("No definition loaded!")
         return ret
 
+    # @staticmethod
+    # def get_additional_button_values(li):
+    #     if "additionalButton" in li:
+    #         return li["additionalButton"], li["additionalButtonFunction"]
+    #     else:
+    #         return None, None
+
     @staticmethod
-    def get_additional_button_values(li):
-        if "additionalButton" in li:
-            return li["additionalButton"], li["additionalButtonFunction"]
+    def get_ui_values(li):
+        # print "\ntest  zzz  li " , li
+        if "ui" in li:
+            return li["ui"] # ,  li["additionalButtonFunction"]
         else:
-            return None, None
+            return None
+
+
 
     def get_example_definition(self):
         example_defi = SingleDefinition("example_defi")
@@ -200,22 +210,28 @@ class Definitions:
 
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():
-                                    addi_vals = self.get_additional_button_values(li)
+                                    # addi_vals = self.get_additional_button_values(li)
 
                                     new_group_action = GroupedActions(li['id'], li['name'])
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
+                                        # new_action = SingleAction(1, li['name'], li['desc'], li['default'],
+                                        #                           li['template'], addi_butt=addi_vals[0],
+                                        #                           addi_fun=addi_vals[1])
+                                        li_ui = self.get_ui_values(li)
                                         new_action = SingleAction(1, li['name'], li['desc'], li['default'],
-                                                                  li['template'], addi_butt=addi_vals[0],
-                                                                  addi_fun=addi_vals[1])
+                                                                  li['template'], ui=li_ui)
                                         new_group_action.actions.append(new_action)
 
                                     elif li['type'] == "group":
                                         for ag in li["subActions"].values():
-                                            addi_vals = self.get_additional_button_values(ag)
+                                            # addi_vals = self.get_additional_button_values(ag)
+                                            ag_ui = self.get_ui_values(ag)
+                                            # new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
+                                            #                           ag['template'], mode=ag['mode'],
+                                            #                           addi_butt=addi_vals[0], addi_fun=addi_vals[1])
                                             new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
-                                                                      ag['template'], mode=ag['mode'],
-                                                                      addi_butt=addi_vals[0], addi_fun=addi_vals[1])
+                                                                      ag['template'], mode=ag['mode'], ui=ag_ui)
                                             new_group_action.actions.append(new_action)
                                     new_definition.add_group_action(new_group_action)
                             else:

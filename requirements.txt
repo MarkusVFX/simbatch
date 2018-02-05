@@ -2,4 +2,5 @@
 pyside
 
 ###  developement
+pyside
 pytest

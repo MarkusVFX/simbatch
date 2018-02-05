@@ -26,13 +26,9 @@ class StorageInOut:
         self.comfun.create_directory(directory + "prevs\\")
         self.comfun.create_directory(directory + "cache\\")
 
-    @staticmethod
-    def get_path_from_full(full):
-        return os.path.dirname(full)
-
     def get_files_from_dir(self, directory, types=""):
         files = []
-        dir_path = self.get_path_from_full(directory)
+        dir_path = self.comfun.get_path_from_full(directory)
         if os.path.isdir(dir_path):
             for fi in os.listdir(dir_path):
                 if len(types) > 0:

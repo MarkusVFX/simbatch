@@ -265,8 +265,7 @@ class SettingsUI:
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())
         definitions_path = str(self.qt_settings_definitions_directory_edit.text())
-        if self.settings.debug_level >= 4:
-            print " [db] data_path ", data_path
+        self.batch.logger.db(("Save settings data_path :",data_path))
         if self.comfun.path_exists(data_path, info="Data Path"):
             if self.comfun.path_exists(definitions_path, info="Definitions Path"):
                 self.settings.store_data_json_directory = data_path
@@ -281,9 +280,9 @@ class SettingsUI:
                     batch.tsk.create_example_tasks_data(do_save=True)
                     # batch.que.createSampleData(taskID, projID)  # TODO
                     # batch.nod.createSampleData()  # TODO
-                    if self.settings.debug_level >= 3:
-                        print " [INF] created sample data: ", data_path
+                    self.batch.logger.inf(("Created sample data :",data_path))
             else:
                 print " [ERR] wrong definitions path !!!"
+                self.batch.logger.err(("Wrong definitions path, directory not exist  :",definitions_path))
         else:
-            print " [ERR] wrong data path !!!"
+            self.batch.logger.err((" Wrong data path, directory not exist :",data_path))

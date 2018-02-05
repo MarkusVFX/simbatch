@@ -151,8 +151,8 @@ class SchemasUI:
         schema_form_copy.setLayout(qt_lay_outer_form_copy)
         qt_lay_form_copy = QVBoxLayout()
 
-        # wfa   widget form add
-        # fa    form add
+        # wfa -  widget form add
+        # fa  -  form add
         wfa_copy_schema = EditLineWithButtons("Copy schema as ... ")
         wfa_target_proj = EditLineWithButtons("Target Proj  (id or name) ... ", text_on_button_1="test")
         wfa_buttons = ButtonWithCheckBoxes("Copy schema", pin_text="pin")
@@ -318,7 +318,7 @@ class SchemasUI:
         self.sch.current_schema_index = cur_sch_index
         self.sch.update_current_from_index(cur_sch_index)
 
-        ret = self.batch.dfn.getSchemaBaseSetupFile(forceSchemaVersion=True)   # TODO  getSchemaBaseSetupFile PEP8
+        ret = self.batch.dfn.get_schema_base_setup_file(forceSchemaVersion=True)
 
         cur_schema = self.sch.schemas_data[cur_sch_index]
         self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
@@ -387,7 +387,7 @@ class SchemasUI:
             new_schema = self.sch.get_blank_schema()
             new_schema.project_id = self.batch.prj.current_project_id
 
-            new_schema.definition_name = self.batch.dfn.current_definition
+            new_schema.definition_name = self.batch.dfn.current_definition_name
             self.schema_form_create.update_form_data(new_schema)
         else:
             self.batch.logger.wrn(("Wrong current project index", self.batch.prj.current_project_index))
@@ -503,7 +503,8 @@ class SchemasUI:
                                           new_schema_item.description, str(new_schema_item.schema_version))
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
-        self.batch.logger.db(("add schema:", new_schema_item.schema_name,"   to proj :", self.batch.prj.current_project_id))
+        self.batch.logger.db(("add schema:", new_schema_item.schema_name,
+                              "   to proj :", self.batch.prj.current_project_id))
         sch_dir = self.batch.prj.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
         self.batch.sio.create_schema_directory(sch_dir)
 
@@ -560,8 +561,7 @@ class SchemasUI:
             self.edit_form_state = 0
 
     def load_base_setup(self, schema_name, version=1):
-        file_to_load = self.batch.dfn.generate_tuple_base_setup_file_name(schema_name,
-                                                                        ver=version)
+        file_to_load = self.batch.dfn.generate_tuple_base_setup_file_name(schema_name, ver=version)
         if file_to_load[0] == 1:
             self.batch.logger.inf(("loadFile: ", file_to_load[1]))
             self.batch.dfn.soco.load_scene(file_to_load[1])

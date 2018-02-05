@@ -73,8 +73,8 @@ class SchemaItem:
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
-        self.actions_array.append(SingleAction(len(self.actions_array ), "virtual action", "virt descr", "<val>",
-                                               "template <f>", type = "single", ui=(("ui", "interaction.ui_fun()"))))
+        self.actions_array.append(SingleAction(len(self.actions_array), "virtual action", "virt descr", "<val>",
+                                               "template <f>", type="single", ui=(("ui", "interaction.ui_fun()"))))
         return True
 
     # def actions_to_string(self):
@@ -337,7 +337,8 @@ class Schemas:
         self.sample_data_checksum = 10
         self.sample_data_total = 4
         self.add_examples_actions_to_all_schemas()
-        self.save_schemas()
+        if do_save:
+            self.save_schemas()
         return collect_ids
 
     def load_schemas(self):
@@ -362,8 +363,6 @@ class Schemas:
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
                                     new_action = SingleAction(lia["id"], lia["name"], lia["desc"], lia["default"],
                                                               lia["template"])
-                                    # print "\n\nloolo",  lia
-                                    # print "loololololololol",  li['actions']["0"]
                                     new_schema_actions.append(new_action)
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), li['definition'], new_schema_actions,
@@ -408,14 +407,10 @@ class Schemas:
                         if field[0] == "actions":
                             schema_actions = {}
                             for j, a in enumerate(sd.actions_array):
-                                new_action={}
-                                for field_a in  a.json_FIELDS_NAMES:
+                                new_action = {}
+                                for field_a in a.json_FIELDS_NAMES:
                                     new_action[field_a[0]] = eval('a.' + field_a[1])
-                                # schema_actions.append(new_action)
-                                schema_actions[j] = (new_action)
-                            # # sch["actions"] = { dict(acti) for acti in sd.actions_array }
-                            # new_action = ((data["name"], data["number"]) for data in json.loads(some_list)[::-1])
-                            # new_action=(sd.actions_array)
+                                schema_actions[j] = new_action
                             sch["actions"] = dict(schema_actions)
                         else:
                             sch[field[0]] = eval('sd.'+field[1])

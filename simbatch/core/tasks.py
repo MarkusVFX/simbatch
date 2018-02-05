@@ -339,9 +339,3 @@ class Tasks:
         # PRO VERSION
         self.batch.logger.inf("MySQL database available in the PRO version")
         return None
-
-
-
-
-
-

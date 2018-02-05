@@ -10,9 +10,6 @@ except ImportError:
 
 from actions import GroupedActions, SingleAction
 
-# import os
-
-
 # JSON Name Format, PEP8 Name Format
 DEFINITION_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
@@ -41,10 +38,6 @@ ACTION_ITEM_FIELDS_NAMES = [
 #
 #     def save_curent_scene_as(self, target ):
 #         pass
-
-
-
-
 
 
 class SingleDefinition:
@@ -146,38 +139,34 @@ class Definitions:
     def load_definitions(self):
         if self.sts.store_data_mode == 1:
             ret = self.load_definitions_from_jsons()
-        if self.sts.store_data_mode == 2:
+        elif self.sts.store_data_mode == 2:
             ret = self.load_definitions_from_mysql()
+        else:
+            ret = False
 
         if self.current_definition_name is None:
             if self.total_definitions > 0:
-                self.current_definition_name = self.definitions_names[0]  #   self.definitions_array[0].name
+                self.current_definition_name = self.definitions_names[0]
                 self.current_definition_index = 0
             else:
                 self.batch.logger.wrn("No definition loaded!")
         return ret
 
-    # @staticmethod
-    # def get_additional_button_values(li):
-    #     if "additionalButton" in li:
-    #         return li["additionalButton"], li["additionalButtonFunction"]
-    #     else:
-    #         return None, None
-
     @staticmethod
     def get_ui_values(li):
-        # print "\ntest  zzz  li " , li
         if "ui" in li:
-            return li["ui"] # ,  li["additionalButtonFunction"]
+            return li["ui"]
         else:
             return None
 
-
-
-    def get_example_definition(self):
+    @staticmethod
+    def get_example_definition():
         example_defi = SingleDefinition("example_defi")
-        example_group_actions = GroupedActions()
-        example_defi.add_group_action()
+        example_group_actions = GroupedActions(1, "example a gr")
+        example_action = SingleAction(1, "ex_a", "desc", "<def>", "templ <o>", mode="single",
+                                      ui=(("Tst", "print('ex')"), ("Tst", "print('ex')")))
+        example_group_actions.add_single_action(example_action)
+        example_defi.add_group_action(example_group_actions)
         return example_defi
 
     def load_definitions_from_jsons(self, definitions_dir=""):
@@ -210,15 +199,9 @@ class Definitions:
 
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():
-
-                                    # print "\n loaddd",  file_nr ,  li
-                                    # addi_vals = self.get_additional_button_values(li)
                                     new_group_action = GroupedActions(li['id'], li['name'])
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
-                                        # new_action = SingleAction(1, li['name'], li['desc'], li['default'],
-                                        #                           li['template'], addi_butt=addi_vals[0],
-                                        #                           addi_fun=addi_vals[1])
                                         li_ui = self.get_ui_values(li)
                                         new_action = SingleAction(1, li['name'], li['desc'], li['default'],
                                                                   li['template'], ui=li_ui)
@@ -226,16 +209,11 @@ class Definitions:
 
                                     elif li['type'] == "group":
                                         for ag in li["subActions"].values():
-                                            # addi_vals = self.get_additional_button_values(ag)
                                             ag_ui = self.get_ui_values(ag)
-                                            # new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
-                                            #                           ag['template'], mode=ag['mode'],
-                                            #                           addi_butt=addi_vals[0], addi_fun=addi_vals[1])
                                             new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
                                                                       ag['template'], mode=ag['mode'], ui=ag_ui)
                                             new_group_action.add_single_action(new_action)
                                     new_definition.add_group_action(new_group_action)
-                                    # print "\n new_group_action: ", new_group_action
                             else:
                                 self.batch.logger.wrn(("No actions defined in : ", json_file, " dir:", definitions_dir))
             # self.print_all(print_children=True)
@@ -245,7 +223,7 @@ class Definitions:
             self.batch.logger.err(("Definitions directory not exist: ", definitions_dir))
             return False
 
-    @staticmethod
-    def load_definitions_from_mysql():
+    def load_definitions_from_mysql(self):
         #  PRO version with sql
-        pass
+        self.batch.logger.inf("PRO version support SQL ")
+        return False

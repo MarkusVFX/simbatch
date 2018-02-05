@@ -267,7 +267,7 @@ class QueueUI:
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
         prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
-                                                  forceQueueVersion=version)
+                                                    forceQueueVersion=version)
 
         self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
 

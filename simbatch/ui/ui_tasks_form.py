@@ -8,7 +8,6 @@ from widgets import *
 from ui_queue import QueueItem
 
 
-
 class AddToQueueForm (QWidget):
     batch = None
     form_atq_local_item = None
@@ -32,15 +31,12 @@ class AddToQueueForm (QWidget):
 
     def __init__(self, batch):
         QWidget.__init__(self)
-        self.form_atq_local_item = QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL" ,0 , "ver", "evo" ,0 ,50 ,
+        self.form_atq_local_item = QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, "ver", "evo", 0, 50,
                                              " 1 ", "", 0, "", 1, 3)
-
-        #self.batch = batch
-        #self.sts = self.batch.sts
-        #self.comfun = self.batch.comfun
+        self.batch = batch
+        # self.sts = self.batch.sts
+        # self.comfun = self.batch.comfun
         self.init_ui_elements()
-
-
 
     def init_ui_elements(self):
         qt_form_add_layout = QVBoxLayout()
@@ -77,7 +73,7 @@ class AddToQueueForm (QWidget):
         qt_form_add_layout.addLayout(qt_button_cb_add_to_queue.qt_widget_layout)
 
         qt_gb_atq = QGroupBox()
-        #qt_gb_atq.setLayout(qt_form_add_layout)
+        # qt_gb_atq.setLayout(qt_form_add_layout)
         self.qt_gb_add_to_queue_now = qt_gb_atq
         qt_form_add_layout.addWidget(qt_gb_atq)
 
@@ -97,11 +93,9 @@ class AddToQueueForm (QWidget):
         # qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)
 
     def update_add_ui(self):
+        # TODO
         pass
 
     def create_directories(self):
+        # TODO
         return True
-
-
-
-

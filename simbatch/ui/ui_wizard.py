@@ -36,7 +36,7 @@ class WizardUI:
         qt_lay_wizard_form = QVBoxLayout()
         # qt_lay_wizard_buttons = QVBoxLayout()
 
-        ###   STEP 1
+        # STEP 1
         qt_lay_step_1a = QVBoxLayout()
         wizard_step_1a = EditLineWithButtons("Project Name:", label_minimum_size=94)
         wizard_step_1b = EditLineWithButtons("Project Directory:", text_on_button_1="Get", label_minimum_size=94,
@@ -56,7 +56,7 @@ class WizardUI:
                                                  SimpleLabel("or", label_maximum=10).qt_widget_layout,
                                                  wizard_step_use_curr_scene.qt_widget_layout])
 
-        ### self s1
+
         self.s1projNameEL = wizard_step_1a.qt_edit_line
         self.s1projDirEL = wizard_step_1b.qt_edit_line
         self.s1workingDirEL = wizard_step_1bb.qt_edit_line

@@ -4,6 +4,8 @@
 #
 #  www.SimBatch.com
 #
+
+
 class SimNodes:
     batch = None
     comfun = None
@@ -20,7 +22,8 @@ class SimNodes:
         self.comfun = batch.comfun
         self.nodes_data = []
 
-    def print_current(self):
+    @staticmethod
+    def print_current():
         print " TODO print node"  # TODO print
 
 #

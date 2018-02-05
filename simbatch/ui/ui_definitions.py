@@ -37,8 +37,6 @@ class DefinitionsUI:
         lay_definitions_main.setContentsMargins(0, 0, 0, 0)
         self.qt_lay_definitions_main = lay_definitions_main
 
-        qt_lay_wizard_form = QVBoxLayout()
-
         prnt_lay = QVBoxLayout()
         current_name = EditLineWithButtons("Project Name:", label_minimum_size=94)
 
@@ -50,19 +48,12 @@ class DefinitionsUI:
         print_current.button.clicked.connect(self.on_click_sprint_current)
         print_all.button.clicked.connect(self.on_click_print_all)
 
-
-
-
         self.comfun.add_layouts(prnt_lay, [current_name.qt_widget_layout,
                                            print_base.qt_widget_layout,
                                            print_current.qt_widget_layout,
                                            print_all.qt_widget_layout])
 
-
-        # lay_definitions_main.addWidget(QLabel("Wizard under refactoring !"))
         self.comfun.add_layouts(lay_definitions_main, [prnt_lay])
-
-
 
     def on_click_print_base(self):
         logger_raw = self.batch.logger.raw
@@ -72,11 +63,9 @@ class DefinitionsUI:
             logger_raw("\n\n total_definitions:{} current:{}".format(self.dfn.total_definitions,
                                                                      self.dfn.current_definition_name))
             logger_raw(" dfn count:{} dfn names count:{}".format(len(self.dfn.definitions_array),
-                                                                    len(self.dfn.definitions_names)))
-        for d in self.dfn.definitions_array :
+                                                                 len(self.dfn.definitions_names)))
+        for d in self.dfn.definitions_array:
             logger_raw(" _name:{} total_actions:{} names count:{}".format(d.name, d.total_actions, len(d.action_names)))
-
-
 
     def print_single_dfn(self, d):
         logger_raw = self.batch.logger.raw
@@ -91,19 +80,14 @@ class DefinitionsUI:
                                                                                len(ga.actions)))
             for j, sa in enumerate(ga.actions):
                 logger_raw("    ___action {}  name:{}  default_value:{}  ui:{}".format(j, sa.name,
-                                                                                        sa.default_value, sa.ui))
+                                                                                       sa.default_value, sa.ui))
 
     def on_click_sprint_current(self):
         self.batch.logger.raw(str(self.dfn.current_definition_name))
-        for d in self.dfn.definitions_array :
+        for d in self.dfn.definitions_array:
             if d.name == self.dfn.current_definition_name:
                 self.print_single_dfn(d)
 
     def on_click_print_all(self):
-        for d in self.dfn.definitions_array :
+        for d in self.dfn.definitions_array:
             self.print_single_dfn(d)
-
-
-
-
-

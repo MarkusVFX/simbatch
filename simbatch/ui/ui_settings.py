@@ -287,7 +287,3 @@ class SettingsUI:
                 print " [ERR] wrong definitions path !!!"
         else:
             print " [ERR] wrong data path !!!"
-
-
-
-

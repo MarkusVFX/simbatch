@@ -63,14 +63,16 @@ class SingleAction:
                                                                                             self.description,
                                                                                             self.default_value,
                                                                                             self.template)
-
     def get_action(self):
+        # TODO
         return self
 
     def get_action(self):
+        # TODO
         return self
 
     def get_action_as_string(self):
+        # TODO
         return ""
 
     def complie_action(self, opions):

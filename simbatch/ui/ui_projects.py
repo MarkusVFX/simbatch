@@ -547,7 +547,7 @@ class ProjectsUI:
         tsk_ui.update_all_tasks()
         tsk_ui.update_list_of_visible_ids()
 
-    def on_list_current_changed(self, x):
+    def on_list_current_changed(self, currentRow):
         if self.freeze_list_on_changed == 1:
             self.batch.logger.deepdb(("proj chngd freeze_list_on_changed", self.qt_list_projects.currentRow()))
         else:
@@ -584,7 +584,7 @@ class ProjectsUI:
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current project:   " + cur_proj.project_name)
             else:
-                self.batch.logger.wrn(("(on chng) Wrong current_list_index: ",current_list_index))
+                self.batch.logger.wrn(("(on chng) Wrong current_list_index: ", current_list_index))
 
             self.update_sch_after_proj_changed()
             self.update_tsk_after_proj_changed()

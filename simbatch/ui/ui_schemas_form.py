@@ -71,7 +71,6 @@ class SchemaFormCreateOrEdit(QWidget):
         qt_fae_schema_description = EditLineWithButtons("Description:  ", label_minimum_size=60)
         self.qt_fae_schema_description_edit = qt_fae_schema_description.qt_edit_line
         qt_fae_schema_version = EditLineWithButtons("Version:  ", label_minimum_size=55)
-                                                        # , edit_maximum_size=70 ,  widgetMaximum = 40)
         self.qt_fae_schema_version_edit = qt_fae_schema_version.qt_edit_line
         qt_fae_schema_as_base = QCheckBox("Copy Current Scene As Base Setup")
         qt_fae_schema_as_base.setStyleSheet("""padding-left:130px;""")
@@ -102,7 +101,6 @@ class SchemaFormCreateOrEdit(QWidget):
         qt_bg_schema_top.setLayout(qt_lay_fae)
         qt_lay_outer_schema_form.addWidget(qt_bg_schema_top)
         self.qt_bg_schema_top = qt_bg_schema_top
-        # qt_bg_schema_top.clicked.connect(self.schema_item_form_object.basic_print)
 
         qt_lay_fae_actions = QVBoxLayout()
         self.qt_lay_fae_actions = qt_lay_fae_actions
@@ -160,16 +158,16 @@ class SchemaFormCreateOrEdit(QWidget):
     # ACTIONS
     # ACTIONS
     # ACTIONS
-    def compile_actions(self):
-        self.actions_array = []
-        for i, action_widget in enumerate(self.action_widgets):
-            single_action = action_widget.get_current_action()
-            if single_action is not None:
-                self.actions_array.append(single_action)
-                # TODO  compile acttion
-                self.batch.logger.deepdb(("COMPILE ACTION", single_action))
-            else:
-                self.batch.logger.wrn(("(compile_actions)  None ACTION : ", i))
+    # def compile_actions(self):
+    #     self.actions_array = []
+    #     for i, action_widget in enumerate(self.action_widgets):
+    #         single_action = action_widget.get_current_action()
+    #         if single_action is not None:
+    #             self.actions_array.append(single_action)
+    #             # TODO  compile acttion
+    #             self.batch.logger.deepdb(("COMPILE ACTION", single_action))
+    #         else:
+    #             self.batch.logger.wrn(("(compile_actions)  None ACTION : ", i))
 
     def add_defined_action_button(self, button_txt, disabled=False):
         b = ButtonOnLayout(button_txt)
@@ -186,7 +184,6 @@ class SchemaFormCreateOrEdit(QWidget):
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.dfn.definitions_array):
                 for action_group in self.batch.dfn.definitions_array[nr].grouped_actions_array:
-                    print " eeeeeeee eeee e e ", action_group, len(action_group.actions)
                     b = self.add_defined_action_button(action_group.name)
                     b.button.clicked.connect(lambda a=action_group: self.on_click_defined_action_button(a, curr_proj))
         else:
@@ -209,11 +206,6 @@ class SchemaFormCreateOrEdit(QWidget):
             if len(group_of_actions.actions[0].ui) > 1:
                 button_2_caption = group_of_actions.actions[0].ui[1][0]
                 button_2_function_str = group_of_actions.actions[0].ui[1][1]
-
-        print "zzzz z z z ", group_of_actions.actions[0].ui
-        print "zzzz z z z ", len(self.action_widgets) , self.action_widgets
-        print "zzzz z z z ", len(group_of_actions.actions), group_of_actions.actions
-        print "zzzz z z z ", group_of_actions
 
         logger = self.batch.logger
         if group_of_actions.actions_count == 0:   # incorrectly defined action

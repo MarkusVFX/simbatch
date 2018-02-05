@@ -95,7 +95,8 @@ class StorageInOut:
 
     def generate_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
         if len(self.prj.projects_data) < self.prj.current_project_index or self.prj.current_project_index < 0:
-            self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index, len(self.prj.projects_data)))
+            self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index,
+                                   len(self.prj.projects_data)))
             return -1, ""
         else:
             proj_working_dir = self.prj.current_project.working_directory_absolute

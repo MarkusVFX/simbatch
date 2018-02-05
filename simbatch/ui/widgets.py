@@ -1,18 +1,18 @@
 
 try:
-    from PySide.QtCore  import *
+    from PySide.QtCore import *
     from PySide.QtGui import *
 except ImportError:
     from PySide2.QtCore import *
     from PySide2.QtGui import *
     from PySide2.QtWidgets import *
 
-
 from core.common import CommonFunctions, Logger
 
 
-class SimpleLabel():
+class SimpleLabel:
     qt_widget_layout = None
+
     def __init__(self, label_text, label_minimum_size=0, label_maximum=0):
         label = QLabel(label_text)
         if label_minimum_size > 0:
@@ -24,13 +24,13 @@ class SimpleLabel():
         self.qt_widget_layout.addWidget(label)
 
 
-class ComboLabel():
+class ComboLabel:
     qt_widget_layout = None
     combo = None
     text_on_button_1 = None
 
     def __init__(self, label_text, combo_items_arr, combo_current_index=0, label_minimum_size=0, text_on_button_1="",
-                 buttonSize=0):
+                 button_size=0):
         self.qt_widget_layout = QHBoxLayout()
         if len(label_text) > 0:
             label = QLabel(label_text)
@@ -48,9 +48,8 @@ class ComboLabel():
         if len(text_on_button_1) > 0:
             self.button_1 = QPushButton(text_on_button_1)
             self.qt_widget_layout.addWidget(self.button_1)
-            if buttonSize > 0:
-                self.button_1.setMaximumWidth(buttonSize)
-
+            if button_size > 0:
+                self.button_1.setMaximumWidth(button_size)
 
 
 class EditLineWithButtons:
@@ -89,7 +88,6 @@ class EditLineWithButtons:
             self.qt_widget_layout.addWidget(self.button_2)
             if button_width > 0:
                 self.button_2.setFixedWidth(button_width)
-
 
     def get_txt(self):
         return self.qt_edit_line.text()
@@ -211,7 +209,7 @@ class ActionWidget(QWidget):
     logger = None
 
     def __init__(self, logger, action_id, label_txt, group_of_actions, edit_txt="", combo_items="", combo_val="",
-                 button_1_caption=None, button_1_fun_str = None, button_2_caption=None, button_2_fun_str = None,
+                 button_1_caption=None, button_1_fun_str=None, button_2_caption=None, button_2_fun_str=None,
                  enabled1=True, enabled2=True):
 
         QWidget.__init__(self)
@@ -257,6 +255,8 @@ class ActionWidget(QWidget):
                     self.qt_button_2.setEnabled(False)
                 self.qt_layout.addWidget(self.qt_button_2)
 
+                self.qt_button_2.clicked.connect(lambda: eval(button_2_fun_str))
+
             if len(combo_items) > 0:
                 self.qt_combo = QComboBox()
                 # combo_items_arr = combo_items.split(",")
@@ -275,20 +275,18 @@ class ActionWidget(QWidget):
                 qt_widget_layout.addWidget(self.qt_combo)
                 self.qt_combo.currentIndexChanged.connect(self.on_change_combo)
         else:
-            self.logger.wrn(("  Incorrectly defined action !  "))
+            self.logger.wrn("  Incorrectly defined action !  ")
         self.setLayout(qt_widget_layout)
-
 
     def file_dialog(self, qt_edit):
         self.comfun.file_dialog_to_edit_line(qt_edit, QFileDialog, "")
         # QFileDialog - protect common function to be independent library
 
     def get_current_action(self):
-        for i,a in enumerate(self.group_of_actions.actions):
+        for i, a in enumerate(self.group_of_actions.actions):
             if i == self.current_action_index:
                 return a
         return None
-
 
     def on_change_line_edit(self, txt):
         self.logger.deepdb(("Action edit chngd: ", txt))
@@ -296,8 +294,6 @@ class ActionWidget(QWidget):
 
     def on_change_combo(self, index):
         self.logger.deepdb(("Action combo chngd: ", index, "  ", self.combo.currentText()))
-
-
 
 
 class WidgetGroup:

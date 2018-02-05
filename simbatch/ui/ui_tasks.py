@@ -156,7 +156,7 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item = TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
 
         self.init_ui_elements(batch.sch)
-        #self.schemas_id_array = batch.sch.schemas_id_array # TODO  visible isd  VS proj's schemas
+        # self.schemas_id_array = batch.sch.schemas_id_array  # TODO  visible isd  VS proj's schemas
 
     def init_ui_elements(self, sch):
         qt_layout_out_form_create = QVBoxLayout()
@@ -289,21 +289,21 @@ class TasksFormCreateOrEdit(QWidget):
     def compile_imputs(self):
         self.form_task_item.task_name = self.qt_schema_name_combo.currentText()
         if self.qt_schema_name_combo.currentIndex() >= 0:
-            self.batch.logger.db(("comlpile inputs", self.qt_schema_name_combo.currentIndex(), self.schemas_id_array ))
+            self.batch.logger.db(("comlpile inputs", self.qt_schema_name_combo.currentIndex(), self.schemas_id_array))
             if len(self.schemas_id_array) > 0:
                 self.batch.logger.db(("comlpile ...", self.schemas_id_array[0], len(self.schemas_id_array)))
             if len(self.schemas_id_array) > self.qt_schema_name_combo.currentIndex():
                 self.form_task_item.schema_id = self.schemas_id_array[self.qt_schema_name_combo.currentIndex()]
             else:
                 if self.sts.debug_level >= 1:
-                    self.batch.logger.err(("comlpile err", len(self.schemas_id_array)))
-                    self.batch.logger.err(("comlpile err", self.qt_schema_name_combo.currentIndex()))
+                    self.batch.logger.err(("Comlpile err", len(self.schemas_id_array)))
+                    self.batch.logger.err(("Comlpile err", self.qt_schema_name_combo.currentIndex()))
         else:
             self.form_task_item.schema_id = -1
-            self.batch.logger.wrn(("wrong index, schema_name_combo:", self.qt_schema_name_combo.currentIndex()))
+            self.batch.logger.wrn(("Wrong index, schema_name_combo:", self.qt_schema_name_combo.currentIndex()))
 
         if self.batch.sch.current_schema_index is None:   # TODO check it
-            self.batch.logger.err(("current schema is None! current_schema_index:", self.batch.sch.current_schema_index))
+            self.batch.logger.err(("Current sch is None! current_schema_index:", self.batch.sch.current_schema_index))
 
         if self.batch.prj.current_project_id is not None:
             self.form_task_item.project_id = self.batch.prj.current_project_id
@@ -366,7 +366,6 @@ class TasksUI:
     qt_form_edit = None
     qt_form_remove = None
     qt_form_add = None
-
 
     batch = None
     top_ui = None
@@ -728,7 +727,8 @@ class TasksUI:
         self.batch.logger.inf("task updated")
 
     def on_click_confirm_remove_project(self):
-        self.batch.logger.db(("remove_project", self.batch.tsk.current_task_index, self.batch.tsk.current_task_list_index))
+        self.batch.logger.db(("remove_project", self.batch.tsk.current_task_index,
+                              self.batch.tsk.current_task_list_index))
         if self.batch.tsk.current_task_list_index >= 0:
             take_item_list = self.batch.tsk.current_task_list_index + 1
             self.batch.tsk.remove_single_task(index=self.batch.tsk.current_task_index, do_save=True)

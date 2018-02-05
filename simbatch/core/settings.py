@@ -149,19 +149,19 @@ class Settings:
             if "dataMode" in self.json_settings_data:
                 print " json_settings_data[dataMode][current]: ", self.json_settings_data["dataMode"]["current"]
             else:
-                self.logger.err(("MISSING dataMode KEY IN SETTINGS FILE:",self.ini_file))
+                self.logger.err(("MISSING dataMode KEY IN SETTINGS FILE:", self.ini_file))
             if "colorMode" in self.json_settings_data:
                 print " json_settings_data[colorMode][current]: ", self.json_settings_data["colorMode"]["current"]
             else:
-                self.logger.err(("MISSING colorMode KEY IN SETTINGS FILE:",self.ini_file))
+                self.logger.err(("MISSING colorMode KEY IN SETTINGS FILE:", self.ini_file))
             if "debugLevel" in self.json_settings_data:
                 print " json_settings_data[debugLevel][current]: ", self.json_settings_data["debugLevel"]["current"]
             else:
-                self.logger.err(("MISSING debugLevel KEY IN SETTINGS FILE:",self.ini_file))
+                self.logger.err(("MISSING debugLevel KEY IN SETTINGS FILE:", self.ini_file))
             if "window" in self.json_settings_data:
                 print " json_settings_data[window]: ", self.json_settings_data["window"]
             else:
-                self.logger.err(("MISSING window KEY IN SETTINGS FILE:",self.ini_file))
+                self.logger.err(("MISSING window KEY IN SETTINGS FILE:", self.ini_file))
 
         print " store_data_mode: ", self.store_data_mode
         print " debug_level: ", self.debug_level

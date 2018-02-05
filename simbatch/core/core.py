@@ -63,21 +63,7 @@ class SimBatch:
         # nodes
         print "\n NODES: "
         self.nod.print_current()
-        
-        # print "       currentTaskID:", self.tsk.currentTaskID, "   currentTaskIndex:", self.tsk.currentTaskIndex, "   total_projects:", self.prj.total_projects
-        # if self.tsk.currentTaskIndex >= 0:
-        #     curTsk = self.tsk.tasksData[self.tsk.currentTaskIndex]
-        #     print "       current task: ", curTsk.taskName
-        #     print "       schemaID:", curTsk.schemaID, "       projID:", curTsk.projID  # ,  "       soft_id:", curTsk.projID,
-        #     print "       shotDetails ", curTsk.shotA, "   ", curTsk.shotB, "   ", curTsk.shotC
-        #     print "       frameFrom  frameTo ", curTsk.frameFrom, curTsk.frameTo
-        #     print "       state  state_id ", curTsk.state, "    ", curTsk.state_id
-        #
-        #
-        # print "       currentQueueID:", self.que.currentQueueID, "   currentQueueIndex:", self.que.currentQueueIndex, "   total_projects:", self.prj.total_projects
-        # if self.que.currentQueueIndex >= 0:
-        #     curQue = self.que.queueData[self.que.currentQueueIndex]
-        #     print "       current queueItem: ", curQue.queueItemName, "     version :", curQue.version, "     evolutionNr :", curQue.evolutionNr
+
         print "\n\n"
 
     def print_current_detailed_values(self, index):

@@ -83,6 +83,19 @@ class SingleDefinition:
         return self.prev_ext
 
 
+class ExampleInteract:
+
+    def __init__(self):
+        self.load()
+
+    def load(self):
+        pass
+
+    def save_curent_scene_as(self, file_and_path):
+        print " [interact] save as :", file_and_path
+
+
+
 class Definitions:
     batch = None
     comfun = None
@@ -95,8 +108,8 @@ class Definitions:
     current_definition_index = None    # current definition index (array index)
 
     # current_software_id = 0
-    # soco = None   # software connector
-    current_interact = None
+
+    current_interact = None        # OLD soco = None   # software connector
 
     def __init__(self, batch):
         self.batch = batch
@@ -105,6 +118,8 @@ class Definitions:
         self.definitions_array = []
         self.definitions_names = []
         # self.soco = SoftwareConnector(batch.sch.current_schema_software_id)
+
+        self.current_interact = ExampleInteract()
 
     def __repr__(self):
         return "Definitions({})".format(self.batch)

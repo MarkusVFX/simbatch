@@ -509,28 +509,27 @@ class SchemasUI:
         self.batch.sio.create_schema_directory(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):
-        self.batch.logger.db(("add sch schema_name: ", new_schema_item.schema_name))
+        self.batch.logger.db(("adding schema with name: ", new_schema_item.schema_name))
 
-        self.schema_form_create.compile_actions()  # new_schema_item.soft_id)
+        self.schema_form_create.compile_actions()
         if new_schema_item is None or len(new_schema_item.schema_name) == 0:
             self.top_ui.set_top_info(" Insert schema name ", 8)
         else:
             new_schema_item.state_id = self.sts.INDEX_STATE_ACTIVE
             new_schema_item.state = "ACTIVE"
-            print "erererzzzz", new_schema_item.schema_version
             if self.comfun.is_float(new_schema_item.schema_version) is False:
                 new_schema_item.schema_version = 1
             self.add_single_schema(copy.copy(new_schema_item))
 
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
-                self.batch.logger.db(("with saveAs:  ", save_as))
+                self.batch.logger.deepdb(("with saveAs:  ", save_as))
                 if self.batch.dfn.current_interact is not None:
                     self.batch.dfn.current_interact.save_curent_scene_as(save_as[1])
             else:
-                self.batch.logger.db(("new_schema_item.save_as_base_state", save_as_base))
+                self.batch.logger.deepdb(("with save_as_base_state:", save_as_base))
 
-            self.top_ui.set_top_info(" schema created, active schema:  " + new_schema_item.schema_name)
+            self.top_ui.set_top_info("schema created, active schema:  " + new_schema_item.schema_name)
             # self.new_schema_item = self.batch.sch.get_blank_schema()   # TODO  clear UI !!!  if clear var
             self.schema_form_create.clear_vars()
             self.schema_form_create.hide()

@@ -46,11 +46,20 @@ class SchemaFormCreateOrEdit(QWidget):
         self.top_ui = top
 
     def form_basic_print(self):
+        self.batch.logger.raw("\n schema_item_form_object:")
         self.schema_item_form_object.basic_print()
-        self.batch.logger.prnt((" action_widgets count:", len(self.action_widgets)))
+        self.batch.logger.raw("\n form action_widgets count: {}".format(len(self.action_widgets)))
+        for i, aw in enumerate(self.action_widgets):
+            self.batch.logger.raw(" action_widget {}  {}".format(i, aw.qt_label.text()))
 
     def form_detailed_print(self):
+        self.batch.logger.raw("\n schema_item_form_object:")
         self.schema_item_form_object.detailed_print()
+        self.batch.logger.raw("\n form action_widgets count: {}".format(len(self.action_widgets)))
+        for i, aw in enumerate(self.action_widgets):
+            self.batch.logger.raw(" action_widget {}  id:{}  label:{}  edit_val:{}".format(i, aw.action_id,
+                                                                                           aw.qt_label.text(),
+                                                                                           aw.edit_val, aw.ui_info))
 
     def init_ui_elements(self):
         qt_lay_outer_schema_form = QVBoxLayout()
@@ -158,16 +167,19 @@ class SchemaFormCreateOrEdit(QWidget):
     # ACTIONS
     # ACTIONS
     # ACTIONS
-    # def compile_actions(self):
-    #     self.actions_array = []
-    #     for i, action_widget in enumerate(self.action_widgets):
-    #         single_action = action_widget.get_current_action()
-    #         if single_action is not None:
-    #             self.actions_array.append(single_action)
-    #             # TODO  compile acttion
-    #             self.batch.logger.deepdb(("COMPILE ACTION", single_action))
-    #         else:
-    #             self.batch.logger.wrn(("(compile_actions)  None ACTION : ", i))
+    def compile_actions(self):
+        #     self.actions_array = []
+        #     for i, action_widget in enumerate(self.action_widgets):
+        #         single_action = action_widget.get_current_action()
+        #         if single_action is not None:
+        #             self.actions_array.append(single_action)
+        #             # TODO  compile acttion
+        #             self.batch.logger.deepdb(("COMPILE ACTION", single_action))
+        #         else:
+        #             self.batch.logger.wrn(("(compile_actions)  None ACTION : ", i))
+        pass
+        # TODO
+
 
     def add_defined_action_button(self, button_txt, disabled=False):
         b = ButtonOnLayout(button_txt)

@@ -225,6 +225,8 @@ class ActionWidget(QWidget):
 
         self.qt_layout = qt_widget_layout  # TODO check this
 
+        self.ui_info = (button_1_caption, button_1_fun_str, button_2_caption, button_2_fun_str)  # only for print
+
         # if len(action_id) > 0:
         #     self.qt_id = QLabel(action_id)
         #     qt_widget_layout.addWidget(self.qt_id)

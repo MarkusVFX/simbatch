@@ -94,6 +94,13 @@ class ExampleInteract:
     def save_curent_scene_as(self, file_and_path):
         print " [interact] save as :", file_and_path
 
+    def ui_get_file(self):
+        print " [interact] save as :"
+        pass
+
+    def ui_get_directory(self):
+        print " [interact] save as :"
+        pass
 
 
 class Definitions:
@@ -242,3 +249,14 @@ class Definitions:
         #  PRO version with sql
         self.batch.logger.inf("PRO version support SQL ")
         return False
+
+    def clear_all_definions_data(self):
+        del self.definitions_array[:]
+        del self.definitions_names[:]
+        self.total_definitions = 0
+        self.current_definition_name = None
+        self.current_definition_index = None
+
+    def reload_definitions(self):
+        self.clear_all_definions_data()
+        self.load_definitions()

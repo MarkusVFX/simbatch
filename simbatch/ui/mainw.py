@@ -174,7 +174,7 @@ class MainWindow(QMainWindow):
         self.que_ui = QueueUI(batch, self, top)
         # self.nod_ui = NodesUI(batch, self, top)
 
-        self.set_ui = SettingsUI(batch, top)
+        self.set_ui = SettingsUI(batch, self, top)
         self.dfn_ui = DefinitionsUI(batch, self, top)
 
         #  TABs
@@ -227,23 +227,8 @@ class MainWindow(QMainWindow):
 
     def on_clicked_but_refresh(self):
         self.batch.logger.inf("but_refresh clicked")
-
         self.sts.update_ui_colors()
-
-        print " [INF] update PROJECTS"
-        self.pro_ui.reload_projects_data_and_refresh_list()
-
-        print " [INF] update SCHEMAS"
-        self.sch_ui.reload_schemas_data_and_refresh_list()
-
-        print " [INF] update TASKS"
-        self.tsk_ui.reload_tasks_data_and_refresh_list()
-
-        print " [INF] update QUEUE"
-        # self.que_ui
-
-        print " [INF] update SIMNODES"
-        # self.nod_ui
+        self.refresh_ui_with_reload_data()
 
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)
@@ -262,3 +247,23 @@ class MainWindow(QMainWindow):
         if self.sts.window is not None:      # if None settings not loaded
             self.sts.window[0] = new_pos.x()
             self.sts.window[1] = new_pos.y()
+
+    def refresh_ui_with_reload_data(self):
+
+        self.batch.logger.inf("reload PROJECTS")
+        self.pro_ui.reload_projects_data_and_refresh_list()
+
+        self.batch.logger.inf("reload PROJECTS")
+        self.pro_ui.reload_projects_data_and_refresh_list()
+
+        self.batch.logger.inf("reload SCHEMAS")
+        self.sch_ui.reload_schemas_data_and_refresh_list()
+
+        self.batch.logger.inf("reload TASKS")
+        self.tsk_ui.reload_tasks_data_and_refresh_list()
+
+        # self.batch.logger.inf("reload QUEUE")
+        # self.que_ui
+
+        # self.batch.logger.inf("reload SIMNODES")
+        # self.nod_ui

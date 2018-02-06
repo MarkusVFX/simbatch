@@ -31,6 +31,9 @@ def test_load_definitions(simbatch):
 #     assert sib.dfn.load_definitions() is True
 
 
+# def test_clear_all_definion_data
+
+
 # def test_action_create(simbatch):
 #     sa = SingleAction()
     # assert sa.

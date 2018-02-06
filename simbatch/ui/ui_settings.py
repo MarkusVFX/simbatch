@@ -15,10 +15,11 @@ class SettingsUI:
     batch = None
     top_ui = None
 
-    def __init__(self, batch, top_ui):
+    def __init__(self, batch, mainw, top_ui):
         settings = batch.sts
         self.settings = batch.sts
         self.batch = batch
+        self.mainw = mainw
         self.top_ui = top_ui
         self.comfun = batch.comfun
 
@@ -235,6 +236,7 @@ class SettingsUI:
             print " [db] clickedRadioColors ", index
         self.settings.ui_color_mode = index
         self.settings.update_ui_colors()
+        self.mainw.refresh_ui_with_reload_data()
 
     def on_changed_sample_data(self, state):
         self.sample_data_state = state

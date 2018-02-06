@@ -101,7 +101,7 @@ class SettingsUI:
         sett_sql_3a = QLabel("pass : ")
         sett_sql_3b = QLineEdit(settings.sql[2])
         sett_sql_3b.textChanged.connect(self.on_edit_update_sql_3)
-        #   sett_sql_4a = QLabel("port : ") TODO cleanup
+        # sett_sql_4a = QLabel("port : ") TODO cleanup
         sett_sql_4b = QLineEdit(settings.sql[3])
         sett_sql_4b.textChanged.connect(self.on_edit_update_sql_4)
 
@@ -225,15 +225,15 @@ class SettingsUI:
     def on_click_radio_data(self, index):
         #  PRO version sql
         #  TODO json vs txt
-        if self.settings.debug_level <= 4:
-            print " [db] on_click_radio_data ", index
+        self.batch.logger.db(("on_click_radio_data ", index))
+
         if index > 1:
             # PRO version
             self.top_ui.set_top_info("MySQL only with proversion", 4)
 
     def on_clicked_radio_colors(self, index):
-        if self.settings.debug_level <= 4:
-            print " [db] clickedRadioColors ", index
+        self.batch.logger.db(("clickedRadioColors ", index))
+
         self.settings.ui_color_mode = index
         self.settings.update_ui_colors()
         self.mainw.refresh_ui_with_reload_data()
@@ -255,8 +255,7 @@ class SettingsUI:
 
     def sql_test_connection(self):
         #  PRO version
-        if self.settings.debug_level >= 3:
-            print "test conn sql  .... "
+        self.batch.logger.db("test conn sql  .... ")
 
     def on_click_get_data_dir(self):
         self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog)

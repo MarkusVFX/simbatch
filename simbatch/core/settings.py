@@ -196,7 +196,12 @@ class Settings:
                     self.store_data_backup_directory = self.json_settings_data["storeData"]["backupDirectory"]
                     self.store_definitions_directory = self.json_settings_data["storeData"]["definitionsDirectory"]
 
-                    self.sql = self.json_settings_data["sql"].values()  # TODO order  values()
+                    s1 = self.json_settings_data["sql"]["db"]
+                    s2 = self.json_settings_data["sql"]["user"]
+                    s3 = self.json_settings_data["sql"]["pass"]
+                    s4 = self.json_settings_data["sql"]["port"]
+                    # self.sql = self.json_settings_data["sql"].values()
+                    self.sql = (s1, s2, s3, s4)
                     self.admin_user = self.json_settings_data["adminUser"].values()  # TODO order  values()
                     wnd = self.json_settings_data["window"]
                     self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]

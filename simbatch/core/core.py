@@ -1,3 +1,5 @@
+import platform
+
 from settings import Settings
 from common import CommonFunctions, Logger
 from users import Users
@@ -10,31 +12,44 @@ from nodes import SimNodes
 from io import StorageInOut
 
 
+
 class SimBatch:
     s = None
     comfun = None
     logger = None
+    os = None
 
-    def __init__(self, runtime_env, ini_file="config.ini"):
+    def __init__(self, runtime_env, ini_file="config.ini", os=None):
         self.logger = Logger(log_level=0, console_level=3)
         self.sts = Settings(self.logger, runtime_env, ini_file=ini_file)   # sts
         self.logger.set_console_level(self.sts.debug_level)
         self.logger.set_log_level(0)
         self.comfun = CommonFunctions(self.logger)
 
-        self.u = Users(self)         # usr
+        if os is None:
+            self.os = platform.system()
+            if self.os == "Windows":
+                self.os = "win"
+            elif self.os == "Linux":
+                self.os = "lnx"
+            else:
+                self.os = "undefined"
+
+        # below one place abbreviation for variables
+        # reasons:
+        # - repeated use
+        # - identification of the main modules
+
+        self.usr = Users(self)         # usr
         self.prj = Projects(self)      # prj
         self.sch = Schemas(self)       # sch
         self.tsk = Tasks(self)         # tsk
         self.que = Queue(self)         # que
         self.nod = SimNodes(self)      # nod
         self.dfn = Definitions(self)   # dfn
-        self.sio = StorageInOut(self)  # ios
+        self.sio = StorageInOut(self)  # sio
 
-        # one place abbreviation for variables
-        # reasons:
-        # - repeated use
-        # - identification of the main modules
+        #  abbreviation  END
 
         self.logger.inf("SimBatch started")
 

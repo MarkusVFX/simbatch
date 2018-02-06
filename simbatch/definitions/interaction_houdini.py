@@ -1,7 +1,10 @@
 
-class InteractHoudini:
+class Interaction:
     def __init__(self):
         pass
+        
+    def test(self):
+        print "\n test Hou \n"
         
     # houdini executions     
     def houdini_open_scene(self, file):

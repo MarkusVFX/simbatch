@@ -1,7 +1,10 @@
 
-class InteractMax:
+class Interaction:
     def __init__(self):
         pass
+        
+    def test(self):
+        print "\n test max \n"
     
     # 3dsmax executions 
     def max_open_scene(self, file):

@@ -524,8 +524,8 @@ class SchemasUI:
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.deepdb(("with saveAs:  ", save_as))
-                if self.batch.dfn.current_interact is not None:
-                    self.batch.dfn.current_interact.save_curent_scene_as(save_as[1])
+                if self.batch.dfn.current_interaction is not None:
+                    self.batch.dfn.current_interaction.save_curent_scene_as(save_as[1])
             else:
                 self.batch.logger.deepdb(("with save_as_base_state:", save_as_base))
 

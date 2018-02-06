@@ -342,12 +342,18 @@ class CommonFunctions:
             self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 
-    @staticmethod
-    def load_from_file(file_name):  # TODO rename it: load content from file
-        with open(file_name, 'a') as f:
-            content = f.readlines()
-            content = [x.strip() for x in content]
-            return content
+    def load_from_file(self,file_name):  # TODO rename it: load content from file
+        if self.file_exists(file_name):
+            try:
+                with open(file_name, 'r') as f:
+                    content = f.readlines()
+                    content = [x.strip() for x in content]
+                    return content
+            except IOError:
+                self.logger.err(("Loading IOError error:", file_name))
+                return None
+        else:
+            self.logger.err(("Loading: File not exists:", file_name))
 
     def load_json_file(self, file_name):
         if self.file_exists(file_name, info=file_name, check_not_empty=True):
@@ -400,12 +406,12 @@ class CommonFunctions:
         if len(qt_edit_line.text()) == 0:
             qt_edit_line.setText(text)
 
-    @staticmethod
-    def file_dialog_to_edit_line(qt_edit_line, qt_file_dialog, init_dir):
-        get_directory = qt_file_dialog.getOpenFileName(dir=init_dir)
-        get_dir = get_directory[0].replace("/", "\\")
-        if len(get_dir) > 0:
-            qt_edit_line.setText(get_dir)
+    def file_dialog_to_edit_line(self, qt_edit_line, qt_file_dialog, init_dir):
+        file_dialog = qt_file_dialog.getOpenFileName(dir=init_dir)
+        get_file = file_dialog[0].replace("/", "\\")
+        self.logger.inf(("selected_directory:", get_file))
+        if len(get_file) > 0:
+            qt_edit_line.setText(get_file)
 
     @staticmethod
     def get_save_file(qt_edit_line, qt_file_dialog):

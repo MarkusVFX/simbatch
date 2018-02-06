@@ -7,6 +7,7 @@
 			"totalActions": 7,
 			"setupExt" : "mb",
 			"prevExt" : "jpg",
+			"interactionScript": "interaction_maya.py",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},		
 		"actions": {
@@ -15,9 +16,9 @@
 				"type": "single",
 				"name": "Open",
 				"desc": "Open Maya scene",
-				"ui" : [["Get file","[ui_get_file]"]],
+				"ui" : [["Get file","[get_file]"]],
 				"default": "<schema_base_setup>",
-				"template": ["interaction.maya_open_scene(\"", "<f>", "\")"]
+				"template": ["interactions.maya_open_scene(\"", "<f>", "\")"]
 			},
 			"2":{
 				"id": 2,
@@ -29,28 +30,24 @@
 						"mode": "ANI",
 						"desc": "Animation cache",
 						"default": "<project_cache_dir>",
-						"ui" : [["Get dir","[ui_get_directory]"],["Objs","interaction.maya_get_scene_objects()"]],
-						"template": ["interaction.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]						
+						"ui" : [["Get dir","[get_directory]"],["Objs","interactions.maya_get_scene_objects"]],
+						"template": ["interactions.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]						
 					},
 					"2": {
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
 						"default": "<project_cam_dir>",
-						"ui" : [["Get dir","[ui_get_directory]"],["Get file","[ui_get_file]"]],
-						"template": ["interaction.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
+						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "OBJ",
 						"desc": "Geometry file",
-						"primaryCaption" : "Get dir",
-						"primaryFunction" : "[ui_get_directory]",
-						"additionalCaption" : "Get file",
-						"additionalFunction" : "[ui_get_file]",
 						"default": "<project_props_dir>",
-						"ui" : [["Get dir","[ui_get_directory]"],["Get file","[ui_get_file]"]],
-						"template": ["interaction.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
+						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.maya_import_obj(", "<o>", ", \"", "<f>", "\" )"]
 					}
 				}
 			},
@@ -61,7 +58,7 @@
 				"desc": "Set value for object property",
 				"ui" : null,
 				"default": "<object>.<param>=<value>",
-				"template": ["interaction.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
+				"template": ["interactions.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
 			"4":{
 				"id": 4,
@@ -74,7 +71,7 @@
 						"desc": "nCloth sim",
 						"ui" : null,
 						"default": "<cloth_objects>",
-						"template": ["interaction.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interactions.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
@@ -82,7 +79,7 @@
 						"desc": "nHair sim",
 						"ui" : null,
 						"default": "<hair_objects>",
-						"template": ["interaction.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interactions.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"3": {
 						"id": 3,
@@ -90,7 +87,7 @@
 						"desc": "nParticle sim",
 						"ui" : null,
 						"default": "<particle_objects>",
-						"template": ["interaction.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interactions.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
 					"4": {
 						"id": 4,
@@ -98,7 +95,7 @@
 						"desc": "FumeFX sim",
 						"ui" : null,
 						"default": "<fume_container>",
-						"template": ["interaction.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
+						"template": ["interactions.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
 					},
 					"5": {
 						"id": 5,
@@ -106,7 +103,7 @@
 						"desc": "FumeFX Wavelet",
 						"ui" : null,
 						"default": "<fume_container>",
-						"template": ["interaction.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
+						"template": ["interactions.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
 					}
 				}
 			},
@@ -121,7 +118,7 @@
 						"desc": "grab viewport",
 						"ui" : null,
 						"default": "<default_camera><shot_prev_dir>",
-						"template": ["interaction.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+						"template": ["interactions.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
 					"2": {
 						"id": 2,
@@ -129,7 +126,7 @@
 						"desc": "render scene",
 						"ui" : null,
 						"default": "<default_camera><shot_prev_dir>",
-						"template": ["interaction.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
+						"template": ["interactions.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
 				}
 			},
@@ -140,7 +137,7 @@
 				"desc": "Save Maya Scene",
 				"ui" : null,
 				"default": "<copmuted_scenes_dir>",
-				"template": ["interaction.maya_save_scene(\"", "<f>", "\")"]
+				"template": ["interactions.maya_save_scene(\"", "<f>", "\")"]
 			},
 			"7":{
 				"id": 7,
@@ -153,7 +150,7 @@
 						"desc": "run Python file",
 						"ui" : null,
 						"default": "<scripts_dir>*.py",
-						"template": ["interaction.maya_script_py(\"", "<f>", "\")"]
+						"template": ["interactions.maya_script_py(\"", "<f>", "\")"]
 					},
 					"2": {
 						"id": 2,
@@ -161,7 +158,7 @@
 						"desc": "run MEL file",
 						"ui" : null,
 						"default": "<scripts_dir>*.mel",
-						"template": ["interaction.maya_script_mel(\"", "<f>", "\")"]
+						"template": ["interactions.maya_script_mel(\"", "<f>", "\")"]
 					}
 				}
 			}

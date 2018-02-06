@@ -159,10 +159,11 @@ class SchemaFormCreateOrEdit(QWidget):
         if nr is None:
             nr = self.batch.dfn.current_definition
         self.add_defined_action_buttons(nr)
+        self.batch.dfn.change_current_definition(nr)
 
     def on_radio_change(self, nr):  # on click definition change
         self.batch.logger.db(("on_radio_change definition", nr))
-        self.change_current_definition(nr)
+        self.change_current_definition(nr=nr)
 
     # ACTIONS
     # ACTIONS
@@ -205,6 +206,7 @@ class SchemaFormCreateOrEdit(QWidget):
     def on_click_defined_action_button(self, group_of_actions, curr_proj):  # , force_val=0
         combo_items = []
         combo_val = []
+        sub_action_data = []
 
         qt_lay = self.qt_lay_fae_actions
         button_1_caption = None
@@ -219,22 +221,26 @@ class SchemaFormCreateOrEdit(QWidget):
                 button_2_caption = group_of_actions.actions[0].ui[1][0]
                 button_2_function_str = group_of_actions.actions[0].ui[1][1]
 
-        logger = self.batch.logger
+        batch = self.batch   #  share logger and interaction fron definition
+        # interaction = self.batch.dfn.current_interaction
         if group_of_actions.actions_count == 0:   # incorrectly defined action
-            action_widget = ActionWidget(logger, -1, "incorrectly defined action", GroupedActions(-1,"empty action") )
+            action_widget = ActionWidget(batch, -1, "incorrectly defined action", GroupedActions(-1,"empty action") )
         elif group_of_actions.actions_count == 1:   # single action, no combo
-            action_widget = ActionWidget(logger, group_of_actions.actions[0].id,
+            action_widget = ActionWidget(batch, group_of_actions.actions[0].id,
                                          group_of_actions.actions[0].name, group_of_actions,
                                          button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                          button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
         else:  # grouped actions :  import ANI,CAM,ENV
+            sub_actions = []
             for i, a in enumerate(group_of_actions.actions):
                 combo_items.append(a.mode)
-                combo_val.append(a.default_value)
-            action_widget = ActionWidget(logger, group_of_actions.group_id, group_of_actions.name, group_of_actions,
+                # combo_val.append(a.default_value)
+                sub_actions.append([i, a.mode, a.default_value, a.ui])   # TODO class !
+            action_widget = ActionWidget(batch, group_of_actions.group_id, group_of_actions.name, group_of_actions,
                                          button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                          button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
-                                         edit_txt=combo_val[0], combo_items=combo_items, combo_val=combo_val)
+                                         edit_txt=sub_actions[0][2], combo_items=combo_items,
+                                         sub_actions_data=sub_actions)   # combo_def_val=combo_val
 
         qt_lay.addWidget(action_widget)
         self.action_widgets.append(action_widget)

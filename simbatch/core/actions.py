@@ -18,6 +18,8 @@ class SingleAction:
     type = None
     mode = None
     default_value = ""
+    template = ""
+    function_str = ""
     json_FIELDS_NAMES = ACTION_DATA_FIELDS_NAMES
     ui = None                       # store ui for quick save
     # standard_butt_caption = None    # store ui for ui forms

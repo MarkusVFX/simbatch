@@ -1,7 +1,9 @@
-
-class InteractMaya:
+class Interaction:
     def __init__(self):
         pass
+        
+    def test(self):
+        print "\n test maya \n"
     
     # maya executions
     def maya_open_scene(self, file):
@@ -48,3 +50,6 @@ class InteractMaya:
         
     def maya_script_mel(self, file):
         pass 
+
+    def maya_get_scene_objects(self):
+        print "\n test maya_get_scene_objects\n"

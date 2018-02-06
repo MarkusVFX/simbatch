@@ -129,11 +129,12 @@ def test_get_proper_path_05(comfun):
 
 
 def test_get_path_from_full(comfun):
-    assert comfun.get_path_from_full("c:\\oki\\doki\\test.png") == "c:\\oki\\doki"
-    assert comfun.get_path_from_full("\\\\serv\\doki\\test.png") == "\\\\serv\\doki"
+    assert comfun.get_path_from_full("c:\\oki\\doki\\test.png") == "c:\\oki\\doki\\"
+    assert comfun.get_path_from_full("\\\\serv\\doki\\test.png") == "\\\\serv\\doki\\"
 
 
 def test_create_directory(comfun):
+    print "TESTING_AREA_DIR: ", TESTING_AREA_DIR
     assert comfun.path_exists(TESTING_AREA_DIR) is True
     assert comfun.path_exists(TESTING_AREA_DIR + TEST_DIR) is False
     assert comfun.create_directory(TESTING_AREA_DIR + TEST_DIR) is True

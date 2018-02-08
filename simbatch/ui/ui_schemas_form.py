@@ -154,12 +154,15 @@ class SchemaFormCreateOrEdit(QWidget):
     # DEFINITIONS
     # DEFINITIONS
     def change_current_definition(self, nr=None):
+        self.batch.logger.db(("change_current_definition ", nr))
         self.remove_all_action_widgets()
         self.remove_all_defined_action_buttons()
         if nr is None:
-            nr = self.batch.dfn.current_definition
+            nr = self.batch.dfn.current_definition_index
+        else:
+            self.batch.dfn.current_definition_index = nr
         self.add_defined_action_buttons(nr)
-        self.batch.dfn.change_current_definition(nr)
+        self.batch.dfn.change_interaction(nr)
 
     def on_radio_change(self, nr):  # on click definition change
         self.batch.logger.db(("on_radio_change definition", nr))
@@ -191,14 +194,22 @@ class SchemaFormCreateOrEdit(QWidget):
 
     # add horizontal row of defined action buttons
     def add_defined_action_buttons(self, nr=None):
+        self.batch.logger.db(("add act but, dfn idx:", nr))
         if nr is None:
-            nr = self.batch.dfn.current_definition_name
+            nr = self.batch.dfn.current_definition_index
         curr_proj = self.batch.prj.current_project
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.dfn.definitions_array):
                 for action_group in self.batch.dfn.definitions_array[nr].grouped_actions_array:
                     b = self.add_defined_action_button(action_group.name)
                     b.button.clicked.connect(lambda a=action_group: self.on_click_defined_action_button(a, curr_proj))
+            else:
+                if nr is None:
+                    self.batch.logger.wrn("add act but nr is None !")
+                else:
+                    self.batch.logger.wrn(("add act but nr < definitions count ___ ", nr, "  < ",
+                                           len(self.batch.dfn.definitions_array)))
+
         else:
             self.batch.logger.wrn("Current project undefined !")
 
@@ -286,6 +297,14 @@ class SchemaFormCreateOrEdit(QWidget):
             b.widget().deleteLater()
             self.qt_lay_fae_actions.takeAt(0)
         self.actionsCount = 0
+
+    def refresh_actions_ui(self):
+        cur_index = self.batch.dfn.current_definition_index
+        # print "\n\ncur index ",cur_index
+        self.remove_all_defined_action_buttons()
+        self.remove_all_action_widgets()
+        self.batch.dfn.current_definition_index = cur_index
+        self.add_defined_action_buttons(nr=cur_index)
 
     #
     ##

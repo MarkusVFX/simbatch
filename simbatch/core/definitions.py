@@ -140,6 +140,11 @@ class Definitions:
     def __str__(self):
         return "Definitions"
 
+    #  print project data, for debug
+    def print_current(self):
+        print "     current definition index: {}   name: {}  total_: {}\n".format(self.current_definition_index,
+                                                                                  self.current_definition_name,
+                                                                                  self.total_definitions)
     #  print definitions data, for debug
     def print_total(self, print_children=False):
         if print_children:
@@ -293,8 +298,8 @@ class Definitions:
         self.clear_all_definions_data()
         self.load_definitions()
 
-    def change_current_definition(self, index):
-        self.batch.logger.db(("change_current_definition ", index))
+    def change_interaction(self, index):
+        self.batch.logger.db(("change_interaction ", index))
         if self.current_interactions is not None:
             self.current_interactions.test()
         self.current_definition_index = index

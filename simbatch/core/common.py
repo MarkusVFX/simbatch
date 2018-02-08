@@ -261,9 +261,7 @@ class CommonFunctions:
     
     def get_path_from_full(self, full):
         path_out = os.path.dirname(full)
-        print "\naaaa", path_out
         path_out = self.get_proper_path(path_out)   # win 7 vs 10 fix
-        print "bbb", path_out
         
         return path_out
 

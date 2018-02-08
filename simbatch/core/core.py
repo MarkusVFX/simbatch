@@ -79,6 +79,10 @@ class SimBatch:
         print "\n NODES: "
         self.nod.print_current()
 
+        # nodes
+        print "\n DEFINITIONS: "
+        self.dfn.print_current()
+
         print "\n\n"
 
     def print_current_detailed_values(self, index):

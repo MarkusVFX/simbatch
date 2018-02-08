@@ -259,6 +259,12 @@ class MainWindow(QMainWindow):
         self.batch.logger.inf("reload SCHEMAS")
         self.sch_ui.reload_schemas_data_and_refresh_list()
 
+        self.batch.logger.inf("reload DEFINITIONS")
+        cur_index = self.batch.dfn.current_definition_index
+        self.batch.dfn.reload_definitions()
+        self.batch.dfn.current_definition_index = cur_index
+        self.sch_ui.schema_form_create.refresh_actions_ui()
+
         self.batch.logger.inf("reload TASKS")
         self.tsk_ui.reload_tasks_data_and_refresh_list()
 

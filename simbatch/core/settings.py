@@ -1,5 +1,6 @@
 import os
 import json
+import random
 from common import CommonFunctions
 
 try:
@@ -173,6 +174,12 @@ class Settings:
         print " window:", self.window
 
         print "\n\n"
+
+    def random_welcome_message(self):
+        messages = ("Welcome", "Have a nice sim!","Sim sim sim")
+
+        rand = int(random.random()*len(messages))  # TODO rand int 
+        return messages[rand]
 
     def clear_state_colors(self):
         self.state_colors = []

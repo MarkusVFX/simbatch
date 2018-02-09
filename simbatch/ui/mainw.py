@@ -228,7 +228,13 @@ class MainWindow(QMainWindow):
     def on_clicked_but_refresh(self):
         self.batch.logger.inf("but_refresh clicked")
         self.sts.update_ui_colors()
-        self.refresh_ui_with_reload_data()
+        ret = self.refresh_ui_with_reload_data()
+        if ret is True:
+            self.top_ui.set_top_info("Refreshed", 1)
+        elif ret is False:
+            self.top_ui.set_top_info("NOT REFRESHED PROPERLY (see log)!", 8)
+        else:
+            self.top_ui.set_top_info("Refreshed with errors: ({})".format(ret), 7)
 
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)
@@ -261,7 +267,7 @@ class MainWindow(QMainWindow):
 
         self.batch.logger.inf("reload DEFINITIONS")
         cur_index = self.batch.dfn.current_definition_index
-        self.batch.dfn.reload_definitions()
+        ret = self.batch.dfn.reload_definitions()
         self.batch.dfn.current_definition_index = cur_index
         self.sch_ui.schema_form_create.refresh_actions_ui()
 
@@ -273,3 +279,5 @@ class MainWindow(QMainWindow):
 
         # self.batch.logger.inf("reload SIMNODES")
         # self.nod_ui
+
+        return ret

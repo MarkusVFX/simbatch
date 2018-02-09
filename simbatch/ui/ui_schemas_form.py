@@ -42,7 +42,6 @@ class SchemaFormCreateOrEdit(QWidget):
         if mode == "edit":
             self.form_mode = 2
         self.init_ui_elements()
-        self.add_defined_action_buttons()
         self.top_ui = top
 
     def form_basic_print(self):
@@ -154,7 +153,7 @@ class SchemaFormCreateOrEdit(QWidget):
     # DEFINITIONS
     # DEFINITIONS
     def change_current_definition(self, nr=None):
-        self.batch.logger.db(("change_current_definition ", nr))
+        self.batch.logger.deepdb(("change_current_definition ", nr))
         self.remove_all_action_widgets()
         self.remove_all_defined_action_buttons()
         if nr is None:
@@ -194,7 +193,7 @@ class SchemaFormCreateOrEdit(QWidget):
 
     # add horizontal row of defined action buttons
     def add_defined_action_buttons(self, nr=None):
-        self.batch.logger.db(("add act but, dfn idx:", nr))
+        self.batch.logger.deepdb(("add act but, dfn idx:", nr))
         if nr is None:
             nr = self.batch.dfn.current_definition_index
         curr_proj = self.batch.prj.current_project

@@ -41,14 +41,19 @@ class Logger:
             log_append = False
 
         if level == 1:
+            indent = ""
             prefix = "ERR"
         elif level == 2:
+            indent = "  "
             prefix = "WRN"
         elif level == 3:
+            indent = "    "
             prefix = "INF"
         elif level == 4:
+            indent = "    _"
             prefix = "DB"
         elif level == 5:
+            indent = "    ___"
             prefix = "deep"
         else:
             prefix = "_"
@@ -58,9 +63,9 @@ class Logger:
         elif console_print:
             if type(message) is tuple:
                 out = "  ".join([str(el) for el in message])
-                print "   [{}] {}".format(prefix, out)
+                print "{}[{}] {}".format(indent, prefix, out)
             else:
-                print "   [{}] {}".format(prefix, message)
+                print "{}[{}] {}".format(indent, prefix, message)
 
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)
@@ -107,16 +112,20 @@ class CommonFunctions:
     @staticmethod
     def is_int(value):
         try:
-            int(value)
-            return True
+            if type(value) == int:
+                return True
+            else:
+                return False
         except ValueError:
             return False
 
     @staticmethod
     def is_float(value):
         try:
-            float(value)
-            return True
+            if type(value) == float:
+                return True
+            else:
+                return False
         except ValueError:
             return False
 

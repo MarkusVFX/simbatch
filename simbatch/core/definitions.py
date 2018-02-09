@@ -132,7 +132,7 @@ class Definitions:
         self.definitions_names = []
         # self.soco = SoftwareConnector(batch.sch.current_schema_software_id)
 
-        self.current_interactions = ExampleInteractions()
+        # self.current_interactions = ExampleInteractions()
 
     def __repr__(self):
         return "Definitions({})".format(self.batch)
@@ -172,6 +172,10 @@ class Definitions:
     def load_definitions(self):
         if self.sts.store_data_mode == 1:
             ret = self.load_definitions_from_jsons()
+            if ret == 0:   # return number of errors
+                return True
+            else:
+                return ret
         elif self.sts.store_data_mode == 2:
             ret = self.load_definitions_from_mysql()
         else:
@@ -202,13 +206,16 @@ class Definitions:
         example_defi.add_group_action(example_group_actions)
         return example_defi
 
-    @staticmethod
     # TODO move to common !!!!
-    def class_from_file(filename):
+    def class_from_file(self, filename):
         with file(filename) as f:
             content = f.read()
-        exec (content)
-        return eval("Interaction")
+        try:
+            exec (content)
+            return eval("Interaction")
+        except SyntaxError:
+            self.batch.logger.err(("syntax error definition file:", filename))
+            return None
     # TODO move to common !!!!
 
     def load_interaction_file(self, file_path):
@@ -216,9 +223,11 @@ class Definitions:
         if self.batch.os == "win":
             file_path = file_path.replace("/", "\\")
         if self.comfun.file_exists(file_path):
-            Interaction = self.class_from_file(file_path)
-            loaded_interaction = Interaction()
-            # print "oooooooo" , ok.test()
+            InteractionClass = self.class_from_file(file_path)
+            if InteractionClass is None:
+                return None
+            else:
+                loaded_interaction = InteractionClass()
             return loaded_interaction
         else:
             return None
@@ -226,6 +235,7 @@ class Definitions:
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
             definitions_dir = self.sts.store_definitions_directory
+        loading_errors = 0
 
         if self.comfun.file_exists(definitions_dir):
             for file_nr, json_file in enumerate(self.batch.sio.get_files_from_dir(definitions_dir, types="json")):
@@ -254,6 +264,8 @@ class Definitions:
                             if "interactionScript" in json_definition['definition']['meta']:
                                 new_definition.interactions = self.load_interaction_file( definitions_dir
                                     + json_definition['definition']['meta']["interactionScript"])
+                                if new_definition.interactions is None:
+                                    loading_errors += 1
 
 
                             if "actions" in json_definition['definition']:
@@ -277,7 +289,7 @@ class Definitions:
                                 self.batch.logger.wrn(("No actions defined in : ", json_file, " dir:", definitions_dir))
             # self.print_all(print_children=True)
             # self.print_total(print_children=True)
-            return True
+            return loading_errors
         else:
             self.batch.logger.err(("Definitions directory not exist: ", definitions_dir))
             return False
@@ -296,10 +308,11 @@ class Definitions:
 
     def reload_definitions(self):
         self.clear_all_definions_data()
-        self.load_definitions()
+        ret = self.load_definitions()
+        return ret
 
     def change_interaction(self, index):
-        self.batch.logger.db(("change_interaction ", index))
+        self.batch.logger.deepdb(("change_interaction ", index))
         if self.current_interactions is not None:
             self.current_interactions.test()
         self.current_definition_index = index
@@ -308,6 +321,3 @@ class Definitions:
 
         if self.current_interactions is not None:
             self.current_interactions.test()
-
-        self.batch.logger.db(("self.definitions_array[index].interactions ", self.definitions_array[index].interactions))
-

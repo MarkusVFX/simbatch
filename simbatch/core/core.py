@@ -124,14 +124,32 @@ class SimBatch:
         self.prj.clear_all_projects_data()
         self.sch.clear_all_schemas_data()
 
-    def load_data(self):
-        self.dfn.load_definitions()
+    def check_is_number_of_errors(self, check_this, counter, msg):
+        if self.comfun.is_float(check_this):
+            counter += check_this
+            self.logger.err("Loading data error: ({}) val:{}".format(msg, check_this))
+        return counter
 
-        if self.prj.load_projects():
+    def load_data(self):
+        ret_def = self.dfn.load_definitions()
+        ret_prj = self.prj.load_projects()
+        if ret_prj is not False:
             self.prj.init_default_proj()
-            if self.sch.load_schemas():
-                if self.tsk.load_tasks():
-                    return True
+            ret_sch = self.sch.load_schemas()
+            if ret_sch is not False:
+                ret_tsk = self.tsk.load_tasks()
+                if ret_tsk is not False:
+                    # count number errors while of loading external data
+                    total_err_count = 0
+                    total_err_count = self.check_is_number_of_errors(ret_def, total_err_count, "definitions")
+                    total_err_count = self.check_is_number_of_errors(ret_prj, total_err_count, "project")
+                    total_err_count = self.check_is_number_of_errors(ret_sch, total_err_count, "schemas")
+                    total_err_count = self.check_is_number_of_errors(ret_tsk, total_err_count, "tsks")
+
+                    if total_err_count == 0:
+                        return True
+                    else:
+                        return total_err_count
                 else:
                     return -1
             else:

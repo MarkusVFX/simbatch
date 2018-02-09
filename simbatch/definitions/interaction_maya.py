@@ -6,6 +6,10 @@ class Interaction:
         print "\n test maya \n"
     
     # maya executions
+    
+    def save_curent_scene_as(self, file)
+        print "to do: interaction save as"
+    
     def maya_open_scene(self, file):
         pass
         

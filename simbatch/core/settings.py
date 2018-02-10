@@ -178,7 +178,7 @@ class Settings:
     def random_welcome_message(self):
         messages = ("Welcome", "Have a nice sim!","Sim sim sim")
 
-        rand = int(random.random()*len(messages))  # TODO rand int 
+        rand = int(random.random()*len(messages))  # TODO rand int
         return messages[rand]
 
     def clear_state_colors(self):
@@ -287,9 +287,6 @@ class Settings:
                 #  palette_id == 4:
                 color_file = self.store_definitions_directory + "colors/" + self.COLORS_CUSTOM_FILE_NAME
 
-            if self.debug_level >= 3:
-                print " [INF] loading colors: ", color_file
-
             if self.comfun.file_exists(color_file, info="colors file"):
                 self.clear_state_colors()
                 f = open(color_file, 'r')
@@ -303,11 +300,17 @@ class Settings:
                             QColor.fromRgb(self.comfun.int_or_val(li[6], 140), self.comfun.int_or_val(li[7], 140),
                                            self.comfun.int_or_val(li[8], 140), a=255))
                 f.close()
+
+                if self.debug_level >= 3:
+                    print " [INF] loaded colors: ", color_file
                 return True
             else:
                 for i in range(0, 40):
                     self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
                     self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
+
+                if self.debug_level >= 3:
+                    print " [WRN] not loaded colors: ", color_file
                 return False
         else:
             # TO DO dblvl

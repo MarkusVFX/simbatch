@@ -120,6 +120,14 @@ class CommonFunctions:
             return False
 
     @staticmethod
+    def can_get_int(value):   #  try get int from string value
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
     def is_float(value):
         try:
             if type(value) == float:
@@ -130,7 +138,7 @@ class CommonFunctions:
             return False
 
     def int_or_val(self, in_val, def_val):
-        if self.is_int(in_val):
+        if self.can_get_int(in_val):
             self.logger.deepdb(("(int_or_val) is int", in_val, def_val))
             return int(in_val)
         else:

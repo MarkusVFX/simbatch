@@ -31,6 +31,7 @@ class SchemaFormCreateOrEdit(QWidget):
     qt_radio_buttons_fc_software = None
     qt_lay_fae_actions = None
     qt_lay_fae_actions_buttons = None
+    schema_form_buttons = None
 
     def __init__(self, batch, mode, top):
         QWidget.__init__(self)
@@ -92,10 +93,11 @@ class SchemaFormCreateOrEdit(QWidget):
         if self.form_mode == 1:
             schema_form_buttons = ButtonWithCheckBoxes("Create schema", pin_text="pin", cb2_text="Crowd mode",
                                                        cb3_text="Save as base setup", cb3_checked=True)
-            schema_form_buttons.third_check_box.stateChanged.connect(self.on_changed_save_as_base_setup)
+            schema_form_buttons.qt_third_check_box.stateChanged.connect(self.on_changed_save_as_base_setup)
         else:
             schema_form_buttons = ButtonWithCheckBoxes("Save schema", pin_text="pin", cb2_text="Crowd mode")
 
+        self.schema_form_buttons = schema_form_buttons
         fae_widget_group = WidgetGroup([qt_fae_schema_name, qt_fae_schema_version, qt_fae_schema_description])
 
         qt_lay_fae = QVBoxLayout()
@@ -143,8 +145,15 @@ class SchemaFormCreateOrEdit(QWidget):
         self.execute_button = schema_form_buttons
         self.setLayout(qt_lay_outer_schema_form)
 
+        if schema_form_buttons.qt_second_check_box is not None:
+            schema_form_buttons.qt_second_check_box.setEnabled(False)    # TODO crowd mode
+
         if self.batch.dfn.current_definition_index is not None:
             self.change_current_definition(self.batch.dfn.current_definition_index)
+            if self.batch.dfn.current_definition_name == "Stand-alone":
+                if schema_form_buttons.qt_third_check_box is not None:
+                    schema_form_buttons.qt_third_check_box.setChecked(False)
+                    schema_form_buttons.qt_third_check_box.setEnabled(False)
 
     #
     ##
@@ -166,6 +175,11 @@ class SchemaFormCreateOrEdit(QWidget):
     def on_radio_change(self, nr):  # on click definition change
         self.batch.logger.db(("on_radio_change definition", nr))
         self.change_current_definition(nr=nr)
+        if self.batch.dfn.current_definition_name == "Stand-alone":
+            self.schema_form_buttons.qt_third_check_box.setChecked(False)
+            self.schema_form_buttons.qt_third_check_box.setEnabled(False)
+        else:
+            self.schema_form_buttons.qt_third_check_box.setEnabled(True)
 
     # ACTIONS
     # ACTIONS
@@ -327,7 +341,6 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.save_as_base_state = 0
 
-
     # SCHEMA PROXY OBJECT
     # SCHEMA PROXY OBJECT
     # SCHEMA PROXY OBJECT
@@ -339,4 +352,4 @@ class SchemaFormCreateOrEdit(QWidget):
     def update_form_data(self, schema_item):   # old update_actions_ui
         self.clear_vars()
         self.schema_item_form_object.project_id = schema_item.project_id
-        self.schema_item_form_object.definition_name = schema_item.definition_name
+        self.schema_item_form_object.based_on_definition = schema_item.based_on_definition

@@ -125,9 +125,9 @@ class SimBatch:
         self.sch.clear_all_schemas_data()
 
     def check_is_number_of_errors(self, check_this, counter, msg):
-        if self.comfun.is_float(check_this):
+        if self.comfun.is_int(check_this):
             counter += check_this
-            self.logger.err("Loading data error: ({}) val:{}".format(msg, check_this))
+            self.logger.err("Loading error! File: ({}) file errors count:{}".format(msg, check_this))
         return counter
 
     def load_data(self):

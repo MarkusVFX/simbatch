@@ -146,7 +146,7 @@ class CommonFunctions:
             return def_val
 
     def str_with_zeros(self, number, zeros=3):
-        if self.is_float(zeros) is False:
+        if self.can_get_int(zeros) is False:
             zeros = 0
             self.logger.err(("(str_with_zeros) zeros is not number:", zeros))
         stri = str(number)

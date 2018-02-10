@@ -112,7 +112,7 @@ class ButtonWithCheckBoxes:
     button = None
     qt_pin_check_box = None
     qt_second_check_box = None
-    third_check_box = None
+    qt_third_check_box = None
 
     def __init__(self, text_on_button, pin_text="", cb2_text="", cb3_text="", label_text="", enabled=True,
                  button_width=0, cb2_checked=False, cb3_checked=False):
@@ -126,10 +126,10 @@ class ButtonWithCheckBoxes:
             if cb2_checked:
                 self.qt_second_check_box.setChecked(True)
         if len(cb3_text) > 0:
-            self.third_check_box = QCheckBox(cb3_text)
-            self.qt_widget_layout.addWidget(self.third_check_box)
+            self.qt_third_check_box = QCheckBox(cb3_text)
+            self.qt_widget_layout.addWidget(self.qt_third_check_box)
             if cb3_checked:
-                self.third_check_box.setChecked(True)
+                self.qt_third_check_box.setChecked(True)
         if len(label_text) > 0:
             self.qt_widget_layout.addWidget(QLabel(label_text))
         self.button = QPushButton(text_on_button)

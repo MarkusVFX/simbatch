@@ -295,6 +295,14 @@ class Schemas:
         else:
             return True
 
+    def clear_json_schema_file(self, json_file=None):
+        if json_file is None:
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
+        if self.comfun.file_exists(json_file):
+            return self.comfun.save_to_file(json_file, "")
+        else:
+            return True
+
     @staticmethod
     def clear_schemas_in_mysql():
         # PRO VERSION with sql
@@ -309,7 +317,7 @@ class Schemas:
         # TODO check clear UI val (last current...)
         if clear_stored_data:
             if self.sts.store_data_mode == 1:
-                if self.delete_json_schema_file():
+                if self.clear_json_schema_file():
                     return True
                 else:
                     return False

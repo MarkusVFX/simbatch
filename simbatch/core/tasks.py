@@ -236,6 +236,14 @@ class Tasks:
         else:
             return True
 
+    def clear_json_tasks_file(self, json_file=None):
+        if json_file is None:
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_TASKS_FILE_NAME
+        if self.comfun.file_exists(json_file):
+            return self.comfun.save_to_file(json_file, "")
+        else:
+            return True
+
     def clear_tasks_in_mysql(self):
         # PRO VERSION with sql
         self.batch.logger.inf("MySQL database available in the PRO version")
@@ -250,7 +258,7 @@ class Tasks:
         # TODO check clear UI val (last current...)
         if clear_stored_data:
             if self.sts.store_data_mode == 1:
-                if self.delete_json_tasks_file():
+                if self.clear_json_tasks_file():
                     return True
                 else:
                     return False

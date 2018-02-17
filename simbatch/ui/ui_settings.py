@@ -91,8 +91,8 @@ class SettingsUI:
         qt_settings_create_example_data_button = QPushButton("Create example data")
         qt_settings_clear_all_data_button = QPushButton("Clear all data")
         qt_lay_settings_buttons_data.addWidget(qt_settings_create_example_data_button)
-        qt_lay_settings_buttons_data.addWidget(qt_settings_clear_data_button)
-        qt_settings_create_example_data_button.connect(self.on_click_create_example_data)
+        qt_lay_settings_buttons_data.addWidget(qt_settings_clear_all_data_button)
+        qt_settings_create_example_data_button.clicked.connect(self.on_click_create_example_data)
         qt_settings_clear_all_data_button.clicked.connect(self.on_click_clear_all_data)
 
         qt_lay_settings_mode_data = QVBoxLayout()
@@ -224,9 +224,9 @@ class SettingsUI:
 
         qt_lay_settings_buttons = QHBoxLayout()
 
-        qt_cb_sample_data = QCheckBox("Create sample data")
-        qt_cb_sample_data.stateChanged.connect(self.on_changed_sample_data)
-        qt_lay_settings_buttons.addWidget(qt_cb_sample_data)
+        qt_cb_always_on_top = QCheckBox("Always on top")
+        qt_cb_always_on_top.stateChanged.connect(self.on_changed_always_on_top)
+        qt_lay_settings_buttons.addWidget(qt_cb_always_on_top)
 
         qt_button_save = QPushButton("Save")
         qt_button_save.clicked.connect(self.on_click_save_settings)
@@ -259,8 +259,14 @@ class SettingsUI:
         self.settings.update_ui_colors()
         self.mainw.refresh_ui_with_reload_data()
 
-    def on_changed_sample_data(self, state):
-        self.sample_data_state = state
+    def on_changed_always_on_top(self, state):
+        self.settings.always_on_top = state
+        if state:
+            self.mainw.setWindowFlags(Qt.WindowStaysOnTopHint)
+            self.mainw.show()
+        else:
+            self.mainw.setWindowFlags(self.mainw.windowFlags() & ~Qt.WindowStaysOnTopHint)
+            self.mainw.show()
 
     def on_edit_update_sql_1(self, txt):
         self.settings.mysql_host = txt
@@ -291,16 +297,19 @@ class SettingsUI:
         batch.tsk.create_example_tasks_data(do_save=True)
         # batch.que.createSampleData(taskID, projID)  # TODO
         # batch.nod.createSampleData()  # TODO
-        self.batch.logger.inf(("Created sample data :", data_path))
+        self.batch.logger.inf(("Created sample data"))
+        self.mainw.refresh_ui_with_reload_data()
 
     def on_click_clear_all_data(self):
         batch = self.batch
-        batch.prj.clear_project_data(do_save=True)
-        batch.sch.clear_schemas_data(do_save=True)
-        batch.tsk.clear_tasks_data(do_save=True)
+        batch.prj.clear_all_projects_data(clear_stored_data=True)
+        batch.sch.clear_all_schemas_data(clear_stored_data=True)
+        batch.tsk.clear_all_tasks_data(clear_stored_data=True)
         # batch.que.clearSampleData(taskID, projID)  # TODO
         # batch.nod.clearSampleData()  # TODO
-        self.batch.logger.inf(("Created sample data :", data_path))
+        self.batch.logger.inf(("Cleared sample data"))
+        self.mainw.refresh_ui_with_reload_data()
+
 
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())

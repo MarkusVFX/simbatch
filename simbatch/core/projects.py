@@ -156,14 +156,17 @@ class Projects:
         return None
 
     #  update id, index and current for fast use by all modules
-    def update_current_from_id(self, id):
-        self.current_project_id = id
-        self.current_project_index = self.get_index_from_id(id)
+    def update_current_from_id(self, proj_id):
+        if proj_id is None:
+            self.current_project_id = self.get_default_project_id()
+        else:
+            self.current_project_id = proj_id
+        self.current_project_index = self.get_index_from_id(self.current_project_id)
         if self.current_project_index is not None:
             self.current_project = self.projects_data[self.current_project_index]
             return True
         else:
-            self.batch.logger.err("(update_current_from_id)  no index found:{}".format(id))
+            self.batch.logger.err("(update_current_from_id)  no index found:{}".format(proj_id))
             self.current_project_id = None
             return False
 
@@ -255,6 +258,13 @@ class Projects:
         else:
             return False
 
+    #  search all project for default
+    def get_default_project_id(self):
+        for p in self.projects_data:
+            if p.is_default == 1:
+                return p.id
+        return None
+
     #  set def project init after loading
     def set_proj_as_default(self, id=-1, index=-1):
         if index >= 0:
@@ -293,7 +303,7 @@ class Projects:
         self.current_project_index = None
         if clear_stored_data:
             if self.sts.store_data_mode == 1:
-                if self.delete_json_project_file():
+                if self.clear_json_project_file():
                     return True
                 else:
                     return False
@@ -409,6 +419,15 @@ class Projects:
             json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
+        else:
+            return True
+
+    #  clear json file content
+    def clear_json_project_file(self, json_file=None):
+        if json_file is None:
+            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
+        if self.comfun.file_exists(json_file):
+            return self.comfun.save_to_file(json_file, "")
         else:
             return True
 

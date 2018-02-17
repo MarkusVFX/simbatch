@@ -267,9 +267,6 @@ class MainWindow(QMainWindow):
         self.batch.logger.inf("reload PROJECTS")
         self.pro_ui.reload_projects_data_and_refresh_list()
 
-        self.batch.logger.inf("reload PROJECTS")
-        self.pro_ui.reload_projects_data_and_refresh_list()
-
         self.batch.logger.inf("reload SCHEMAS")
         self.sch_ui.reload_schemas_data_and_refresh_list()
 

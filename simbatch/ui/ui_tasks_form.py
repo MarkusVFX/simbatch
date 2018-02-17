@@ -1,11 +1,16 @@
-try:
-    from PySide.QtGui import *
+try:  # Maya 2016
     from PySide.QtCore import *
+    from PySide.QtGui import *
 except ImportError:
-    print "PySide.QtGui ERR"
+    try:  # Maya 2017
+        from PySide2.QtCore import *
+        from PySide2.QtGui import *
+        from PySide2.QtWidgets import *
+    except ImportError:
+        print "PySide import ERROR"
 
 from widgets import *
-from ui_queue import QueueItem
+from simbatch.core.queue import QueueItem
 
 
 class AddToQueueForm (QWidget):

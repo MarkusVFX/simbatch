@@ -1,14 +1,19 @@
 import copy
 # import time
 
-try:
-    from PySide.QtGui import *
+try:  # Maya 2016
     from PySide.QtCore import *
+    from PySide.QtGui import *
 except ImportError:
-    print "PySide.QtGui ERR"
+    try:  # Maya 2017
+        from PySide2.QtCore import *
+        from PySide2.QtGui import *
+        from PySide2.QtWidgets import *
+    except ImportError:
+        print "PySide import ERROR"
 
 from widgets import *
-from core.tasks import *
+from simbatch.core.tasks import *
 from ui_tasks_form import AddToQueueForm
 
 

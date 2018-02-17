@@ -1,7 +1,6 @@
 .idea
 .cache/
 
-
 /data
 /prv
 simbatch/config.ini
@@ -15,3 +14,4 @@ eggs/
 *.egg
 *.pyc
 __pycache__/
+.pytest_cache/

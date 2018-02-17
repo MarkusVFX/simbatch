@@ -3,11 +3,16 @@ import json
 import random
 from common import CommonFunctions
 
-try:
-    from PySide.QtGui import *
+try:  # Maya 2016
     from PySide.QtCore import *
+    from PySide.QtGui import *
 except ImportError:
-    print " [ERR] import PySide error"
+    try:  # Maya 2017
+        from PySide2.QtCore import *
+        from PySide2.QtGui import *
+        from PySide2.QtWidgets import *
+    except ImportError:
+        print "PySide import ERROR"
 
 
 class Settings:

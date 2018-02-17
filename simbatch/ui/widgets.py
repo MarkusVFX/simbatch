@@ -1,13 +1,15 @@
-
-try:
+try:  # Maya 2016
     from PySide.QtCore import *
     from PySide.QtGui import *
 except ImportError:
-    from PySide2.QtCore import *
-    from PySide2.QtGui import *
-    from PySide2.QtWidgets import *
+    try:  # Maya 2017
+        from PySide2.QtCore import *
+        from PySide2.QtGui import *
+        from PySide2.QtWidgets import *
+    except ImportError:
+        print "PySide import ERROR"
 
-from core.common import CommonFunctions, Logger
+from simbatch.core.common import CommonFunctions, Logger
 
 
 class SimpleLabel:

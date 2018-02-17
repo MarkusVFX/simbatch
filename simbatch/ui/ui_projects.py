@@ -1,11 +1,16 @@
-try:
-    from PySide.QtGui import *
+try:  # Maya 2016
     from PySide.QtCore import *
+    from PySide.QtGui import *
 except ImportError:
-    print "PySide.QtGui ERR"
+    try:  # Maya 2017
+        from PySide2.QtCore import *
+        from PySide2.QtGui import *
+        from PySide2.QtWidgets import *
+    except ImportError:
+        print "PySide import ERROR"
 
 from widgets import *
-from core.projects import *
+from simbatch.core.projects import *
 
 
 class ProjectListItem(QWidget):
@@ -21,18 +26,23 @@ class ProjectListItem(QWidget):
 
         self.qt_label_id = QLabel(txt_id)
         self.qt_label_id.setFont(self.qt_label_font)
+        self.qt_label_id.setStyleSheet("""color:#000;padding-left:2px;""")
         self.qt_label_id.setMinimumWidth(22)
         self.qt_label_id.setMaximumWidth(22)
         self.qt_lay.addWidget(self.qt_label_id)
 
         self.qt_label_name = QLabel(txt_name)
-        self.qt_label_name.setStyleSheet("""padding-left:4px;""")
+        self.qt_label_name.setStyleSheet("""color:#000;padding-left:4px;""")
         self.qt_label_name.setFont(self.qt_label_font)
         self.qt_lay.addWidget(self.qt_label_name)
+
         self.qt_label_directory = QLabel(working_directory)
+        self.qt_label_directory.setStyleSheet("""color:#000;padding-left:2px;""")
         self.qt_label_directory.setFont(self.qt_label_font)
         self.qt_lay.addWidget(self.qt_label_directory)
+
         self.qt_label_description = QLabel(txt_description)
+        self.qt_label_description.setStyleSheet("""color:#000;padding-left:2px;""")
         self.qt_label_description.setFont(self.qt_label_font)
         self.qt_lay.addWidget(self.qt_label_description)
 

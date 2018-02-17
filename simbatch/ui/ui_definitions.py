@@ -67,27 +67,13 @@ class DefinitionsUI:
         for d in self.dfn.definitions_array:
             logger_raw(" _name:{} total_actions:{} names count:{}".format(d.name, d.total_actions, len(d.action_names)))
 
-    def print_single_dfn(self, d):
-        logger_raw = self.batch.logger.raw
-        logger_raw("\n\n name:{} total_actions:{} names count:{}".format(d.name, d.total_actions, len(d.action_names)))
-        for i, an in enumerate(d.action_names):
-            logger_raw("  arr action_names:{}  {} ".format(i, an))
-        for i, ga in enumerate(d.grouped_actions_array):
-            if ga.actions_count == len(ga.actions):
-                logger_raw("  _group_name:{} {}  count: {}".format(i, ga.name, ga.actions_count))
-            else:
-                logger_raw("  _group_name:{} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
-                                                                               len(ga.actions)))
-            for j, sa in enumerate(ga.actions):
-                logger_raw("    ___action {}  name:{}  default_value:{}  ui:{}".format(j, sa.name,
-                                                                                       sa.default_value, sa.ui))
-
     def on_click_sprint_current(self):
         self.batch.logger.raw(str(self.dfn.current_definition_name))
         for d in self.dfn.definitions_array:
             if d.name == self.dfn.current_definition_name:
-                self.print_single_dfn(d)
+                # self.print_single_dfn(d)
+                d.print_single()
 
     def on_click_print_all(self):
         for d in self.dfn.definitions_array:
-            self.print_single_dfn(d)
+            d.print_single()

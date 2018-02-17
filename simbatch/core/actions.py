@@ -21,7 +21,9 @@ class SingleAction:
     template = ""
     function_str = ""
     json_FIELDS_NAMES = ACTION_DATA_FIELDS_NAMES
-    ui = None                       # store ui for quick save
+    ui = None
+    description = ""
+    # store ui for quick save
     # standard_butt_caption = None    # store ui for ui forms
     # standard_funcion_str = None     # store ui for ui forms
     # addional_butt_caption = None    # store ui for ui forms
@@ -82,26 +84,26 @@ class SingleAction:
         return self.template
 
 
-class GroupedActions:
+class MultiAction:    #  old GroupedActions
     """
     Grouped actions class is container for ONE or more SingleAction objects
     this container grouping similar actions, few actions of one type  or different versions of actions
     """
-    group_id = None
+    multi_id = None
     name = ""
     actions = []  # one or more SingleAction objects
     actions_count = 0
 
-    def __init__(self, group_id, name):
-        self.group_id = group_id
+    def __init__(self, multi_id, name):
+        self.multi_id = multi_id
         self.name = name
         self.actions = []
 
     def __repr__(self):
-        return "GroupedActions({},{})".format(self.name, self.name)
+        return "MultiAction({},{})".format(self.name, self.name)
 
     def __str__(self):
-        return "GroupedActions"
+        return "MultiAction"
 
     def add_single_action(self, new_action):
         if isinstance(new_action, SingleAction):

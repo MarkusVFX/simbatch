@@ -8,7 +8,7 @@ try:
 except ImportError:
     pass
 
-from actions import GroupedActions, SingleAction
+from actions import MultiAction, SingleAction
 
 # JSON Name Format, PEP8 Name Format
 DEFINITION_ITEM_FIELDS_NAMES = [
@@ -46,17 +46,19 @@ class SingleDefinition:
     prev_ext = ""   # without dot "png"
     file_ext = ""   # without dot
     # actions_array = []    # SingleAction or GroupAction
-    grouped_actions_array = []    # GroupAction array
+    # grouped_actions_array = []    # GroupAction array  grouped_actions_array
+    multi_actions_array = []    # GroupAction array  grouped_actions_array
     total_actions = 0
     action_names = []
     # TODO list supported versions
 
     interactions = None
 
-    def __init__(self, name):
+    def __init__(self, name, logger):
         self.name = name
-        self.grouped_actions_array = []
+        self.multi_actions_array = []
         self.action_names = []
+        self.logger = logger
 
     def __repr__(self):
         return "SingleDefinition({})".format(self.software)
@@ -68,13 +70,30 @@ class SingleDefinition:
         print "   [INF] {} total actions:{}".format(prefix, self.total_actions)
 
     def print_all(self):
-        for action_group in self.grouped_actions_array:
+        for action_group in self.multi_actions_array:
             for ai in action_group.actions:
                 ai.print_minimum()
         self.print_total()
 
+    def print_single(self):
+        #logger_raw = self.batch.logger.raw
+        logger_raw = self.logger.raw
+        logger_raw("\n\n name:{} total_actions:{} names count:{}".format(self.name, self.total_actions,
+                                                                         len(self.action_names)))
+        for i, an in enumerate(self.action_names):
+            logger_raw("  arr action_names:{}  {} ".format(i, an))
+        for i, ga in enumerate(self.multi_actions_array):
+            if ga.actions_count == len(ga.actions):
+                logger_raw("  _group_name:{} {}  count: {}".format(i, ga.name, ga.actions_count))
+            else:
+                logger_raw("  _group_name:{} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
+                                                                               len(ga.actions)))
+            for j, sa in enumerate(ga.actions):
+                logger_raw("    ___action {}  name:{}  default_value:{}  ui:{}".format(j, sa.name,
+                                                                                       sa.default_value, sa.ui))
+
     def add_group_action(self, element):
-        self.grouped_actions_array.append(element)
+        self.multi_actions_array.append(element)
         self.total_actions += 1
         self.action_names.append(element.name)
 
@@ -199,7 +218,7 @@ class Definitions:
     @staticmethod
     def get_example_definition():
         example_defi = SingleDefinition("example_defi")
-        example_group_actions = GroupedActions(1, "example a gr")
+        example_group_actions = MultiAction(1, "example a gr")
         example_action = SingleAction(1, "ex_a", "desc", "<def>", "templ <o>", mode="single",
                                       ui=(("Tst", "print('ex')"), ("Tst", "print('ex')")))
         example_group_actions.add_single_action(example_action)
@@ -251,7 +270,7 @@ class Definitions:
                     if json_definition['definition']['meta']['totalActions'] > 0:
                         if "name" in json_definition['definition']['meta']:
                             definition_name = json_definition['definition']['meta']["name"]
-                            new_definition = SingleDefinition(definition_name)
+                            new_definition = SingleDefinition(definition_name, self.batch.logger)
                             if "software" in json_definition['definition']['meta']:
                                 new_definition.software = json_definition['definition']['meta']["software"]
                             if "setupExt" in json_definition['definition']['meta']:
@@ -267,10 +286,9 @@ class Definitions:
                                 if new_definition.interactions is None:
                                     loading_errors += 1
 
-
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():
-                                    new_group_action = GroupedActions(li['id'], li['name'])
+                                    new_group_action = MultiAction(li['id'], li['name'])
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
                                         li_ui = self.get_ui_values(li)
@@ -278,7 +296,7 @@ class Definitions:
                                                                   li['template'], ui=li_ui)
                                         new_group_action.add_single_action(new_action)
 
-                                    elif li['type'] == "group":
+                                    elif li['type'] == "multi":
                                         for ag in li["subActions"].values():
                                             ag_ui = self.get_ui_values(ag)
                                             new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],

@@ -18,7 +18,7 @@
 			},
 			"2":{
 				"id": 2,
-				"type": "group",
+				"type": "multi",
 				"name": "Run App",
 				"subActions":{
 					"1": {

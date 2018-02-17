@@ -1,5 +1,5 @@
 from simbatch.core import core
-from simbatch.core.actions import SingleAction, GroupedActions
+from simbatch.core.actions import SingleAction, MultiAction
 import pytest
 
 
@@ -24,14 +24,21 @@ def simbatch():
 def test_single_action():
     sa = SingleAction(-1, "acti name", "descr", "abc", "template <f>")
     assert sa.name == "acti name"
+    assert sa.description == "descr"
+    assert sa.default_value == "abc"
+    assert sa.template == "template <f>"
 
 
-def test_grouped_action():
-    sia = SingleAction(-2, "acti name2", "descr2", "abc", "template2 <f>")
-    gra = GroupedActions(1, "tst")
-    assert gra.actions_count == 0
-    gra.add_single_action(sia)
-    assert gra.actions_count == 1
+def test_multi_action():
+    singl_a1 = SingleAction(-2, "acti name1", "descr1", "abc", "template1 <f>")
+    singl_a2 = SingleAction(-2, "acti name2", "descr2", "abc", "template2 <f>")
+    multi_a = MultiAction(1, "tst")
+    assert multi_a.actions_count == 0
+    multi_a.add_single_action(singl_a1)
+    assert multi_a.actions_count == 1
+    multi_a.add_single_action(singl_a2)
+    assert multi_a.actions_count == 2
+
 
 
 

@@ -29,7 +29,7 @@ SCHEMA_ITEM_FIELDS_NAMES = [
 #         self.soft_id = soft_id
 
 
-class SchemaItem:
+class SchemaItem:   # TODO SingleSchema name refactor !?!?
     """ Single schema """
     id = None
     schema_name = None

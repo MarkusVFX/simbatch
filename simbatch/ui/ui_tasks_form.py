@@ -24,7 +24,7 @@ class AddToQueueForm (QWidget):
     execute_button = None
 
     actions_widgets_array = []
-    actionsCount = 0
+    form_actions_count = 0
 
     all_actions_array = []
     comfun = None

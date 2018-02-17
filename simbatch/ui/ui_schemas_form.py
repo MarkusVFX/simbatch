@@ -6,7 +6,7 @@ except ImportError:
 
 from widgets import *
 # from core.schemas import SingleAction
-from core.actions import GroupedActions
+from core.actions import MultiAction, SingleAction
 
 
 class SchemaFormCreateOrEdit(QWidget):
@@ -16,7 +16,7 @@ class SchemaFormCreateOrEdit(QWidget):
     form_mode = 1  # 1 create    2 edit
 
     # actions
-    actionsCount = 0
+    form_actions_count = 0
     # actions_array = []
     action_widgets = []
     actions_string = ""
@@ -57,9 +57,12 @@ class SchemaFormCreateOrEdit(QWidget):
         self.schema_item_form_object.detailed_print()
         self.batch.logger.raw("\n form action_widgets count: {}".format(len(self.action_widgets)))
         for i, aw in enumerate(self.action_widgets):
-            self.batch.logger.raw(" action_widget {}  id:{}  label:{}  edit_val:{}".format(i, aw.action_id,
+            self.batch.logger.raw(" action_widget {}  id:{}  label:{}  edit_val:{}".format(i, aw.widget_id,
                                                                                            aw.qt_label.text(),
                                                                                            aw.edit_val, aw.ui_info))
+        self.batch.logger.raw("object's action_array count:{}".format(len(self.schema_item_form_object.actions_array)))
+        for a in self.schema_item_form_object.actions_array:
+            self.batch.logger.raw(" object's action_array {}    {}    {}".format(a.id, a.name, a.default_value) )
 
     def init_ui_elements(self):
         qt_lay_outer_schema_form = QVBoxLayout()
@@ -176,10 +179,12 @@ class SchemaFormCreateOrEdit(QWidget):
         self.batch.logger.db(("on_radio_change definition", nr))
         self.change_current_definition(nr=nr)
         if self.batch.dfn.current_definition_name == "Stand-alone":
-            self.schema_form_buttons.qt_third_check_box.setChecked(False)
-            self.schema_form_buttons.qt_third_check_box.setEnabled(False)
+            if self.schema_form_buttons.qt_third_check_box is not None:
+                self.schema_form_buttons.qt_third_check_box.setChecked(False)
+                self.schema_form_buttons.qt_third_check_box.setEnabled(False)
         else:
-            self.schema_form_buttons.qt_third_check_box.setEnabled(True)
+            if self.schema_form_buttons.qt_third_check_box is not None:
+                self.schema_form_buttons.qt_third_check_box.setEnabled(True)
 
     # ACTIONS
     # ACTIONS
@@ -197,7 +202,6 @@ class SchemaFormCreateOrEdit(QWidget):
         pass
         # TODO
 
-
     def add_defined_action_button(self, button_txt, disabled=False):
         b = ButtonOnLayout(button_txt)
         self.qt_lay_fae_actions_buttons.addLayout(b.qt_widget_layout)
@@ -213,9 +217,9 @@ class SchemaFormCreateOrEdit(QWidget):
         curr_proj = self.batch.prj.current_project
         if curr_proj is not None:
             if nr is not None and nr < len(self.batch.dfn.definitions_array):
-                for action_group in self.batch.dfn.definitions_array[nr].grouped_actions_array:
-                    b = self.add_defined_action_button(action_group.name)
-                    b.button.clicked.connect(lambda a=action_group: self.on_click_defined_action_button(a, curr_proj))
+                for multi_action in self.batch.dfn.definitions_array[nr].multi_actions_array:
+                    b = self.add_defined_action_button(multi_action.name)
+                    b.button.clicked.connect(lambda a=multi_action: self.on_click_defined_action_button(a))
             else:
                 if nr is None:
                     self.batch.logger.wrn("add act but nr is None !")
@@ -226,48 +230,69 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.batch.logger.wrn("Current project undefined !")
 
-    # on click one of horizontal button add action widget to vertical list of schema actions
-    def on_click_defined_action_button(self, group_of_actions, curr_proj):  # , force_val=0
+    # on click one of horizontal button: adding action widget to vertical list of schema's actions
+    def on_click_defined_action_button(self, multi_action):  # , curr_proj):  # , force_val=0
         combo_items = []
-        combo_val = []
-        sub_action_data = []
+        # combo_val = []
+        # sub_action_data = []
 
         qt_lay = self.qt_lay_fae_actions
         button_1_caption = None
         button_2_caption = None
         button_1_function_str = None
         button_2_function_str = None
-        if group_of_actions.actions[0].ui is not None:
-            if len(group_of_actions.actions[0].ui) > 0:
-                button_1_caption = group_of_actions.actions[0].ui[0][0]
-                button_1_function_str = group_of_actions.actions[0].ui[0][1]
-            if len(group_of_actions.actions[0].ui) > 1:
-                button_2_caption = group_of_actions.actions[0].ui[1][0]
-                button_2_function_str = group_of_actions.actions[0].ui[1][1]
+        if len(multi_action.actions) > 0:
+            if multi_action.actions[0].ui is not None:
+                if len(multi_action.actions[0].ui) > 0:
+                    button_1_caption = multi_action.actions[0].ui[0][0]
+                    button_1_function_str = multi_action.actions[0].ui[0][1]
+                if len(multi_action.actions[0].ui) > 1:
+                    button_2_caption = multi_action.actions[0].ui[1][0]
+                    button_2_function_str = multi_action.actions[0].ui[1][1]
 
         batch = self.batch   #  share logger and interaction fron definition
         # interaction = self.batch.dfn.current_interaction
-        if group_of_actions.actions_count == 0:   # incorrectly defined action
-            action_widget = ActionWidget(batch, -1, "incorrectly defined action", GroupedActions(-1,"empty action") )
-        elif group_of_actions.actions_count == 1:   # single action, no combo
-            action_widget = ActionWidget(batch, group_of_actions.actions[0].id,
-                                         group_of_actions.actions[0].name, group_of_actions,
+        if multi_action.actions_count == 0:   # incorrectly defined action
+            action_widget = ActionWidget(batch, -1, "incorrectly defined action", MultiAction(-1,"empty action") )
+            single_action = SingleAction(-1, multi_action.multi_id, multi_action.name, "err",
+                                         "incorrectly defined action", "null")
+
+        elif multi_action.actions_count == 1:   # single action, no combo
+            single_action = SingleAction(multi_action.actions[0].id, multi_action.actions[0].name,
+                                         multi_action.actions[0].description, multi_action.actions[0].default_value,
+                                         multi_action.actions[0].template)
+
+            action_widget = ActionWidget(batch, self.form_actions_count+1, multi_action.actions[0].name, multi_action,
                                          button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                          button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
-        else:  # grouped actions :  import ANI,CAM,ENV
+
+        else:  # grouped actions :  import ANI, CAM, ENV
             sub_actions = []
-            for i, a in enumerate(group_of_actions.actions):
+            for i, a in enumerate(multi_action.actions):
                 combo_items.append(a.mode)
                 # combo_val.append(a.default_value)
                 sub_actions.append([i, a.mode, a.default_value, a.ui])   # TODO class !
-            action_widget = ActionWidget(batch, group_of_actions.group_id, group_of_actions.name, group_of_actions,
+
+            single_action = SingleAction(multi_action.actions[0].id, multi_action.actions[0].name,
+                                         multi_action.actions[0].description, multi_action.actions[0].default_value,
+                                         multi_action.actions[0].template)
+
+            action_widget = ActionWidget(batch, self.form_actions_count+1, multi_action.name, multi_action,
                                          button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                          button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
                                          edit_txt=sub_actions[0][2], combo_items=combo_items,
-                                         sub_actions_data=sub_actions)   # combo_def_val=combo_val
+                                         sub_actions_data=sub_actions)
 
         qt_lay.addWidget(action_widget)
         self.action_widgets.append(action_widget)
+        self.schema_item_form_object.actions_array.append(single_action)
+        self.form_actions_count += 1
+
+        #
+
+        #
+
+        #
 
         # action_widget.qt_button_1.clicked.connect(
         #     lambda: group_of_actions.get_get_file(group_of_actions.actionWidget.edit,
@@ -304,12 +329,12 @@ class SchemaFormCreateOrEdit(QWidget):
             self.qt_lay_fae_actions_buttons.takeAt(0)
 
     def remove_all_action_widgets(self):
-        self.action_widgets = []
+        del self.action_widgets[:]
         while self.qt_lay_fae_actions.count() > 0:
             b = self.qt_lay_fae_actions.itemAt(0)
             b.widget().deleteLater()
             self.qt_lay_fae_actions.takeAt(0)
-        self.actionsCount = 0
+        self.form_actions_count = 0
 
     def refresh_actions_ui(self):
         cur_index = self.batch.dfn.current_definition_index

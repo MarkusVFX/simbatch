@@ -192,7 +192,8 @@ class RadioButtons:
 class ActionWidget(QWidget):
     # action_name = ""
     # action_sub_mode = ""
-    group_of_actions = None  # GroupAction
+    # group_of_actions = None  # GroupAction
+    multi_action = None  # MultiAction
     qt_id = None
     qt_layout = None
     qt_label = None
@@ -205,6 +206,8 @@ class ActionWidget(QWidget):
     cb2 = None
     cb3 = None
 
+    widget_id = None
+
     current_action_index = 0   # current index from GroupAction;  0 for single action
     sub_action_data = []
 
@@ -212,7 +215,7 @@ class ActionWidget(QWidget):
     logger = None
     interactions = None
 
-    def __init__(self, batch, action_id, label_txt, group_of_actions, edit_txt="", combo_items="", combo_def_val="",
+    def __init__(self, batch, widget_id, label_txt, multi_action, edit_txt="", combo_items="", combo_def_val="",
                  button_1_caption=None, button_1_fun_str=None, button_2_caption=None, button_2_fun_str=None,
                  enabled1=True, enabled2=True, sub_actions_data=None):
 
@@ -221,8 +224,8 @@ class ActionWidget(QWidget):
         self.logger = batch.logger
         self.interactions = batch.dfn.current_interactions      #  connect  qt_button_1   or and   qt_button_1
         self.comfun = CommonFunctions()
-        self.action_id = action_id
-        self.group_of_actions = group_of_actions
+        self.widget_id = widget_id
+        self.multi_action = multi_action
         if sub_actions_data is None:
             self.sub_action_data = []
         else:
@@ -245,62 +248,62 @@ class ActionWidget(QWidget):
         self.qt_label = QLabel(label_txt)
         qt_widget_layout.addWidget(self.qt_label)
 
-        if self.action_id >= 0:
-            if edit_txt is not False:
-                if edit_txt == " ":
-                    edit_txt = ""
-                self.edit_val = str(edit_txt)
-                self.qt_edit = QLineEdit(self.edit_val)
-                qt_widget_layout.addWidget(self.qt_edit)
-                self.qt_edit.textChanged.connect(self.on_change_line_edit)
+        # if multi_action.actions_count > 0:
+        if edit_txt is not False:
+            if edit_txt == " ":
+                edit_txt = ""
+            self.edit_val = str(edit_txt)
+            self.qt_edit = QLineEdit(self.edit_val)
+            qt_widget_layout.addWidget(self.qt_edit)
+            self.qt_edit.textChanged.connect(self.on_change_line_edit)
 
-            if button_1_caption is not None and len(button_1_caption) > 0:
-                self.qt_button_1 = QPushButton(button_1_caption)
-                if enabled1 is False:
-                    self.qt_button_1.setEnabled(False)
-                self.qt_layout.addWidget(self.qt_button_1)
+        if button_1_caption is not None and len(button_1_caption) > 0:
+            self.qt_button_1 = QPushButton(button_1_caption)
+            if enabled1 is False:
+                self.qt_button_1.setEnabled(False)
+            self.qt_layout.addWidget(self.qt_button_1)
 
-                # self.qt_button_1.clicked.connect(lambda: eval(button_1_fun_str))
-                # self.qt_button_1.clicked.connect(eval("self."+button_1_fun_str))
-                if button_1_fun_str[0] == "[":
-                    button_1_fun_str = button_1_fun_str[1:-1]
-                    self.qt_button_1.clicked.connect(eval ("self.defined_button_" + button_1_fun_str))
-                    #  definition predefined function !!!!
-                else:
-                    self.qt_button_1.clicked.connect(eval("self."+button_1_fun_str))  # self.interactions.function !!!!
+            # self.qt_button_1.clicked.connect(lambda: eval(button_1_fun_str))
+            # self.qt_button_1.clicked.connect(eval("self."+button_1_fun_str))
+            if button_1_fun_str[0] == "[":
+                button_1_fun_str = button_1_fun_str[1:-1]
+                self.qt_button_1.clicked.connect(eval ("self.defined_button_" + button_1_fun_str))
+                #  definition predefined function !!!!
+            else:
+                self.qt_button_1.clicked.connect(eval("self."+button_1_fun_str))  # self.interactions.function !!!!
 
-            if button_2_caption is not None and len(button_2_caption) > 0:
-                self.qt_button_2 = QPushButton(button_2_caption)
-                if enabled2 is False:
-                    self.qt_button_2.setEnabled(False)
-                self.qt_layout.addWidget(self.qt_button_2)
+        if button_2_caption is not None and len(button_2_caption) > 0:
+            self.qt_button_2 = QPushButton(button_2_caption)
+            if enabled2 is False:
+                self.qt_button_2.setEnabled(False)
+            self.qt_layout.addWidget(self.qt_button_2)
 
-                if button_2_fun_str[0] == "[":
-                    button_2_fun_str = button_2_fun_str[1:-1]
-                    self.qt_button_2.clicked.connect(eval ("self.defined_button_" + button_2_fun_str))
-                    #  definition predefined function !!!!
-                else:
-                    print "\n button_2_fun_str \n......._____" , button_2_fun_str
-                    self.qt_button_2.clicked.connect(eval("self."+button_2_fun_str))  # self.interactions.function !!!!
+            if button_2_fun_str[0] == "[":
+                button_2_fun_str = button_2_fun_str[1:-1]
+                self.qt_button_2.clicked.connect(eval ("self.defined_button_" + button_2_fun_str))
+                #  definition predefined function !!!!
+            else:
+                print "\n button_2_fun_str \n......._____" , button_2_fun_str
+                self.qt_button_2.clicked.connect(eval("self."+button_2_fun_str))  # self.interactions.function !!!!
 
-            if len(combo_items) > 0:
-                self.qt_combo = QComboBox()
-                # combo_items_arr = combo_items.split(",")
-                set_index = 0
-                for counter, it in enumerate(combo_items):
-                    if len(combo_def_val) > 0 and it == combo_def_val:
-                        set_index = counter
-                        self.logger.deepdb(("new combo val ", set_index, "___", combo_def_val))
-                    self.qt_combo.addItem(it)
-                    # self.sub_action_data.append([counter, combo_val, x])
+        if len(combo_items) > 0:
+            self.qt_combo = QComboBox()
+            # combo_items_arr = combo_items.split(",")
+            set_index = 0
+            for counter, it in enumerate(combo_items):
+                if len(combo_def_val) > 0 and it == combo_def_val:
+                    set_index = counter
+                    self.logger.deepdb(("new combo val ", set_index, "___", combo_def_val))
+                self.qt_combo.addItem(it)
+                # self.sub_action_data.append([counter, combo_val, x])
 
-                self.qt_combo.setCurrentIndex(set_index)
-                # self.action_sub_mode = combo_items_arr[0]
-                # print " init action subtype : ", combo_items_arr[0]
-                qt_widget_layout.addWidget(self.qt_combo)
-                self.qt_combo.currentIndexChanged.connect(self.on_change_combo)
-        else:
-            self.logger.wrn("  Incorrectly defined action !  ")
+            self.qt_combo.setCurrentIndex(set_index)
+            # self.action_sub_mode = combo_items_arr[0]
+            # print " init action subtype : ", combo_items_arr[0]
+            qt_widget_layout.addWidget(self.qt_combo)
+            self.qt_combo.currentIndexChanged.connect(self.on_change_combo)
+        # else:
+            # self.logger.wrn("  Incorrectly defined action !  ")
         self.setLayout(qt_widget_layout)
 
     def defined_button_get_file(self):
@@ -315,7 +318,7 @@ class ActionWidget(QWidget):
 
 
     def get_current_action(self):
-        for i, a in enumerate(self.group_of_actions.actions):
+        for i, a in enumerate(self.multi_action.actions):
             if i == self.current_action_index:
                 return a
         return None

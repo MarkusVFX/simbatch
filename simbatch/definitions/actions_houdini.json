@@ -21,7 +21,7 @@
 			},
 			"2":{
 				"id": 2,
-				"type": "group",
+				"type": "multi",
 				"name": "Import",
 				"subActions":{
 					"1": {
@@ -57,7 +57,7 @@
 			},
 			"4":{
 				"id": 4,
-				"type": "group",
+				"type": "multi",
 				"name": "Simulate", 
 				"subActions":{
 					"1": {

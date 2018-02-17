@@ -22,7 +22,7 @@
 			},
 			"2":{
 				"id": 2,
-				"type": "group",
+				"type": "multi",
 				"name": "Import",
 				"subActions":{
 					"1": {
@@ -62,7 +62,7 @@
 			},
 			"4":{
 				"id": 4,
-				"type": "group",
+				"type": "multi",
 				"name": "Simulate", 
 				"subActions":{
 					"1": {
@@ -109,7 +109,7 @@
 			},
 			"5":{
 				"id": 5,
-				"type": "group",
+				"type": "multi",
 				"name": "Render", 
 				"subActions":{
 					"1": {
@@ -141,7 +141,7 @@
 			},
 			"7":{
 				"id": 7,
-				"type": "group",
+				"type": "multi",
 				"name": "Script", 
 				"subActions":{
 					"1": {

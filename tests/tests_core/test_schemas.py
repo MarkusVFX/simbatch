@@ -124,8 +124,6 @@ def test_remove_single_schema_by_index(sib):
     assert len(sib.sch.schemas_data) == 2
 
 def test_actions_in_single_schema(sib):
-    print "uuuuuiiiiii ",sib.sch.current_schema.actions_array[0].print_action()
-    print "uuuuuiiiiii ",sib.sch.current_schema.actions_array[0].ui
     assert sib.sch.total_schemas == 2
     assert len(sib.sch.schemas_data) == 2
 

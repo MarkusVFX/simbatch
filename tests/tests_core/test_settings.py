@@ -7,7 +7,7 @@ import pytest
 @pytest.fixture(scope="module")
 def settings():
     # TODO pytest-datadir pytest-datafiles
-    return sett.Settings(Logger(), 5, ini_file="S:/simbatch/simbatch/config.ini")
+    return sett.Settings(Logger(), 5, ini_file="S:/simbatch/config.ini")
 
 
 def test_update_ui_colors(settings):

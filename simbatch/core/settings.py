@@ -32,7 +32,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.10"   # current version
+    SIMBATCH_VERSION = "v0.2.13"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -93,6 +93,7 @@ class Settings:
     state_colors = []       # item list colors
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
+    always_on_top = False   # obvious obviousness
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1
@@ -270,10 +271,14 @@ class Settings:
         jd = self.json_settings_data
         json_keys = ["dataMode", "debugLevel", "storeData", "sql", "adminUser", "window"]
         errors = 0
-        for k in json_keys:
-            if (k in jd) is False:
-                print " [ERR] missing key:", k
-                errors += 1
+        if self.json_settings_data is not None:
+            for k in json_keys:
+                if (k in jd) is False:
+                    print " [ERR] missing key:", k
+                    errors += 1
+        else:
+            return False
+
         if errors == 0:
             return True
         else:

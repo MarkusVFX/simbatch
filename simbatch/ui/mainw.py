@@ -160,6 +160,8 @@ class MainWindow(QMainWindow):
             self.setGeometry(x_wnd_pos, y_wnd_pos, wnd[2], wnd[3])
 
         self.setWindowTitle("SimBatch " + self.sts.SIMBATCH_VERSION + "     " + self.sts.runtime_env)
+        if self.sts.always_on_top:
+            self.setWindowFlags(Qt.WindowStaysOnTopHint)
         qt_central_widget = QWidget(self)
         self.setCentralWidget(qt_central_widget)
         qt_lay_central = QVBoxLayout(qt_central_widget)

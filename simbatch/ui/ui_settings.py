@@ -37,6 +37,7 @@ class SettingsUI:
         ''' MODE '''
         qt_button_group_data = QButtonGroup()
         qt_radio_group_mode = QGroupBox()
+        qt_radio_group_mode.setTitle("Data options")
         qt_lay_settings_mode = QHBoxLayout()
         qt_label_mode = QLabel("Data store mode: ")
         qt_lay_settings_mode.addWidget(qt_label_mode)
@@ -86,17 +87,27 @@ class SettingsUI:
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_edit)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_button)
 
+        qt_lay_settings_buttons_data = QHBoxLayout()
+        qt_settings_create_example_data_button = QPushButton("Create example data")
+        qt_settings_clear_all_data_button = QPushButton("Clear all data")
+        qt_lay_settings_buttons_data.addWidget(qt_settings_create_example_data_button)
+        qt_lay_settings_buttons_data.addWidget(qt_settings_clear_data_button)
+        qt_settings_create_example_data_button.connect(self.on_click_create_example_data)
+        qt_settings_clear_all_data_button.clicked.connect(self.on_click_clear_all_data)
+
         qt_lay_settings_mode_data = QVBoxLayout()
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_mode)
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_data)
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_definitions)
+        qt_lay_settings_mode_data.addLayout(qt_lay_settings_buttons_data)
 
         qt_radio_group_mode.setLayout(qt_lay_settings_mode_data)
 
         ''' MySQL '''
         qt_lay_settings_sql = QFormLayout()
-
         qt_radio_group_sql = QGroupBox()
+        qt_radio_group_sql.setTitle("MySQL settings (available in the Pro version)")
+        qt_radio_group_sql.setEnabled(False)
 
         sett_sql_1a = QLabel("host : ")
         sett_sql_1b = QLineEdit(settings.sql[0])
@@ -123,12 +134,14 @@ class SettingsUI:
         qt_lay_settings_sql.addRow(sett_sql_3a, sett_sql_3b)
         qt_lay_settings_sql.addRow(sett_sql_4abc.qt_widget_layout)
 
-        qt_radio_group_sql.setTitle("MySQL settigs")
         qt_radio_group_sql.setLayout(qt_lay_settings_sql)
 
         ''' Users '''
         qt_lay_settings_user = QFormLayout()
         qt_radio_group_user = QGroupBox()
+        qt_radio_group_user.setTitle("User settings (available in the Pro version)")
+        qt_radio_group_user.setEnabled(False)
+
         qt_sett_ser_1a = QLabel("name : ")
         qt_sett_ser_1b = QLineEdit("Markus")
         qt_sett_ser_2a = QLabel("sign : ")
@@ -143,12 +156,12 @@ class SettingsUI:
         qt_lay_settings_user.addRow(qt_sett_ser_3a, qt_sett_ser_3b)
         qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)
 
-        qt_radio_group_user.setTitle("user settings : ")
         qt_radio_group_user.setLayout(qt_lay_settings_user)
 
         ''' Colors '''
         qt_button_group_colors = QButtonGroup()
         qt_radio_group_colors = QGroupBox()
+        qt_radio_group_colors.setTitle("Colors")
         qt_lay_settings_colors = QHBoxLayout()
 
         qt_radio_mode_1 = QRadioButton("grayscale")
@@ -172,7 +185,6 @@ class SettingsUI:
             qt_button_group_colors.addButton(qt_radio_mode_4)
         qt_lay_settings_colors.addWidget(qt_radio_mode_4)
 
-        qt_radio_group_colors.setTitle("Colors")
         qt_radio_group_colors.setLayout(qt_lay_settings_colors)
 
         qt_button_group_colors.setExclusive(True)
@@ -185,6 +197,7 @@ class SettingsUI:
         '''  structure '''
         qt_lay_settings_structure = QHBoxLayout()
         qt_radio_group_structure = QGroupBox()
+        qt_radio_group_structure.setTitle("Structure")
         s1a = QLabel("camera dir : ")
         s1b = QLineEdit("\\\\cam")
         s2a = QLabel("envo dir : ")
@@ -199,13 +212,15 @@ class SettingsUI:
         qt_lay_settings_structure.addWidget(s3a)
         qt_lay_settings_structure.addWidget(s3b)
 
-        qt_radio_group_structure.setTitle("Structure")
         qt_radio_group_structure.setLayout(qt_lay_settings_structure)
 
         ''' Info '''
         qt_lay_settings_info = QFormLayout()
-        qt_label_info = QLabel(" \n\n             www.simbatch.com ")
+        qt_radio_group_info = QGroupBox()
+        qt_radio_group_info.setTitle("Support and updates")
+        qt_label_info = QLabel("              www.simbatch.com ")
         qt_lay_settings_info.addWidget(qt_label_info)
+        qt_radio_group_info.setLayout(qt_lay_settings_info)
 
         qt_lay_settings_buttons = QHBoxLayout()
 
@@ -218,13 +233,13 @@ class SettingsUI:
         qt_lay_settings_buttons.addWidget(qt_button_save)
 
         qt_lay_settings_main.addWidget(qt_radio_group_mode)
+        qt_lay_settings_main.addWidget(qt_radio_group_structure)
+        qt_lay_settings_main.addWidget(qt_radio_group_colors)
         qt_lay_settings_main.addWidget(qt_radio_group_sql)
         qt_lay_settings_main.addWidget(qt_radio_group_user)
-        qt_lay_settings_main.addWidget(qt_radio_group_colors)
-        qt_lay_settings_main.addWidget(qt_radio_group_structure)
 
         qt_lay_settings_main.addItem(QSpacerItem(1, 22))
-        qt_lay_settings_main.addLayout(qt_lay_settings_info)
+        qt_lay_settings_main.addWidget(qt_radio_group_info)
         qt_lay_settings_main.addItem(QSpacerItem(1, 22))
         qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
 
@@ -269,6 +284,24 @@ class SettingsUI:
     def on_click_get_definitions_dir(self):
         self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog)
 
+    def on_click_create_example_data(self):
+        batch = self.batch
+        batch.prj.create_example_project_data(do_save=True)
+        batch.sch.create_example_schemas_data(do_save=True)
+        batch.tsk.create_example_tasks_data(do_save=True)
+        # batch.que.createSampleData(taskID, projID)  # TODO
+        # batch.nod.createSampleData()  # TODO
+        self.batch.logger.inf(("Created sample data :", data_path))
+
+    def on_click_clear_all_data(self):
+        batch = self.batch
+        batch.prj.clear_project_data(do_save=True)
+        batch.sch.clear_schemas_data(do_save=True)
+        batch.tsk.clear_tasks_data(do_save=True)
+        # batch.que.clearSampleData(taskID, projID)  # TODO
+        # batch.nod.clearSampleData()  # TODO
+        self.batch.logger.inf(("Created sample data :", data_path))
+
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())
         definitions_path = str(self.qt_settings_definitions_directory_edit.text())
@@ -279,15 +312,6 @@ class SettingsUI:
                 self.settings.store_data_backup_directory = data_path + "backup\\"
                 self.settings.store_definitions_directory = definitions_path
                 self.settings.save_settings()
-
-                if self.sample_data_state:
-                    batch = self.batch
-                    batch.prj.create_example_project_data(do_save=True)
-                    batch.sch.create_example_schemas_data(do_save=True)
-                    batch.tsk.create_example_tasks_data(do_save=True)
-                    # batch.que.createSampleData(taskID, projID)  # TODO
-                    # batch.nod.createSampleData()  # TODO
-                    self.batch.logger.inf(("Created sample data :",data_path))
             else:
                 print " [ERR] wrong definitions path !!!"
                 self.batch.logger.err(("Wrong definitions path, directory not exist  :",definitions_path))

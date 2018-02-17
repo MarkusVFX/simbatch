@@ -1,11 +1,15 @@
-import sys
+##################################
+# Tested with Maya 2016 and 2017 #
+##################################
 
-sys.path.append("S:\\simbatch\\")
+import sys
+sys.path.append("S:/simbatch/")
 
 import simbatch.core.core as simbatch_core
 import simbatch.ui.mainw as simbatch_ui
 
 import maya.OpenMayaUI as mui
+
 try:    # Maya 2016
     import shiboken
 except:
@@ -19,7 +23,7 @@ def getMayaWindow():
     return shiboken.wrapInstance(long(pointer), QtGui.QWidget)
 
 
-sim_batch = simbatch_core.SimBatch("Maya", ini_file="S:\\simbatch\\config.ini")
+sim_batch = simbatch_core.SimBatch("Maya", ini_file="S:/simbatch/config.ini")
 loading_data_state = sim_batch.load_data()
 
 if sim_batch.sts.WITH_GUI == 1:

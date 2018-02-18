@@ -5,8 +5,8 @@ import simbatch.ui.mainw as ui
 
 app = QApplication([])
 
-
-sim_batch = core.SimBatch("Stand-alone")
+sim_batch = core.SimBatch("Maya")
+# sim_batch = core.SimBatch("Stand-alone")
 loading_data_state = sim_batch.load_data()
 
 

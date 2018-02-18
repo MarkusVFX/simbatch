@@ -9,7 +9,7 @@ except ImportError:
     except ImportError:
         print "PySide import ERROR"
 
-from simbatch.core.common import CommonFunctions, Logger
+from simbatch.core.common import CommonFunctions     # , Logger
 
 
 class SimpleLabel:
@@ -180,7 +180,7 @@ class RadioButtons:
             qt_radio_group.addButton(qt_radio_butt, i)
             qt_lay.addWidget(qt_radio_butt)
             self.qt_radio_butt_arr.append(qt_radio_butt)
-            qt_radio_butt.clicked.connect(lambda i=i: on_radio_change(i))
+            qt_radio_butt.clicked.connect(lambda ii=i: on_radio_change(ii))
 
         if checked_index is not None and checked_index < len(self.qt_radio_butt_arr):
             self.qt_radio_butt_arr[checked_index].setChecked(True)
@@ -217,14 +217,15 @@ class ActionWidget(QWidget):
     logger = None
     interactions = None
 
-    def __init__(self, batch, widget_id, label_txt, multi_action, edit_txt="", combo_items="", combo_def_val="",
+    def __init__(self, batch, top_ui, widget_id, label_txt, multi_action, edit_txt="", combo_items="", combo_def_val="",
                  button_1_caption=None, button_1_fun_str=None, button_2_caption=None, button_2_fun_str=None,
                  enabled1=True, enabled2=True, sub_actions_data=None):
 
         QWidget.__init__(self)
         self.batch = batch
+        self.top_ui = top_ui
         self.logger = batch.logger
-        self.interactions = batch.dfn.current_interactions      #  connect  qt_button_1   or and   qt_button_1
+        self.interactions = batch.dfn.current_interactions      # connect  qt_button_1   or and   qt_button_1
         self.comfun = CommonFunctions()
         self.widget_id = widget_id
         self.multi_action = multi_action
@@ -265,14 +266,8 @@ class ActionWidget(QWidget):
                 self.qt_button_1.setEnabled(False)
             self.qt_layout.addWidget(self.qt_button_1)
 
-            # self.qt_button_1.clicked.connect(lambda: eval(button_1_fun_str))
-            # self.qt_button_1.clicked.connect(eval("self."+button_1_fun_str))
-            if button_1_fun_str[0] == "[":
-                button_1_fun_str = button_1_fun_str[1:-1]
-                self.qt_button_1.clicked.connect(eval ("self.defined_button_" + button_1_fun_str))
-                #  definition predefined function !!!!
-            else:
-                self.qt_button_1.clicked.connect(eval("self."+button_1_fun_str))  # self.interactions.function !!!!
+            self.qt_button_1.clicked.connect(lambda: self.eval_button_fun(self.qt_edit, button_1_fun_str))
+            # predefined function from definition !!!!
 
         if button_2_caption is not None and len(button_2_caption) > 0:
             self.qt_button_2 = QPushButton(button_2_caption)
@@ -282,10 +277,15 @@ class ActionWidget(QWidget):
 
             if button_2_fun_str[0] == "[":
                 button_2_fun_str = button_2_fun_str[1:-1]
-                self.qt_button_2.clicked.connect(eval ("self.defined_button_" + button_2_fun_str))
-                #  definition predefined function !!!!
+                script_function_splitted = button_2_fun_str.split("|")
+                if len(script_function_splitted) > 1:
+                    function_to_eval = "self.defined_button_{}(\"{}\")".format(script_function_splitted[0],
+                                                                               script_function_splitted[1])
+                    self.qt_button_2.clicked.connect(lambda: self.eval_str(function_to_eval))
+                else:
+                    self.qt_button_2.clicked.connect(eval("self.defined_button_" + script_function_splitted[0]))
+                # predefined function from definition !!!!
             else:
-                print "\n button_2_fun_str \n......._____" , button_2_fun_str
                 self.qt_button_2.clicked.connect(eval("self."+button_2_fun_str))  # self.interactions.function !!!!
 
         if len(combo_items) > 0:
@@ -308,16 +308,40 @@ class ActionWidget(QWidget):
             # self.logger.wrn("  Incorrectly defined action !  ")
         self.setLayout(qt_widget_layout)
 
-    def defined_button_get_file(self):
-        self.comfun.file_dialog_to_edit_line(self.qt_edit, QFileDialog,
-                                             self.batch.prj.current_project.project_directory)
-        # QFileDialog - protect common function to be independent library
+    def eval_button_fun(self, edit, button_fun_str):
+        if button_fun_str[0] == "[":
+            button_fun_str = button_fun_str[1:-1]
+            script_function_splitted = button_fun_str.split("|")
+            if len(script_function_splitted) > 1:
+                function_to_eval = "self.defined_button_{}(\"{}\")".format(script_function_splitted[0],
+                                                                           script_function_splitted[1])
+            else:
+                function_to_eval = "self.defined_button_"+script_function_splitted[0]+"()"
+        else:
+            function_to_eval = "self."+button_fun_str+"()"
 
-    def defined_button_get_directory(self):
-        self.comfun.get_dialog_directory(self.qt_edit, QFileDialog,
-                                         force_start_dir = self.batch.prj.current_project.project_directory)
-        # QFileDialog - protect common function to be independent library
+        if function_to_eval is not None:
+            eval_ret = eval(function_to_eval)
+            edit.setText(eval_ret)
+        else:
+            self.batch.logger.wrn("Dynamic button clicked connect is EMPTY")
 
+    @staticmethod
+    def eval_str(str_to_eval):
+        eval(str_to_eval)
+
+    def defined_button_get_file(self):                # QFileDialog - protect common function to be independent library
+        ret_file = self.comfun.file_dialog_to_edit_line(self.qt_edit, QFileDialog,
+                                                        self.batch.prj.current_project.project_directory)
+        return ret_file
+
+    def defined_button_get_directory(self):           # QFileDialog - protect common function to be independent library
+        ret_dir = self.comfun.get_dialog_directory(self.qt_edit, QFileDialog,
+                                                   force_start_dir=self.batch.prj.current_project.project_directory)
+        return ret_dir
+
+    def defined_button_show_info(self, info):
+        self.top_ui.set_top_info(info, 4)
 
     def get_current_action(self):
         for i, a in enumerate(self.multi_action.actions):

@@ -219,7 +219,7 @@ class SettingsUI:
         qt_radio_group_debug_level.setTitle("Debug level")
         qt_lay_settings_debug_level = QHBoxLayout()
 
-        qt_radio_mode_db_1 = QRadioButton("ERR")
+        qt_radio_mode_db_1 = QRadioButton("only ERR")
         if settings.debug_level == 1:
             qt_radio_mode_db_1.setChecked(True)
         qt_button_group_debug_level.addButton(qt_radio_mode_db_1)

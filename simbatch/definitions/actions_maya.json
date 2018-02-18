@@ -30,7 +30,7 @@
 						"mode": "ANI",
 						"desc": "Animation cache",
 						"default": "<project_cache_dir>",
-						"ui" : [["Get dir","[get_directory]"],["Objs","interactions.maya_get_scene_objects"]],
+						"ui" : [["Get dir","[get_directory]"],["Get selection","interactions.maya_get_selection"]],
 						"template": ["interactions.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]						
 					},
 					"2": {
@@ -56,7 +56,7 @@
 				"type": "single",
 				"name": "Set Value",
 				"desc": "Set value for object property",
-				"ui" : null,
+				"ui" : [["Get selection","interactions.maya_get_selection"],["Info","[show_info|format: object.param=value]"]],
 				"default": "<object>.<param>=<value>",
 				"template": ["interactions.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
 			},
@@ -69,7 +69,7 @@
 						"id": 1,
 						"mode": "nCloth",
 						"desc": "nCloth sim",
-						"ui" : null,
+						"ui" : [["Get selection","interactions.maya_get_selection"]],
 						"default": "<cloth_objects>",
 						"template": ["interactions.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
@@ -77,7 +77,7 @@
 						"id": 2,
 						"mode": "nHair",
 						"desc": "nHair sim",
-						"ui" : null,
+						"ui" : [["Get selection","interactions.maya_get_selection"]],
 						"default": "<hair_objects>",
 						"template": ["interactions.maya_simulate_nhair(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
@@ -85,7 +85,7 @@
 						"id": 3,
 						"mode": "nParticle",
 						"desc": "nParticle sim",
-						"ui" : null,
+						"ui" : [["Get selection","interactions.maya_get_selection"]],
 						"default": "<particle_objects>",
 						"template": ["interactions.maya_simulate_nparticle(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
 					},
@@ -93,7 +93,7 @@
 						"id": 4,
 						"mode": "FumeFX",
 						"desc": "FumeFX sim",
-						"ui" : null,
+						"ui" : [["Get selection","interactions.maya_get_selection"]],
 						"default": "<fume_container>",
 						"template": ["interactions.maya_simulate_fume(", "<o>", ", \"", "<d>", "\" )"]
 					},
@@ -101,7 +101,7 @@
 						"id": 5,
 						"mode": "FumeFX WT",
 						"desc": "FumeFX Wavelet",
-						"ui" : null,
+						"ui" : [["Get selection","interactions.maya_get_selection"]],
 						"default": "<fume_container>",
 						"template": ["interactions.maya_simulate_fumewt(", "<o>", ", \"", "<d>", "\" )"]
 					}
@@ -116,7 +116,7 @@
 						"id": 1,
 						"mode": "BLAST",
 						"desc": "grab viewport",
-						"ui" : null,
+						"ui" : [["Get camera","interactions.maya_get_camera"]],
 						"default": "<default_camera><shot_prev_dir>",
 						"template": ["interactions.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
@@ -124,7 +124,7 @@
 						"id": 2,
 						"mode": "RENDER",
 						"desc": "render scene",
-						"ui" : null,
+						"ui" : [["Get camera","interactions.maya_get_camera"]],
 						"default": "<default_camera><shot_prev_dir>",
 						"template": ["interactions.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
@@ -135,7 +135,7 @@
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Maya Scene",
-				"ui" : null,
+				"ui" : [["Get dir","[get_directory]"]],
 				"default": "<copmuted_scenes_dir>",
 				"template": ["interactions.maya_save_scene(\"", "<f>", "\")"]
 			},
@@ -148,7 +148,7 @@
 						"id": 1,
 						"mode": "PY",
 						"desc": "run Python file",
-						"ui" : null,
+						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
 						"default": "<scripts_dir>*.py",
 						"template": ["interactions.maya_script_py(\"", "<f>", "\")"]
 					},
@@ -156,7 +156,7 @@
 						"id": 2,
 						"mode": "MEL",
 						"desc": "run MEL file",
-						"ui" : null,
+						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
 						"default": "<scripts_dir>*.mel",
 						"template": ["interactions.maya_script_mel(\"", "<f>", "\")"]
 					}

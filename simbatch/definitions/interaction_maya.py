@@ -8,9 +8,19 @@ class Interaction:
     # maya executions
     
     def save_curent_scene_as(self, file):
-        print "to do: interaction save as"
+        print "TODO: interaction save as"
     
     def maya_open_scene(self, file):
+        print "TODO: maya_open_scene"
+        pass
+        
+    def maya_get_selection(self):
+        print "TODO: maya_get_selection"
+        
+        return "test sel obj"
+        
+    def maya_get_camera(self):
+        print "TODO: maya_get_camera"
         pass
         
     def maya_import_ani(self, objects, dir):

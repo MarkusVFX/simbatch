@@ -231,12 +231,12 @@ class SchemaFormCreateOrEdit(QWidget):
                 else:
                     self.batch.logger.wrn(("add act but nr < definitions count ___ ", nr, "  < ",
                                            len(self.batch.dfn.definitions_array)))
-
         else:
             self.batch.logger.wrn("Current project undefined !")
 
-    # on click one of horizontal button: adding action widget to vertical list of schema's actions
-    def on_click_defined_action_button(self, multi_action):  # , curr_proj):  # , force_val=0
+    # on click one of horizontal button:
+    # ADD action widget to vertical list of schema's actions
+    def on_click_defined_action_button(self, multi_action):
         combo_items = []
         # combo_val = []
         # sub_action_data = []
@@ -255,38 +255,34 @@ class SchemaFormCreateOrEdit(QWidget):
                     button_2_caption = multi_action.actions[0].ui[1][0]
                     button_2_function_str = multi_action.actions[0].ui[1][1]
 
-        batch = self.batch   #  share logger and interaction fron definition
-        # interaction = self.batch.dfn.current_interaction
+        batch = self.batch   # share logger and interaction from definition
+        top = self.top_ui
         if multi_action.actions_count == 0:   # incorrectly defined action
-            action_widget = ActionWidget(batch, -1, "incorrectly defined action", MultiAction(-1,"empty action") )
+            action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", MultiAction(-1,"empty action") )
             single_action = SingleAction(-1, multi_action.multi_id, multi_action.name, "err",
                                          "incorrectly defined action", "null")
 
-        elif multi_action.actions_count == 1:   # single action, no combo
+        else:
             single_action = SingleAction(multi_action.actions[0].id, multi_action.actions[0].name,
                                          multi_action.actions[0].description, multi_action.actions[0].default_value,
                                          multi_action.actions[0].template)
 
-            action_widget = ActionWidget(batch, self.form_actions_count+1, multi_action.actions[0].name, multi_action,
-                                         button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
-                                         button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
+            if multi_action.actions_count == 1:   # single action, no combo
+                action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.actions[0].name,
+                                             multi_action,
+                                             button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
+                                             button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
 
-        else:  # grouped actions :  import ANI, CAM, ENV
-            sub_actions = []
-            for i, a in enumerate(multi_action.actions):
-                combo_items.append(a.mode)
-                # combo_val.append(a.default_value)
-                sub_actions.append([i, a.mode, a.default_value, a.ui])   # TODO class !
-
-            single_action = SingleAction(multi_action.actions[0].id, multi_action.actions[0].name,
-                                         multi_action.actions[0].description, multi_action.actions[0].default_value,
-                                         multi_action.actions[0].template)
-
-            action_widget = ActionWidget(batch, self.form_actions_count+1, multi_action.name, multi_action,
-                                         button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
-                                         button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
-                                         edit_txt=sub_actions[0][2], combo_items=combo_items,
-                                         sub_actions_data=sub_actions)
+            else:  # grouped actions :  import ANI, CAM, ENV
+                sub_actions = []
+                for i, a in enumerate(multi_action.actions):
+                    combo_items.append(a.mode)
+                    sub_actions.append([i, a.mode, a.default_value, a.ui])   # TODO class !
+                action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.name, multi_action,
+                                             button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
+                                             button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
+                                             edit_txt=sub_actions[0][2], combo_items=combo_items,
+                                             sub_actions_data=sub_actions)
 
         qt_lay.addWidget(action_widget)
         self.action_widgets.append(action_widget)

@@ -193,27 +193,25 @@ class SettingsUI:
         qt_radio_mode_3.clicked.connect(lambda: self.on_clicked_radio_colors(3))
         qt_radio_mode_4.clicked.connect(lambda: self.on_clicked_radio_colors(4))
 
-        '''  structure '''
-        qt_lay_settings_structure = QHBoxLayout()
-        qt_radio_group_structure = QGroupBox()
-        qt_radio_group_structure.setTitle("Structure")
-        s1a = QLabel("camera dir : ")
-        s1b = QLineEdit("\\\\cam")
-        s2a = QLabel("envo dir : ")
-        s2b = QLineEdit("\\\\env")
-        s3a = QLabel("anim cache : ")
-        s3b = QLineEdit("\\\\ani")
+        # '''  structure '''
+        # qt_lay_settings_structure = QHBoxLayout()
+        # qt_radio_group_structure = QGroupBox()
+        # qt_radio_group_structure.setTitle("Structure")
+        # s1a = QLabel("camera dir : ")
+        # s1b = QLineEdit("<proj_dir>/cam")
+        # s2a = QLabel("env dir : ")
+        # s2b = QLineEdit("<proj_dir>/env")
+        # s3a = QLabel("anim cache : ")
+        # s3b = QLineEdit("<proj_dir>/ani")
 
-        qt_lay_settings_structure.addWidget(s1a)
-        qt_lay_settings_structure.addWidget(s1b)
-        qt_lay_settings_structure.addWidget(s2a)
-        qt_lay_settings_structure.addWidget(s2b)
-        qt_lay_settings_structure.addWidget(s3a)
-        qt_lay_settings_structure.addWidget(s3b)
+        # qt_lay_settings_structure.addWidget(s1a)
+        # qt_lay_settings_structure.addWidget(s1b)
+        # qt_lay_settings_structure.addWidget(s2a)
+        # qt_lay_settings_structure.addWidget(s2b)
+        # qt_lay_settings_structure.addWidget(s3a)
+        # qt_lay_settings_structure.addWidget(s3b)
 
-        qt_radio_group_structure.setLayout(qt_lay_settings_structure)
-
-
+        # qt_radio_group
 
         ''' Debug level '''
         qt_button_group_debug_level = QButtonGroup()
@@ -287,7 +285,7 @@ class SettingsUI:
         qt_lay_settings_buttons.addWidget(qt_button_save)
 
         qt_lay_settings_main.addWidget(qt_radio_group_mode)
-        qt_lay_settings_main.addWidget(qt_radio_group_structure)
+        # qt_lay_settings_main.addWidget(qt_radio_group_structure)
         qt_lay_settings_main.addWidget(qt_radio_group_colors)
         qt_lay_settings_main.addWidget(qt_radio_group_sql)
         qt_lay_settings_main.addWidget(qt_radio_group_user)

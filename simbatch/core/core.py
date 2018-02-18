@@ -87,6 +87,9 @@ class SimBatch:
 
     def print_current_detailed_values(self, index):
         print "  \n\n"
+        if self.sts.ui_edition_mode == 0:    # open source hide wizard tab
+            index += 1                       # index compensation
+
         if index == 0:
             print " WIZARD: "
         if index == 1:

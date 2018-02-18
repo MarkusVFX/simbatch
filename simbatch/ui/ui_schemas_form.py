@@ -291,35 +291,16 @@ class SchemaFormCreateOrEdit(QWidget):
 
         #
 
-        #
-
-        #
-
-        # action_widget.qt_button_1.clicked.connect(
-        #     lambda: group_of_actions.get_get_file(group_of_actions.actionWidget.edit,
-        #                                           curr_proj.working_directory,
-        #                                           action_type, QFileDialog)
-        # )
-
-        # if button_2 is not None and len(button_2) > 0:
-        #     action_widget.qt_button_2.clicked.connect(
-        #         lambda: self.on_clicked_addional_action_button(group_of_actions)
-        #     )
-
         # if len(combo_items) > 0:
         #     action_widget.qt_combo.currentIndexChanged.connect(
         #         lambda: self.on_change_combo_action(action_widget, group_of_actions)
         #     )
 
-    def on_clicked_addional_action_button(self, act):
-        self.batch.logger.db(("on_clicked_addional_action_button", act))
-        # TODO
 
     # @staticmethod
     # def on_change_combo_action(action_widget, software_action):
     #     action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
     #     action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
-
 
     # remove horizontal row of defined actions buttons
     def remove_all_defined_action_buttons(self):
@@ -339,7 +320,6 @@ class SchemaFormCreateOrEdit(QWidget):
 
     def refresh_actions_ui(self):
         cur_index = self.batch.dfn.current_definition_index
-        # print "\n\ncur index ",cur_index
         self.remove_all_defined_action_buttons()
         self.remove_all_action_widgets()
         self.batch.dfn.current_definition_index = cur_index

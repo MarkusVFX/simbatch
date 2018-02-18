@@ -331,11 +331,11 @@ class Definitions:
 
     def change_interaction(self, index):
         self.batch.logger.deepdb(("change_interaction ", index))
-        if self.current_interactions is not None:
-            self.current_interactions.test()
+        # if self.current_interactions is not None:
+        #     self.current_interactions.test()
         self.current_definition_index = index
         self.current_definition_name = self.definitions_array[index].name
         self.current_interactions = self.definitions_array[index].interactions
 
-        if self.current_interactions is not None:
-            self.current_interactions.test()
+        # if self.current_interactions is not None:
+        #    self.current_interactions.test()

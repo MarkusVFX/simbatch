@@ -275,18 +275,8 @@ class ActionWidget(QWidget):
                 self.qt_button_2.setEnabled(False)
             self.qt_layout.addWidget(self.qt_button_2)
 
-            if button_2_fun_str[0] == "[":
-                button_2_fun_str = button_2_fun_str[1:-1]
-                script_function_splitted = button_2_fun_str.split("|")
-                if len(script_function_splitted) > 1:
-                    function_to_eval = "self.defined_button_{}(\"{}\")".format(script_function_splitted[0],
-                                                                               script_function_splitted[1])
-                    self.qt_button_2.clicked.connect(lambda: self.eval_str(function_to_eval))
-                else:
-                    self.qt_button_2.clicked.connect(eval("self.defined_button_" + script_function_splitted[0]))
-                # predefined function from definition !!!!
-            else:
-                self.qt_button_2.clicked.connect(eval("self."+button_2_fun_str))  # self.interactions.function !!!!
+            self.qt_button_2.clicked.connect(lambda: self.eval_button_fun(self.qt_edit, button_2_fun_str))
+            # predefined function from definition !!!!
 
         if len(combo_items) > 0:
             self.qt_combo = QComboBox()
@@ -309,6 +299,7 @@ class ActionWidget(QWidget):
         self.setLayout(qt_widget_layout)
 
     def eval_button_fun(self, edit, button_fun_str):
+        self.logger.deepdb(("eval_button_fun", button_fun_str ))
         if button_fun_str[0] == "[":
             button_fun_str = button_fun_str[1:-1]
             script_function_splitted = button_fun_str.split("|")

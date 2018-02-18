@@ -3,7 +3,7 @@ class Interaction:
         pass
         
     def test(self):
-        print "\n test maya \n"
+        print "\n interaction test maya \n"
     
     # maya executions
     
@@ -16,7 +16,6 @@ class Interaction:
         
     def maya_get_selection(self):
         print "TODO: maya_get_selection"
-        
         return "test sel obj"
         
     def maya_get_camera(self):

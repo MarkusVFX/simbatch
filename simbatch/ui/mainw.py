@@ -62,15 +62,17 @@ class TopMenuUI:
         qt_but_print_details = QPushButton("I+")
         qt_but_print_details.setMinimumSize(22, 22)
         qt_but_print_details.setMaximumSize(22, 22)
-        if self.batch.sts.debug_level >= 4:            # show debug button
-            qt_lay_top_menu.addWidget(qt_but_print_details)
+        qt_lay_top_menu.addWidget(qt_but_print_details)
+        if self.batch.sts.debug_level < 4:            # hide debug button
+            qt_but_print_details.hide()
         self.qt_but_print_details = qt_but_print_details
 
         qt_but_debug = QPushButton("[db]")
         qt_but_debug.setMinimumSize(22, 22)
         qt_but_debug.setMaximumSize(22, 22)
-        if self.batch.sts.debug_level >= 4:            # show debug button
-            qt_lay_top_menu.addWidget(qt_but_debug)
+        qt_lay_top_menu.addWidget(qt_but_debug)
+        if self.batch.sts.debug_level < 4:            # hide debug button
+            qt_but_debug.hide()
         self.qt_but_debug = qt_but_debug
 
         qt_but_filter = QPushButton("F")

@@ -88,6 +88,7 @@ class Settings:
 
     # GUI settings
     runtime_env = ""        # runtime environment as software name display on frame and set active definition
+    ui_edition_mode = 0     # 0 open source    1 Pro
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
     ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors

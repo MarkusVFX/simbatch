@@ -410,7 +410,7 @@ class CommonFunctions:
 
         get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="hymmmm...."
         get_directory = get_directory.replace("/", "\\")
-        self.logger.inf(("selected_directory:", get_directory))
+        self.logger.inf(("selected directory:", get_directory))
         if len(get_directory) > 0:
             qt_edit_line.setText(get_directory + "\\")
             return get_directory + "\\"
@@ -424,9 +424,11 @@ class CommonFunctions:
     def file_dialog_to_edit_line(self, qt_edit_line, qt_file_dialog, init_dir):
         file_dialog = qt_file_dialog.getOpenFileName(dir=init_dir)
         get_file = file_dialog[0].replace("/", "\\")
-        self.logger.inf(("selected_directory:", get_file))
+        self.logger.inf(("selected file:", get_file))
         if len(get_file) > 0:
             qt_edit_line.setText(get_file)
+            return get_file
+        return ""
 
     @staticmethod
     def get_save_file(qt_edit_line, qt_file_dialog):

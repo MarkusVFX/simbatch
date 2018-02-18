@@ -246,6 +246,7 @@ class MainWindow(QMainWindow):
             self.top_ui.set_top_info("NOT REFRESHED PROPERLY (see log)!", 8)
         else:
             self.top_ui.set_top_info("Refreshed with errors: ({})".format(ret), 7)
+        # TODO update debug level
 
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)

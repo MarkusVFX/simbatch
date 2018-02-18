@@ -119,15 +119,14 @@ class SettingsUI:
         sett_sql_3b = QLineEdit(settings.sql[2])
         sett_sql_3b.textChanged.connect(self.on_edit_update_sql_3)
         # sett_sql_4a = QLabel("port : ") TODO cleanup
-        sett_sql_4b = QLineEdit(settings.sql[3])
-        sett_sql_4b.textChanged.connect(self.on_edit_update_sql_4)
-
-        sett_sql_4abc = EditLineWithButtons("port : ", edit_text_string=settings.sql[0],
+        # sett_sql_4b = QLineEdit(settings.sql[3])
+        # sett_sql_4b.textChanged.connect(self.on_edit_update_sql_4)
+        sett_sql_4abc = EditLineWithButtons("port : ", edit_text_string=settings.sql[3],
                                             text_on_button_1="  Test MySQL connection  ")
 
-        sett_sql_test = QPushButton("Test MySQL connection")
-        sett_sql_test.setFixedWidth(130)
-        sett_sql_test.clicked.connect(self.sql_test_connection)
+        # sett_sql_test = QPushButton("Test MySQL connection")
+        # sett_sql_test.setFixedWidth(130)
+        # sett_sql_test.clicked.connect(self.sql_test_connection)
 
         qt_lay_settings_sql.addRow(sett_sql_1a, sett_sql_1b)
         qt_lay_settings_sql.addRow(sett_sql_2a, sett_sql_2b)
@@ -214,6 +213,59 @@ class SettingsUI:
 
         qt_radio_group_structure.setLayout(qt_lay_settings_structure)
 
+
+
+        ''' Debug level '''
+        qt_button_group_debug_level = QButtonGroup()
+        qt_radio_group_debug_level = QGroupBox()
+        qt_radio_group_debug_level.setTitle("Debug level")
+        qt_lay_settings_debug_level = QHBoxLayout()
+
+        qt_radio_mode_db_1 = QRadioButton("ERR")
+        if settings.debug_level == 1:
+            qt_radio_mode_db_1.setChecked(True)
+        qt_button_group_debug_level.addButton(qt_radio_mode_db_1)
+        qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_1)
+        qt_radio_mode_db_2 = QRadioButton("+WRN")
+        if settings.debug_level == 2:
+            qt_radio_mode_db_2.setChecked(True)
+        qt_button_group_debug_level.addButton(qt_radio_mode_db_2)
+        qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_2)
+        qt_radio_mode_db_3 = QRadioButton("+INF")
+        if settings.debug_level == 3:
+            qt_radio_mode_db_3.setChecked(True)
+        qt_button_group_debug_level.addButton(qt_radio_mode_db_3)
+        qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_3)
+        qt_radio_mode_db_4 = QRadioButton("+DB")
+        if settings.debug_level == 4:
+            qt_radio_mode_db_4.setChecked(True)
+        qt_button_group_debug_level.addButton(qt_radio_mode_db_4)
+        qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_4)
+        qt_radio_mode_db_5 = QRadioButton("+db")
+        if settings.debug_level == 5:
+            qt_radio_mode_db_5.setChecked(True)
+        qt_button_group_debug_level.addButton(qt_radio_mode_db_5)
+        qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_5)
+        qt_radio_mode_db_6 = QRadioButton("ALL")
+        if settings.debug_level == 6:
+            qt_radio_mode_db_6.setChecked(True)
+        qt_button_group_debug_level.addButton(qt_radio_mode_db_6)
+        qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_6)
+
+        qt_radio_group_debug_level.setLayout(qt_lay_settings_debug_level)
+
+        qt_button_group_debug_level.setExclusive(True)
+
+        qt_radio_mode_db_1.clicked.connect(lambda: self.on_clicked_radio_debug_level(1))
+        qt_radio_mode_db_2.clicked.connect(lambda: self.on_clicked_radio_debug_level(2))
+        qt_radio_mode_db_3.clicked.connect(lambda: self.on_clicked_radio_debug_level(3))
+        qt_radio_mode_db_4.clicked.connect(lambda: self.on_clicked_radio_debug_level(4))
+        qt_radio_mode_db_5.clicked.connect(lambda: self.on_clicked_radio_debug_level(5))
+        qt_radio_mode_db_6.clicked.connect(lambda: self.on_clicked_radio_debug_level(6))
+
+
+
+
         ''' Info '''
         qt_lay_settings_info = QFormLayout()
         qt_radio_group_info = QGroupBox()
@@ -239,8 +291,7 @@ class SettingsUI:
         qt_lay_settings_main.addWidget(qt_radio_group_colors)
         qt_lay_settings_main.addWidget(qt_radio_group_sql)
         qt_lay_settings_main.addWidget(qt_radio_group_user)
-
-        qt_lay_settings_main.addItem(QSpacerItem(1, 22))
+        qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         qt_lay_settings_main.addWidget(qt_radio_group_info)
         qt_lay_settings_main.addItem(QSpacerItem(1, 22))
         qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
@@ -255,11 +306,28 @@ class SettingsUI:
             self.top_ui.set_top_info("MySQL only with proversion", 4)
 
     def on_clicked_radio_colors(self, index):
-        self.batch.logger.db(("clickedRadioColors ", index))
+        self.batch.logger.db(("clicked_radio_colors ", index))
 
         self.settings.ui_color_mode = index
         self.settings.update_ui_colors()
         self.mainw.refresh_ui_with_reload_data()
+
+    def on_clicked_radio_debug_level(self, level):
+        prev_lvl = self.settings.debug_level
+        self.settings.debug_level = level
+        self.batch.logger.console_level = level
+        self.batch.logger.db(("clicked_debug_level", level))
+        if level >= 4 and prev_lvl < 4:     #  show db UI elements
+            self.mainw.top_ui.qt_but_print_general.show()
+            self.mainw.top_ui.qt_but_print_details.show()
+            self.mainw.top_ui.qt_but_debug.show()
+            self.mainw.qt_tab_widget.addTab(self.mainw.dfn_ui.qt_widget_definitions, "Definitions")
+        if level < 4 and prev_lvl >= 4:      # hide db UI elements
+            self.mainw.top_ui.qt_but_print_general.hide()
+            self.mainw.top_ui.qt_but_print_details.hide()
+            self.mainw.top_ui.qt_but_debug.hide()
+            self.mainw.qt_tab_widget.removeTab(5)
+
 
     def on_changed_always_on_top(self, state):   #  state values 0 or 2  !
         if state:

@@ -53,22 +53,24 @@ class TopMenuUI:
 
         qt_lay_top_menu.addStretch(1)
 
-        qt_but_print_general = QPushButton("[i]")
+        qt_but_print_general = QPushButton("I")
         qt_but_print_general.setMinimumSize(22, 22)
         qt_but_print_general.setMaximumSize(22, 22)
         qt_lay_top_menu.addWidget(qt_but_print_general)
         self.qt_but_print_general = qt_but_print_general
 
-        qt_but_print_details = QPushButton("[ii]")
+        qt_but_print_details = QPushButton("I+")
         qt_but_print_details.setMinimumSize(22, 22)
         qt_but_print_details.setMaximumSize(22, 22)
-        qt_lay_top_menu.addWidget(qt_but_print_details)
+        if self.batch.sts.debug_level >= 4:            # show debug button
+            qt_lay_top_menu.addWidget(qt_but_print_details)
         self.qt_but_print_details = qt_but_print_details
 
         qt_but_debug = QPushButton("[db]")
         qt_but_debug.setMinimumSize(22, 22)
         qt_but_debug.setMaximumSize(22, 22)
-        qt_lay_top_menu.addWidget(qt_but_debug)
+        if self.batch.sts.debug_level >= 4:            # show debug button
+            qt_lay_top_menu.addWidget(qt_but_debug)
         self.qt_but_debug = qt_but_debug
 
         qt_but_filter = QPushButton("F")
@@ -191,21 +193,22 @@ class MainWindow(QMainWindow):
         qt_tab_widget = QTabWidget(self)
         self.qt_tab_widget = qt_tab_widget
 
-        qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")
+        # qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")         # PRO version
         qt_tab_widget.addTab(self.pro_ui.qt_widget_projects, "Projects")
         qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
         qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
         qt_tab_widget.addTab(self.que_ui.qt_widget_queue, "Queue")
         # qt_tab_widget.addTab(self.nod_ui.qt_widget_nodes, "Sim Nodes")       # PRO version
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
-        qt_tab_widget.addTab(self.dfn_ui.qt_widget_definitions, "Definitions")
+        if self.sts.debug_level >= 4:
+            qt_tab_widget.addTab(self.dfn_ui.qt_widget_definitions, "Definitions")
         qt_tab_widget.setMinimumSize(220, 400)
 
         if self.sts.store_data_mode == 1:
             if self.comfun.path_exists(self.sts.store_data_json_directory):
-                qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB: show tasks
+                qt_tab_widget.setCurrentIndex(1)  # STANDARD TAB
             else:
-                qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings
+                qt_tab_widget.setCurrentIndex(4)  # NO data dir : show settings
         else:
             # PRO version
             pass

@@ -16,7 +16,8 @@ def test_prepare_data_directory_by_delete_all_files(sib):
     else:
         # PRO version with sql
         pass
-    sib.tsk.clear_all_tasks_data(clear_stored_data=True)
+    # sib.tsk.clear_all_tasks_data(clear_stored_data=True)
+    sib.tsk.delete_json_tasks_file()
 
 
 def test_no_task_data(sib):

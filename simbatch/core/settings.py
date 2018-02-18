@@ -120,7 +120,7 @@ class Settings:
                         "adminUser":
                             {"name": "admin", "sign": "A", "pass": "pass"},
                         "window":
-                            {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800}
+                            {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800, "always_on_top": False}
                         }
 
     def __init__(self, logger, runtime_env, ini_file="config.ini", force_os=False):
@@ -218,7 +218,7 @@ class Settings:
                     self.admin_user = self.json_settings_data["adminUser"].values()  # TODO order  values()
                     wnd = self.json_settings_data["window"]
                     self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]
-
+                    self.always_on_top = wnd["alwaysOnTop"]
                     self.loading_state = 3
 
                     if self.debug_level >= 3:
@@ -248,6 +248,7 @@ class Settings:
         self.default_settings["window"]["posY"] = self.window[1]
         self.default_settings["window"]["sizeX"] = self.window[2]
         self.default_settings["window"]["sizeY"] = self.window[3]
+        self.default_settings["window"]["alwaysOnTop"] = self.always_on_top
 
         if len(settings_file) == 0:
             settings_file = comfun.current_scripts_path() + "config.ini"  # JSON format

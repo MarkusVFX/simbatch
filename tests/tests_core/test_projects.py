@@ -18,7 +18,8 @@ def test_prepare_data_directory_by_delete_all_files(sib):
     else:
         # PRO version with sql
         pass
-    sib.prj.clear_all_projects_data(clear_stored_data=True)
+    #sib.prj.clear_all_projects_data(clear_stored_data=True)
+    sib.prj.delete_json_project_file()
 
 
 def test_print_repr_str(sib):

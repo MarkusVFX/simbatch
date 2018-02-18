@@ -16,7 +16,8 @@ def test_prepare_data_directory_by_delete_all_files(sib):
     else:
         # PRO version with sql
         pass
-    sib.sch.clear_all_schemas_data(clear_stored_data=True)
+    # sib.sch.clear_all_schemas_data(clear_stored_data=True)
+    sib.sch.delete_json_schema_file()
 
 
 def test_no_schema_data(sib):

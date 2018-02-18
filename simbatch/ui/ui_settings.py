@@ -225,6 +225,8 @@ class SettingsUI:
         qt_lay_settings_buttons = QHBoxLayout()
 
         qt_cb_always_on_top = QCheckBox("Always on top")
+        if settings.always_on_top:
+            qt_cb_always_on_top.setChecked(True)
         qt_cb_always_on_top.stateChanged.connect(self.on_changed_always_on_top)
         qt_lay_settings_buttons.addWidget(qt_cb_always_on_top)
 
@@ -259,12 +261,13 @@ class SettingsUI:
         self.settings.update_ui_colors()
         self.mainw.refresh_ui_with_reload_data()
 
-    def on_changed_always_on_top(self, state):
-        self.settings.always_on_top = state
+    def on_changed_always_on_top(self, state):   #  state values 0 or 2  !
         if state:
+            self.settings.always_on_top = True
             self.mainw.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.mainw.show()
         else:
+            self.settings.always_on_top = False
             self.mainw.setWindowFlags(self.mainw.windowFlags() & ~Qt.WindowStaysOnTopHint)
             self.mainw.show()
 

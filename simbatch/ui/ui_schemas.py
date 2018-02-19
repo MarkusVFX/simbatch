@@ -392,8 +392,11 @@ class SchemasUI:
             # self.schema_form_create.schema_item_form_object.projectID = self.batch.prj.current_project_id
             new_schema = self.sch.get_blank_schema()
             new_schema.project_id = self.batch.prj.current_project_id
-
-            new_schema.definition_name = self.batch.dfn.current_definition_name
+            cur_dfn = self.batch.dfn.current_definition
+            if cur_dfn is not None:
+                new_schema.based_on_definition = cur_dfn.name + "__" + str(cur_dfn.version)
+            else:
+                self.batch.logger.wrn("(update_form_create) current_definition is None")
             self.schema_form_create.update_form_data(new_schema)
         else:
             self.batch.logger.wrn(("Wrong current project index", self.batch.prj.current_project_index))
@@ -466,9 +469,10 @@ class SchemasUI:
             new_name = self.new_name_on_copy
             if len(new_name) > 0:
                 curr = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
-                copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, curr.schema_version,
-                                                curr.project_id, curr.project_name, curr.definition_id,
-                                                curr.actions, curr.description)
+                copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, curr.project_id, "based_on",
+                                                curr.actions, curr.schema_version, curr.description)
+                                                # curr.project_name, curr.definition_id, )
+                                                # TODO    "based_on",
                 self.on_click_add_schema(copied_schema_item)
                 self.schema_form_copy.hide()
                 self.copy_form_state = 0

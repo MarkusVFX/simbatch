@@ -22,7 +22,6 @@ class SchemaFormCreateOrEdit(QWidget):
 
     # actions
     form_actions_count = 0
-    # actions_array = []
     action_widgets = []
     actions_string = ""
 
@@ -67,7 +66,7 @@ class SchemaFormCreateOrEdit(QWidget):
                                                                                            aw.edit_val, aw.ui_info))
         self.batch.logger.raw("object's action_array count:{}".format(len(self.schema_item_form_object.actions_array)))
         for a in self.schema_item_form_object.actions_array:
-            self.batch.logger.raw(" object's action_array {}    {}    {}".format(a.id, a.name, a.default_value) )
+            self.batch.logger.raw(" object's action_array {}    {}    {}".format(a.id, a.name, a.default_value))
 
     def init_ui_elements(self):
         qt_lay_outer_schema_form = QVBoxLayout()
@@ -178,7 +177,7 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.batch.dfn.current_definition_index = nr
         self.add_defined_action_buttons(nr)
-        self.batch.dfn.change_interaction(nr)
+        self.batch.dfn.update_current_definition(nr)
 
     def on_radio_change(self, nr):  # on click definition change
         self.batch.logger.db(("on_radio_change definition", nr))
@@ -190,22 +189,6 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             if self.schema_form_buttons.qt_third_check_box is not None:
                 self.schema_form_buttons.qt_third_check_box.setEnabled(True)
-
-    # ACTIONS
-    # ACTIONS
-    # ACTIONS
-    def compile_actions(self):
-        #     self.actions_array = []
-        #     for i, action_widget in enumerate(self.action_widgets):
-        #         single_action = action_widget.get_current_action()
-        #         if single_action is not None:
-        #             self.actions_array.append(single_action)
-        #             # TODO  compile acttion
-        #             self.batch.logger.deepdb(("COMPILE ACTION", single_action))
-        #         else:
-        #             self.batch.logger.wrn(("(compile_actions)  None ACTION : ", i))
-        pass
-        # TODO
 
     def add_defined_action_button(self, button_txt, disabled=False):
         b = ButtonOnLayout(button_txt)
@@ -238,9 +221,6 @@ class SchemaFormCreateOrEdit(QWidget):
     # ADD action widget to vertical list of schema's actions
     def on_click_defined_action_button(self, multi_action):
         combo_items = []
-        # combo_val = []
-        # sub_action_data = []
-
         qt_lay = self.qt_lay_fae_actions
         button_1_caption = None
         button_2_caption = None
@@ -258,14 +238,12 @@ class SchemaFormCreateOrEdit(QWidget):
         batch = self.batch   # share logger and interaction from definition
         top = self.top_ui
         if multi_action.actions_count == 0:   # incorrectly defined action
-            action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", MultiAction(-1,"empty action") )
-            single_action = SingleAction(-1, multi_action.multi_id, multi_action.name, "err",
-                                         "incorrectly defined action", "null")
+            action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", MultiAction(-1, "empty action"))
+            single_action = SingleAction(multi_action.name, "err", "incorrectly defined action", "null")
 
         else:
-            single_action = SingleAction(multi_action.actions[0].id, multi_action.actions[0].name,
-                                         multi_action.actions[0].description, multi_action.actions[0].default_value,
-                                         multi_action.actions[0].template)
+            single_action = SingleAction(multi_action.actions[0].name, multi_action.actions[0].description,
+                                         multi_action.actions[0].default_value, multi_action.actions[0].template)
 
             if multi_action.actions_count == 1:   # single action, no combo
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.actions[0].name,
@@ -273,34 +251,27 @@ class SchemaFormCreateOrEdit(QWidget):
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                              button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
 
-            else:  # grouped actions :  import ANI, CAM, ENV
-                sub_actions = []
+            else:            # multi action :  import ANI, CAM, ENV
                 for i, a in enumerate(multi_action.actions):
                     combo_items.append(a.mode)
-                    sub_actions.append([i, a.mode, a.default_value, a.ui])   # TODO class !
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.name, multi_action,
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                              button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
-                                             edit_txt=sub_actions[0][2], combo_items=combo_items,
-                                             sub_actions_data=sub_actions)
+                                             combo_items=combo_items)
 
         qt_lay.addWidget(action_widget)
         self.action_widgets.append(action_widget)
         self.schema_item_form_object.actions_array.append(single_action)
         self.form_actions_count += 1
 
-        #
-
-        # if len(combo_items) > 0:
-        #     action_widget.qt_combo.currentIndexChanged.connect(
-        #         lambda: self.on_change_combo_action(action_widget, group_of_actions)
-        #     )
-
-
-    # @staticmethod
-    # def on_change_combo_action(action_widget, software_action):
-    #     action_widget.qt_edit.setText(software_action.actions[action_widget.qt_combo.currentIndex()].default_value)
-    #     action_widget.action_data.current_sub_action_index = action_widget.qt_combo.currentIndex()
+    # ACTIONS
+    # ACTIONS
+    # ACTIONS
+    def compile_actions(self):
+        del self.schema_item_form_object.actions_array[:]
+        for a_wi in self.action_widgets:
+            if len(a_wi.multi_action.actions) > a_wi.current_action_index:
+                self.schema_item_form_object.actions_array.append(a_wi.multi_action.actions[a_wi.current_action_index])
 
     # remove horizontal row of defined actions buttons
     def remove_all_defined_action_buttons(self):

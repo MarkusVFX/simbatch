@@ -41,18 +41,17 @@ ACTION_ITEM_FIELDS_NAMES = [
 
 
 class SingleDefinition:
-    name = ""
-    software = ""
-    prev_ext = ""   # without dot "png"
-    file_ext = ""   # without dot
-    # actions_array = []    # SingleAction or GroupAction
-    # grouped_actions_array = []    # GroupAction array  grouped_actions_array
-    multi_actions_array = []    # GroupAction array  grouped_actions_array
+    name = ""       # actions in schema are copied from definition for protect schema data if no definition
+    version = 0     # version are useful for recognize exact source of definition
+    software = ""   # TODO software name or software version ???
+    #               # TODO list supported versions
+    prev_ext = ""   # "prevExt" without dot "png"
+    file_ext = ""   # "setupExt" without dot
+    multi_actions_array = []    # old  GroupAction  grouped_actions_array
     total_actions = 0
     action_names = []
-    # TODO list supported versions
 
-    interactions = None
+    interactions = None  # file with common functions for current definition
 
     def __init__(self, name, logger):
         self.name = name
@@ -76,7 +75,6 @@ class SingleDefinition:
         self.print_total()
 
     def print_single(self):
-        #logger_raw = self.batch.logger.raw
         logger_raw = self.logger.raw
         logger_raw("\n\n name:{} total_actions:{} names count:{}".format(self.name, self.total_actions,
                                                                          len(self.action_names)))
@@ -109,22 +107,16 @@ class ExampleInteractions:
     def __init__(self):
         self.load()
 
-    def load(self):
-        pass
+    @staticmethod
+    def load():
+        print " [interact example] loaded "
 
-    def ui_get_file(self):
-        print " [interact] save as :"
-        pass
-
-    def ui_get_directory(self):
-        print " [interact example] save as :"
-        pass
-
-    def test(self):
+    @staticmethod
+    def test():
         print " [interact example] test "
-        pass
 
-    def maya_get_scene_objects(self):
+    @staticmethod
+    def maya_get_scene_objects():
         print " [interact example]      def maya_get_scene_objects "
 
 
@@ -136,6 +128,7 @@ class Definitions:
     definitions_names = []
 
     total_definitions = 0
+    current_definition = None          # current definition       (definition object)
     current_definition_name = None     # current definition name  (unique name)
     current_definition_index = None    # current definition index (array index)
 
@@ -164,6 +157,7 @@ class Definitions:
         print "     current definition index: {}   name: {}  total_: {}\n".format(self.current_definition_index,
                                                                                   self.current_definition_name,
                                                                                   self.total_definitions)
+
     #  print definitions data, for debug
     def print_total(self, print_children=False):
         if print_children:
@@ -215,11 +209,10 @@ class Definitions:
         else:
             return None
 
-    @staticmethod
-    def get_example_definition():
-        example_defi = SingleDefinition("example_defi")
+    def get_example_definition(self):
+        example_defi = SingleDefinition("example_defi", self.batch.logger)
         example_group_actions = MultiAction(1, "example a gr")
-        example_action = SingleAction(1, "ex_a", "desc", "<def>", "templ <o>", mode="single",
+        example_action = SingleAction("ex_a", "desc", "<def>", "templ <o>", mode="single",
                                       ui=(("Tst", "print('ex')"), ("Tst", "print('ex')")))
         example_group_actions.add_single_action(example_action)
         example_defi.add_group_action(example_group_actions)
@@ -230,7 +223,7 @@ class Definitions:
         with file(filename) as f:
             content = f.read()
         try:
-            exec (content)
+            exec content
             return eval("Interaction")
         except SyntaxError:
             self.batch.logger.err(("syntax error definition file:", filename))
@@ -277,12 +270,14 @@ class Definitions:
                                 new_definition.setup_ext = json_definition['definition']['meta']['setupExt']
                             if "prevExt" in json_definition['definition']['meta']:
                                 new_definition.prev_ext = json_definition['definition']['meta']['prevExt']
+                            if "version" in json_definition['definition']['meta']:
+                                new_definition.version = json_definition['definition']['meta']['version']
                             self.definitions_names.append(json_definition['definition']['meta']["name"])
                             self.add_definition(new_definition)
 
                             if "interactionScript" in json_definition['definition']['meta']:
-                                new_definition.interactions = self.load_interaction_file( definitions_dir
-                                    + json_definition['definition']['meta']["interactionScript"])
+                                inters_f = definitions_dir + json_definition['definition']['meta']["interactionScript"]
+                                new_definition.interactions = self.load_interaction_file(inters_f)
                                 if new_definition.interactions is None:
                                     loading_errors += 1
 
@@ -292,14 +287,14 @@ class Definitions:
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
                                         li_ui = self.get_ui_values(li)
-                                        new_action = SingleAction(1, li['name'], li['desc'], li['default'],
+                                        new_action = SingleAction(li['name'], li['desc'], li['default'],
                                                                   li['template'], ui=li_ui)
                                         new_group_action.add_single_action(new_action)
 
                                     elif li['type'] == "multi":
                                         for ag in li["subActions"].values():
                                             ag_ui = self.get_ui_values(ag)
-                                            new_action = SingleAction(ag['id'], li['name'], ag['desc'], ag['default'],
+                                            new_action = SingleAction(li['name'], ag['desc'], ag['default'],
                                                                       ag['template'], mode=ag['mode'], ui=ag_ui)
                                             new_group_action.add_single_action(new_action)
                                     new_definition.add_group_action(new_group_action)
@@ -321,6 +316,7 @@ class Definitions:
         del self.definitions_array[:]
         del self.definitions_names[:]
         self.total_definitions = 0
+        self.current_definition = None
         self.current_definition_name = None
         self.current_definition_index = None
 
@@ -329,13 +325,16 @@ class Definitions:
         ret = self.load_definitions()
         return ret
 
-    def change_interaction(self, index):
-        self.batch.logger.deepdb(("change_interaction ", index))
-        # if self.current_interactions is not None:
-        #     self.current_interactions.test()
-        self.current_definition_index = index
-        self.current_definition_name = self.definitions_array[index].name
-        self.current_interactions = self.definitions_array[index].interactions
+    def update_current_definition(self, index):
+        self.batch.logger.deepdb(("update_current_definition ", index))
+        if len(self.definitions_array) > index:
+            self.current_definition_index = index
+            self.current_definition = self.definitions_array[index]
+            self.current_definition_name = self.definitions_array[index].name
+            self.current_interactions = self.definitions_array[index].interactions
+        else:
+            self.batch.logger.wrn(("update current definition is not possible, definitions count:  ",
+                                   len(self.definitions_array), "  try set:", index))
 
         # if self.current_interactions is not None:
         #    self.current_interactions.test()

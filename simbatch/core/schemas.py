@@ -73,8 +73,8 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
-        self.actions_array.append(SingleAction(len(self.actions_array), "virtual action", "virt descr", "<val>",
-                                               "template <f>", type="single", ui=(("ui", "interaction.ui_fun()"))))
+        self.actions_array.append(SingleAction("virtual action", "virt descr", "<def_val>", "template <f>",
+                                               ui=(("ui", "interaction.ui_fun()"))))
         return True
 
     # def actions_to_string(self):
@@ -114,7 +114,7 @@ class Schemas:
 
     @staticmethod
     def get_blank_schema():
-        return SchemaItem(0, "", 1, "NULL", 1, "defi", [], 1, "")
+        return SchemaItem(0, "", 1, "NULL", 1, "blank defi", [], 1, "")
 
     #  print schema data, for debug
     def print_current(self):
@@ -126,7 +126,10 @@ class Schemas:
             print "       current schema name: ", cur_sch.schema_name
             print "       definition id:{}   project id:{}".format(cur_sch.based_on_definition, cur_sch.project_id)
             for a in cur_sch.actions_array:
-                print "       __a: id{}  name:{}   description:{}".format(a.id, a.name, a.description)
+                print "       __a: name:{}  default_value:{}  actual_value:{}  description:{}".format(a.name,
+                                                                                                      a.default_value,
+                                                                                                      a.actual_value,
+                                                                                                      a.description)
 
     def print_all(self):
         if self.total_schemas == 0:
@@ -137,7 +140,7 @@ class Schemas:
             print "   proj id:{},  definition:{} ".format(sch.project_id, sch.based_on_definition)
             print "   actions count: ", len(sch.actions_array)
             for a in sch.actions_array:
-                print "   __action: {}__{}__{}__{}".format(a.id, a.name, a.default_value, a.template)
+                print "   __action: {}__{}__{}__{}".format(a.name, a.default_value, a.actual_value, a.template)
         print "\n\n"
 
     def get_schema_names(self, as_string=False, fit=()):
@@ -369,8 +372,7 @@ class Schemas:
                             if "actions" in li:
                                 for lia in li['actions'].values():
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                    new_action = SingleAction(lia["id"], lia["name"], lia["desc"], lia["default"],
-                                                              lia["template"])
+                                    new_action = SingleAction(lia["name"], lia["desc"], lia["default"], lia["template"])
                                     new_schema_actions.append(new_action)
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), li['definition'], new_schema_actions,

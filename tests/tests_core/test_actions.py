@@ -3,8 +3,6 @@ from simbatch.core.actions import SingleAction, MultiAction
 import pytest
 
 
-
-
 # TODO check dir on prepare tests
 TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 
@@ -20,9 +18,8 @@ def simbatch():
     return sib
 
 
-
 def test_single_action():
-    sa = SingleAction(-1, "acti name", "descr", "abc", "template <f>")
+    sa = SingleAction("acti name", "descr", "abc", "template <f>")
     assert sa.name == "acti name"
     assert sa.description == "descr"
     assert sa.default_value == "abc"
@@ -30,16 +27,14 @@ def test_single_action():
 
 
 def test_multi_action():
-    singl_a1 = SingleAction(-2, "acti name1", "descr1", "abc", "template1 <f>")
-    singl_a2 = SingleAction(-2, "acti name2", "descr2", "abc", "template2 <f>")
+    singl_a1 = SingleAction("acti name1", "descr1", "abc", "template1 <f>")
+    singl_a2 = SingleAction("acti name2", "descr2", "abc", "template2 <f>")
     multi_a = MultiAction(1, "tst")
     assert multi_a.actions_count == 0
     multi_a.add_single_action(singl_a1)
     assert multi_a.actions_count == 1
     multi_a.add_single_action(singl_a2)
     assert multi_a.actions_count == 2
-
-
 
 
 def test_exist_definitions_data(simbatch):

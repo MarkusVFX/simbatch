@@ -121,7 +121,7 @@ class Settings:
                         "adminUser":
                             {"name": "admin", "sign": "A", "pass": "pass"},
                         "window":
-                            {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800, "always_on_top": False}
+                            {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800, "alwaysOnTop": False}
                         }
 
     def __init__(self, logger, runtime_env, ini_file="config.ini", force_os=False):
@@ -182,9 +182,9 @@ class Settings:
 
         print "\n\n"
 
-    def random_welcome_message(self):
+    @staticmethod
+    def random_welcome_message():
         messages = ("Welcome", "Have a nice sim!","Sim sim sim")
-
         rand = int(random.random()*len(messages))  # TODO rand int
         return messages[rand]
 
@@ -328,9 +328,3 @@ class Settings:
             # TO DO dblvl
             print " [WRN] store_definitions_directory  is None"
             return False
-
-
-if __name__ == "__main__":
-    settings = Settings("..\\config.ini")
-    if settings.debug_level >= 3:
-        settings.print_all()

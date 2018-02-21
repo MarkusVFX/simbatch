@@ -479,10 +479,10 @@ class TasksUI:
         qt_button_remove_task = QPushButton("Remove  ")
         qt_button_add_to_queue = QPushButton("Add to Queue")
 
-        qt_button_create_task.clicked.connect(self.on_click_show_create)
-        qt_button_edit_task.clicked.connect(self.on_click_show_edit)
-        qt_button_remove_task.clicked.connect(self.on_click_show_remove)
-        qt_button_add_to_queue.clicked.connect(self.on_click_show_add_to_queue)
+        qt_button_create_task.clicked.connect(self.on_click_show_create_form)
+        qt_button_edit_task.clicked.connect(self.on_click_show_edit_form)
+        qt_button_remove_task.clicked.connect(self.on_click_show_remove_form)
+        qt_button_add_to_queue.clicked.connect(self.on_click_show_add_to_queue_form)
 
         qt_lay_tasks_list.addWidget(list_tasks)
 
@@ -626,7 +626,7 @@ class TasksUI:
         self.remove_form_state = 0
         self.add_form_state = 0
 
-    def on_click_show_create(self):
+    def on_click_show_create_form(self):
         if self.create_form_state == 0:
             self.hide_all_forms()
             if self.batch.tsk.current_task_index >= 0:
@@ -644,7 +644,7 @@ class TasksUI:
             self.qt_form_create.hide()
             self.create_form_state = 0
 
-    def on_click_show_edit(self):
+    def on_click_show_edit_form(self):
         if self.edit_form_state == 0:
             self.hide_all_forms()
             if self.batch.tsk.current_task_index >= 0:
@@ -653,28 +653,36 @@ class TasksUI:
                 self.qt_form_edit.show()
                 self.edit_form_state = 1
             else:
-                self.batch.logger.wrn("(on_click_show_edit) Please Select Task:")
-                self.top_ui.set_top_info(" Please Select Task ", 7)
+                self.batch.logger.wrn("(on_click_show_edit_form) Please Select Task")
+                self.top_ui.set_top_info("Please select task first", 7)
         else:
             self.qt_form_edit.hide()
             self.edit_form_state = 0
 
-    def on_click_show_remove(self):
+    def on_click_show_remove_form(self):
         if self.remove_form_state == 0:
-            self.hide_all_forms()
-            self.qt_form_remove.show()
-            self.remove_form_state = 1
+            if self.batch.tsk.current_task_id is not None:
+                self.hide_all_forms()
+                self.qt_form_remove.show()
+                self.remove_form_state = 1
+            else:
+                self.batch.logger.wrn("(on_click_show_remove_form) Please Select Task")
+                self.top_ui.set_top_info("Please select task first", 7)
         else:
             self.qt_form_remove.hide()
             self.remove_form_state = 0
 
-    def on_click_show_add_to_queue(self):
+    def on_click_show_add_to_queue_form(self):
         self.batch.logger.db(("on_click_add_to_queue  proj: ", self.batch.prj.current_project_id))
         if self.add_form_state == 0:
-            self.hide_all_forms()
-            self.qt_form_add.show()
-            self.qt_form_add.update_add_ui()
-            self.add_form_state = 1
+            if self.batch.tsk.current_task_id is not None:
+                self.hide_all_forms()
+                self.qt_form_add.show()
+                self.qt_form_add.update_add_ui()
+                self.add_form_state = 1
+            else:
+                self.batch.logger.wrn("(on_click_show_add_to_queue_form) Please Select Task")
+                self.top_ui.set_top_info("Please select task first", 7)
         else:
             self.qt_form_add.hide()
             self.add_form_state = 0
@@ -719,7 +727,8 @@ class TasksUI:
 
         current_list_index = self.list_tasks.currentRow()
         ed_item = self.list_tasks.item(current_list_index)
-        list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name, edited_task_item.user_id,
+        list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name,
+                                        str(edited_task_item.user_id),
                                         edited_task_item.sequence, edited_task_item.shot, edited_task_item.take,
                                         edited_task_item.state, str(edited_task_item.schema_ver),
                                         str(edited_task_item.queue_ver), edited_task_item.options,
@@ -755,15 +764,18 @@ class TasksUI:
 
     def on_click_add_to_queue(self):
         form_atq = self.qt_form_add
-        if self.batch.tsk.current_task_index > -1:
+        current_task_id = self.batch.tsk.current_task_id
+        if current_task_id is not None:
             ret = form_atq.create_directories()
             if ret:
-                self.batch.tsk.tasks_data[self.batch.tsk.current_task_index].queue_ver += 1
-                self.batch.tsk.tasks_data[self.batch.tsk.current_task_index].state = "QUEUED"
-                self.batch.tsk.tasks_data[self.batch.tsk.current_task_index].state_id = 3
+                self.batch.tsk.current_task.queue_ver += 1
+                self.batch.tsk.current_task.state_id = self.sts.INDEX_STATE_QUEUED
+                self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_QUEUED]
                 self.batch.tsk.save_tasks()
 
-                self.batch.que_ui.add_to_queue_and_update_list(form_atq)
+                form_queue_items = self.batch.que.generate_queue_items(current_task_id, options=form_atq.options)
+                self.batch.que.add_to_queue(form_queue_items, do_save=True)
+                self.mainw.que_ui.update_all_queue()
 
                 self.freeze_list_on_changed = 1
                 self.batch.tsk.last_task_list_index = -1
@@ -771,11 +783,15 @@ class TasksUI:
 
                 self.freeze_list_on_changed = 0
                 self.qt_form_add.update_add_ui()
+
+                self.batch.logger.err("Add to queue: cant create directory !")
+                self.top_ui.set_top_info(" ERR: cant create directory ", 9)
             else:
                 self.batch.logger.err("Add to queue: cant create directory !")
                 self.top_ui.set_top_info(" ERR: cant create directory ", 9)
         else:
-            self.top_ui.set_top_info(" Please select task ", 7)
+            self.batch.logger.wrn("Current task undefined! Please select task again.")
+            self.top_ui.set_top_info("Please select task ", 7)
 
     def clear_list(self):
         self.freeze_list_on_changed = 1
@@ -860,11 +876,11 @@ class TasksUI:
 
                 # update TASK form
                 if self.create_form_state == 1:
-                    self.qt_form_create.update_create_ui(cur_task.schema_id)
+                    self.qt_form_create.update_create_ui(cur_task.schema_id)   # update create task form
                 if self.edit_form_state == 1:
-                    self.qt_form_edit.update_edit_ui(cur_task)
-                if self.add_form_state == 1:  # add to queue
-                    self.qt_form_add.update_add_ui()
+                    self.qt_form_edit.update_edit_ui(cur_task)                 # update edit form
+                if self.add_form_state == 1:
+                    self.qt_form_add.update_add_ui()                           # update add to queue form
 
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index, self.batch.tsk.tasks_data))

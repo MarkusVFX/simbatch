@@ -191,7 +191,7 @@ class RadioButtons:
     #         self.qt_radio_butt_arr[nr-1].setChecked(True)
 
 
-class ActionWidget(QWidget):
+class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    For add to queue use: ActionWidgetATQ
     # action_name = ""
     # action_sub_mode = ""
     # group_of_actions = None  # GroupAction
@@ -358,6 +358,22 @@ class ActionWidget(QWidget):
                 self.qt_button_2.setText(button_2_caption)
                 self.qt_button_2.clicked.disconnect()
                 self.qt_button_2.clicked.connect(lambda: self.eval_button_fun(self.qt_edit, button_2_fun_str))
+
+
+class ActionWidgetATQ(QWidget):
+    widget_layout = None
+    CMB = None   # ComboLabel
+    ELWB = None  # EditLineWithButtons
+
+    comfun = CommonFunctions()
+
+    def __init__(self, text_label, text_edit, combo_label=None, combo_items=None ):
+
+        self.CMB = ComboLabel(combo_label, comboItemsArr, button1=comboBut, buttonSize=comboButSize)
+        self.ELWB = EditLineWithButtons(text_label, text_edit)
+
+        self.widget_layout.addLayout( self.CMB.widget_layout)
+        self.widget_layout.addLayout( self.ELWB.widget_layout)
 
 
 class WidgetGroup:

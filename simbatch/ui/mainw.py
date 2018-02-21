@@ -208,9 +208,16 @@ class MainWindow(QMainWindow):
 
         if self.sts.store_data_mode == 1:
             if self.comfun.path_exists(self.sts.store_data_json_directory):
-                qt_tab_widget.setCurrentIndex(1)  # STANDARD TAB
+                if self.sts.ui_edition_mode == 0:
+                    qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB
+                else:
+                    qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB (Pro version)
             else:
-                qt_tab_widget.setCurrentIndex(4)  # NO data dir : show settings
+                if self.sts.ui_edition_mode == 0:
+                    qt_tab_widget.setCurrentIndex(4)  # NO data dir : show settings
+                else:
+                    qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings  (Pro version)
+
         else:
             # PRO version
             pass

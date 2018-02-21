@@ -87,6 +87,7 @@ class Tasks:
             print "       sim framerange  ", cur_tsk.sim_frame_start, cur_tsk.sim_frame_end
             print "       prev framerange  ", cur_tsk.prev_frame_start, cur_tsk.prev_frame_end
             print "       state  state_id ", cur_tsk.state, "    ", cur_tsk.state_id
+            print "       options ", cur_tsk.options
 
     def print_all(self):
         if self.total_tasks == 0:

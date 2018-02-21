@@ -15,7 +15,8 @@ from simbatch.core.queue import QueueItem
 
 class AddToQueueForm (QWidget):
     batch = None
-    form_atq_local_item = None
+    form_atq_local_item = None    # obsolete
+    options = []                  # all inputted user's options with parameters
 
     qt_edit_button_frame_from = None
     qt_edit_button_frame_to = None
@@ -23,6 +24,8 @@ class AddToQueueForm (QWidget):
     qt_edit_button_sim_to = None
     qt_edit_button_version = None
     qt_edit_button_prior = None
+    qt_gb_add_to_queue_now = None
+    qt_lay_actions = None
 
     qt_edit_button_description = None
     FoQuWiEvolve = None
@@ -36,9 +39,8 @@ class AddToQueueForm (QWidget):
 
     def __init__(self, batch):
         QWidget.__init__(self)
-        self.form_atq_local_item = QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, "ver", "evo", 0, 50,
-                                             " 1 ", "", 0, "", 1, 3)
         self.batch = batch
+        self.form_atq_local_item = self.batch.que.get_blank_queue_item()
         # self.sts = self.batch.sts
         # self.comfun = self.batch.comfun
         self.init_ui_elements()
@@ -56,7 +58,6 @@ class AddToQueueForm (QWidget):
         qt_gb_actions.setTitle("Actions")
         qt_gb_actions.setLayout(qt_lay_actions)
         qt_form_add_layout.addWidget(qt_gb_actions)
-        self.qt_gb_actions = qt_gb_actions
 
         qt_edit_button_version = EditLineWithButtons("version")
         qt_edit_button_prior = EditLineWithButtons("prior")
@@ -98,9 +99,31 @@ class AddToQueueForm (QWidget):
         # qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)
 
     def update_add_ui(self):
-        # TODO
-        pass
+        current_task = self.batch.tsk.current_task
+        self.qt_edit_button_sim_from.qt_edit_line.setText(str(current_task.sim_frame_start))
+        self.qt_edit_button_sim_to.qt_edit_line.setText(str(current_task.sim_frame_end))
+        self.qt_edit_button_frame_from.qt_edit_line.setText(str(current_task.prev_frame_start))
+        self.qt_edit_button_frame_to.qt_edit_line.setText(str(current_task.prev_frame_end))
+        self.qt_edit_button_prior.qt_edit_line.setText(str(current_task.priority))
+        self.qt_edit_button_version.qt_edit_line.setText(str(current_task.task_ver))
+        self.qt_edit_button_description.qt_edit_line.setText(current_task.description)
+
+        current_sch = self.batch.sch.get_schema_by_id(current_task.schema_id)
+        for act in current_sch.actions_array:
+            print "ddddd ", act
+        self.add_action_to_form()
 
     def create_directories(self):
         # TODO
         return True
+
+    def add_action_to_form(self, info, edit_txt=None, evo=None):
+        if edit_txt is None and evo is None:
+            wi = SimpleLabel(info)
+
+            self.qt_lay_actions..addWidget(wi)
+        else:
+            if edit_txt is not None:
+                wi = EditLineWithButtons(info,edit_txt)
+            else:
+                wi = ActionWidgetATQ()

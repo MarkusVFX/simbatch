@@ -231,7 +231,7 @@ class QueueUI:
             qt_list_item = QListWidgetItem(widget_list)
             cur_color = self.sts.state_colors[que.state_id].color()
             qt_list_item.setBackground(cur_color)
-            list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, que.prior, que.state,
+            list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, str(que.prior), que.state,
                                              que.evolution, que.sim_node, que.description)
 
             widget_list.addItem(qt_list_item)
@@ -247,6 +247,10 @@ class QueueUI:
         self.batch.que.current_queue_index = index
         self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
         self.freeze_list_on_changed = 0
+
+    def update_all_queue(self):
+        self.clear_list()
+        self.init_queue_items()
 
     def _change_current_queue_item_state_and_reset_list(self, state_id):
         self.batch.que.current_queue.state = self.sts.states_visible_names[state_id]

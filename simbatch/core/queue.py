@@ -103,6 +103,10 @@ class Queue:
                                                                                     q.description)   # TODO "q.evo"
         print "\n\n"
 
+    @staticmethod
+    def get_blank_queue_item():
+        return QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, "ver", "evo", 0, 50, " 1 ", "", 0, "", 1, 3)
+
     def get_queue_index_by_id(self, get_id):
         for i, que in enumerate(self.queue_data):
             if que.id == get_id:
@@ -171,6 +175,9 @@ class Queue:
         return True
 
     def add_to_queue(self, queue_item, do_save=False):
+        queue_item
+        print "adadad " , type(queue_item)
+
         if queue_item.id > 0:
             self.max_id = queue_item.id
         else:
@@ -185,6 +192,12 @@ class Queue:
             else:
                 return False
         return queue_item.id
+
+    def generate_queue_items(self,task_id, options=None):
+
+        print "compile2 ", task_id, options
+        return self.get_blank_queue_item()
+
 
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):
@@ -212,9 +225,9 @@ class Queue:
         sample_queue_item_1 = QueueItem(0, "queue item 1", 1, "T", 1, "", "", "", 1, 2, "DONE", 11, 3, "", 0, 50,
                                         "first", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
         sample_queue_item_2 = QueueItem(0, "queue item 2", 3, "T", 1, "", "", "", 3, 4, "WORKING", 4, 2, "", 0, 50,
-                                        "second", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
+                                        "second", "sim_01", 1, "2017_12_28 02:02:03", 1, 1)
         sample_queue_item_3 = QueueItem(0, "queue item 3", 4, "T", 1, "", "", "", 5, 6, "WAITING", 2, 1, "", 0, 40,
-                                        "third", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
+                                        "third", "sim_01", 1, "2017_12_28 02:02:04", 1, 1)
         collect_ids += self.add_to_queue(sample_queue_item_1)
         collect_ids += self.add_to_queue(sample_queue_item_2)
         collect_ids += self.add_to_queue(sample_queue_item_3, do_save=do_save)

@@ -784,8 +784,8 @@ class TasksUI:
                 self.freeze_list_on_changed = 0
                 self.qt_form_add.update_add_ui()
 
-                self.batch.logger.err("Add to queue: cant create directory !")
-                self.top_ui.set_top_info(" ERR: cant create directory ", 9)
+                self.batch.logger.inf(" add to queue !")
+                self.top_ui.set_top_info(" add to queue ", 2)
             else:
                 self.batch.logger.err("Add to queue: cant create directory !")
                 self.top_ui.set_top_info(" ERR: cant create directory ", 9)

@@ -289,6 +289,8 @@ class Definitions:
                                         li_ui = self.get_ui_values(li)
                                         new_action = SingleAction(li['name'], li['desc'], li['default'],
                                                                   li['template'], ui=li_ui)
+                                        if "params" in li:
+                                            new_action.parameters = ag["params"]
                                         new_group_action.add_single_action(new_action)
 
                                     elif li['type'] == "multi":
@@ -296,7 +298,10 @@ class Definitions:
                                             ag_ui = self.get_ui_values(ag)
                                             new_action = SingleAction(li['name'], ag['desc'], ag['default'],
                                                                       ag['template'], mode=ag['mode'], ui=ag_ui)
+                                            if "params" in ag:
+                                                new_action.parameters = ag["params"]
                                             new_group_action.add_single_action(new_action)
+
                                     new_definition.add_group_action(new_group_action)
                             else:
                                 self.batch.logger.wrn(("No actions defined in : ", json_file, " dir:", definitions_dir))

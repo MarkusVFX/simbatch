@@ -18,7 +18,8 @@ class SingleAction:
     mode = None
     default_value = ""  # pattern changed when add to queue
     actual_value = ""   # var set by user or default_value, finally used for generate action_script from template
-    template = ""
+    template = ""       # use template for create absolute ...
+    parameters = None   # for nucleus engine it's  BND STR MAS
     description = ""
     json_FIELDS_NAMES = ACTION_DATA_FIELDS_NAMES
     ui = None

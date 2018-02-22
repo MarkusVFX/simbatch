@@ -71,7 +71,27 @@
 						"desc": "nCloth sim",
 						"ui" : [["Get selection","interactions.maya_get_selection"]],
 						"default": "<cloth_objects>",
-						"template": ["interactions.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+						"template": ["interactions.maya_simulate_ncloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"],
+                        "params":{
+                            "paramsTemplate": ["interactions.maya_set_param(\"", "<o>", "\"", ", ", "\"", "<p>", "\" , ", "<v>", ")"],
+                            "paramsList":{
+                                "STR": ["stretch", "stretchResistance", 40, "stretch Resistance"],
+                                "BND": ["bend", "bendResistance", 1, "bend Resistance"],
+                                "CMP": ["compression", "compressionResistance", 40, "Compression Resistance"],
+                                "DRP": ["Bend Angle Dropoff", "bendAngleDropoff", 40, "Bend Angle Dropoff"],
+                                "SHR": ["Shear Resistance", "shearResistance", 40, "Shear Resistance"],
+                                "RIG": ["Rigridity", "rigidity", 40, "cloth rigidity"],
+                                "MAS": ["Mass", "pointMass", 40, "cloth point mass"],
+                                "LFT": ["Lift", "lift", 40, "cloth lift"],
+                                "DRG": ["Drag", "drag", 40, "cloth drag"], 
+                                "DRT": ["Tangental Drag", "Tangental Drag", 1, "cloth time scale"],
+                                "DMP": ["Damp", "damp", 1, "cloth damp  "],
+                                "SMP": ["Stretch Damp", "stretchDamp", 1, "stretchDamp"],
+                                "STI": ["Stickness", "stickiness", 1, "cloth stickiness" ],
+                                "FRI": ["Friction", "friction", 1, "cloth friction"],
+                                "THC": ["Thickness", "thickness", 1, "cloth thickness"] 
+                            }
+                        }
 					},
 					"2": {
 						"id": 2,

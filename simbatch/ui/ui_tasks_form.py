@@ -108,22 +108,35 @@ class AddToQueueForm (QWidget):
         self.qt_edit_button_version.qt_edit_line.setText(str(current_task.task_ver))
         self.qt_edit_button_description.qt_edit_line.setText(current_task.description)
 
+        self.remove_all_action_widgets()
         current_sch = self.batch.sch.get_schema_by_id(current_task.schema_id)
         for act in current_sch.actions_array:
             print "ddddd ", act
-        self.add_action_to_form()
-
-    def create_directories(self):
-        # TODO
-        return True
+            self.add_action_to_form(act.name, act.actual_value)
 
     def add_action_to_form(self, info, edit_txt=None, evo=None):
         if edit_txt is None and evo is None:
             wi = SimpleLabel(info)
-
-            self.qt_lay_actions..addWidget(wi)
         else:
             if edit_txt is not None:
-                wi = EditLineWithButtons(info,edit_txt)
+                wi = EditLineWithButtons(info, edit_txt)
             else:
                 wi = ActionWidgetATQ()
+        qt_widget = QWidget()
+        qt_widget.setLayout(wi.qt_widget_layout)
+        self.qt_lay_actions.addWidget(qt_widget)
+        # self.qt_lay_actions.addLayout(wi.qt_widget_layout)
+
+    def remove_all_action_widgets(self):
+        # self.actionsWidgetasArray = []
+        # self.actionsAllArray = []
+        while self.qt_lay_actions.count() > 0 :
+            b = self.qt_lay_actions.itemAt(0)
+            b.widget().deleteLater()
+            # b.deleteLater()
+            self.qt_lay_actions.takeAt(0)
+        # self.actionsCount = 0
+
+    def create_directories(self):
+        # TODO
+        return True

@@ -361,7 +361,7 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
 
 
 class ActionWidgetATQ(QWidget):
-    widget_layout = None
+    qt_widget_layout = None
     CMB = None   # ComboLabel
     ELWB = None  # EditLineWithButtons
 
@@ -372,8 +372,8 @@ class ActionWidgetATQ(QWidget):
         self.CMB = ComboLabel(combo_label, comboItemsArr, button1=comboBut, buttonSize=comboButSize)
         self.ELWB = EditLineWithButtons(text_label, text_edit)
 
-        self.widget_layout.addLayout( self.CMB.widget_layout)
-        self.widget_layout.addLayout( self.ELWB.widget_layout)
+        self.qt_widget_layout.addLayout( self.CMB.widget_layout)
+        self.qt_widget_layout.addLayout( self.ELWB.widget_layout)
 
 
 class WidgetGroup:

@@ -370,7 +370,7 @@ class Projects:
     #  load projects data from sql
     def load_projects_from_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     #  save projects
@@ -390,7 +390,7 @@ class Projects:
     #  save projects data to sql
     def save_projects_to_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     #  remove single project
@@ -434,5 +434,5 @@ class Projects:
     #  clear project data from sql
     def clear_projects_in_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return True

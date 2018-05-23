@@ -7,7 +7,7 @@ import pytest
 def sett():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
     # return core.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
-    return settings.Settings(Logger(), 5, ini_file="S:/simbatch/tests/config_tests.ini")
+    return settings.Settings(Logger(), 5, ini_file="config_tests.ini")
 
 
 def test_settings_file(sett):

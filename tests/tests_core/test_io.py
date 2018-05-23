@@ -10,7 +10,7 @@ TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 @pytest.fixture(scope="module")
 def io():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    sib = core.SimBatch("Stand-alone", ini_file="S:/simbatch/tests/config_tests.ini")
+    sib = core.SimBatch("Stand-alone", ini_file="config_tests.ini")
     sib.clear_all_memory_data()
     sib.prj.create_example_project_data(do_save=False)
     sib.prj.update_current_from_index(1)

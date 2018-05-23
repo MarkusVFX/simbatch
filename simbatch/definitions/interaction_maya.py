@@ -7,7 +7,7 @@ class Interaction:
     
     # maya executions
     
-    def save_curent_scene_as(self, file):
+    def save_current_scene_as(self, file):
         print "TODO: interaction save as"
     
     def maya_open_scene(self, file):

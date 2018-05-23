@@ -301,10 +301,11 @@ class SettingsUI:
 
         if index > 1:
             # PRO version
-            self.top_ui.set_top_info("MySQL only with proversion", 4)
+            self.top_ui.set_top_info("MySQL will be supported with the PRO version", 4)
+            self.batch.logger.inf("MySQL will be supported with the PRO version")
 
     def on_clicked_radio_colors(self, index):
-        self.batch.logger.db(("clicked_radio_colors ", index))
+        self.batch.logger.db(("on_clicked_radio_colors ", index))
 
         self.settings.ui_color_mode = index
         self.settings.update_ui_colors()
@@ -314,7 +315,7 @@ class SettingsUI:
         prev_lvl = self.settings.debug_level
         self.settings.debug_level = level
         self.batch.logger.console_level = level
-        self.batch.logger.db(("clicked_debug_level", level))
+        self.batch.logger.db(("on_clicked_debug_level", level))
         if level >= 4 and prev_lvl < 4:     #  show db UI elements
             self.mainw.top_ui.qt_but_print_general.show()
             self.mainw.top_ui.qt_but_print_details.show()

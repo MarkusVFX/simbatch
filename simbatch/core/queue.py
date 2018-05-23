@@ -250,7 +250,7 @@ class Queue:
 
     def load_queue_from_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     def save_queue(self):
@@ -267,5 +267,5 @@ class Queue:
 
     def save_queue_to_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None

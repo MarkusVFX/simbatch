@@ -247,7 +247,7 @@ class Tasks:
 
     def clear_tasks_in_mysql(self):
         # PRO VERSION with sql
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return False
 
     def clear_all_tasks_data(self, clear_stored_data=False):
@@ -307,7 +307,7 @@ class Tasks:
 
     def load_tasks_from_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     def save_tasks(self):
@@ -346,5 +346,5 @@ class Tasks:
 
     def save_tasks_to_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None

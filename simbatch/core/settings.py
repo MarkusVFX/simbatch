@@ -1,6 +1,6 @@
 import os
 import json
-import random
+from random import randint
 from common import CommonFunctions
 
 try:  # Maya 2016
@@ -184,8 +184,8 @@ class Settings:
 
     @staticmethod
     def random_welcome_message():
-        messages = ("Welcome", "Have a nice sim!","Sim sim sim")
-        rand = int(random.random()*len(messages))  # TODO rand int
+        messages = ("Welcome", "Have a nice sim!", "Sim, Forrest, sim!")
+        rand = randint(0, len(messages)-1)
         return messages[rand]
 
     def clear_state_colors(self):

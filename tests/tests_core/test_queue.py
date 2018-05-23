@@ -5,7 +5,7 @@ import pytest
 @pytest.fixture(scope="module")
 def sib():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    sib = batch.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
+    sib = batch.SimBatch(5, ini_file="config_tests.ini")
     return sib
 
 def test_prepare_data_directory_by_delete_all_files(sib):

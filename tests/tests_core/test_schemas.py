@@ -1,11 +1,13 @@
 from simbatch.core import core as batch
+from simbatch.core.actions import SingleAction
+
 import pytest
 
 
 @pytest.fixture(scope="module")
 def sib():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    sib = batch.SimBatch(5, ini_file="S:/simbatch/tests/config_tests.ini")
+    sib = batch.SimBatch(5, ini_file="config_tests.ini")
     return sib
 
 
@@ -124,9 +126,18 @@ def test_remove_single_schema_by_index(sib):
     assert sib.sch.total_schemas == 2
     assert len(sib.sch.schemas_data) == 2
 
+
 def test_actions_in_single_schema(sib):
     assert sib.sch.total_schemas == 2
     assert len(sib.sch.schemas_data) == 2
+
+
+def test_add_schema(sib):
+    assert len(sib.sch.current_schema.actions_array) == 1
+    # sia = SingleAction(-1, "virtual action", "virt descr", "<val>", "template <f>", type="single", ui=(("ui", "2+2")))
+    sia = SingleAction("virtual action", "virt descr", "<val>", "template <f>", mode="single", ui=(("ui", "2+2")))
+    sib.sch.current_schema.add_action_to_schema(sia)
+    assert len(sib.sch.current_schema.actions_array) == 2
 
 
 def test_print_current(sib):

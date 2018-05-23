@@ -328,7 +328,7 @@ class SchemasUI:
 
         cur_schema = self.sch.schemas_data[cur_sch_index]
         self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
-        self.batch.dfn.soco.save_curent_scene_as(ret[1])
+        self.batch.dfn.current_interactions.save_current_scene_as(ret[1])
 
     def on_menu_locate_base_setup(self):
         import subprocess
@@ -535,7 +535,7 @@ class SchemasUI:
                 save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.deepdb(("with saveAs:  ", save_as))
                 if self.batch.dfn.current_interactions is not None:
-                    self.batch.dfn.current_interactions.save_curent_scene_as(save_as[1])
+                    self.batch.dfn.current_interactions.save_current_scene_as(save_as[1])
             else:
                 self.batch.logger.deepdb(("with save_as_base_state:", save_as_base))
 
@@ -573,7 +573,7 @@ class SchemasUI:
         file_to_load = self.batch.dfn.generate_tuple_base_setup_file_name(schema_name, ver=version)
         if file_to_load[0] == 1:
             self.batch.logger.inf(("loadFile: ", file_to_load[1]))
-            self.batch.dfn.soco.load_scene(file_to_load[1])
+            self.batch.dfn.current_interactions.load_scene(file_to_load[1])
         else:
             self.batch.logger.err(("loadFile: ", file_to_load))
 

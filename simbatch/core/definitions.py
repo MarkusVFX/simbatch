@@ -27,19 +27,6 @@ ACTION_ITEM_FIELDS_NAMES = [
     ('desc', 'description')]
 
 
-# class SoftwareConnector:
-#     currentSoft = -1
-#
-#     def __init__(self, current_soft):
-#         self.currentSoft = current_soft
-#
-#     def load_scene(self, target ):
-#         pass
-#
-#     def save_curent_scene_as(self, target ):
-#         pass
-
-
 class SingleDefinition:
     name = ""       # actions in schema are copied from definition for protect schema data if no definition
     version = 0     # version are useful for recognize exact source of definition
@@ -51,7 +38,7 @@ class SingleDefinition:
     total_actions = 0
     action_names = []
 
-    interactions = None  # file with common functions for current definition
+    interactions = None  # object of class Interaction created by: def class_from_file(self, filename)
 
     def __init__(self, name, logger):
         self.name = name
@@ -134,7 +121,7 @@ class Definitions:
 
     # current_software_id = 0
 
-    current_interactions = None        # OLD soco = None   # software connector
+    current_interactions = None        # depreciate: soco = None   # software connector
 
     def __init__(self, batch):
         self.batch = batch

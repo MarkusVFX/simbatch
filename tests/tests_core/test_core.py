@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture(scope="module")
 def sib():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    return core.SimBatch("Stand-alone", ini_file="S:/simbatch/tests/config_tests.ini")
+    return core.SimBatch("Stand-alone", ini_file="config_tests.ini")
 
 
 def test_init_simbatch(sib):

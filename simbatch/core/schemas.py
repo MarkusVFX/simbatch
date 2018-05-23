@@ -73,9 +73,13 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
-        self.actions_array.append(SingleAction("virtual action", "virt descr", "<def_val>", "template <f>",
+        self.add_action_to_schema(SingleAction("virtual action", "virt descr", "<def_val>", "template <f>",
                                                ui=(("ui", "interaction.ui_fun()"))))
         return True
+
+    def add_action_to_schema(self, single_action_object):
+        self.actions_array.append(single_action_object)
+
 
     # def actions_to_string(self):
     #     for a in self.actions_array:
@@ -391,7 +395,7 @@ class Schemas:
 
     def load_schemas_from_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     def save_schemas(self):
@@ -439,7 +443,7 @@ class Schemas:
 
     def save_schemas_to_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL database available in the PRO version")
+        self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     def get_all_object_from_all_schemas(self, soft_id=0):

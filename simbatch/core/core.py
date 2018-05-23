@@ -11,7 +11,7 @@ from queue import Queue
 from nodes import SimNodes
 from io import StorageInOut
 
-# I'm moving to LONDON !!!
+# I moved to LONDON :)
 
 class SimBatch:
     s = None
@@ -35,11 +35,7 @@ class SimBatch:
             else:
                 self.os = "undefined"
 
-        # below one place abbreviation for variables
-        # reasons:
-        # - repeated use
-        # - identification of the main modules
-
+        # abbreviation for very often used variables, helping with identification the main modules
         self.usr = Users(self)         # usr
         self.prj = Projects(self)      # prj
         self.sch = Schemas(self)       # sch
@@ -48,7 +44,6 @@ class SimBatch:
         self.nod = SimNodes(self)      # nod
         self.dfn = Definitions(self)   # dfn
         self.sio = StorageInOut(self)  # sio
-
         #  abbreviation  END
 
         self.logger.inf("SimBatch started")
@@ -143,16 +138,16 @@ class SimBatch:
                 ret_tsk = self.tsk.load_tasks()
                 if ret_tsk is not False:
                     # count number errors while of loading external data
-                    total_err_count = 0
-                    total_err_count = self.check_is_number_of_errors(ret_def, total_err_count, "definitions")
-                    total_err_count = self.check_is_number_of_errors(ret_prj, total_err_count, "project")
-                    total_err_count = self.check_is_number_of_errors(ret_sch, total_err_count, "schemas")
-                    total_err_count = self.check_is_number_of_errors(ret_tsk, total_err_count, "tsks")
+                    loading_err_count = 0
+                    loading_err_count = self.check_is_number_of_errors(ret_def, loading_err_count, "definitions")
+                    loading_err_count = self.check_is_number_of_errors(ret_prj, loading_err_count, "project")
+                    loading_err_count = self.check_is_number_of_errors(ret_sch, loading_err_count, "schemas")
+                    loading_err_count = self.check_is_number_of_errors(ret_tsk, loading_err_count, "tsks")
 
-                    if total_err_count == 0:
+                    if loading_err_count == 0:
                         return True
                     else:
-                        return total_err_count
+                        return loading_err_count
                 else:
                     return -1
             else:

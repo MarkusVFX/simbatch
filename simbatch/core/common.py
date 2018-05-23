@@ -56,6 +56,7 @@ class Logger:
             indent = "    ___"
             prefix = "deep"
         else:
+            indent = "'"
             prefix = "_"
 
         if raw:
@@ -108,9 +109,8 @@ class CommonFunctions:
             else:
                 print "     ", index, " : ", val
 
-    # values ...
     @staticmethod
-    def is_int(value):
+    def is_int(value):     # check is int   [for True return 0]
         try:
             if type(value) == int:
                 return True
@@ -120,7 +120,7 @@ class CommonFunctions:
             return False
 
     @staticmethod
-    def can_get_int(value):   #  try get int from string value
+    def can_get_int(value):   # check can convert to int (e.g.: test string "1")   [for True return 1]
         try:
             int(value)
             return True

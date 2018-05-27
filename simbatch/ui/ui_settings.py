@@ -14,14 +14,14 @@ from widgets import *
 
 class SettingsUI:
     qt_widget_settings = None
+    qt_scroll_widget = None
     settings = None
     sett_sql_test = None
     comfun = None
     sample_data_state = False
     batch = None
     top_ui = None
-    qt_scroll_widget = None
-    scroll_margin = 24   # scroll child widget margin, used on init and resize
+    scroll_margin = 26       # scroll child widget margin, used on init and resize
 
     def __init__(self, batch, mainw, top_ui):
         settings = batch.sts
@@ -32,31 +32,26 @@ class SettingsUI:
         self.comfun = batch.comfun
 
         qt_widget_settings = QWidget()
-        # qt_widget_settings.setBackgroundRole( QPalette.Mid ) ## QPalette.Dark    # TODO
         self.qt_widget_settings = qt_widget_settings
+        # qt_widget_settings.setBackgroundRole( QPalette.Mid ) # QPalette.Dark    # TODO  colors schema
         qt_scroll_area = QScrollArea()
-
         qt_lay_scroll_and_buttons = QVBoxLayout()  #  layout for  scroll   and   bottom buttons
         qt_lay_scroll_and_buttons.addWidget(qt_scroll_area)
         qt_widget_settings.setLayout(qt_lay_scroll_and_buttons)
-        self.qt_widget_settings = qt_widget_settings
-
         qt_lay_scroll_and_buttons.setContentsMargins(0, 0, 0, 0)
 
-
-        qt_lay_settings_main = QVBoxLayout()  ###  main lay !
+        qt_lay_settings_main = QVBoxLayout()  #   layout for group boxes  !
         qt_scroll_widget = QWidget()
         self.qt_scroll_widget = qt_scroll_widget
-        qt_scroll_widget.setMinimumWidth(self.settings.window[2]-self.scroll_margin)   #   400
-        qt_scroll_widget.setMinimumHeight(self.settings.window[3])  #   700
+        qt_scroll_widget.setMinimumWidth(self.settings.window[2]-self.scroll_margin)
+        qt_scroll_widget.setMinimumHeight(self.settings.window[3])
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
-
-        qt_lay_settings_main = QVBoxLayout(qt_widget_settings)
 
         ''' MODE '''
         qt_button_group_data = QButtonGroup()
         qt_radio_group_mode = QGroupBox()
+        qt_radio_group_mode.setMaximumHeight(155)
         qt_radio_group_mode.setTitle("Data options")
         qt_lay_settings_mode = QHBoxLayout()
         qt_label_mode = QLabel("Data store mode: ")
@@ -84,6 +79,7 @@ class SettingsUI:
 
         ''' DATA '''
         qt_lay_settings_data = QHBoxLayout()
+        # qt_lay_settings_data.setMaximumHeight(155) # mmm
         qt_settings_data_directory_label = QLabel("Data directory : ")
         qt_settings_data_directory_edit = QLineEdit(settings.store_data_json_directory)
         qt_settings_data_directory_button = QPushButton("Get")
@@ -126,6 +122,7 @@ class SettingsUI:
         ''' MySQL '''
         qt_lay_settings_sql = QFormLayout()
         qt_radio_group_sql = QGroupBox()
+        qt_radio_group_sql.setMaximumHeight(130)
         qt_radio_group_sql.setTitle("MySQL settings (available in the Pro version)")
         qt_radio_group_sql.setEnabled(False)
 
@@ -158,6 +155,7 @@ class SettingsUI:
         ''' Users '''
         qt_lay_settings_user = QFormLayout()
         qt_radio_group_user = QGroupBox()
+        qt_radio_group_user.setMaximumHeight(130)
         qt_radio_group_user.setTitle("User settings (available in the Pro version)")
         qt_radio_group_user.setEnabled(False)
 
@@ -180,6 +178,7 @@ class SettingsUI:
         ''' Colors '''
         qt_button_group_colors = QButtonGroup()
         qt_radio_group_colors = QGroupBox()
+        qt_radio_group_colors.setMaximumHeight(55)
         qt_radio_group_colors.setTitle("Colors")
         qt_lay_settings_colors = QHBoxLayout()
 
@@ -236,6 +235,7 @@ class SettingsUI:
         ''' Debug level '''
         qt_button_group_debug_level = QButtonGroup()
         qt_radio_group_debug_level = QGroupBox()
+        qt_radio_group_debug_level.setMaximumHeight(55)
         qt_radio_group_debug_level.setTitle("Debug level")
         qt_lay_settings_debug_level = QHBoxLayout()
 
@@ -282,17 +282,17 @@ class SettingsUI:
         qt_radio_mode_db_6.clicked.connect(lambda: self.on_clicked_radio_debug_level(6))
 
 
-
-
         ''' Info '''
         qt_lay_settings_info = QFormLayout()
         qt_radio_group_info = QGroupBox()
+        #qt_radio_group_info.setMaximumHeight(55)
         qt_radio_group_info.setTitle("Support and updates")
         qt_label_info = QLabel("              www.simbatch.com ")
         qt_lay_settings_info.addWidget(qt_label_info)
         qt_radio_group_info.setLayout(qt_lay_settings_info)
 
         qt_lay_settings_buttons = QHBoxLayout()
+        qt_lay_settings_buttons.setContentsMargins(40, 4, 40, 13)
 
         qt_cb_always_on_top = QCheckBox("Always on top")
         if settings.always_on_top:
@@ -306,13 +306,16 @@ class SettingsUI:
 
         qt_lay_settings_main.addWidget(qt_radio_group_mode)
         # qt_lay_settings_main.addWidget(qt_radio_group_structure)
+        # qt_lay_settings_main.addStretch()
         qt_lay_settings_main.addWidget(qt_radio_group_colors)
+        qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         qt_lay_settings_main.addWidget(qt_radio_group_sql)
         qt_lay_settings_main.addWidget(qt_radio_group_user)
-        qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         qt_lay_settings_main.addWidget(qt_radio_group_info)
         qt_lay_settings_main.addItem(QSpacerItem(1, 22))
-        qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
+
+        qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
+        # qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
 
     def on_click_radio_data(self, index):
         #  PRO version sql

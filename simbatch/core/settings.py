@@ -23,6 +23,7 @@ class Settings:
 
     # fundamental settings (config.ini)
     current_os = -1
+    current_os_dir_separator = "/"
     store_data_mode = None                      # 1 json     2 MySQL (PRO version)
     debug_level = None                          # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
     store_data_json_directory = None            # dir basic config settings (def:config.ini)

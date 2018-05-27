@@ -265,6 +265,7 @@ class MainWindow(QMainWindow):
         if self.sts.window is not None:       # if None settings not loaded
             self.sts.window[2] = new_size.width()
             self.sts.window[3] = new_size.height()
+            self.set_ui.resize_settings_widget(self.sts.window[2])
 
     def moveEvent(self, event):              # PySide  moveEvent
         self.on_move_window(event)

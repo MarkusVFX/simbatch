@@ -29,11 +29,11 @@ class SimBatch:
         if os is None:
             self.os = platform.system()
             if self.os == "Windows":
-                self.os = "win"
+                self.os = "w"
             elif self.os == "Linux":
-                self.os = "lnx"
+                self.os = "l"
             else:
-                self.os = "undefined"
+                self.os = None
 
         # abbreviation for very often used variables, helping with identification the main modules
         self.usr = Users(self)         # usr

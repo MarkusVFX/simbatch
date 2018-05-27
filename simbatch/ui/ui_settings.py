@@ -20,6 +20,8 @@ class SettingsUI:
     sample_data_state = False
     batch = None
     top_ui = None
+    qt_scroll_widget = None
+    scroll_margin = 24   # scroll child widget margin, used on init and resize
 
     def __init__(self, batch, mainw, top_ui):
         settings = batch.sts
@@ -30,7 +32,25 @@ class SettingsUI:
         self.comfun = batch.comfun
 
         qt_widget_settings = QWidget()
+        # qt_widget_settings.setBackgroundRole( QPalette.Mid ) ## QPalette.Dark    # TODO
         self.qt_widget_settings = qt_widget_settings
+        qt_scroll_area = QScrollArea()
+
+        qt_lay_scroll_and_buttons = QVBoxLayout()  #  layout for  scroll   and   bottom buttons
+        qt_lay_scroll_and_buttons.addWidget(qt_scroll_area)
+        qt_widget_settings.setLayout(qt_lay_scroll_and_buttons)
+        self.qt_widget_settings = qt_widget_settings
+
+        qt_lay_scroll_and_buttons.setContentsMargins(0, 0, 0, 0)
+
+
+        qt_lay_settings_main = QVBoxLayout()  ###  main lay !
+        qt_scroll_widget = QWidget()
+        self.qt_scroll_widget = qt_scroll_widget
+        qt_scroll_widget.setMinimumWidth(self.settings.window[2]-self.scroll_margin)   #   400
+        qt_scroll_widget.setMinimumHeight(self.settings.window[3])  #   700
+        qt_scroll_area.setWidget(qt_scroll_widget)
+        qt_scroll_widget.setLayout(qt_lay_settings_main)
 
         qt_lay_settings_main = QVBoxLayout(qt_widget_settings)
 
@@ -380,6 +400,9 @@ class SettingsUI:
         self.batch.logger.inf(("Cleared sample data"))
         self.mainw.refresh_ui_with_reload_data()
 
+    def resize_settings_widget(self, val):
+        self.qt_scroll_widget.setMinimumWidth(val-self.scroll_margin)
+        self.qt_scroll_widget.setMaximumWidth(val-self.scroll_margin)
 
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())
@@ -396,3 +419,4 @@ class SettingsUI:
                 self.batch.logger.err(("Wrong definitions path, directory not exist  :",definitions_path))
         else:
             self.batch.logger.err((" Wrong data path, directory not exist :",data_path))
+        self.resize_settings_widget(self.settings.window[2])

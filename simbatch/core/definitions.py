@@ -27,9 +27,7 @@ ACTION_ITEM_FIELDS_NAMES = [
     ('desc', 'description')]
 
 
-
 class ExampleInteractions:
-
     def __init__(self):
         self.load()
 
@@ -110,7 +108,6 @@ class SingleDefinition:
 
     def get_prev_ext(self):
         return self.prev_ext
-
 
 
 class Definitions:
@@ -283,7 +280,7 @@ class Definitions:
                                         new_action = SingleAction(li['name'], li['desc'], li['default'],
                                                                   li['template'], ui=li_ui)
                                         if "params" in li:
-                                            new_action.parameters = ag["params"]
+                                            new_action.parameters = li["params"]
                                         new_group_action.add_single_action(new_action)
 
                                     elif li['type'] == "multi":

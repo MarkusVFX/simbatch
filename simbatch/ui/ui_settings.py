@@ -281,7 +281,6 @@ class SettingsUI:
         qt_radio_mode_db_5.clicked.connect(lambda: self.on_clicked_radio_debug_level(5))
         qt_radio_mode_db_6.clicked.connect(lambda: self.on_clicked_radio_debug_level(6))
 
-
         ''' Info '''
         qt_lay_settings_info = QFormLayout()
         qt_radio_group_info = QGroupBox()
@@ -339,7 +338,7 @@ class SettingsUI:
         self.settings.debug_level = level
         self.batch.logger.console_level = level
         self.batch.logger.db(("on_clicked_debug_level", level))
-        if level >= 4 and prev_lvl < 4:     #  show db UI elements
+        if level >= 4 and prev_lvl < 4:     # show db UI elements
             self.mainw.top_ui.qt_but_print_general.show()
             self.mainw.top_ui.qt_but_print_details.show()
             self.mainw.top_ui.qt_but_debug.show()
@@ -350,8 +349,7 @@ class SettingsUI:
             self.mainw.top_ui.qt_but_debug.hide()
             self.mainw.qt_tab_widget.removeTab(5)
 
-
-    def on_changed_always_on_top(self, state):   #  state values 0 or 2  !
+    def on_changed_always_on_top(self, state):   # state values 0 or 2  !
         if state:
             self.settings.always_on_top = True
             self.mainw.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -390,7 +388,7 @@ class SettingsUI:
         batch.tsk.create_example_tasks_data(do_save=True)
         # batch.que.createSampleData(taskID, projID)  # TODO
         # batch.nod.createSampleData()  # TODO
-        self.batch.logger.inf(("Created sample data"))
+        self.batch.logger.inf("Created sample data")
         self.mainw.refresh_ui_with_reload_data()
 
     def on_click_clear_all_data(self):
@@ -400,7 +398,7 @@ class SettingsUI:
         batch.tsk.clear_all_tasks_data(clear_stored_data=True)
         # batch.que.clearSampleData(taskID, projID)  # TODO
         # batch.nod.clearSampleData()  # TODO
-        self.batch.logger.inf(("Cleared sample data"))
+        self.batch.logger.inf("Cleared sample data")
         self.mainw.refresh_ui_with_reload_data()
 
     def resize_settings_widget(self, val):
@@ -410,7 +408,7 @@ class SettingsUI:
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())
         definitions_path = str(self.qt_settings_definitions_directory_edit.text())
-        self.batch.logger.db(("Save settings data_path :",data_path))
+        self.batch.logger.db(("Save settings data_path :", data_path))
         if self.comfun.path_exists(data_path, info="Data Path"):
             if self.comfun.path_exists(definitions_path, info="Definitions Path"):
                 self.settings.store_data_json_directory = data_path
@@ -419,7 +417,7 @@ class SettingsUI:
                 self.settings.save_settings()
             else:
                 print " [ERR] wrong definitions path !!!"
-                self.batch.logger.err(("Wrong definitions path, directory not exist  :",definitions_path))
+                self.batch.logger.err(("Wrong definitions path, directory not exist  :", definitions_path))
         else:
-            self.batch.logger.err((" Wrong data path, directory not exist :",data_path))
+            self.batch.logger.err((" Wrong data path, directory not exist :", data_path))
         self.resize_settings_widget(self.settings.window[2])

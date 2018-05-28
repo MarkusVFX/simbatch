@@ -130,7 +130,7 @@ class AddToQueueForm (QWidget):
     def remove_all_action_widgets(self):
         # self.actionsWidgetasArray = []
         # self.actionsAllArray = []
-        while self.qt_lay_actions.count() > 0 :
+        while self.qt_lay_actions.count() > 0:
             b = self.qt_lay_actions.itemAt(0)
             b.widget().deleteLater()
             # b.deleteLater()

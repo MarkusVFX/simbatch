@@ -471,9 +471,7 @@ class SchemasUI:
             if len(new_name) > 0:
                 curr = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
                 copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, curr.project_id, "based_on",
-                                                curr.actions, curr.schema_version, curr.description)
-                                                # curr.project_name, curr.definition_id, )
-                                                # TODO    "based_on",
+                                                curr.actions, curr.schema_version, curr.description)  # TODO "based_on"
                 self.on_click_add_schema(copied_schema_item)
                 self.schema_form_copy.hide()
                 self.copy_form_state = 0

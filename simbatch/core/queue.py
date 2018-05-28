@@ -175,9 +175,6 @@ class Queue:
         return True
 
     def add_to_queue(self, queue_item, do_save=False):
-        queue_item
-        print "adadad " , type(queue_item)
-
         if queue_item.id > 0:
             self.max_id = queue_item.id
         else:
@@ -193,11 +190,10 @@ class Queue:
                 return False
         return queue_item.id
 
-    def generate_queue_items(self,task_id, options=None):
+    def generate_queue_items(self, task_id, options=None):
 
         print "compile2 ", task_id, options
         return self.get_blank_queue_item()
-
 
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):

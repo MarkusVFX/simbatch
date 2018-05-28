@@ -61,14 +61,13 @@ class SingleAction:
                                                                                            self.actual_value,
                                                                                            self.template)
 
-
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
         logger_raw("   action: {}   default_value: {}   actual_value: {}   template: {}".format(self.name,
-                                                                                           self.default_value,
-                                                                                           self.actual_value,
-                                                                                           self.template))
+                                                                                                self.default_value,
+                                                                                                self.actual_value,
+                                                                                                self.template))
 
         self.logger.buffering_off()
         return self.logger.get_buffer()
@@ -121,14 +120,9 @@ class MultiAction:    # old GroupedActions
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw("\n\n name:  {}     total_actions:  {} ".format(self.name, self.actions_count) )
+        logger_raw("\nname:  {}     total_actions:  {} ".format(self.name, self.actions_count))
         for i, ac in enumerate(self.actions):
-            logger_raw("  _action:  {} ".format(ac.name))
+            logger_raw("  _action:  {}    desc: {} ".format(ac.name, ac.description))
 
         self.logger.buffering_off()
         return self.logger.get_buffer()
-
-
-
-
-

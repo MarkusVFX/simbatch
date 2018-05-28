@@ -13,6 +13,7 @@ class Logger:
     log_file_path = ""
     force_add_to_log = False
     buffering = False
+    buffer = ""
 
     def __init__(self, log_level=0, console_level=3):
         if console_level is None or console_level > 4:
@@ -30,7 +31,7 @@ class Logger:
         pass
         # TODO !!!
 
-    def dispatch(self, level, message, force_print=False, raw=False, buffering=False):
+    def dispatch(self, level, message, force_print=False, raw=False):
         if self.console_level >= level or force_print:
             console_print = True
         else:
@@ -373,7 +374,7 @@ class CommonFunctions:
             self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 
-    def load_from_file(self,file_name):  # TODO rename it: load content from file
+    def load_from_file(self, file_name):  # TODO rename it: load content from file
         if self.file_exists(file_name):
             try:
                 with open(file_name, 'r') as f:

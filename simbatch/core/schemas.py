@@ -80,7 +80,6 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
     def add_action_to_schema(self, single_action_object):
         self.actions_array.append(single_action_object)
 
-
     # def actions_to_string(self):
     #     for a in self.actions_array:
     #         self.actions_string += a + "|"
@@ -197,7 +196,7 @@ class Schemas:
             self.current_schema_id = last_sch.id
             return 1
         else:
-            # TODO
+            # TODO schema_id  index !!!
             self.batch.logger.wrn("update_current_schema parameter missing !")
 
     def get_current_project_schemas_indexes(self, proj_id):

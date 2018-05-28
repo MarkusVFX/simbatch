@@ -27,7 +27,8 @@ class SingleAction:
     ui = None
 
     user_value = ""
-    logger = None
+    logger = None  # TODO  @classmethod
+
 
     def __init__(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
         # self.id = action_id
@@ -55,6 +56,13 @@ class SingleAction:
     def print_minimum(self):
         print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
 
+    @staticmethod
+    def unicode_arr_to_asci_str(arr):
+        ret = ""
+        for a in arr:
+            ret += a
+        return ret
+
     def print_action(self):
         print "   action: {}   default_value: {}   actual_value: {}   template: {}".format(self.name,
                                                                                            self.default_value,
@@ -64,10 +72,9 @@ class SingleAction:
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw("   action: {}   default_value: {}   actual_value: {}   template: {}".format(self.name,
-                                                                                                self.default_value,
-                                                                                                self.actual_value,
-                                                                                                self.template))
+        logger_raw("   action:          {}\n      default_value: {}\n      actual_value: {}\
+                   \n      template:       {}".format(self.name, self.default_value, self.actual_value,
+                                                      self.unicode_arr_to_asci_str(self.template)))
 
         self.logger.buffering_off()
         return self.logger.get_buffer()

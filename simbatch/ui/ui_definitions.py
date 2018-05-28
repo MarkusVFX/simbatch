@@ -35,7 +35,7 @@ class DefinitionsUI:
 
     def init_ui(self):
         qt_widget_definitions = QWidget()
-        qt_widget_definitions.setContentsMargins(20, 20, 20, 20)
+        qt_widget_definitions.setContentsMargins(0, 0, 0, 0)
 
         self.qt_widget_definitions = qt_widget_definitions
 
@@ -55,32 +55,37 @@ class DefinitionsUI:
         self.qt_definitions_tree = qt_definitions_tree
         qt_tree_lay.addWidget(qt_definitions_tree)
 
-        qt_print_lay = QHBoxLayout()
+        qt_print_lay = QVBoxLayout()
+        qt_print_lay_A = QHBoxLayout()
+        qt_print_lay_B = QHBoxLayout()
         # current_name = EditLineWithButtons("Project Name:", label_minimum_size=94)
         qt_current = EditLineWithButtons("Current:")
         self.qt_current = qt_current
-        qt_print_base = ButtonOnLayout("Definitons", width=90)
-        qt_print_current = ButtonOnLayout("Print Current", width=80)
-        qt_print_all = ButtonOnLayout("Print ALL", width=80)
-        qt_clear_info = ButtonOnLayout("Clear Info", width=80)
+        qt_print_base = ButtonOnLayout("Definitons")
+        qt_print_current = ButtonOnLayout("Print Current")
+        qt_print_all = ButtonOnLayout("Print ALL")
+        qt_clear_info = ButtonOnLayout("Clear Info")
 
         qt_print_base.button.clicked.connect(self.on_click_print_base)
         qt_print_current.button.clicked.connect(self.on_click_print_current)
         qt_print_all.button.clicked.connect(self.on_click_print_all)
         qt_clear_info.button.clicked.connect(self.on_click_clear_info)
 
-        self.comfun.add_layouts(qt_print_lay, [qt_current.qt_widget_layout,
-                                               qt_print_base.qt_widget_layout,
-                                               qt_print_current.qt_widget_layout,
-                                               qt_print_all.qt_widget_layout,
-                                               qt_clear_info.qt_widget_layout])
+        self.comfun.add_layouts(qt_print_lay_A, [qt_current.qt_widget_layout])
+        self.comfun.add_layouts(qt_print_lay_B, [qt_print_current.qt_widget_layout,
+                                                 qt_print_base.qt_widget_layout,
+                                                 qt_print_all.qt_widget_layout,
+                                                 qt_clear_info.qt_widget_layout])
+        qt_print_lay.addLayout(qt_print_lay_A)
+        qt_print_lay.addLayout(qt_print_lay_B)
+
         qt_show_lay = QVBoxLayout()
         qt_definition_content = QTextEdit()
         qt_definition_content.setText("Definition detailed info:")
         self.qt_definition_content = qt_definition_content
         qt_show_lay.addWidget(qt_definition_content)
 
-        self.comfun.add_layouts(qt_lay_definitions_main, [qt_tree_lay, qt_print_lay, qt_show_lay])
+        self.comfun.add_layouts(qt_lay_definitions_main, [qt_show_lay, qt_tree_lay, qt_print_lay])
         self.init_tree()
 
     def init_tree(self):
@@ -149,39 +154,46 @@ class DefinitionsUI:
         for d in self.dfn.definitions_array:
             self.print_to_definition_info(" _name:{} total_actions:{} names count:{}".format(d.name, d.total_actions,
                                                                                              len(d.action_names)))
+        self.qt_definition_content.append("\n\n\n")
 
     def on_click_print_current(self):
         # TODO optimize algo !
         current_str = self.qt_current.qt_edit_line.text()
-        current_str_split = current_str.split(")")
-        indexes = []
-        for i, el in enumerate(current_str_split):
-            if "(" in el:
-                index = self.comfun.int_or_val(el.split("(")[1], -1)
-                indexes.append(index)
+        if len(current_str) > 0:
+            current_str_split = current_str.split(")")
+            indexes = []
+            for i, el in enumerate(current_str_split):
+                if "(" in el:
+                    index = self.comfun.int_or_val(el.split("(")[1], -1)
+                    indexes.append(index)
 
-        self.print_to_definition_info("Current definition :  {}".format(self.dfn.definitions_names[indexes[0]]))
-        if len(indexes) > 1:
-            self.print_to_definition_info(" Current action :  {}".format(
-                self.dfn.definitions_array[indexes[0]].action_names[indexes[1]]))
-        if len(indexes) > 2:
-            self.print_to_definition_info("  Current subaction :  {}".format(
-                self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]].name))
+            self.print_to_definition_info("Current definition :  {}".format(self.dfn.definitions_names[indexes[0]]))
+            if len(indexes) > 1:
+                self.print_to_definition_info(" Current action :  {}".format(
+                    self.dfn.definitions_array[indexes[0]].action_names[indexes[1]]))
+            if len(indexes) > 2:
+                self.print_to_definition_info("  Current subaction :  {}".format(
+                    self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]].name))
 
-        if len(indexes) == 1:
-            d = self.dfn.definitions_array[indexes[0]]
-            self.qt_definition_content.append(d.print_single())
-        elif len(indexes) == 2:
-            ma = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]]
-            self.qt_definition_content.append(ma.print_actions())
+            if len(indexes) == 1:
+                d = self.dfn.definitions_array[indexes[0]]
+                self.qt_definition_content.append(d.print_single())
+            elif len(indexes) == 2:
+                ma = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]]
+                self.qt_definition_content.append(ma.print_actions())
+            else:
+                sa = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]]
+                self.qt_definition_content.append(sa.print_action())
+            self.qt_definition_content.append("\n\n\n")
         else:
-            sa = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]]
-            self.qt_definition_content.append(sa.print_action())
+            self.top_ui.set_top_info("Select element from tree view", 7)
 
     def on_click_print_all(self):
         for d in self.dfn.definitions_array:
             self.qt_definition_content.append("\n")
             self.qt_definition_content.append(d.print_single())
+
+        self.qt_definition_content.append("\n\n\n")
 
     def on_click_clear_info(self):
         self.qt_definition_content.setText("")

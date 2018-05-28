@@ -11,7 +11,6 @@ from queue import Queue
 from nodes import SimNodes
 from io import StorageInOut
 
-# I moved to LONDON :)
 
 class SimBatch:
     s = None

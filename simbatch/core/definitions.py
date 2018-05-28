@@ -27,6 +27,25 @@ ACTION_ITEM_FIELDS_NAMES = [
     ('desc', 'description')]
 
 
+
+class ExampleInteractions:
+
+    def __init__(self):
+        self.load()
+
+    @staticmethod
+    def load():
+        print " [interact example] loaded "
+
+    @staticmethod
+    def test():
+        print " [interact example] test "
+
+    @staticmethod
+    def interact_get_scene_objects():
+        print " [interact example]     def interact_get_scene_objects "
+
+
 class SingleDefinition:
     name = ""       # actions in schema are copied from definition for protect schema data if no definition
     version = 0     # version are useful for recognize exact source of definition
@@ -62,20 +81,24 @@ class SingleDefinition:
         self.print_total()
 
     def print_single(self):
+        self.logger.clear_buffer()
+        self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw("\n\n name:{} total_actions:{} names count:{}".format(self.name, self.total_actions,
-                                                                         len(self.action_names)))
+        logger_raw("\n\n name: {} total_actions: {} names count: {}".format(self.name, self.total_actions,
+                                                                            len(self.action_names)))
         for i, an in enumerate(self.action_names):
-            logger_raw("  arr action_names:{}  {} ".format(i, an))
+            logger_raw("  arr action_names: {}  {} ".format(i, an))
         for i, ga in enumerate(self.multi_actions_array):
             if ga.actions_count == len(ga.actions):
-                logger_raw("  _group_name:{} {}  count: {}".format(i, ga.name, ga.actions_count))
+                logger_raw("  _group_name: {} {}  count: {}".format(i, ga.name, ga.actions_count))
             else:
-                logger_raw("  _group_name:{} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
-                                                                               len(ga.actions)))
+                logger_raw("  _group_name: {} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
+                                                                                len(ga.actions)))
             for j, sa in enumerate(ga.actions):
-                logger_raw("    ___action {}  name:{}  default_value:{}  ui:{}".format(j, sa.name,
-                                                                                       sa.default_value, sa.ui))
+                logger_raw("    ___action {}  name: {}  default_value: {}  ui: {}".format(j, sa.name,
+                                                                                          sa.default_value, sa.ui))
+        self.logger.buffering_off()
+        return self.logger.get_buffer()
 
     def add_group_action(self, element):
         self.multi_actions_array.append(element)
@@ -88,23 +111,6 @@ class SingleDefinition:
     def get_prev_ext(self):
         return self.prev_ext
 
-
-class ExampleInteractions:
-
-    def __init__(self):
-        self.load()
-
-    @staticmethod
-    def load():
-        print " [interact example] loaded "
-
-    @staticmethod
-    def test():
-        print " [interact example] test "
-
-    @staticmethod
-    def maya_get_scene_objects():
-        print " [interact example]      def maya_get_scene_objects "
 
 
 class Definitions:

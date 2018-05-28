@@ -12,6 +12,7 @@ class Logger:
     log_file_level = 0
     log_file_path = ""
     force_add_to_log = False
+    buffering = False
 
     def __init__(self, log_level=0, console_level=3):
         if console_level is None or console_level > 4:
@@ -29,7 +30,7 @@ class Logger:
         pass
         # TODO !!!
 
-    def dispatch(self, level, message, force_print=False, raw=False):
+    def dispatch(self, level, message, force_print=False, raw=False, buffering=False):
         if self.console_level >= level or force_print:
             console_print = True
         else:
@@ -71,6 +72,9 @@ class Logger:
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)
 
+        if self.buffering is not False:
+            self.buffer += "\n"+message
+
     def err(self, message, force_print=False):
         self.dispatch(1, message, force_print=force_print)
 
@@ -88,6 +92,18 @@ class Logger:
 
     def raw(self, message):
         self.dispatch(5, message, raw=True)
+
+    def clear_buffer(self):
+        self.buffer = ""
+
+    def get_buffer(self):
+        return self.buffer
+
+    def buffering_on(self):
+        self.buffering = True
+
+    def buffering_off(self):
+        self.buffering = False
 
 
 class CommonFunctions:

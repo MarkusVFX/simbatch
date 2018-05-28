@@ -1,3 +1,5 @@
+from common import Logger
+
 
 ACTION_DATA_FIELDS_NAMES = (
     # ('id', 'id'),
@@ -13,7 +15,7 @@ ACTION_DATA_FIELDS_NAMES = (
 
 
 class SingleAction:
-    """ Single action is class for store template"""
+    """ Single action with template"""
     name = ""
     mode = None
     default_value = ""  # pattern changed when add to queue
@@ -25,6 +27,7 @@ class SingleAction:
     ui = None
 
     user_value = ""
+    logger = None
 
     def __init__(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
         # self.id = action_id
@@ -38,6 +41,8 @@ class SingleAction:
             self.actual_value = actual_value
         self.template = template
 
+        self.logger = Logger()
+
     def __repr__(self):
         return 'SingleAction("{}", "{}", "{}", "{}", actual_value="{}", ui="{}")'.format(self.name, self.description,
                                                                                          self.default_value,
@@ -48,11 +53,25 @@ class SingleAction:
         return "SingleAction"
 
     def print_minimum(self):
-        print "   action:{}   actual_value:{}".format(self.name, self.actual_value)
+        print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
 
     def print_action(self):
-        print "   action:{}   default_value:{}   actual_value:{}   template:{}".format(self.name, self.default_value,
-                                                                                       self.actual_value, self.template)
+        print "   action: {}   default_value: {}   actual_value: {}   template: {}".format(self.name,
+                                                                                           self.default_value,
+                                                                                           self.actual_value,
+                                                                                           self.template)
+
+
+        self.logger.clear_buffer()
+        self.logger.buffering_on()
+        logger_raw = self.logger.raw
+        logger_raw("   action: {}   default_value: {}   actual_value: {}   template: {}".format(self.name,
+                                                                                           self.default_value,
+                                                                                           self.actual_value,
+                                                                                           self.template))
+
+        self.logger.buffering_off()
+        return self.logger.get_buffer()
 
     def get_action(self):
         # TODO
@@ -76,11 +95,13 @@ class MultiAction:    # old GroupedActions
     name = ""
     actions = []  # one or more SingleAction objects
     actions_count = 0
+    logger = None
 
     def __init__(self, multi_id, name):
         self.multi_id = multi_id
         self.name = name
         self.actions = []
+        self.logger = Logger()
 
     def __repr__(self):
         return "MultiAction({},{})".format(self.name, self.name)
@@ -95,3 +116,19 @@ class MultiAction:    # old GroupedActions
             return True
         else:
             return False
+
+    def print_actions(self):
+        self.logger.clear_buffer()
+        self.logger.buffering_on()
+        logger_raw = self.logger.raw
+        logger_raw("\n\n name:  {}     total_actions:  {} ".format(self.name, self.actions_count) )
+        for i, ac in enumerate(self.actions):
+            logger_raw("  _action:  {} ".format(ac.name))
+
+        self.logger.buffering_off()
+        return self.logger.get_buffer()
+
+
+
+
+

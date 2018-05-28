@@ -224,7 +224,6 @@ class MainWindow(QMainWindow):
             pass
 
         if self.sts.force_start_tab > 0:
-            print "\n\n\n\n ZZZZ ZZZ ZZZ Z Z zzzzz", self.sts.force_start_tab
             qt_tab_widget.setCurrentIndex(self.sts.force_start_tab)
 
         qt_lay_central.addWidget(qt_tab_widget)

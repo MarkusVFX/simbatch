@@ -161,6 +161,8 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item = TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
 
         self.init_ui_elements(batch.sch)
+
+        self.update_schema_names_combo()
         # self.schemas_id_array = batch.sch.schemas_id_array  # TODO  visible isd  VS proj's schemas
 
     def init_ui_elements(self, sch):
@@ -239,15 +241,15 @@ class TasksFormCreateOrEdit(QWidget):
 
     def update_create_ui(self, schema_id=-1):
         self.qt_combo_state_names.setCurrentIndex(1)
-        print " update ", schema_id
+        self.batch.logger.deepdb(("update_create_ui qt_schema_name_combo.count():", self.qt_schema_name_combo.count()))
         if schema_id == -1:
-            print " ____update ", self.qt_schema_name_combo.count()
+            self.batch.logger.deepdb(("update current index:", self.qt_schema_name_combo.count() - 1))
             self.qt_schema_name_combo.setCurrentIndex(self.qt_schema_name_combo.count() - 1)
         else:
             arr_index = 0
             for arrEl in self.schemas_id_array:
                 if arrEl == schema_id:
-                    print " ____set ", arr_index
+                    self.batch.logger.deepdb(("set current index:", arr_index))
                     self.qt_schema_name_combo.setCurrentIndex(arr_index)
                 arr_index += 1
 
@@ -281,6 +283,7 @@ class TasksFormCreateOrEdit(QWidget):
 
     # update combo box after project change or schema add, rem
     def update_schema_names_combo(self, combo_current_index=None):
+        self.batch.logger.deepdb(("update_schema_names_combo", combo_current_index))
         combo_items_arr = self.mainw.sch_ui.current_project_schemas_names
         schemas_id_array = self.mainw.sch_ui.current_project_schemas_ids
 
@@ -633,7 +636,7 @@ class TasksUI:
                 curr_task = self.batch.tsk.tasks_data[self.batch.tsk.current_task_index]
                 self.qt_form_create.update_create_ui(curr_task.schema_id)
             elif self.batch.sch.current_schema_index >= 0:
-                cur_sch = self.batch.sch.schemas_data[self.batch.sch.curr_schema_index]
+                cur_sch = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
                 self.qt_form_create.update_create_ui(schema_id=cur_sch.id)
             else:
                 self.qt_form_create.update_create_ui()

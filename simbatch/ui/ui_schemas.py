@@ -109,6 +109,7 @@ class SchemasUI:
         self.init_ui()
         self.init_schemas_list()
         # self.on_click_show_form_create()
+        self.update_current_project_schemas()
 
     def init_ui(self):
         list_schemas = QListWidget()
@@ -280,8 +281,8 @@ class SchemasUI:
         self.update_current_project_schemas()
 
     def update_current_project_schemas(self):  # all current project's schemas used for drop box in create task form
-        self.current_project_schemas_ids = []
-        self.current_project_schemas_names = []
+        del self.current_project_schemas_ids[:]
+        del self.current_project_schemas_names[:]
         for schema in self.batch.sch.schemas_data:
             if schema.project_id == self.batch.prj.current_project_id:
                 self.current_project_schemas_names.append(schema.schema_name)
@@ -310,10 +311,10 @@ class SchemasUI:
         self.update_visible_schemas_ids()
 
     def on_menu_open(self):
-        current_schema_id = self.sch.list_visible_schemas_ids[self.sch.current_schema_list_index]
-        self.batch.logger.db(("list_schemas_double_clicked :", current_schema_id))
-        sch = self.sch.get_schema_by_id(current_schema_id)
-        self.load_base_setup(sch.schema_name, sch.schemaVersion)
+        current_schema_id = self.sch.current_schema_id
+        self.batch.logger.db((" [WIP] double clicked  schema id :", current_schema_id))
+        # sch = self.sch.get_schema_by_id(current_schema_id)
+        # self.load_base_setup(sch.schema_name, sch.schemaVersion) TO DO move to interactions
 
     def on_menu_save_as_next_version(self):
         cur_sch_index = self.batch.sch.current_schema_index
@@ -578,7 +579,7 @@ class SchemasUI:
             self.batch.logger.err(("loadFile: ", file_to_load))
 
     def on_list_schemas_double_clicked(self, item):
-        self.batch.logger.db(("list_schemas_double_clicked: ", self.sch.current_schema_list_index, item))
+        self.batch.logger.db(("list_schemas_double_clicked: ", self.sch.current_schema_id, item))
         self.on_menu_open()
 
     def on_list_schemas_current_changed(self, current_row):

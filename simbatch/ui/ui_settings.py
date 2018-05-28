@@ -40,11 +40,11 @@ class SettingsUI:
         qt_widget_settings.setLayout(qt_lay_scroll_and_buttons)
         qt_lay_scroll_and_buttons.setContentsMargins(0, 0, 0, 0)
 
-        qt_lay_settings_main = QVBoxLayout()  #   layout for group boxes  !
+        qt_lay_settings_main = QVBoxLayout()      #   layout for group boxes
         qt_scroll_widget = QWidget()
         self.qt_scroll_widget = qt_scroll_widget
         qt_scroll_widget.setMinimumWidth(self.settings.window[2]-self.scroll_margin)
-        qt_scroll_widget.setMinimumHeight(self.settings.window[3])
+        qt_scroll_widget.setMinimumHeight(650)
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
 

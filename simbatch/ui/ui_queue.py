@@ -243,7 +243,7 @@ class QueueUI:
         self.freeze_list_on_changed = 1
         index = self.batch.que.current_queue_index
         self.clear_list()
-        self.batch.init_queue(self.list_queue)
+        self.batch.init_queue(self.list_queue)   # TODO check
         self.batch.que.current_queue_index = index
         self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
         self.freeze_list_on_changed = 0
@@ -251,6 +251,11 @@ class QueueUI:
     def update_all_queue(self):
         self.clear_list()
         self.init_queue_items()
+
+    def reload_tasks_data_and_refresh_list(self):
+        self.batch.que.clear_all_queue_items()
+        self.batch.que.load_queue()
+        self.reset_list()
 
     def _change_current_queue_item_state_and_reset_list(self, state_id):
         self.batch.que.current_queue.state = self.sts.states_visible_names[state_id]

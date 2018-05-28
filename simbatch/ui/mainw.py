@@ -184,10 +184,12 @@ class MainWindow(QMainWindow):
         self.sch_ui = SchemasUI(batch, self, top)
         self.tsk_ui = TasksUI(batch, self, top)
         self.que_ui = QueueUI(batch, self, top)
-        # self.nod_ui = NodesUI(batch, self, top)
+        # self.nod_ui = NodesUI(batch, self, top)     #  PRO version
 
         self.set_ui = SettingsUI(batch, self, top)
         self.dfn_ui = DefinitionsUI(batch, self, top)
+
+        #
 
         #  TABs
         #  TABs   TABs
@@ -211,24 +213,25 @@ class MainWindow(QMainWindow):
                 if self.sts.ui_edition_mode == 0:
                     qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB
                 else:
-                    qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB (Pro version)
+                    qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB (PRO version)
             else:
                 if self.sts.ui_edition_mode == 0:
                     qt_tab_widget.setCurrentIndex(4)  # NO data dir : show settings
                 else:
-                    qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings  (Pro version)
+                    qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings  (PRO version)
 
         else:
-            # PRO version
+            # PRO version  with SQL
             pass
 
         qt_lay_central.addWidget(qt_tab_widget)
         qt_central_widget.setLayout(qt_lay_central)
         qt_tab_widget.currentChanged.connect(self.on_tab_change)
 
-        # after init main window and load settings and data
+        # status after init main window and load settings and data
         if self.sts.loading_state < 3:
-            top.set_top_info("Settings not loaded properly", 7)
+            top.set_top_info("Settings loaded not properly", 7)
+            self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state))
 
     def on_tab_change(self, tab):
         self.batch.logger.inf(("tab change: ", tab))
@@ -293,8 +296,8 @@ class MainWindow(QMainWindow):
         self.batch.logger.inf("reload TASKS")
         self.tsk_ui.reload_tasks_data_and_refresh_list()
 
-        # self.batch.logger.inf("reload QUEUE")
-        # self.que_ui
+        self.batch.logger.inf("reload QUEUE")
+        self.que_ui
 
         # self.batch.logger.inf("reload SIMNODES")
         # self.nod_ui

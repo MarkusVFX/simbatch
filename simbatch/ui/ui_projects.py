@@ -542,12 +542,16 @@ class ProjectsUI:
             self.remove_form_state = 0
 
     def update_sch_after_proj_changed(self):
+        self.batch.logger.deepdb(("update_sch_after_proj_changed"))
         self.mainw.sch_ui.current_of_visible_schema_index = None
         self.mainw.sch_ui.last_schema_list_index = None
         self.mainw.sch_ui.reset_list()
         self.batch.sch.update_current_from_index(None)
+        self.mainw.sch_ui.update_current_project_schemas()
+
 
     def update_tsk_after_proj_changed(self):
+        self.batch.logger.deepdb(("update_tsk_after_proj_changed"))
         self.batch.tsk.currentTaskID = None
         self.batch.tsk.currentTaskIndex = None
         self.batch.tsk.currentTaskListIndex = None
@@ -556,6 +560,9 @@ class ProjectsUI:
         tsk_ui.qt_form_edit.update_schema_names_combo(combo_current_index=0)
         tsk_ui.update_all_tasks()
         tsk_ui.update_list_of_visible_ids()
+        tsk_ui.qt_form_create.update_schema_names_combo()
+        tsk_ui.qt_form_edit.update_schema_names_combo()
+
 
     def on_list_current_changed(self, current_row):
         if self.freeze_list_on_changed == 1:

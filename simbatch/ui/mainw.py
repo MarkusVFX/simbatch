@@ -219,10 +219,13 @@ class MainWindow(QMainWindow):
                     qt_tab_widget.setCurrentIndex(4)  # NO data dir : show settings
                 else:
                     qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings  (PRO version)
-
         else:
             # PRO version  with SQL
             pass
+
+        if self.sts.force_start_tab > 0:
+            print "\n\n\n\n ZZZZ ZZZ ZZZ Z Z zzzzz", self.sts.force_start_tab
+            qt_tab_widget.setCurrentIndex(self.sts.force_start_tab)
 
         qt_lay_central.addWidget(qt_tab_widget)
         qt_central_widget.setLayout(qt_lay_central)

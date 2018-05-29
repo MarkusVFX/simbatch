@@ -96,7 +96,7 @@ class TopMenuUI:
         self.qt_lbl_info.setText(txt)
         if self.current_top_info_mode != mode:
             if self.batch.sts.ui_brightness_mode == 1:
-                if mode == 1:
+                if mode < 6:
                     self.qt_lbl_info.setStyleSheet("")
                 if mode == 7:
                     self.qt_lbl_info.setStyleSheet("""color:#000000;background-color:#ffdc1a;""")
@@ -105,7 +105,7 @@ class TopMenuUI:
                 if mode == 9:
                     self.qt_lbl_info.setStyleSheet("""color:#000000;background-color:#ff4422;""")
             else:
-                if mode == 1:
+                if mode < 6:
                     self.qt_lbl_info.setStyleSheet("")
                 if mode == 7:
                     self.qt_lbl_info.setStyleSheet("""background-color:#f2dc1a;""")
@@ -235,6 +235,17 @@ class MainWindow(QMainWindow):
             top.set_top_info("Settings loaded not properly", 7)
             self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state))
 
+    def post_run(self, loading_data_state):  # show welcome message or error info
+        if loading_data_state is True:
+            self.top_ui.set_top_info(self.batch.sts.random_welcome_message())
+        elif loading_data_state is False:
+            self.top_ui.set_top_info("Settings not loaded config.ini file not exists!", 9)
+        else:
+            if loading_data_state == 1:
+                self.top_ui.set_top_info("Loaded with one data error")
+            else:
+                selt.top_ui.set_top_info("Loaded with data errors ({})".format(loading_data_state))
+
     def on_tab_change(self, tab):
         self.batch.logger.inf(("tab change: ", tab))
 
@@ -299,7 +310,7 @@ class MainWindow(QMainWindow):
         self.tsk_ui.reload_tasks_data_and_refresh_list()
 
         self.batch.logger.inf("reload QUEUE")
-        self.que_ui
+        #self.que_ui      # TODO reload !!!
 
         # self.batch.logger.inf("reload SIMNODES")
         # self.nod_ui

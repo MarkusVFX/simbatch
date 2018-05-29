@@ -33,7 +33,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.16"   # current version
+    SIMBATCH_VERSION = "v0.2.18"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -230,7 +230,7 @@ class Settings:
                     print " [WRN] json data inconsistency:", self.ini_file
                     self.loading_state = 2
         else:
-            print " [ERR] ini file not exists: ", self.ini_file
+            print " [ERR] config.ini file not exists: ", self.ini_file
             self.loading_state = -1
 
     def save_settings(self, settings_file=""):

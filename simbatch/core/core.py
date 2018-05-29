@@ -128,31 +128,34 @@ class SimBatch:
         return counter
 
     def load_data(self):
-        ret_def = self.dfn.load_definitions()
-        ret_prj = self.prj.load_projects()
-        if ret_prj is not False:
-            self.prj.init_default_proj()
-            ret_sch = self.sch.load_schemas()
-            if ret_sch is not False:
-                ret_tsk = self.tsk.load_tasks()
-                if ret_tsk is not False:
-                    # count number errors while of loading external data
-                    loading_err_count = 0
-                    loading_err_count = self.check_is_number_of_errors(ret_def, loading_err_count, "definitions")
-                    loading_err_count = self.check_is_number_of_errors(ret_prj, loading_err_count, "project")
-                    loading_err_count = self.check_is_number_of_errors(ret_sch, loading_err_count, "schemas")
-                    loading_err_count = self.check_is_number_of_errors(ret_tsk, loading_err_count, "tsks")
+        if self.sts.loading_state >= 3:
+            ret_def = self.dfn.load_definitions()
+            ret_prj = self.prj.load_projects()
+            if ret_prj is not False:
+                self.prj.init_default_proj()
+                ret_sch = self.sch.load_schemas()
+                if ret_sch is not False:
+                    ret_tsk = self.tsk.load_tasks()
+                    if ret_tsk is not False:
+                        # count number errors while of loading external data
+                        loading_err_count = 0
+                        loading_err_count = self.check_is_number_of_errors(ret_def, loading_err_count, "definitions")
+                        loading_err_count = self.check_is_number_of_errors(ret_prj, loading_err_count, "project")
+                        loading_err_count = self.check_is_number_of_errors(ret_sch, loading_err_count, "schemas")
+                        loading_err_count = self.check_is_number_of_errors(ret_tsk, loading_err_count, "tsks")
 
-                    if loading_err_count == 0:
-                        return True
+                        if loading_err_count == 0:
+                            return True
+                        else:
+                            return loading_err_count
                     else:
-                        return loading_err_count
+                        return -1
                 else:
-                    return -1
+                    return -2
             else:
-                return -2
+                return -3
         else:
-            return -3
+            return False
 
     def create_example_data(self):
         self.prj.create_example_project_data()

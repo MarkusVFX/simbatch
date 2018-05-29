@@ -10,6 +10,7 @@ except ImportError:
         print "PySide import ERROR"
 
 from widgets import *
+import os
 
 
 class SettingsUI:
@@ -35,18 +36,34 @@ class SettingsUI:
         self.qt_widget_settings = qt_widget_settings
         # qt_widget_settings.setBackgroundRole( QPalette.Mid ) # QPalette.Dark    # TODO  colors schema
         qt_scroll_area = QScrollArea()
-        qt_lay_scroll_and_buttons = QVBoxLayout()  #  layout for  scroll   and   bottom buttons
+        qt_lay_scroll_and_buttons = QVBoxLayout()  # layout for  scroll   and   bottom buttons
         qt_lay_scroll_and_buttons.addWidget(qt_scroll_area)
         qt_widget_settings.setLayout(qt_lay_scroll_and_buttons)
         qt_lay_scroll_and_buttons.setContentsMargins(0, 0, 0, 0)
 
-        qt_lay_settings_main = QVBoxLayout()      #   layout for group boxes
+        qt_lay_settings_main = QVBoxLayout()      # layout for group boxes
         qt_scroll_widget = QWidget()
         self.qt_scroll_widget = qt_scroll_widget
-        qt_scroll_widget.setMinimumWidth(self.settings.window[2]-self.scroll_margin)
+        if settings.window is not None:
+            qt_scroll_widget.setMinimumWidth(settings.window[2]-self.scroll_margin)
+        else:
+            qt_scroll_widget.setMinimumWidth(400)
         qt_scroll_widget.setMinimumHeight(650)
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
+
+        ''' CONFIG INI '''
+        qt_lay_config_ini = QVBoxLayout()
+        qt_group_config_ini = QGroupBox()
+        qt_group_config_ini.setMaximumHeight(70)
+        qt_group_config_ini.setTitle("Config file:")
+        elwb_config_ini = EditLineWithButtons(settings.ini_file, edit_text_string=None, text_on_button_1="Test Data",
+                                              text_on_button_2="Test Acces", button_width=70)
+
+        elwb_config_ini.button_1.clicked.connect(self.test_data_config_ini)
+        elwb_config_ini.button_2.clicked.connect(self.test_acces_config_ini)
+        qt_lay_config_ini.addLayout(elwb_config_ini.qt_widget_layout)
+        qt_group_config_ini.setLayout(qt_lay_config_ini)
 
         ''' MODE '''
         qt_button_group_data = QButtonGroup()
@@ -284,7 +301,6 @@ class SettingsUI:
         ''' Info '''
         qt_lay_settings_info = QFormLayout()
         qt_radio_group_info = QGroupBox()
-        #qt_radio_group_info.setMaximumHeight(55)
         qt_radio_group_info.setTitle("Support and updates")
         qt_label_info = QLabel("              www.simbatch.com ")
         qt_lay_settings_info.addWidget(qt_label_info)
@@ -303,6 +319,7 @@ class SettingsUI:
         qt_button_save.clicked.connect(self.on_click_save_settings)
         qt_lay_settings_buttons.addWidget(qt_button_save)
 
+        qt_lay_settings_main.addWidget(qt_group_config_ini)
         qt_lay_settings_main.addWidget(qt_radio_group_mode)
         # qt_lay_settings_main.addWidget(qt_radio_group_structure)
         # qt_lay_settings_main.addStretch()
@@ -315,6 +332,55 @@ class SettingsUI:
 
         qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
         # qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
+
+    def test_data_config_ini(self):
+        if self.test_exist_config_ini():
+            ini = self.comfun.load_from_file(self.settings.ini_file)
+            # print "RAW config:\n ", ini
+            self.batch.logger.inf(("RAW config: ", ini))
+
+            ini_content = self.comfun.load_json_file(self.settings.ini_file)
+            vars_count = 0
+            if ini_content is not None:
+                ini_elements = ["colorMode", "dataMode", "debugLevel", "sql", "storeData", "window"]
+                for ie in ini_elements:
+                    if ie in ini_content.keys():
+                        vars_count += 1
+                    else:
+                        self.batch.logger.err(("missing key in config file ", ie))
+                        print "missing key : ", ie
+                if vars_count == len(ini_elements):
+                    self.top_ui.set_top_info("config.ini OK ", 4)
+                else:
+                    self.top_ui.set_top_info("config.ini missing keys, more info in log ", 8)
+            else:
+                self.top_ui.set_top_info("config.ini wrong format ! ", 8)
+
+    def test_acces_config_ini(self):
+        if self.test_exist_config_ini:
+            ret_W = os.access(self.settings.ini_file, os.W_OK)
+            if ret_W:
+                self.top_ui.set_top_info("config.ini is writable ", 4)
+            else:
+                ret_R = os.access(self.settings.ini_file, os.R_OK)
+                if ret_R:
+                    self.top_ui.set_top_info("config.ini is only readable ", 4)
+                else:
+                    self.top_ui.set_top_info("No access to config.ini", 7)
+
+    def test_exist_config_ini(self):
+        ret_d = self.comfun.path_exists(self.comfun.get_path_from_full(self.settings.ini_file), info="config.ini dir")
+        if ret_d:
+            ret_f = self.comfun.file_exists(self.settings.ini_file, info="config.ini")
+            if ret_f:
+                self.top_ui.set_top_info("config.ini exist ", 4)
+                return True
+            else:
+                self.top_ui.set_top_info("config.ini file not exist !", 9)
+                return False
+        else:
+            self.top_ui.set_top_info("config.ini dir not exist !", 9)
+            return False
 
     def on_click_radio_data(self, index):
         #  PRO version sql

@@ -64,11 +64,12 @@ class EditLineWithButtons:
     def __init__(self, label_text, edit_text_string="", label_minimum_size=0, text_on_button_1="", text_on_button_2="",
                  button_width=0, align_right=0, edit_minimum_size=0, edit_maximum_size=0):
         self.qt_widget_layout = QHBoxLayout()
-        self.qt_edit_line = QLineEdit(edit_text_string)
-        if edit_minimum_size > 0:
-            self.qt_edit_line.setMinimumWidth(edit_minimum_size)
-        if edit_maximum_size > 0:
-            self.qt_edit_line.setMaximumWidth(edit_maximum_size)
+        if edit_text_string is not None:
+            self.qt_edit_line = QLineEdit(edit_text_string)
+            if edit_minimum_size > 0:
+                self.qt_edit_line.setMinimumWidth(edit_minimum_size)
+            if edit_maximum_size > 0:
+                self.qt_edit_line.setMaximumWidth(edit_maximum_size)
 
         if len(label_text) > 0:
             label = QLabel(label_text)
@@ -78,7 +79,8 @@ class EditLineWithButtons:
             if align_right == 1:
                 label.setAlignment(Qt.AlignRight)
             self.qt_widget_layout.addWidget(label)
-        self.qt_widget_layout.addWidget(self.qt_edit_line)
+        if edit_text_string is not None:
+            self.qt_widget_layout.addWidget(self.qt_edit_line)
 
         if len(text_on_button_1) > 0:
             self.button_1 = QPushButton(text_on_button_1)

@@ -376,33 +376,34 @@ class ProjectsUI:
         if self.batch.prj.current_project_index >= 0:
             force_start_dir = self.batch.prj.projects_data[self.batch.prj.current_project_index].project_directory
 
-        ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir)
+        sep = self.sts.dir_separator
+        ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir, dir_separator=sep)
         if len(ret) > 0:
-            self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, ret + "FX\\")  # TODO user cfg FX
-            self.comfun.if_empty_put_text(self.wfa_cam_dir_edit.qt_edit_line, ret + "cam\\")     # TODO user cfg cam
-            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "ani\\")     # TODO user cfg ani
-            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "env\\")     # TODO user cfg ani
+            self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, ret + "FX" + sep)  # TODO user cfg FX
+            self.comfun.if_empty_put_text(self.wfa_cam_dir_edit.qt_edit_line, ret + "cam" + sep)     # TODO user cfg cam
+            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "ani" + sep)     # TODO user cfg ani
+            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "env" + sep)    # TODO user cfg ani
 
     def fa_get_working_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     def fa_get_cam_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     def fa_get_cache_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     def get_dialog_project_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     def get_dialog_working_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     def get_dialog_cam_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     def get_dialog_anicache_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
 
     #  Add
     #  Add  Add

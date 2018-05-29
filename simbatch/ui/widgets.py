@@ -321,7 +321,8 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
 
     def defined_button_get_directory(self):           # QFileDialog - protect common function to be independent library
         ret_dir = self.comfun.get_dialog_directory(self.qt_edit, QFileDialog,
-                                                   force_start_dir=self.batch.prj.current_project.project_directory)
+                                                   force_start_dir=self.batch.prj.current_project.project_directory,
+                                                   dir_separator=self.sts.dir_separator)
         return ret_dir
 
     def defined_button_show_info(self, info):

@@ -22,8 +22,8 @@ class Settings:
     json_settings_data = None       # basic config data
 
     # fundamental settings (config.ini)
-    current_os = -1
-    current_os_dir_separator = "/"
+    current_os = -1                             # 1 Linux, 2 windoza   detected on __init__ or forced by force_os
+    dir_separator = ""                          # set on __init__   depend on  current_os
     store_data_mode = None                      # 1 json     2 MySQL (PRO version)
     debug_level = None                          # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
     store_data_json_directory = None            # dir basic config settings (def:config.ini)
@@ -135,6 +135,10 @@ class Settings:
                 self.current_os = 2
         else:
             self.current_os = force_os
+        if self.current_os == 1:
+            self.dir_separator = "/"
+        else:
+            self.dir_separator = "\\"
 
         self.runtime_env = runtime_env
         self.ini_file = ini_file
@@ -254,7 +258,7 @@ class Settings:
         self.default_settings["window"]["alwaysOnTop"] = self.always_on_top
 
         if len(settings_file) == 0:
-            settings_file = comfun.current_scripts_path() + "config.ini"  # JSON format
+            settings_file = self.ini_file  # JSON format
         comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True))
         print ' [INF] settings saved to: ', settings_file
 

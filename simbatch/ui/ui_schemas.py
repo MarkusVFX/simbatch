@@ -514,7 +514,10 @@ class SchemasUI:
         self.list_schemas.setItemWidget(list_item, list_item_widget)
         self.batch.logger.db(("add schema:", new_schema_item.schema_name,
                               "   to proj :", self.batch.prj.current_project_id))
-        sch_dir = self.batch.prj.current_project.working_directory_absolute + new_schema_item.schema_name + "\\"
+
+        sch_dir = self.batch.prj.current_project.working_directory_absolute
+        sch_dir += new_schema_item.schema_name + self.sts.dir_separator
+
         self.batch.sio.create_schema_directory(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):

@@ -142,11 +142,14 @@ class MainWindow(QMainWindow):
         self.init_ui(batch)
 
     def init_ui(self, batch):
-        user32 = ctypes.windll.user32
-        wnd = self.sts.window
-        current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
-        current_screen_height = user32.GetSystemMetrics(79)   # SM_CYVIRTUALSCREEN
+        current_screen_width = 800     #  TODO detect linux
+        current_screen_height = 600    #  TODO detect linux
+        if self.sts.current_os == 2:
+            user32 = ctypes.windll.user32
+            current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
+            current_screen_height = user32.GetSystemMetrics(79)   # SM_CYVIRTUALSCREEN
 
+        wnd = self.sts.window
         if wnd is not None and len(wnd) == 4:
             x_wnd_pos = wnd[0]
             y_wnd_pos = wnd[1]

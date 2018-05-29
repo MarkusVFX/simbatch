@@ -310,7 +310,7 @@ class CommonFunctions:
                     else:
                         self.logger.err(("drive: ", directory[0], " NOT EXIST !!!"))
                         return False
-                else:  # TODO test server \\
+                else:  # linux /     or     win server \\
                     os.makedirs(directory)
                     return True
             else:
@@ -349,6 +349,8 @@ class CommonFunctions:
             if check_path[1] == ":" and check_path[2] == "/":
                 return True
             if check_path[0] == "\\" and check_path[1] == "\\":
+                return True
+            if check_path[0] == "/":
                 return True
         return False
 
@@ -417,7 +419,7 @@ class CommonFunctions:
         for ar in arr:
             lay.addLayout(ar)
 
-    def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir=""):
+    def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir="", dir_separator="/"):
         start_dir = ""
         if len(force_start_dir) > 0:
             start_dir = force_start_dir
@@ -426,11 +428,10 @@ class CommonFunctions:
                 start_dir = qt_edit_line.text()
 
         get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="hymmmm...."
-        get_directory = get_directory.replace("/", "\\")
         self.logger.inf(("selected directory:", get_directory))
         if len(get_directory) > 0:
-            qt_edit_line.setText(get_directory + "\\")
-            return get_directory + "\\"
+            qt_edit_line.setText(get_directory + dir_separator)
+            return get_directory + dir_separator
         return ""
 
     @staticmethod
@@ -440,19 +441,19 @@ class CommonFunctions:
 
     def file_dialog_to_edit_line(self, qt_edit_line, qt_file_dialog, init_dir):
         file_dialog = qt_file_dialog.getOpenFileName(dir=init_dir)
-        get_file = file_dialog[0].replace("/", "\\")
+        get_file = file_dialog[0]
+        # if self.settings.current_os == 1:
+        #    get_file = get_file.replace("/", "\\")
         self.logger.inf(("selected file:", get_file))
         if len(get_file) > 0:
             qt_edit_line.setText(get_file)
             return get_file
         return ""
 
-    @staticmethod
-    def get_save_file(qt_edit_line, qt_file_dialog):
+    def get_save_file(self, qt_edit_line, qt_file_dialog, dir_separator="/"):
         get_directory = qt_file_dialog.getSaveFileName()
-        get_dir = get_directory[0].replace("/", "\\")
-        if len(get_dir) > 0:
-            qt_edit_line.setText(get_dir + "\\")
+        if len(get_directory) > 0:
+            qt_edit_line.setText(get_directory + dir_separator)
 
     def get_incremented_name(self, name_in, db=False):
         last_not_digit = next((i for i, j in list(enumerate(name_in, 1))[::-1] if not j.isdigit()), -1)

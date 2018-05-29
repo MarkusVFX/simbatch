@@ -48,7 +48,10 @@ class SettingsUI:
             qt_scroll_widget.setMinimumWidth(settings.window[2]-self.scroll_margin)
         else:
             qt_scroll_widget.setMinimumWidth(400)
-        qt_scroll_widget.setMinimumHeight(650)
+        if self.settings.current_os == 1:
+            qt_scroll_widget.setMinimumHeight(750)   # Linux
+        else:
+            qt_scroll_widget.setMinimumHeight(650)   # win7
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
 
@@ -442,10 +445,12 @@ class SettingsUI:
         self.batch.logger.db("test conn sql  .... ")
 
     def on_click_get_data_dir(self):
-        self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog)
+        self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog,
+                                         dir_separator=self.sts.dir_separator)
 
     def on_click_get_definitions_dir(self):
-        self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog)
+        self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog,
+                                         dir_separator=self.sts.dir_separator)
 
     def on_click_create_example_data(self):
         batch = self.batch

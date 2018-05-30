@@ -73,7 +73,8 @@ class SchemasUI:
     schema_form_edit = None
     schema_form_remove = None
 
-    new_name_on_copy = ""  # form copied schema
+    new_name_on_copy = ""           # form copy schema
+    new_project_id_on_copy = None   # form copy schema
 
     comfun = None
 
@@ -161,11 +162,11 @@ class SchemasUI:
         # wfa -  widget form add
         # fa  -  form add
         wfa_copy_schema = EditLineWithButtons("Copy schema as ... ")
-        wfa_target_proj = EditLineWithButtons("Target Proj  (id or name) ... ", text_on_button_1="test")
+        wfa_target_proj = EditLineWithButtons("Target Proj  (id or name) ... ", text_on_button_1="check")
         wfa_buttons = ButtonWithCheckBoxes("Copy schema", pin_text="pin")
 
         wfa_target_proj.button_1.clicked.connect(
-            lambda: self.on_changed_copy_target(wfa_target_proj.qt_edit_line))
+            lambda: self.on_check_project_target(wfa_target_proj.qt_edit_line))
         wfa_buttons.button.clicked.connect(self.on_clicked_copy_as)
         wfa_copy_schema.qt_edit_line.textChanged.connect(self.on_changed_copy_name)
 
@@ -412,19 +413,10 @@ class SchemasUI:
             self.schema_form_create.hide()
             self.create_form_state = 0
 
-    def form_edit_update_ui(self):
-        if self.sch.current_schema_index >= 0:
-            cur_schema = self.sch.current_schema
-            self.schema_form_edit.qt_fae_schema_name_edit.setText(cur_schema.schema_name)
-            self.schema_form_edit.qt_fae_schema_version_edit.setText(str(cur_schema.schema_version))
-            self.schema_form_edit.qt_fae_schema_description_edit.setText(cur_schema.description)
-
     def on_click_show_form_edit(self):
         if self.edit_form_state == 0:
             self.hide_all_forms()
             self.schema_form_edit.show()
-            self.form_edit_update_ui()
-
             if self.sch.current_schema_index >= 0:
                 self.schema_form_edit.update_form_data(self.sch.current_schema)
             self.edit_form_state = 1
@@ -452,33 +444,61 @@ class SchemasUI:
         # TODO !!! copy schema
         self.batch.logger.db(("on_changed_copy_name", txt))
 
-    def on_changed_copy_target(self, qt_edit_line):
+    def on_check_project_target(self, qt_edit_line):
         el_txt = qt_edit_line.text()
-        if self.comfun.is_float(el_txt):
+        if self.comfun.is_int(el_txt):
             index = self.batch.prj.get_index_from_id(int(el_txt))
             if index >= 0:
                 qt_edit_line.setText(self.batch.prj.projects_data[index].project_name)
+                self.new_project_id_on_copy = index
             else:
-                qt_edit_line.setText("[ERR] Wrong index: " + qt_edit_line.text())
-
+                qt_edit_line.setText("[ERR] Wrong index: " + el_txt)
+                self.new_project_id_on_copy = None
         else:
-            self.batch.prj.get_index_from_name(qt_edit_line.text(), check_similar=True)
-        self.batch.logger.db(("qt_edit_line.text() : ", qt_edit_line.text()))
+            prj_id = self.batch.prj.get_id_from_name(qt_edit_line.text(), check_similar=True)
+            if prj_id is not None:
+                index = self.batch.prj.get_index_from_id(prj_id)
+                if index >= 0:
+                    qt_edit_line.setText(self.batch.prj.projects_data[index].project_name)
+                    self.batch.logger.inf(("project found : ", prj_id))
+                    self.new_project_id_on_copy = prj_id
+                else:
+                    self.batch.logger.wrn(("project index not found from id: ", prj_id))
+                    self.new_project_id_on_copy = None
+            else:
+                qt_edit_line.setText("No project matches : " + el_txt)
+                self.new_project_id_on_copy = None
+        self.batch.logger.db(("qt_edit_line.text() : ", el_txt))
 
     def on_clicked_copy_as(self):
         if self.batch.sch.current_schema_index >= 0:
             new_name = self.new_name_on_copy
-            if len(new_name) > 0:
-                curr = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
-                copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, curr.project_id, "based_on",
-                                                curr.actions, curr.schema_version, curr.description)  # TODO "based_on"
-                self.on_click_add_schema(copied_schema_item)
-                self.schema_form_copy.hide()
-                self.copy_form_state = 0
+            new_project_id = self.new_project_id_on_copy
+            if new_project_id is not None:
+                if len(new_name) > 0:
+                    is_unique = True
+                    for sch in self.batch.sch.schemas_data:
+                        if sch.project_id == new_project_id:
+                            if sch.schema_name == new_name:
+                                is_unique = False
+                    if is_unique:
+                        curr = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
+                        copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, new_project_id,
+                                                        curr.schema_name, # "based_on"
+                                                        curr.actions_array, curr.schema_version, curr.description)
+                        self.on_click_add_schema(copied_schema_item)
+                        self.schema_form_copy.hide()
+                        self.copy_form_state = 0
+                        self.new_name_on_copy = ""
+                        self.wfa_copy_schema.qt_edit_line.setText("")
+                    else:
+                        self.top_ui.set_top_info(" new name is not unique", 7)
+                else:
+                    self.top_ui.set_top_info(" please, input a new name ", 7)
             else:
-                self.top_ui.set_top_info(" please, input a new name ")
+                self.top_ui.set_top_info(" destination project undefined ", 7)
         else:
-            self.top_ui.set_top_info(" select schema to copy ! ")
+            self.top_ui.set_top_info(" select schema to copy ! ", 7)
 
     def on_click_show_form_remove(self):
         if self.remove_form_state == 0:
@@ -617,7 +637,6 @@ class SchemasUI:
                 self.batch.logger.wrn(("(on sch chng) current_list_item_nr:", self.current_list_item_nr))
 
             if self.edit_form_state == 1:
-                self.form_edit_update_ui()
                 self.schema_form_edit.update_form_data(self.sch.current_schema)
                 self.batch.logger.db(("update edit form: ", self.sch.current_schema.schema_name))
 

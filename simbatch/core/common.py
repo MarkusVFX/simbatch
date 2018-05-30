@@ -281,6 +281,9 @@ class CommonFunctions:
             self.logger.err(("(path_exists) wrong parameter!", check_path, info))
             return False
 
+    def get_win_visual_path(self, path):
+        return path.replace("/", "\\")
+
     def get_proper_path(self, get_path, info=""):
         if len(get_path) > 0:
             if get_path.find("/") >= 0:

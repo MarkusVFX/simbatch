@@ -172,7 +172,7 @@ class TasksFormCreateOrEdit(QWidget):
 
         qt_combo_schema_name = ComboLabel("", sch.get_schema_names())
         self.qt_schema_name_combo = qt_combo_schema_name.combo
-        qt_combo_state = ComboLabel("", ["NULL", "INIT", "WAITING", "HOLD", "QUEUED"])
+        qt_combo_state = ComboLabel("", ["NULL", "INIT", "WAITING", "HOLD", "QUEUED", "DONE"])
         self.qt_combo_state_names = qt_combo_state.combo
 
         qt_edit_buton_sequence = EditLineWithButtons("Sequence ", label_minimum_size=70)

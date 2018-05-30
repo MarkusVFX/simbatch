@@ -330,3 +330,6 @@ class SchemaFormCreateOrEdit(QWidget):
         self.clear_vars()
         self.schema_item_form_object.project_id = schema_item.project_id
         self.schema_item_form_object.based_on_definition = schema_item.based_on_definition
+        self.qt_fae_schema_name_edit.setText(schema_item.schema_name)
+        self.qt_fae_schema_version_edit.setText(str(schema_item.schema_version))
+        self.qt_fae_schema_description_edit.setText(schema_item.description)

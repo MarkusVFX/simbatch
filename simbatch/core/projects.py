@@ -155,6 +155,17 @@ class Projects:
                 return i
         return None
 
+    #  get index from name for form copy schema
+    def get_id_from_name(self, name, check_similar=False):
+        for p in self.projects_data:
+            if name == p.project_name:
+                return p.id
+        if check_similar:
+            for p in self.projects_data:
+                if name.lower() in p.project_name.lower():
+                    return p.id
+        return None
+
     #  update id, index and current for fast use by all modules
     def update_current_from_id(self, proj_id):
         if proj_id is None:

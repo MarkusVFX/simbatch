@@ -451,8 +451,13 @@ class ProjectsUI:
             list_item = QListWidgetItem(self.qt_list_projects)
             list_item_widget = ProjectListItem(str(new_project.id), new_project_name, working_directory, description)
             self.qt_list_projects.addItem(list_item)
-            self.qt_list_projects.setItemWidget(list_item, list_item_widget)
+            self.batch.sio.create_project_working_directory(new_project.project_directory)
             self.batch.sio.create_project_working_directory(new_project.working_directory_absolute)
+            self.batch.sio.create_project_working_directory(new_project.cameras_directory_absolute)
+            self.batch.sio.create_project_working_directory(new_project.cache_directory_absolute)
+            # self.batch.sio.create_project_working_directory(new_project.env_directory_absolute)
+            # self.batch.sio.create_project_working_directory(new_project.props_directory_absolute)
+            # self.batch.sio.create_project_working_directory(new_project.scripts_directory_absolute)
 
             if pin_checked is False:
                 self.clear_form_add()

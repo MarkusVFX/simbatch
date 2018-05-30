@@ -60,7 +60,11 @@ class SettingsUI:
         qt_group_config_ini = QGroupBox()
         qt_group_config_ini.setMaximumHeight(70)
         qt_group_config_ini.setTitle("Config file:")
-        elwb_config_ini = EditLineWithButtons(settings.ini_file, edit_text_string=None, text_on_button_1="Test Data",
+        if self.settings.current_os == 1:
+            show_ini_file = settings.ini_file
+        else:
+            show_ini_file = self.comfun.get_win_visual_path(settings.ini_file)
+        elwb_config_ini = EditLineWithButtons(show_ini_file, edit_text_string=None, text_on_button_1="Test Data",
                                               text_on_button_2="Test Acces", button_width=70)
 
         elwb_config_ini.button_1.clicked.connect(self.test_data_config_ini)
@@ -101,7 +105,12 @@ class SettingsUI:
         qt_lay_settings_data = QHBoxLayout()
         # qt_lay_settings_data.setMaximumHeight(155) # mmm
         qt_settings_data_directory_label = QLabel("Data directory : ")
-        qt_settings_data_directory_edit = QLineEdit(settings.store_data_json_directory)
+
+        if self.settings.current_os == 1:
+            show_store_data_json_directory = settings.store_data_json_directory
+        else:
+            show_store_data_json_directory = self.comfun.get_win_visual_path(settings.store_data_json_directory)
+        qt_settings_data_directory_edit = QLineEdit(show_store_data_json_directory)
         qt_settings_data_directory_button = QPushButton("Get")
         qt_settings_data_directory_button.setToolTip('Select directory for store data')
         qt_settings_data_directory_button.clicked.connect(self.on_click_get_data_dir)
@@ -113,7 +122,12 @@ class SettingsUI:
 
         qt_lay_settings_definitions = QHBoxLayout()
         qt_settings_definitions_directory_label = QLabel("Definitions directory : ")
-        qt_settings_definitions_directory_edit = QLineEdit(settings.store_definitions_directory)
+
+        if self.settings.current_os == 1:
+            show_store_definitions_directory = settings.store_definitions_directory
+        else:
+            show_store_definitions_directory = self.comfun.get_win_visual_path(settings.store_definitions_directory)
+        qt_settings_definitions_directory_edit = QLineEdit(show_store_definitions_directory)
         qt_settings_definitions_directory_button = QPushButton("Get")
         qt_settings_definitions_directory_button.setToolTip('Select definitions directory')
         qt_settings_definitions_directory_button.clicked.connect(self.on_click_get_definitions_dir)
@@ -446,11 +460,11 @@ class SettingsUI:
 
     def on_click_get_data_dir(self):
         self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog,
-                                         dir_separator=self.sts.dir_separator)
+                                         dir_separator=self.settings.dir_separator)
 
     def on_click_get_definitions_dir(self):
         self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog,
-                                         dir_separator=self.sts.dir_separator)
+                                         dir_separator=self.settings.dir_separator)
 
     def on_click_create_example_data(self):
         batch = self.batch

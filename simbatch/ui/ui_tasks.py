@@ -344,8 +344,8 @@ class TasksFormCreateOrEdit(QWidget):
     def get_frame_range_from_cache(self):
         curr_proj = self.batch.prj.projects_data[self.batch.prj.current_project_index]
 
-        pa_seq = self.batch.prj.getSeqPattern(curr_proj.seq_shot_take_pattern)
-        pa_sh = self.batch.prj.getShPattern(curr_proj.seq_shot_take_pattern)
+        # pa_seq = self.batch.prj.getSeqPattern(curr_proj.seq_shot_take_pattern)   # TODO
+        # pa_sh = self.batch.prj.getShPattern(curr_proj.seq_shot_take_pattern)     # TODO
 
         #  TODO get frame range from cache or framerange file.
 
@@ -691,7 +691,7 @@ class TasksUI:
             self.add_form_state = 0
 
     def add_single_task(self, new_task_item):
-        self.batch.tsk.add_task(new_task_item, do_save=True)
+        new_task_item.id = self.batch.tsk.add_task(new_task_item, do_save=True)
         qt_list_item = QListWidgetItem(self.list_tasks)
         list_item_widget = TaskListItem(str(new_task_item.id), new_task_item.task_name, str(new_task_item.user_id),
                                         new_task_item.sequence, new_task_item.shot, new_task_item.take,
@@ -702,6 +702,7 @@ class TasksUI:
         qt_list_item.setSizeHint(QSize(1, 24))
         self.list_tasks.addItem(qt_list_item)
         self.list_tasks.setItemWidget(qt_list_item, list_item_widget)
+        return new_task_item.id
 
     def on_click_add_task(self, new_task_tem):
         if self.batch.prj.current_project_id >= 0:
@@ -710,13 +711,16 @@ class TasksUI:
                 if new_task_tem.schema_id < 0:
                     self.batch.logger.err(("(on_click_add_task) wrong schema_id: ", new_task_tem.schema_id))
 
-                self.add_single_task(copy.copy(new_task_tem))
-                self.top_ui.set_top_info(" [INF] Task created, active task:  " + new_task_tem.task_name)
+                new_task_id = self.add_single_task(copy.copy(new_task_tem))
+                self.top_ui.set_top_info(" [INF] Task created, active task: [{}] {}".format(new_task_id,
+                                                                                            new_task_tem.task_name))
 
                 self.qt_form_add.hide()
                 self.add_form_state = 0
 
                 self.reload_tasks_data_and_refresh_list()
+
+                self.batch.tsk.update_current_from_id(new_task_id)
             else:
                 self.batch.logger.err("(on_click_add_task) PLEASE SELECT SCHEMA ")
                 self.top_ui.set_top_info(" [INF] PLEASE SELECT SCHEMA !", 8)

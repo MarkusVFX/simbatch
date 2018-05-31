@@ -1,5 +1,3 @@
-import copy
-
 try:  # Maya 2016
     from PySide.QtCore import *
     from PySide.QtGui import *

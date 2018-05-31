@@ -69,7 +69,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
         print "       schema_version {}   description:{}".format(self.schema_version, self.description)
         print "       actions count:{}".format(len(self.actions_array))
         for i, act in enumerate(self.actions_array):
-            print "           {}  {}".format(i, act)
+            print "           {}  {}".format(i, act.name)
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
@@ -255,11 +255,11 @@ class Schemas:
             up_sch.schema_name = edited_schema_item.schema_name
             up_sch.description = edited_schema_item.description
             up_sch.schema_version = edited_schema_item.schema_version
-            up_sch.objects_to_sim = edited_schema_item.objects_to_sim
-            up_sch.project_name = edited_schema_item.project_name
+            # up_sch.objects_to_sim = edited_schema_item.objects_to_sim
+            # up_sch.project_name = edited_schema_item.project_name
             up_sch.project_id = edited_schema_item.project_id
-            up_sch.soft_id = edited_schema_item.soft_id
-            up_sch.actions = edited_schema_item.actions
+            # up_sch.soft_id = edited_schema_item.soft_id
+            up_sch.actions_array = copy.deepcopy(edited_schema_item.actions_array)
             if do_save is True:
                 self.save_schemas()
         else:

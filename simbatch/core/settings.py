@@ -96,7 +96,7 @@ class Settings:
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
-    force_start_tab = 0     # if > 0 show tab with this index after run
+    force_start_tab = 1     # if > 0 show tab with this index after run
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1

@@ -1,3 +1,5 @@
+import copy
+
 try:  # Maya 2016
     from PySide.QtCore import *
     from PySide.QtGui import *
@@ -57,16 +59,16 @@ class SchemaFormCreateOrEdit(QWidget):
             self.batch.logger.raw(" action_widget {}  {}".format(i, aw.qt_label.text()))
 
     def form_detailed_print(self):
-        self.batch.logger.raw("\n schema_item_form_object:")
+        self.batch.logger.raw("\nschema_item_form_object:")
         self.schema_item_form_object.detailed_print()
-        self.batch.logger.raw("\n form action_widgets count: {}".format(len(self.action_widgets)))
+        self.batch.logger.raw("\nform action_widgets count:  {}".format(len(self.action_widgets)))
         for i, aw in enumerate(self.action_widgets):
             self.batch.logger.raw(" action_widget {}  id:{}  label:{}  edit_val:{}".format(i, aw.widget_id,
                                                                                            aw.qt_label.text(),
                                                                                            aw.edit_val, aw.ui_info))
-        self.batch.logger.raw("object's action_array count:{}".format(len(self.schema_item_form_object.actions_array)))
+        self.batch.logger.raw("forms action_array count:  {}".format(len(self.schema_item_form_object.actions_array)))
         for a in self.schema_item_form_object.actions_array:
-            self.batch.logger.raw(" object's action_array {}    {}    {}".format(a.id, a.name, a.default_value))
+            self.batch.logger.raw("action: {}   {}  {}".format(a.name, a.default_value, a.actual_value))
 
     def init_ui_elements(self):
         qt_lay_outer_schema_form = QVBoxLayout()
@@ -217,9 +219,8 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.batch.logger.wrn("Current project undefined !")
 
-    # on click one of horizontal button:
-    # ADD action widget to vertical list of schema's actions
-    def on_click_defined_action_button(self, multi_action):
+
+    def add_action_widget_to_form(self, multi_action):
         combo_items = []
         qt_lay = self.qt_lay_fae_actions
         button_1_caption = None
@@ -263,6 +264,11 @@ class SchemaFormCreateOrEdit(QWidget):
         self.action_widgets.append(action_widget)
         self.schema_item_form_object.actions_array.append(single_action)
         self.form_actions_count += 1
+
+    # on click one of horizontal button:
+    # ADD action widget to vertical list of schema's actions
+    def on_click_defined_action_button(self, multi_action):
+        self.add_action_widget_to_form(multi_action)
 
     # ACTIONS
     # ACTIONS
@@ -333,3 +339,14 @@ class SchemaFormCreateOrEdit(QWidget):
         self.qt_fae_schema_name_edit.setText(schema_item.schema_name)
         self.qt_fae_schema_version_edit.setText(str(schema_item.schema_version))
         self.qt_fae_schema_description_edit.setText(schema_item.description)
+        self.schema_item_form_object.actions_array = copy.deepcopy(schema_item.actions_array)
+
+        self.remove_all_action_widgets()
+        for i, ac in enumerate(copy.deepcopy(self.schema_item_form_object.actions_array)):
+            #if isinstance(ac, SingleAction):
+            print "TODO SingleAction ", ac.name, len(self.schema_item_form_object.actions_array)  # TODO
+            mac = MultiAction(i, ac.name)
+            mac.add_single_action(copy.deepcopy(ac))
+            self.add_action_widget_to_form(mac)
+            # else:
+                # self.add_action_widget_to_form(ac)

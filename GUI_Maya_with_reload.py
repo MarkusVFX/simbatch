@@ -45,7 +45,11 @@ sim_batch.comfun = simbatch_comfun.CommonFunctions()
 
 import simbatch.core.settings as simbatch_settings
 reload (simbatch_settings)
-sim_batch.sts = simbatch_settings.Settings(sim_batch.logger, "Maya", ini_file="/job/pinwheel/dev/sandbox/sandbox_msulecki/work/msulecki/tmp/simbatch_test/config.ini")
+sim_batch.sts = simbatch_settings.Settings(sim_batch.logger, "Maya", ini_file=simbatch_config_ini)
+
+import simbatch.core.projects as simbatch_projects
+reload (simbatch_projects)
+sim_batch.prj = simbatch_projects.Projects(sim_batch)
 ############  force reload  END
 
 loading_data_state = sim_batch.load_data()
@@ -55,6 +59,14 @@ if sim_batch.sts.WITH_GUI == 1:
     ############  force update UI  START
     import simbatch.ui.ui_settings as simbatch_ui_settings
     reload (simbatch_ui_settings)
+    import simbatch.ui.ui_projects as simbatch_ui_projects
+    reload (simbatch_ui_projects)
+    import simbatch.ui.ui_schemas as simbatch_ui_schemas
+    reload (simbatch_ui_schemas)
+    import simbatch.ui.ui_schemas_form as simbatch_ui_schemas_form
+    reload (simbatch_ui_schemas_form)
+    import simbatch.ui.ui_tasks as simbatch_ui_tasks
+    reload (simbatch_ui_tasks)
     reload (simbatch_ui)
     ############  force update UI  END
     main_window = simbatch_ui.MainWindow(sim_batch)

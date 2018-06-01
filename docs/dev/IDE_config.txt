@@ -1,5 +1,10 @@
+
+
+//  add words to dictionary
+
 comfun
 mainw
+snsn
 
 
 dirProj

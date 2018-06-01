@@ -313,7 +313,7 @@ class SchemasUI:
         current_schema_id = self.sch.current_schema_id
         self.batch.logger.db((" [WIP] double clicked  schema id :", current_schema_id))
         # sch = self.sch.get_schema_by_id(current_schema_id)
-        # self.load_base_setup(sch.schema_name, sch.schemaVersion) TO DO move to interactions
+        # self.load_base_setup(sch.schema_name, sch.schemaVersion)  # TODO move to interactions
 
     def on_menu_save_as_next_version(self):
         cur_sch_index = self.batch.sch.current_schema_index
@@ -602,7 +602,9 @@ class SchemasUI:
         self.on_menu_open()
 
     def on_list_schemas_current_changed(self, current_row):
-        if self.freeze_list_on_changed == 0:
+        if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
+            self.batch.logger.deepdb(("sch chngd freeze_list_on_changed", self.list_schemas.currentRow()))
+        else:
             self.batch.logger.inf(("list_schemas_current_changed: ", self.list_schemas.currentRow()))
 
             self.last_list_item_nr = self.current_list_item_nr

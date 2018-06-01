@@ -9,7 +9,7 @@ except ImportError:
     except ImportError:
         print "PySide import ERROR"
 
-from simbatch.core.common import CommonFunctions     # , Logger
+from simbatch.core.lib.common import CommonFunctions     # , Logger
 
 
 class SimpleLabel:

@@ -401,13 +401,11 @@ class TasksUI:
         self.top_ui = top
         self.mainw = mainw
 
-        self.array_visible_tasks_ids = []
-
         # init GUI
         list_tasks = QListWidget()
         list_tasks.setSelectionMode(QAbstractItemView.NoSelection)
         list_tasks.setFrameShadow(QFrame.Raised)
-        list_tasks.currentItemChanged.connect(self.on_change_current_list_task)
+        list_tasks.currentItemChanged.connect(self.on_current_item_changed)
         list_tasks.setSpacing(1)
         p = list_tasks.sizePolicy()
         p.setVerticalPolicy(QSizePolicy.Policy.Maximum)
@@ -453,7 +451,7 @@ class TasksUI:
         qt_form_remove_layout = QFormLayout()
 
         wfr_buttons = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?        ")
-        wfr_buttons.button.clicked.connect(self.on_click_confirm_remove_project)
+        wfr_buttons.button.clicked.connect(self.on_click_confirmed_remove_project)
 
         qt_form_remove_layout.addRow(" ", QLabel("   "))
         qt_form_remove_layout.addRow(" ", wfr_buttons.qt_widget_layout)
@@ -532,7 +530,7 @@ class TasksUI:
     def reset_list(self):
         self.freeze_list_on_changed = 1
         index = self.batch.tsk.current_task_index
-        self.clear_list()
+        self.clear_list(with_freeze=False)
         self.init_tasks()
         self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
@@ -561,8 +559,8 @@ class TasksUI:
     def on_click_menu_set_hold(self):
         self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
 
-    def on_click_menu_schema_remove(self):
-        self.on_click_confirm_remove_project()
+    def on_click_menu_remove(self):
+        self.on_click_confirmed_remove_project()
 
     def on_click_menu_sch_ver_from_schema(self):
         cur_sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
@@ -616,7 +614,7 @@ class TasksUI:
         qt_right_menu.addAction("Set DONE", self.on_click_menu_set_done)
         qt_right_menu.addAction("Set HOLD", self.on_click_menu_set_hold)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
-        qt_right_menu.addAction("Remove Task", self.on_click_menu_schema_remove)
+        qt_right_menu.addAction("Remove Task", self.on_click_menu_remove)
         qt_right_menu.exec_(global_cursor_pos)
 
     def hide_all_forms(self):
@@ -747,15 +745,15 @@ class TasksUI:
         self.add_form_state = 0
         self.batch.logger.inf("task updated")
 
-    def on_click_confirm_remove_project(self):
+    def on_click_confirmed_remove_project(self):
         self.batch.logger.db(("remove_project", self.batch.tsk.current_task_index,
-                              self.batch.tsk.current_task_list_index))
-        if self.batch.tsk.current_task_list_index >= 0:
-            take_item_list = self.batch.tsk.current_task_list_index + 1
+                              self.current_list_item_index))
+        if self.current_list_item_index >= 0:
+            take_item_list = self.current_list_item_index + 1
             self.batch.tsk.remove_single_task(index=self.batch.tsk.current_task_index, do_save=True)
-            self.batch.tsk.last_task_list_index = -1
-            self.batch.tsk.current_task_index = -1
-            self.batch.tsk.current_task_list_index = -1
+            self.last_list_item_index = None
+            self.batch.tsk.current_task_index = None
+            self.current_list_item_index = None
             self.list_tasks.takeItem(take_item_list)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
@@ -800,11 +798,13 @@ class TasksUI:
             self.batch.logger.wrn("Current task undefined! Please select task again.")
             self.top_ui.set_top_info("Please select task ", 7)
 
-    def clear_list(self):
-        self.freeze_list_on_changed = 1
+    def clear_list(self, with_freeze=True):
+        if with_freeze:
+            self.freeze_list_on_changed = 1
         while self.list_tasks.count() > 0:
             self.list_tasks.takeItem(0)
-        self.freeze_list_on_changed = 0
+        if with_freeze:
+            self.freeze_list_on_changed = 0
 
     def update_all_tasks(self):
         self.clear_list()
@@ -818,14 +818,11 @@ class TasksUI:
                 array_visible_tasks_ids.append(task.id)
         self.array_visible_tasks_ids = array_visible_tasks_ids
 
-    def on_change_current_list_task(self, current_task_item):
-        if current_task_item is None:
-            self.batch.logger.db(("chng current task (current_task_item is None) ", self.list_tasks.currentRow()))
+    def on_current_item_changed(self, current_task_item):
+        if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
+            self.batch.logger.deepdb(("tsk chngd freeze_list_on_changed", self.list_tasks.currentRow()))
         else:
-            self.batch.logger.db(("chng current task ", self.list_tasks.currentRow()))
-
-        if self.freeze_list_on_changed == 0:  # on massive action    or   refresh
-            # self.batch.tsk.last_task_list_index = self.batch.tsk.current_task_list_index
+            self.batch.logger.inf(("list_task_current_item_changed: ", self.list_tasks.currentRow()))
             self.last_list_item_index = self.current_list_item_index
             current_list_index = self.list_tasks.currentRow() - 1
             self.current_list_item_index = current_list_index
@@ -863,7 +860,6 @@ class TasksUI:
                 self.batch.tsk.update_current_from_id(current_task_id)
 
             current_task_index = self.batch.tsk.current_task_index
-
             if 0 <= current_task_index < len(self.batch.tsk.tasks_data):
                 cur_task = self.batch.tsk.tasks_data[current_task_index]
                 if self.top_ui is not None:
@@ -890,4 +886,5 @@ class TasksUI:
                     self.qt_form_add.update_add_ui()                           # update add to queue form
 
             else:
-                self.batch.logger.err("on chng list task {} < {}".format(current_task_index, self.batch.tsk.tasks_data))
+                self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
+                                                                         len(self.batch.tsk.tasks_data)))

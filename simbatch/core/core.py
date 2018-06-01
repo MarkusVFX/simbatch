@@ -1,7 +1,7 @@
 import platform
 
 from settings import Settings
-from common import CommonFunctions, Logger
+from lib.common import CommonFunctions, Logger
 from users import Users
 from definitions import Definitions
 from projects import Projects
@@ -102,7 +102,6 @@ class SimBatch:
             self.que.print_all()
             self.que.print_current()
         # if index == 5:
-        #     print " TO DO NODES: "
             # TODO NODES !!!!
             # self.nod.print_all()
             # self.nod.print_current()

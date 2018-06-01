@@ -1,7 +1,7 @@
 import os
 import json
 from random import randint
-from common import CommonFunctions
+from lib.common import CommonFunctions
 
 try:  # Maya 2016
     from PySide.QtCore import *
@@ -331,6 +331,6 @@ class Settings:
                     print " [WRN] not loaded colors: ", color_file
                 return False
         else:
-            # TO DO dblvl
+            # TODO dblvl
             print " [WRN] store_definitions_directory  is None"
             return False

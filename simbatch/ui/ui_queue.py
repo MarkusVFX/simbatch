@@ -102,6 +102,12 @@ class QueueUI:
 
     freeze_list_on_changed = 0
 
+    array_visible_queue_items_ids = []
+
+    current_list_item_index = None
+    last_list_item_index = None
+
+
     def __init__(self, batch, mainw, top):
         self.batch = batch
         self.sts = batch.sts
@@ -114,7 +120,7 @@ class QueueUI:
         list_queue.setSelectionMode(QAbstractItemView.NoSelection)
 
         list_queue.setFrameShadow(QFrame.Raised)
-        list_queue.currentItemChanged.connect(self.list_queue_current_changed)
+        list_queue.currentItemChanged.connect(self.on_current_item_changed)
         list_queue.setSpacing(1)
         p = list_queue.sizePolicy()
         p.setVerticalPolicy(QSizePolicy.Policy.Maximum)
@@ -184,7 +190,7 @@ class QueueUI:
         qt_form_remove_layout.addRow(" ", QLabel("   "))
         qt_form_remove_layout.addRow(" ", qt_cb_button_remove.qt_widget_layout)
         qt_form_remove_layout.addRow(" ", QLabel("   "))
-        qt_cb_button_remove.button.clicked.connect(self.on_click_confirm_remove_project)
+        qt_cb_button_remove.button.clicked.connect(self.on_click_confirmed_remove_queue_item)
 
         qt_gb_remove = QGroupBox()
         qt_gb_remove.setLayout(qt_form_remove_layout)
@@ -242,7 +248,7 @@ class QueueUI:
     def reset_list(self):
         self.freeze_list_on_changed = 1
         index = self.batch.que.current_queue_index
-        self.clear_list()
+        self.clear_list(with_freeze=False)
         self.batch.init_queue(self.list_queue)   # TODO check
         self.batch.que.current_queue_index = index
         self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
@@ -251,11 +257,13 @@ class QueueUI:
     def update_all_queue(self):
         self.clear_list()
         self.init_queue_items()
+        self.update_list_of_visible_ids()
 
     def reload_tasks_data_and_refresh_list(self):
         self.batch.que.clear_all_queue_items()
         self.batch.que.load_queue()
         self.reset_list()
+        self.update_list_of_visible_ids()
 
     def _change_current_queue_item_state_and_reset_list(self, state_id):
         self.batch.que.current_queue.state = self.sts.states_visible_names[state_id]
@@ -380,13 +388,98 @@ class QueueUI:
         pass
 
     def on_click_remove(self):
+        self.qt_form_remove.show()
         pass
 
-    def on_click_confirm_remove_project(self):
-        pass
+    def on_click_confirmed_remove_queue_item(self):
+        self.batch.logger.db(("remove_queue_item", self.batch.que.current_queue_index,
+                              self.current_list_item_index))
+        if self.current_list_item_index >= 0:
+            take_item_list = self.current_list_item_index + 1
+            self.batch.que.remove_single_queue_item(index=self.batch.que.current_queue_index, do_save=True)
+            self.last_list_item_index = None
+            self.batch.que.current_queue_index = None
+            self.current_list_item_index = None
+            self.list_queue.takeItem(take_item_list)
+            self.qt_form_remove.hide()
+            self.remove_form_state = 0
 
-    def clear_list(self):
-        pass
+    def clear_list(self, with_freeze=True):
+        if with_freeze:
+            self.freeze_list_on_changed = 1
+        while self.list_queue.count() > 0:
+            self.list_queue.takeItem(0)
+        if with_freeze:
+            self.freeze_list_on_changed = 0
 
-    def list_queue_current_changed(self, x):
-        pass
+    def update_list_of_visible_ids(self):
+        print "\n\n UP QQQQQQQ"
+        array_visible_queue_items_ids = []
+        for que in self.batch.que.queue_data:
+            if que.proj_id == self.batch.prj.current_project_id:
+                array_visible_queue_items_ids.append(que.id)
+                print "    ____ jest QQ", que.id
+        self.array_visible_queue_items_ids = array_visible_queue_items_ids
+
+    def on_current_item_changed(self, current_queue_item):
+        if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
+            self.batch.logger.deepdb(("que chngd freeze_list_on_changed", self.list_queue.currentRow()))
+        else:
+            self.batch.logger.inf(("list_queue_current_item_changed: ", self.list_queue.currentRow()))
+
+            self.last_list_item_index = self.current_list_item_index
+            current_list_index = self.list_queue.currentRow() - 1
+            self.current_list_item_index = current_list_index
+
+            if self.last_list_item_index is not None:
+                if self.last_list_item_index is not None and self.last_list_item_index < len(self.batch.que.queue_data):
+                    item = self.list_queue.item(self.last_list_item_index + 1)
+                    if self.last_list_item_index < len(self.array_visible_queue_items_ids):
+                        last_id = self.array_visible_queue_items_ids[self.last_list_item_index]
+                        last_index = self.batch.que.get_index_by_id(last_id)
+                        if item is not None and last_index is not None:
+                            color_index = self.batch.que.queue_data[last_index].state_id
+                            item.setBackground(self.batch.sts.state_colors[color_index].color())
+                else:
+                    self.batch.logger.wrn("Wrong last_que_list_index {} vs {} ".format(self.last_list_item_index,
+                                                                                       len(self.batch.tsk.tasks_data)))
+            else:
+                self.batch.logger.db("last_task_list_index is None")
+
+            if len(self.array_visible_queue_items_ids) <= current_list_index:
+                self.update_list_of_visible_ids()  # TODO move  to init / change list
+                if len(self.array_visible_queue_items_ids) > current_list_index:
+                    self.batch.logger.deepdb(("vis ids FIXED: len(array_visible_queue_items_ids):",
+                                              len(self.array_visible_queue_items_ids),
+                                              "vs current_list_index:", current_list_index))
+                else:
+                    self.batch.logger.err(("vis ids NOT FIXED: len(array_visible_queue_items_ids):",
+                                           len(self.array_visible_queue_items_ids),
+                                           "vs current_list_index:", current_list_index))
+
+            if 0 <= current_list_index < len(self.array_visible_queue_items_ids):
+                current_queue_item_id = self.array_visible_queue_items_ids[current_list_index]
+                self.batch.que.current_queue_id = current_queue_item_id
+                self.batch.que.update_current_from_id(current_queue_item_id)
+
+            current_queue_index = self.batch.que.current_queue_index
+            if 0 <= current_queue_index < len(self.batch.que.queue_data):
+                cur_queue = self.batch.que.queue_data[current_queue_index]
+                if self.top_ui is not None:
+                    self.top_ui.set_top_info("Current task: [" + str(cur_queue.id) + "]    " + cur_queue.queue_name)
+                else:
+                    self.batch.logger.err("top_ui is None")
+
+                if current_list_index >= 0:
+                    item_c = self.list_queue.item(current_list_index + 1)
+                    cur_color = self.batch.sts.state_colors_up[cur_queue.state_id].color()
+                    item_c.setBackground(cur_color)
+
+
+                # update QUE form
+                if self.edit_form_state == 1:
+                    self.qt_form_edit.update_edit_ui(cur_queue)  # update edit form
+
+            else:
+                self.batch.logger.err("on chng list que {} < {}".format(current_queue_index,
+                                                                        len(self.batch.que.queue_data)))

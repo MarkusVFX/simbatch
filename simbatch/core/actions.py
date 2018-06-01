@@ -1,4 +1,4 @@
-from common import Logger
+from lib.common import Logger
 
 
 ACTION_DATA_FIELDS_NAMES = (

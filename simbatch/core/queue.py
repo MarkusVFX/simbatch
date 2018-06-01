@@ -55,7 +55,7 @@ class QueueItem:
         self.sim_node = sim_node
         self.sim_node_id = sim_node_id
         self.time = time
-        self.proj_id = proj_id
+        self.proj_id = proj_id   # TODO  change to project_id
         self.soft_id = soft_id
 
 
@@ -88,8 +88,8 @@ class Queue:
                                                                                           self.total_queue_items)
 
     def print_current(self):
-        print "       current task index:{}, id:{}, total:{}".format(self.current_queue_index, self.current_queue_id,
-                                                                     self.total_queue_items)
+        print "       current queue index:{}, id:{}, total:{}".format(self.current_queue_index, self.current_queue_id,
+                                                                      self.total_queue_items)
         if self.current_queue_index is not None:
             cur_que = self.current_queue
             print "       current queue name:{}".format(cur_que.queue_name)
@@ -98,9 +98,10 @@ class Queue:
         if self.total_queue_items == 0:
             print "   [INF] no queu items loaded"
         for q in self.queue_data:
-            print "\n\n {}  {}  {} state:{}   evo:{}   simnode:{}   desc:{}".format(q.id, q.queue_item_name, q.prior,
-                                                                                    q.state, "q.evo", q.sim_node,
-                                                                                    q.description)   # TODO "q.evo"
+            print "\n\n {}  {}  {}  {} state:{}   evo:{}   simnode:{}  desc:{}".format(q.id, q.queue_item_name, q.prior,
+                                                                                       q.proj_id, q.state, "q.evo",
+                                                                                       q.sim_node, q.description,
+                                                                                       q.proj_id) # TODO "q.evo"
         print "\n\n"
 
     @staticmethod
@@ -190,9 +191,30 @@ class Queue:
                 return False
         return queue_item.id
 
-    def generate_queue_items(self, task_id, options=None):
 
-        print "compile2 ", task_id, options
+    def remove_single_queue_item(self, index=None, id=None, do_save=False):
+        if index is None and id is None:
+            return False
+        if id > 0:
+            for i, que in enumerate(self.queue_data):
+                if que.id == id:
+                    del self.queue_data[i]
+                    self.total_queue_items -= 1
+                    break
+        if index >= 0:
+            del self.queue_data[index]
+            self.total_queue_items -= 1
+        if do_save is True:
+            return self.save_queue()
+        else:
+            return True
+
+    def generate_queue_items(self, task_id, options=None):
+        # TODO
+        # TODO
+        # TODO
+        # TODO
+        print "\n  !!! TODO compile2 ", task_id, options
         return self.get_blank_queue_item()
 
     # prepare 'queue_data' for backup or save

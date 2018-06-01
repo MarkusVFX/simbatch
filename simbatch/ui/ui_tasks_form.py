@@ -111,7 +111,6 @@ class AddToQueueForm (QWidget):
         self.remove_all_action_widgets()
         current_sch = self.batch.sch.get_schema_by_id(current_task.schema_id)
         for act in current_sch.actions_array:
-            print "ddddd ", current_sch.schema_name , act.name
             self.add_action_to_form(act.name, act.actual_value)
 
     def add_action_to_form(self, info, edit_txt=None, evo=None):

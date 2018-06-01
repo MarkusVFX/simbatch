@@ -1,5 +1,5 @@
 import os
-from common import CommonFunctions, Logger
+from lib.common import CommonFunctions, Logger
 from io import *
 
 # JSON Name Format, PEP8 Name Format

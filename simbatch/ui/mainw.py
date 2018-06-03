@@ -142,8 +142,16 @@ class MainWindow(QMainWindow):
         self.init_ui(batch)
 
     def init_ui(self, batch):
-        current_screen_width = 800     #  TODO detect linux
-        current_screen_height = 600    #  TODO detect linux
+        current_screen_width = 800
+        current_screen_height = 600
+        if self.sts.current_os == 1:
+            try:
+                app = QApplication.instance()
+                screen_resolution = app.desktop().screenGeometry()
+                current_screen_width = screen_resolution.width()
+                current_screen_height = screen_resolution.height()
+            except:
+                pass   # TODO err   +  multi screen
         if self.sts.current_os == 2:
             user32 = ctypes.windll.user32
             current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
@@ -157,6 +165,7 @@ class MainWindow(QMainWindow):
                 if wnd[0] > current_screen_width - 130:
                     x_wnd_pos = 40
                     self.batch.logger.inf("reset window position X")
+                    self.batch.logger.inf(("reset window position X [", current_screen_width, "]"))
                 if wnd[1] > current_screen_height - 130:
                     y_wnd_pos = 40
                     self.batch.logger.inf("reset window position Y")
@@ -247,7 +256,7 @@ class MainWindow(QMainWindow):
             if loading_data_state == 1:
                 self.top_ui.set_top_info("Loaded with one data error")
             else:
-                selt.top_ui.set_top_info("Loaded with data errors ({})".format(loading_data_state))
+                self.top_ui.set_top_info("Loaded with data errors ({})".format(loading_data_state))
 
     def on_tab_change(self, tab):
         self.batch.logger.inf(("tab change: ", tab))
@@ -313,7 +322,7 @@ class MainWindow(QMainWindow):
         self.tsk_ui.reload_tasks_data_and_refresh_list()
 
         self.batch.logger.inf("reload QUEUE")
-        #self.que_ui      # TODO reload !!!
+        # self.que_ui      # TODO reload !!!
 
         # self.batch.logger.inf("reload SIMNODES")
         # self.nod_ui

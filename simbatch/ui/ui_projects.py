@@ -145,7 +145,7 @@ class ProjectsUI:
             lambda: self.on_click_add_project(wfa_project_name_edit.get_txt(), wfa_project_dir_edit.get_txt(),
                                               wfa_working_dir_edit.get_txt(), wfa_cam_dir_edit.get_txt(),
                                               wfa_ani_dir_edit.get_txt(), wfa_descr_edit.get_txt(),
-                                              wfa_buttons.qt_pin_check_box.isChecked()))
+                                              wfa_buttons.qt_second_check_box.isChecked()))
 
         qt_form_add_layout.addLayout(wfa_proj_name_label.qt_widget_layout)
         qt_form_add_layout.addLayout(wfa_project_name_edit.qt_widget_layout)

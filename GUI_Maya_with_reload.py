@@ -39,7 +39,7 @@ def getMayaWindow():
 sim_batch = simbatch_core.SimBatch("Maya", ini_file=simbatch_config_ini)
 
 ############  force reload  START
-import simbatch.core.common as simbatch_comfun
+import simbatch.core.lib.common as simbatch_comfun
 reload (simbatch_comfun)
 sim_batch.comfun = simbatch_comfun.CommonFunctions()
 

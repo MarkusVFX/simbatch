@@ -20,11 +20,10 @@ class StorageInOut:
         self.comfun.create_directory(directory)
 
     def create_schema_directory(self, directory):
-        self.comfun.create_directory(directory)
-        self.comfun.create_directory(directory + "base_setup\\")
-        self.comfun.create_directory(directory + "computed_setups\\")
-        self.comfun.create_directory(directory + "prevs\\")
-        self.comfun.create_directory(directory + "cache\\")
+        self.comfun.create_directory(directory + "base_setup" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "computed_setups" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "prevs" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
 
     def get_files_from_dir(self, directory, types=""):
         files = []
@@ -78,7 +77,7 @@ class StorageInOut:
         end = 0
         if os.path.isdir(directory):
             for fi in os.listdir(directory):
-                if os.path.isfile(directory + "\\" + fi):
+                if os.path.isfile(directory + self.sts.dir_separator + fi):
                     fi_no_ext = fi[:-4]
                     fi_arr = fi_no_ext.split("__")
                     if self.comfun.is_float(fi_arr[1]):
@@ -97,11 +96,10 @@ class StorageInOut:
         else:
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
-            directory = proj_working_dir + schema_flat_name + "\\base_setup\\"
+            directory = proj_working_dir+schema_flat_name+self.sts.dir_separator+"base_setup"+self.sts.dir_separator
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
-            # file_ext = self.batch.dfn.get_base_setup_ext(self.sts.runtime_env)
-            file_ext = "TODO12"
-            return 1, directory + schema_flat_name + file_version + file_ext
+            file_ext = self.batch.dfn.get_current_setup_ext()
+            return 1, directory + schema_flat_name + file_version + "." + file_ext
 
     #  get directory pattern for current project
     #  pattern is generated basis on directories structure on storage

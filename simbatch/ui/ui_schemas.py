@@ -311,9 +311,12 @@ class SchemasUI:
 
     def on_menu_open(self):
         current_schema_id = self.sch.current_schema_id
-        self.batch.logger.db((" [WIP] double clicked  schema id :", current_schema_id))
-        # sch = self.sch.get_schema_by_id(current_schema_id)
-        # self.load_base_setup(sch.schema_name, sch.schemaVersion)  # TODO move to interactions
+        base_setup = self.batch.sio.generate_base_setup_file_name(self.sch.current_schema.schema_name, ver=self.sch.current_schema.schema_version)
+        self.batch.logger.db(("double clicked  schema id :", current_schema_id, base_setup))
+        if base_setup[0] == 1:
+            self.batch.dfn.current_interactions.open_scene(base_setup[1])
+        else:
+            self.batch.logger.err((" Base setup from schema dclick error :", base_setup))
 
     def on_menu_save_as_next_version(self):
         cur_sch_index = self.batch.sch.current_schema_index
@@ -324,11 +327,13 @@ class SchemasUI:
         self.sch.current_schema_index = cur_sch_index
         self.sch.update_current_from_index(cur_sch_index)
 
-        ret = self.batch.dfn.get_schema_base_setup_file(forceSchemaVersion=True)
-
-        cur_schema = self.sch.schemas_data[cur_sch_index]
-        self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
-        self.batch.dfn.current_interactions.save_current_scene_as(ret[1])
+        cur_schema = self.sch.current_schema
+        ret = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name, ver=cur_schema.schema_version)
+        if ret[0] == 1:
+            self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
+            self.batch.dfn.current_interactions.save_current_scene_as(ret[1])
+        else:
+            self.batch.logger.err((" Error on generating increment setup version :", ret))
 
     def on_menu_locate_base_setup(self):
         import subprocess
@@ -554,10 +559,13 @@ class SchemasUI:
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.deepdb(("with saveAs:  ", save_as))
-                if self.batch.dfn.current_interactions is not None:
-                    self.batch.dfn.current_interactions.save_current_scene_as(save_as[1])
+                if save_as[0] == 1 :
+                    if self.batch.dfn.current_interactions is not None:
+                        self.batch.dfn.current_interactions.save_current_scene_as(save_as[1])
+                else:
+                    self.batch.logger.err(("Setup NOT SAVED as default!   on_click_add_schema saveAs error:", save_as))
             else:
-                self.batch.logger.deepdb(("with save_as_base_state:", save_as_base))
+                self.batch.logger.deepdb(("without save_as_base_state:", save_as_base))
 
             self.top_ui.set_top_info("schema created, active schema:  " + new_schema_item.schema_name)
             # self.new_schema_item = self.batch.sch.get_blank_schema()   # TODO  clear UI !!!  if clear var
@@ -605,7 +613,9 @@ class SchemasUI:
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("sch chngd freeze_list_on_changed", self.list_schemas.currentRow()))
         else:
-            self.batch.logger.inf(("list_schemas_current_changed: ", self.list_schemas.currentRow()))
+            self.batch.logger.inf(("schemas item changed: ", self.list_schemas.currentRow(),
+                                   "   last: ",self.last_list_item_nr,
+                                   "   current: ", self.current_list_item_nr))
 
             self.last_list_item_nr = self.current_list_item_nr
             self.current_list_item_nr = self.list_schemas.currentRow()

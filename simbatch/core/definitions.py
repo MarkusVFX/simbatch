@@ -50,7 +50,8 @@ class SingleDefinition:
     software = ""   # TODO software name or software version ???
     #               # TODO list supported versions
     prev_ext = ""   # "prevExt" without dot "png"
-    file_ext = ""   # "setupExt" without dot
+    setup_ext = ""  # "setupExt" without dot
+
     multi_actions_array = []    # old  GroupAction  grouped_actions_array
     total_actions = 0
     action_names = []
@@ -104,7 +105,7 @@ class SingleDefinition:
         self.action_names.append(element.name)
 
     def get_base_setup_ext(self):
-        return self.file_ext
+        return self.setup_ext
 
     def get_prev_ext(self):
         return self.prev_ext
@@ -168,6 +169,9 @@ class Definitions:
     def get_definitions(self):
         return self.definitions_array
 
+    def get_current_setup_ext(self):    # TODO  env = self.sts.runtime_env
+        return self.current_definition.setup_ext
+
     def add_definition(self, defi):
         self.definitions_array.append(defi)
         self.total_definitions += 1
@@ -222,14 +226,14 @@ class Definitions:
 
     def load_interaction_file(self, file_path):
         self.batch.logger.db(("__load_interaction_file: ", file_path))
-        if self.batch.os == "win":
+        if self.sts.current_os == 1:
             file_path = file_path.replace("/", "\\")
         if self.comfun.file_exists(file_path):
             InteractionClass = self.class_from_file(file_path)
             if InteractionClass is None:
                 return None
             else:
-                loaded_interaction = InteractionClass()
+                loaded_interaction = InteractionClass(self.sts.current_os, self.batch.logger)
             return loaded_interaction
         else:
             return None

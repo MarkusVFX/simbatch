@@ -38,19 +38,27 @@ def getMayaWindow():
 
 sim_batch = simbatch_core.SimBatch("Maya", ini_file=simbatch_config_ini)
 
-############  force reload  START
-import simbatch.core.lib.common as simbatch_comfun
-reload (simbatch_comfun)
-sim_batch.comfun = simbatch_comfun.CommonFunctions()
-
+############  force update  START
 import simbatch.core.settings as simbatch_settings
 reload (simbatch_settings)
 sim_batch.sts = simbatch_settings.Settings(sim_batch.logger, "Maya", ini_file=simbatch_config_ini)
 
+import simbatch.core.lib.common as simbatch_comfun
+reload (simbatch_comfun)
+sim_batch.comfun = simbatch_comfun.CommonFunctions()
+
 import simbatch.core.projects as simbatch_projects
 reload (simbatch_projects)
 sim_batch.prj = simbatch_projects.Projects(sim_batch)
-############  force reload  END
+
+import simbatch.core.definitions as simbatch_definitions
+reload (simbatch_definitions)
+sim_batch.dfn = simbatch_definitions.Definitions(sim_batch)
+
+import simbatch.core.io as simbatch_ios
+reload (simbatch_ios)
+sim_batch.sio = simbatch_ios.StorageInOut(sim_batch)
+############  force update  END
 
 loading_data_state = sim_batch.load_data()
 

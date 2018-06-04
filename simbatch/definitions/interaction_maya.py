@@ -1,11 +1,13 @@
 class Interaction:
-    def __init__(self):
-        pass
-        
-    def test(self):
-        print "\n interaction test maya \n"
-    
-    # maya executions
+    current_os = -1
+    logger = None
+
+    def __init__(self, current_os, logger):
+        self.current_os = current_os
+        self.logger = logger
+
+    def print_info(self):
+        self.logger.raw("This is interaction with Maya")
     
     def save_current_scene_as(self, file):
         print "TODO: interaction save as"

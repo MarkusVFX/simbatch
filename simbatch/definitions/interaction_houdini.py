@@ -1,10 +1,14 @@
 
 class Interaction:
-    def __init__(self):
-        pass
-        
-    def test(self):
-        print "\n test Hou \n"
+    current_os = -1
+    logger = None
+
+    def __init__(self, current_os, logger):
+        self.current_os = current_os
+        self.logger = logger
+
+    def print_info(self):
+        self.logger.raw("This is interaction with Houdini")
         
     # houdini executions     
     def houdini_open_scene(self, file):

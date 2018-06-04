@@ -208,6 +208,11 @@ class Schemas:
             counter += 1
         return schemas_indexes
 
+    def clear_current_schema(self):
+        self.current_schema_id = None
+        self.current_schema_index = None
+        self.current_schema = None
+
     def update_current_from_id(self, schema_id):
         for i, sch in enumerate(self.schemas_data):
             if sch.id == schema_id:
@@ -215,9 +220,7 @@ class Schemas:
                 self.current_schema_id = schema_id
                 self.current_schema = sch
                 return i
-        self.current_schema_id = None
-        self.current_schema_index = None
-        self.current_schema = None
+        self.clear_current_schema()
         return False
 
     def update_current_from_index(self, index):
@@ -227,9 +230,7 @@ class Schemas:
             self.current_schema = self.schemas_data[index]
             return self.current_schema_id
         else:
-            self.current_schema_id = None
-            self.current_schema_index = None
-            self.current_schema = None
+            self.clear_current_schema()
             return False
 
     def add_schema(self, schema_item, do_save=False):

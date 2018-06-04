@@ -619,3 +619,7 @@ class ProjectsUI:
                 self.qt_fe_anicache_dir.setText(cur_proj.cache_directory)
                 self.qt_fe_description.setText(cur_proj.description)
                 self.qtcb_fe_default_proj.setChecked(cur_proj.is_default)
+
+            # update schemas
+            self.batch.sch.clear_current_schema()
+            self.mainw.sch_ui.clear_current_and_last_list_item()

@@ -287,11 +287,16 @@ class SchemasUI:
                 self.current_project_schemas_names.append(schema.schema_name)
                 self.current_project_schemas_ids.append(schema.id)
 
+    def clear_current_and_last_list_item(self):
+        self.last_list_item_nr = None
+        self.current_list_item_nr = None
+
     def clear_list(self):
         self.list_visible_schemas_names = []
         self.list_visible_schemas_ids = []
         while self.list_schemas.count() > 0:
             self.list_schemas.takeItem(0)
+        self.clear_current_and_last_list_item()
 
     def reset_list(self):
         self.freeze_list_on_changed = 1

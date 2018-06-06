@@ -12,8 +12,14 @@ except ImportError:
         from PySide2.QtGui import *
         from PySide2.QtWidgets import *
     except ImportError:
-        print "PySide import ERROR"
-
+        print "PySide not found"
+        class QBrush:
+            def __init__(self, q):
+                pass
+        class QColor:
+            @classmethod
+            def fromRgb(self, r, g, b, a=""):
+                pass
 
 class Settings:
     logger = None                   # logger prints errors, warnings, info and db to console and to log file

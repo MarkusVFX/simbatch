@@ -1,6 +1,11 @@
-###  general
-pyside
+###  SimBatch
+python 2.7
 
-###  developement
-pyside
+###  SimBatch with GIU
+python 2.7
+pyside or pyside2
+
+###  SimBatch dev
+python 2.7
+pyside or pyside2
 pytest

@@ -10,7 +10,7 @@ except ImportError:
         from PySide2.QtGui import *
         from PySide2.QtWidgets import *
     except ImportError:
-        print "PySide import ERROR"
+        raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from widgets import *
 # from simbatch.core.queue import *

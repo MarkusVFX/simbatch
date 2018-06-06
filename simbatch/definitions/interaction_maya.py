@@ -8,14 +8,22 @@ class Interaction:
 
     def print_info(self):
         self.logger.raw("This is interaction with Maya")
-    
-    def save_current_scene_as(self, file):
-        print "TODO: interaction save as"
-    
+
+    # framework interactions
+    def schema_item_double_click(self, param):
+        self.maya_open_scene(param)
+
+    def save_as_next_version(self, param):
+        self.save_current_scene_as(param)
+
+    # maya interactions
     def maya_open_scene(self, file):
         print "TODO: maya_open_scene"
         pass
-        
+
+    def save_current_scene_as(self, file):
+        print "TODO: interaction save as"
+
     def maya_get_selection(self):
         print "TODO: maya_get_selection"
         return "test sel obj"

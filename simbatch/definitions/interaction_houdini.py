@@ -9,8 +9,15 @@ class Interaction:
 
     def print_info(self):
         self.logger.raw("This is interaction with Houdini")
-        
-    # houdini executions     
+
+    # framework interactions
+    def schema_item_double_click(self, param):
+        self.maya_open_scene(param)
+
+    def save_as_next_version(self, param):
+        self.save_current_scene_as(param)
+
+    # houdini interactions
     def houdini_open_scene(self, file):
         pass
         
@@ -27,7 +34,10 @@ class Interaction:
         pass   
         
     def houdini_render(self, ts, te, out_file=""):
-        pass 
-        
+        pass
+
     def houdini_save_scene(self, file):
+        pass
+
+    def save_current_scene_as(self, file):
         pass

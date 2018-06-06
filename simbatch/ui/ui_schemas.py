@@ -319,7 +319,7 @@ class SchemasUI:
         base_setup = self.batch.sio.generate_base_setup_file_name(self.sch.current_schema.schema_name, ver=self.sch.current_schema.schema_version)
         self.batch.logger.db(("double clicked  schema id :", current_schema_id, base_setup))
         if base_setup[0] == 1:
-            self.batch.dfn.current_interactions.open_scene(base_setup[1])
+            self.batch.dfn.current_interactions.schema_item_double_click(base_setup[1])
         else:
             self.batch.logger.err((" Base setup from schema dclick error :", base_setup))
 
@@ -336,6 +336,7 @@ class SchemasUI:
         ret = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name, ver=cur_schema.schema_version)
         if ret[0] == 1:
             self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
+            self.batch.dfn.current_interactions.save_as_next_version(ret[1])
             self.batch.dfn.current_interactions.save_current_scene_as(ret[1])
         else:
             self.batch.logger.err((" Error on generating increment setup version :", ret))

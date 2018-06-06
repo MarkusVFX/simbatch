@@ -10,6 +10,14 @@ class Interaction:
     def print_info(self):
         self.logger.raw("This is interaction with 3dsmax")
 
+    # framework interactions
+    def schema_item_double_click(self, param):
+        self.max_open_scene(param)
+
+    def save_as_next_version(self, param):
+        self.save_current_scene_as(param)
+
+    # max interactions
     def max_open_scene(self, file):
         pass
         
@@ -26,7 +34,10 @@ class Interaction:
         pass   
         
     def max_render(self, ts, te, out_file=""):
-        pass 
-        
+        pass
+
     def max_save_scene(self, file):
+        pass
+
+    def save_current_scene_as(self, file):
         pass

@@ -4,13 +4,13 @@
 #
 ##
 ###
-simbatch_instalation_dir = "S:/simbatch/"
+simbatch_installation_dir = "S:/simbatch/"
 simbatch_config_ini = "S:/simbatch/config.ini"
 ###
 ##
 #
 import sys
-sys.path.append(simbatch_instalation_dir)
+sys.path.append(simbatch_installation_dir)
 
 import simbatch.core.core as simbatch_core
 import simbatch.ui.mainw as simbatch_ui

@@ -191,13 +191,12 @@ class MainWindow(QMainWindow):
         top.qt_but_refresh.clicked.connect(self.on_clicked_but_refresh)
 
         self.top_ui = top
-        self.wiz_ui = WizardUI(batch, self, top)
+        self.wiz_ui = WizardUI(batch, self, top)        #  PRO version
         self.pro_ui = ProjectsUI(batch, self, top)
         self.sch_ui = SchemasUI(batch, self, top)
         self.tsk_ui = TasksUI(batch, self, top)
         self.que_ui = QueueUI(batch, self, top)
-        # self.nod_ui = NodesUI(batch, self, top)     #  PRO version
-
+        self.nod_ui = NodesUI(batch, self, top)
         self.set_ui = SettingsUI(batch, self, top)
         self.dfn_ui = DefinitionsUI(batch, self, top)
 
@@ -214,7 +213,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
         qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
         qt_tab_widget.addTab(self.que_ui.qt_widget_queue, "Queue")
-        # qt_tab_widget.addTab(self.nod_ui.qt_widget_nodes, "Sim Nodes")       # PRO version
+        qt_tab_widget.addTab(self.nod_ui.qt_widget_nodes, "Sim Nodes")
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         if self.sts.debug_level >= 4:
             qt_tab_widget.addTab(self.dfn_ui.qt_widget_definitions, "Definitions")
@@ -305,7 +304,6 @@ class MainWindow(QMainWindow):
             self.sts.window[1] = new_pos.y()
 
     def refresh_ui_with_reload_data(self):
-
         self.batch.logger.inf("reload PROJECTS")
         self.pro_ui.reload_projects_data_and_refresh_list()
 
@@ -321,10 +319,10 @@ class MainWindow(QMainWindow):
         self.batch.logger.inf("reload TASKS")
         self.tsk_ui.reload_tasks_data_and_refresh_list()
 
-        self.batch.logger.inf("reload QUEUE")
+        # self.batch.logger.inf("reload QUEUE")
         # self.que_ui      # TODO reload !!!
 
-        # self.batch.logger.inf("reload SIMNODES")
-        # self.nod_ui
+        self.batch.logger.inf("reload SIMNODES")
+        self.nod_ui.reload_simnodes_data_and_refresh_list()
 
         return ret

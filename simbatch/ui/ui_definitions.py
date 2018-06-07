@@ -62,7 +62,7 @@ class DefinitionsUI:
         qt_current = EditLineWithButtons("Current:")
         self.qt_current = qt_current
         qt_print_base = ButtonOnLayout("Definitons")
-        qt_print_current = ButtonOnLayout("Print Current")
+        qt_print_current = ButtonOnLayout("Print Selected")
         qt_print_all = ButtonOnLayout("Print ALL")
         qt_clear_info = ButtonOnLayout("Clear Info")
 
@@ -72,8 +72,8 @@ class DefinitionsUI:
         qt_clear_info.button.clicked.connect(self.on_click_clear_info)
 
         self.comfun.add_layouts(qt_print_lay_A, [qt_current.qt_widget_layout])
-        self.comfun.add_layouts(qt_print_lay_B, [qt_print_current.qt_widget_layout,
-                                                 qt_print_base.qt_widget_layout,
+        self.comfun.add_layouts(qt_print_lay_B, [qt_print_base.qt_widget_layout,
+                                                 qt_print_current.qt_widget_layout,
                                                  qt_print_all.qt_widget_layout,
                                                  qt_clear_info.qt_widget_layout])
         qt_print_lay.addLayout(qt_print_lay_A)

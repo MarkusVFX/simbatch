@@ -91,6 +91,10 @@ if sim_batch.sts.WITH_GUI == 1:
     reload(simbatch_ui_schemas_form)
     import simbatch.ui.ui_tasks as simbatch_ui_tasks
     reload(simbatch_ui_tasks)
+    import simbatch.ui.ui_queue as simbatch_ui_queue
+    reload (simbatch_ui_queue)
+    import simbatch.ui.ui_definitions as simbatch_ui_definitions
+    reload (simbatch_ui_definitions)
     reload(simbatch_ui)
     ############  force update UI  END
     main_window = simbatch_ui.MainWindow(sim_batch)

@@ -120,7 +120,7 @@ class SimBatch:
         self.prj.clear_all_projects_data()
         self.sch.clear_all_schemas_data()
 
-    def check_is_number_of_errors(self, check_this, counter, msg):
+    def loading_errors(self, check_this, counter, msg):
         if self.comfun.is_int(check_this):
             counter += check_this
             self.logger.err("Loading error! File: ({}) file errors count:{}".format(msg, check_this))
@@ -136,17 +136,22 @@ class SimBatch:
                 if ret_sch is not False:
                     ret_tsk = self.tsk.load_tasks()
                     if ret_tsk is not False:
-                        ret_nod = self.nod.load_nodes()
-                        if ret_tsk is not False:
-                            loading_err_count = 0     # count number errors while of loading external data
-                            loading_err_count = self.check_is_number_of_errors(ret_def, loading_err_count, "definitions")
-                            loading_err_count = self.check_is_number_of_errors(ret_prj, loading_err_count, "project")
-                            loading_err_count = self.check_is_number_of_errors(ret_sch, loading_err_count, "schemas")
-                            loading_err_count = self.check_is_number_of_errors(ret_tsk, loading_err_count, "tsks")
-                            if loading_err_count == 0:
-                                return True
+                        ret_que = self.que.load_queue()
+                        if ret_que is not False:
+                            ret_nod = self.nod.load_nodes()
+                            if ret_tsk is not False:
+                                loading_err_count = 0     # count number errors while of loading external data
+                                loading_err_count = self.loading_errors(ret_def, loading_err_count, "definitions")
+                                loading_err_count = self.loading_errors(ret_prj, loading_err_count, "project")
+                                loading_err_count = self.loading_errors(ret_sch, loading_err_count, "schemas")
+                                loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "tasks")
+
+                                if loading_err_count == 0:
+                                    return True
+                                else:
+                                    return loading_err_count
                             else:
-                                return loading_err_count
+                                return -5
                         else:
                             return -4
                     else:

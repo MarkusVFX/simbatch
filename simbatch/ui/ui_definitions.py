@@ -121,19 +121,19 @@ class DefinitionsUI:
 
     def on_definitions_tree_changed(self, new, old):
         if new is not None:
-            full_path_element = new.text(0) + "(" + new.text(1)+")   "
+            full_path_element = new.text(0)
             parent_str = ""
             parent_parent_str = ""
             parent = new.parent()
             if parent is not None:
                 parent_str = parent.text(0)
                 parent_id = parent.text(1)
-                full_path_element = parent_str + "(" + parent_id + ")   " + full_path_element
+                full_path_element = "{}    {}".format(parent_str, full_path_element)
                 parent_parent = parent.parent()
                 if parent_parent is not None:
                     parent_parent_str = parent_parent.text(0)
                     parent_parent_id = parent_parent.text(1)
-                    full_path_element = parent_parent_str + "(" + parent_parent_id + ")   " + full_path_element
+                    full_path_element = "{}    {}   {}{}{}".format(parent_parent_str, full_path_element,"[" ,new.text(1),"]")
 
             self.qt_current.qt_edit_line.setText(full_path_element)
 

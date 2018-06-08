@@ -315,9 +315,8 @@ class QueueUI:
         else:
             self.batch.logger.wrn(("file_to_load not exist: ", file_to_load[1]))
 
-    def on_click_menu_schema_remove(self):
-        self.batch.que.removeQueueItem(index=self.batch.que.current_queue_index, do_save=True)
-        self.reset_list()
+    def on_click_menu_queue_item_remove(self):
+        self.remove_queue_item()
 
     @staticmethod
     def on_click_menu_spacer():
@@ -334,7 +333,7 @@ class QueueUI:
         qt_right_menu.addAction("Locate prev", self.on_menu_locate_prev)
         qt_right_menu.addAction("Open computed scene", self.on_menu_open_computed_scene)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
-        qt_right_menu.addAction("Remove", self.on_click_menu_schema_remove)
+        qt_right_menu.addAction("Remove", self.on_click_menu_queue_item_remove)
         qt_right_menu.exec_(global_cursor_pos)
 
     def hide_all_forms(self):
@@ -393,10 +392,8 @@ class QueueUI:
     def on_click_remove(self):
         self.qt_form_remove.show()
         pass
-
-    def on_click_confirmed_remove_queue_item(self):
-        self.batch.logger.db(("remove_queue_item", self.batch.que.current_queue_index,
-                              self.current_list_item_index))
+    
+   def remove_queue_item(self):
         if self.current_list_item_index >= 0:
             take_item_list = self.current_list_item_index + 1
             self.batch.que.remove_single_queue_item(index=self.batch.que.current_queue_index, do_save=True)
@@ -406,6 +403,12 @@ class QueueUI:
             self.list_queue.takeItem(take_item_list)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
+        else:
+            self.batch.logger.wrn(("cannot remove from list, element unknown for list index: ", self.current_list_item_index))
+
+    def on_click_confirmed_remove_queue_item(self):
+        self.batch.logger.db(("remove_queue_item", self.batch.que.current_queue_index,
+                              self.current_list_item_index))
 
     def clear_list(self, with_freeze=True):
         if with_freeze:

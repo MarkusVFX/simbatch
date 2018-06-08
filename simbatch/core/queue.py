@@ -17,6 +17,7 @@ QUEUE_ITEM_FIELDS_NAMES = [
     ('ver', 'version'),
     ('evo', 'evolution'),
     ('evoNr', 'evolution_nr'),
+    ('evoScript', 'evolution_script'),
     ('prior', 'prior'),
     ('desc', 'description'),
     ('simNode', 'sim_node'),
@@ -266,6 +267,8 @@ class Queue:
             json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
             self.batch.logger.inf(("loading queue items: ", json_file))
+        else:
+            self.batch.logger.wrn(("queue file doesn't exist: ", json_file))
         return False
 
     def load_queue_from_mysql(self):

@@ -107,7 +107,6 @@ class QueueUI:
     current_list_item_index = None
     last_list_item_index = None
 
-
     def __init__(self, batch, mainw, top):
         self.batch = batch
         self.sts = batch.sts
@@ -294,9 +293,13 @@ class QueueUI:
 
         self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
 
-        prev_dir = prev_dir + "\\"
+        prev_dir = prev_dir + self.sts.dir_separator
         if self.comfun.path_exists(prev_dir, " prev open "):
-            subprocess.Popen('explorer "' + prev_dir + '"')
+            if self.sts.current_os == 1:
+                pass
+                # TODO linux
+            else:
+                subprocess.Popen('explorer "' + prev_dir + '"')
 
     def on_menu_open_computed_scene(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
@@ -475,11 +478,9 @@ class QueueUI:
                     cur_color = self.batch.sts.state_colors_up[cur_queue.state_id].color()
                     item_c.setBackground(cur_color)
 
-
                 # update QUE form
                 if self.edit_form_state == 1:
                     self.qt_form_edit.update_edit_ui(cur_queue)  # update edit form
-
             else:
                 self.batch.logger.err("on chng list que {} < {}".format(current_queue_index,
                                                                         len(self.batch.que.queue_data)))

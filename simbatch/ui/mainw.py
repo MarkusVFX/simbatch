@@ -17,6 +17,7 @@ from ui_projects import ProjectsUI
 from ui_schemas import SchemasUI
 from ui_tasks import TasksUI
 from ui_queue import QueueUI
+from ui_nodes import NodesUI
 from ui_settings import SettingsUI
 from ui_definitions import DefinitionsUI
 

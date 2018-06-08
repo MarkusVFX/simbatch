@@ -69,7 +69,7 @@ class ProjectsUI:
     debug_level = None
 
     freeze_list_on_changed = 0
-    last_project_index = None    # used for list item color change to unselected
+    last_project_list_index = None    # used for list item color change to unselected
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
@@ -541,7 +541,7 @@ class ProjectsUI:
         if self.batch.prj.current_project_index is not None:
             remove_index = self.batch.prj.current_project_index
             self.batch.prj.current_project_index = None
-            self.last_project_index = None
+            self.last_project_list_index = None
             self.batch.prj.remove_single_project(index=remove_index, do_save=True)
             self.qt_list_projects.takeItem(remove_index + 1)
             self.qt_form_remove.hide()
@@ -574,16 +574,16 @@ class ProjectsUI:
         else:
             self.batch.logger.inf(("on_list_current_changed", self.qt_list_projects.currentRow()))
 
-            self.last_project_index = self.batch.prj.current_project_index
+            self.last_project_list_index = self.batch.prj.current_project_index
             current_list_index = self.qt_list_projects.currentRow() - 1
             self.batch.prj.current_project_index = current_list_index
             self.batch.prj.update_current_from_index(current_list_index)
 
             # update color of last item list
-            if self.last_project_index >= 0:
-                last_item = self.qt_list_projects.item(self.last_project_index+1)
-                last_proj_state_id = self.batch.prj.projects_data[self.last_project_index].state_id
-                last_proj_def = self.batch.prj.projects_data[self.last_project_index].is_default
+            if self.last_project_list_index >= 0:
+                last_item = self.qt_list_projects.item(self.last_project_list_index + 1)
+                last_proj_state_id = self.batch.prj.projects_data[self.last_project_list_index].state_id
+                last_proj_def = self.batch.prj.projects_data[self.last_project_list_index].is_default
                 if last_proj_def == 1:
                     color_index = self.sts.INDEX_STATE_DEFAULT
                 else:

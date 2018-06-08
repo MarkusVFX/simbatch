@@ -392,6 +392,7 @@ class TasksUI:
     last_list_item_index = None
 
     freeze_list_on_changed = 0
+    last_task_list_index = None  # used for list item color change to unselected
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
@@ -767,7 +768,7 @@ class TasksUI:
             else:
                 self.batch.logger.deepdb(("not is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script))
 
-    def on_click_add_to_queue(self):
+    def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
         current_task_id = self.batch.tsk.current_task_id
         if current_task_id is not None:
@@ -783,7 +784,7 @@ class TasksUI:
                 self.mainw.que_ui.update_all_queue()
 
                 self.freeze_list_on_changed = 1
-                self.batch.tsk.last_task_list_index = -1
+                self.last_task_list_index = -1
                 self.reset_list()
 
                 self.freeze_list_on_changed = 0
@@ -823,21 +824,21 @@ class TasksUI:
             self.batch.logger.deepdb(("tsk chngd freeze_list_on_changed", self.list_tasks.currentRow()))
         else:
             self.batch.logger.inf(("list_task_current_item_changed: ", self.list_tasks.currentRow()))
-            self.last_list_item_index = self.current_list_item_index
+            self.last_task_list_index = self.current_list_item_index
             current_list_index = self.list_tasks.currentRow() - 1
             self.current_list_item_index = current_list_index
 
-            if self.last_list_item_index is not None:
-                if self.last_list_item_index is not None and self.last_list_item_index < len(self.batch.tsk.tasks_data):
-                    item = self.list_tasks.item(self.last_list_item_index + 1)
-                    if self.last_list_item_index < len(self.array_visible_tasks_ids):
-                        last_id = self.array_visible_tasks_ids[self.last_list_item_index]
+            if self.last_task_list_index is not None:
+                if self.last_task_list_index is not None and self.last_task_list_index < len(self.batch.tsk.tasks_data):
+                    item = self.list_tasks.item(self.last_task_list_index + 1)
+                    if self.last_task_list_index < len(self.array_visible_tasks_ids):
+                        last_id = self.array_visible_tasks_ids[self.last_task_list_index]
                         last_index = self.batch.tsk.get_index_by_id(last_id)
                         if item is not None and last_index is not None:
                             color_index = self.batch.tsk.tasks_data[last_index].state_id
                             item.setBackground(self.batch.sts.state_colors[color_index].color())
                 else:
-                    self.batch.logger.wrn("Wrong last_task_list_index {} vs {} ".format(self.last_list_item_index,
+                    self.batch.logger.wrn("Wrong last_task_list_index {} vs {} ".format(self.last_task_list_index,
                                                                                         len(self.batch.tsk.tasks_data)))
             else:
                 self.batch.logger.db("last_task_list_index is None")

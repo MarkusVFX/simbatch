@@ -120,7 +120,8 @@ class AddToQueueForm (QWidget):
             if edit_txt is not None:
                 wi = EditLineWithButtons(info, edit_txt)
             else:
-                wi = ActionWidgetATQ()
+                # wi = ActionWidgetATQ()
+                wi = EditLineWithButtons("evo_" + info, edit_txt)  # TODO
         qt_widget = QWidget()
         qt_widget.setLayout(wi.qt_widget_layout)
         self.qt_lay_actions.addWidget(qt_widget)

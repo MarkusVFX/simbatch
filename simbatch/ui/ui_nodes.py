@@ -146,9 +146,9 @@ class NodesUI:
             qt_list_item.setBackground(self.sts.state_colors[nod.state_id])
 
     def reload_simnodes_data_and_refresh_list(self):
-        self.batch.nod.clear_all_nodes()
+        self.batch.nod.clear_all_nodes_data()
         self.batch.nod.load_nodes()
-        self.resetList()
+        self.reset_list()
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
@@ -199,7 +199,7 @@ class NodesUI:
     def on_refresh_nodes(self):
         print " [db] refreshNodes"
         self.clear_list()
-        self.nod.clear_all_nodes()
+        self.nod.clear_all_nodes_data()
         self.nod.load_nodes()
         # self.nod.checkNodesState()     #TODO
         self.batch.initNodes(self.qt_list_nodes)
@@ -209,7 +209,7 @@ class NodesUI:
                 print "    [db]  EXE doUpdateNodeData !  "
             self.nod.save_nodes()
             self.clear_list()
-            self.nod.clear_all_nodes()
+            self.nod.clear_all_nodes_data()
             self.nod.load_nodes()
             # self.nod.checkNodesState()   ### TODO
             self.batch.initNodes(self.qt_list_nodes)

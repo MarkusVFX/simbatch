@@ -15,8 +15,8 @@ NODES_ITEM_FIELDS_NAMES = [
 
 
 class SingleNode:
-    def __init__(self, id, node_name, state, state_id, state_file, description):
-        self.id = id
+    def __init__(self, node_id, node_name, state, state_id, state_file, description):
+        self.id = node_id
         self.node_name = node_name
         self.state = state
         self.state_id = state_id
@@ -27,6 +27,7 @@ class SingleNode:
 class SimNodes:
     batch = None
     comfun = None
+    sts = None
 
     nodes_data = []
     total_nodes = 0
@@ -39,6 +40,7 @@ class SimNodes:
 
     def __init__(self, batch):
         self.batch = batch
+        self.sts = batch.sts
         self.comfun = batch.comfun
         self.nodes_data = []
 
@@ -77,9 +79,9 @@ class SimNodes:
         self.total_nodes += 1
 
     def load_nodes(self):
-        if self.batch.sts.store_data_mode == 1 :
+        if self.batch.sts.store_data_mode == 1:
             self.load_nodes_from_json()
-        if self.batch.sts.store_data_mode == 2 :
+        if self.batch.sts.store_data_mode == 2:
             self.load_nodes_from_mysql()
 
     def load_nodes_from_json(self, json_file=""):
@@ -124,7 +126,7 @@ class SimNodes:
         return self.comfun.save_json_file(json_file, content)
 
     def format_nodes_data(self, json=False, sql=False, backup=False):
-        if json == sql == backup == False:
+        if json == sql == backup is False:
             self.batch.logger.err("(format_nodes_data) no format param !")
         else:
             if json or backup:
@@ -145,43 +147,41 @@ class SimNodes:
                 return False
 
     def save_nodes_to_myqsl(self):
-        ### PRO VERSION
+        # PRO VERSION
         self.batch.logger.inf("PRO version with SQL")
 
-    def clear_all_nodes(self):
+    def clear_all_nodes_data(self):
         del self.nodes_data[:]
         self.max_id = 0
         self.total_nodes = 0
-        self.lastNodeNr = -1
-        self.currentNodeNr = -1
+        self.current_node_id = -1
+        self.current_node_index = -1
 
-    def get_node_state(self, file):  ### TODO tryToCreateIfNotExist = False,
-        if self.comfun.file_exists(file, "get state file txt"):
-            f = open(file, 'r')
-            firstLine = f.readline()
+    def get_node_state(self, state_file):     # TODO tryToCreateIfNotExist = False,
+        if self.comfun.file_exists(state_file, "get state file txt"):
+            f = open(state_file, 'r')
+            first_line = f.readline()
             f.close()
-            if len(firstLine) > 0:
-                li = firstLine.split(";")
+            if len(first_line) > 0:
+                li = first_line.split(";")
             else:
                 li = [-1]
-                self.batch.logger.deepdb((" [db] len(firstLine) : ", len(firstLine), " ___ ", len(firstLine)))
+                self.batch.logger.deepdb((" [db] len(first_line) : ", len(first_line), " ___ ", len(first_line)))
 
-            stateInt = self.comfun.int_or_val(li[0], -1);
-            self.batch.logger.deepdb((" [db] get stateInt : ", stateInt))
-            return stateInt
+            state_int = self.comfun.int_or_val(li[0], -1)
+            self.batch.logger.deepdb((" [db] get state_int : ", state_int))
+            return state_int
         else:
             return -1
 
-    def set_node_state(self, file, serverName, state):
-        if self.comfun.fileExists(file, "set state file txs"):
+    def set_node_state(self, state_file, server_name, state):
+        if self.comfun.fileExists(state_file, "set state file txs"):
             self.batch.logger.deepdb((" [db] set state : ", state))
-            f = open(file, 'w')
-            f.write(str(state) + ";" + serverName + ";" + self.comfun.getCurrentTime())
+            f = open(state_file, 'w')
+            f.write(str(state) + ";" + server_name + ";" + self.comfun.getCurrentTime())
             f.close()
         else:
-            self.batch.logger.err(("[ERR] file set state not exist: ", file))
-
-
+            self.batch.logger.err(("[ERR] file set state not exist: ", state_file))
 
 #
 # For network and multi node implementation

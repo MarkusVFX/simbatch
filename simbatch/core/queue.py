@@ -33,8 +33,7 @@ class QueueItem:
     max_id = 0
 
     def __init__(self, id, queue_item_name, task_id, user, user_id, sequence, shot, take, frame_from, frame_to, state,
-                 state_id, ver, evo, evo_nr, evo_script_type, evo_script, prior, description, sim_node, sim_node_id,
-                 time, proj_id, soft_id):
+                 state_id, ver, evo, evo_nr, evo_script, prior, description, sim_node, sim_node_id, time, proj_id, soft_id):
         self.id = id
         self.queue_item_name = queue_item_name
         self.task_id = task_id
@@ -50,7 +49,6 @@ class QueueItem:
         self.version = ver
         self.evolution = evo
         self.evolution_nr = evo_nr
-        self.evolution_script_type = evo_script_type
         self.evolution_script = evo_script
         self.prior = prior
         self.description = description
@@ -101,21 +99,20 @@ class Queue:
             print "   [INF] no queu items loaded"
         for q in self.queue_data:
             print "\n\n {}  {}  {}  {} state:{}   evo:{}   simnode:{}  desc:{}".format(q.id, q.queue_item_name, q.prior,
-                                                                                       q.proj_id, q.state, "q.evo",
+                                                                                       q.proj_id, q.state, q.evolution,
                                                                                        q.sim_node, q.description,
-                                                                                       q.proj_id) # TODO "q.evo"
+                                                                                       q.proj_id)
         print "\n\n"
 
     @staticmethod
     def get_blank_queue_item():
-        return QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, "ver", "evo", 0, "scripttype", "script", 50,
-                         " 1 ", "", 0, "", 1, 3)
+        return QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, "ver", "evo", 0, "script", 50, " 1 ", "", 0, "", 1, 3)
 
     def get_queue_index_by_id(self, get_id):
         for i, que in enumerate(self.queue_data):
             if que.id == get_id:
                 return i
-        self.batch.logger.wrn(("(get index by ) no queue item with ID: ", get_id))
+        self.batch.logger.wrn(("(get index by id) no queue item with id: ", get_id))
         return None
 
     def get_first_with_state(self, state_id, soft=0):
@@ -123,10 +120,10 @@ class Queue:
             if q.state_id == state_id:
                 if soft > 0:
                     if q.soft_id == soft:
-                        return index, self.queue_data[index].id
+                        return (index, self.queue_data[index].id)
                 else:
-                    return index, self.queue_data[index].id
-        return -1, -1
+                    return (index, self.queue_data[index].id)
+        return (-1, -1)
 
     def set_state(self, id, state, state_id, server_name="", server_id=-1, set_time=0, add_current_time=False):
         for i, q in enumerate(self.queue_data):
@@ -244,11 +241,11 @@ class Queue:
     def create_example_queue_data(self, do_save=True):
         collect_ids = 0
         sample_queue_item_1 = QueueItem(0, "queue item 1", 1, "T", 1, "", "", "", 1, 2, "DONE", 11, 3, "", 0,
-                                        "scripttype", "script", 50, "first", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
+                                        "script", 50, "first", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
         sample_queue_item_2 = QueueItem(0, "queue item 2", 3, "T", 1, "", "", "", 3, 4, "WORKING", 4, 2, "", 0,
-                                        "scripttype", "script", 50, "second", "sim_01", 1, "2017_12_28 02:02:03", 1, 1)
+                                        "script", 50, "second", "sim_01", 1, "2017_12_28 02:02:03", 1, 1)
         sample_queue_item_3 = QueueItem(0, "queue item 3", 4, "T", 1, "", "", "", 5, 6, "WAITING", 2, 1, "", 0,
-                                        "scripttype", "script", 40, "third", "sim_01", 1, "2017_12_28 02:02:04", 1, 1)
+                                        "script", 40, "third", "sim_01", 1, "2017_12_28 02:02:04", 1, 1)
         collect_ids += self.add_to_queue(sample_queue_item_1)
         collect_ids += self.add_to_queue(sample_queue_item_2)
         collect_ids += self.add_to_queue(sample_queue_item_3, do_save=do_save)

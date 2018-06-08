@@ -15,17 +15,9 @@ NODES_ITEM_FIELDS_NAMES = [
 
 
 class SingleNode:
-    totalItems = 0
-    max_id = 0
-    def __init__(self, id, nodeName, state, state_id, state_file, description):
-        if id > 0:
-            SingleNode.max_id = id
-        else:
-            SingleNode.max_id += 1
-        SingleNode.totalItems += 1
-
-        self.id = SingleNode.max_id
-        self.node_name = nodeName
+    def __init__(self, id, node_name, state, state_id, state_file, description):
+        self.id = id
+        self.node_name = node_name
         self.state = state
         self.state_id = state_id
         self.state_file = state_file

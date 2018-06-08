@@ -267,6 +267,7 @@ class Queue:
             json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
             self.batch.logger.inf(("loading queue items: ", json_file))
+
         else:
             self.batch.logger.wrn(("queue file doesn't exist: ", json_file))
         return False

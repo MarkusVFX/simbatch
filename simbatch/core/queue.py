@@ -267,7 +267,23 @@ class Queue:
             json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
             self.batch.logger.inf(("loading queue items: ", json_file))
-
+            json_nodes = self.comfun.load_json_file(json_file)
+            if json_nodes is not None and "queueItems" in json_nodes.keys():
+                if json_nodes['queueItems']['meta']['total'] > 0:
+                    for li in json_nodes['queueItems']['data'].values():
+                        if len(li) == len(QUEUE_ITEM_FIELDS_NAMES):
+                            new_queue_item = QueueItem(int(li['id']), li['name'], int(li['taskId']), li['user'], int(li['userId']), li['sequence'], li['shot'], li['take'],
+                                                       int(li['frameFrom']), int(li['frameTo']),  li['state'], int(li['stateId']), li['ver'], 
+                                                       li['evo'], int(li['evoNr']),  li['evoScript'],
+                                                       int(li['prior']), li['desc'], li['simNode'],int(li['simNodeId']), li['time'], int(li['projId']), int(li['softId']) )
+                            self.add_to_queue(new_queue_item) 
+                        else:
+                            self.batch.logger.wrn(("queue json data not consistent:", len(li),
+                                                   len(QUEUE_ITEM_FIELDS_NAMES)))
+                    return True
+            else:
+                self.batch.logger.wrn(("no tasks data in : ", json_file))
+                return False
         else:
             self.batch.logger.wrn(("queue file doesn't exist: ", json_file))
         return False

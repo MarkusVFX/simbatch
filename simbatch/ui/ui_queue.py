@@ -383,17 +383,16 @@ class QueueUI:
         wigdet_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
 
-    def add_to_queue_and_update_list(self, form_atq):
-        pass
+    # def add_to_queue_and_update_list(self, form_atq):
+    #     pass      TODO cleanup
 
     def on_click_save_changes(self, updated_queue_name, updated_prior, updated_state, updated_description):
         pass
 
     def on_click_remove(self):
         self.qt_form_remove.show()
-        pass
     
-   def remove_queue_item(self):
+    def remove_queue_item(self):
         if self.current_list_item_index >= 0:
             take_item_list = self.current_list_item_index + 1
             self.batch.que.remove_single_queue_item(index=self.batch.que.current_queue_index, do_save=True)
@@ -419,12 +418,10 @@ class QueueUI:
             self.freeze_list_on_changed = 0
 
     def update_list_of_visible_ids(self):
-        print "\n\n UP QQQQQQQ"
         array_visible_queue_items_ids = []
         for que in self.batch.que.queue_data:
             if que.proj_id == self.batch.prj.current_project_id:
                 array_visible_queue_items_ids.append(que.id)
-                print "    ____ jest QQ", que.id
         self.array_visible_queue_items_ids = array_visible_queue_items_ids
 
     def on_current_item_changed(self, current_queue_item):
@@ -472,7 +469,7 @@ class QueueUI:
             if 0 <= current_queue_index < len(self.batch.que.queue_data):
                 cur_queue = self.batch.que.queue_data[current_queue_index]
                 if self.top_ui is not None:
-                    self.top_ui.set_top_info("Current task: [" + str(cur_queue.id) + "]    " + cur_queue.queue_name)
+                    self.top_ui.set_top_info("Current task: [" + str(cur_queue.id) + "]    "+cur_queue.queue_item_name)
                 else:
                     self.batch.logger.err("top_ui is None")
 

@@ -40,6 +40,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
     actions_array = []
     schema_version = None
     description = None
+    soft_name = None
 
     def __init__(self, schema_id, schema_name, state_id, state, project_id, based_on_definition,
                  actions_array, schema_version, description):  # actions_array
@@ -55,6 +56,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
         # self.actions_string = ""
         self.description = description
         # self.actions_to_string()
+        soft_name = "Maya_TODO"  # TODO
 
     def basic_print(self):
         print "\n [INF] basic print: "

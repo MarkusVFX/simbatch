@@ -1,4 +1,5 @@
 import os
+import copy
 
 # JSON Name Format, PEP8 Name Format
 QUEUE_ITEM_FIELDS_NAMES = [
@@ -29,13 +30,11 @@ QUEUE_ITEM_FIELDS_NAMES = [
 
 
 class QueueItem:
-    total_items = 0
-    max_id = 0
 
-    def __init__(self, id, queue_item_name, task_id, user, user_id, sequence, shot, take, frame_from, frame_to, state,
-                 state_id, ver, evo, evo_nr, evo_script_type, evo_script, prior, description, sim_node, sim_node_id,
-                 time, proj_id, soft_id):
-        self.id = id
+    def __init__(self, queue_item_id, queue_item_name, task_id, user, user_id, sequence, shot, take,
+                 frame_from, frame_to, state, state_id, ver, evo, evo_nr, evo_script, prior,
+                 description, sim_node, sim_node_id, time, proj_id, soft_id):
+        self.id = queue_item_id
         self.queue_item_name = queue_item_name
         self.task_id = task_id
         self.user = user
@@ -50,7 +49,6 @@ class QueueItem:
         self.version = ver
         self.evolution = evo
         self.evolution_nr = evo_nr
-        self.evolution_script_type = evo_script_type
         self.evolution_script = evo_script
         self.prior = prior
         self.description = description
@@ -101,22 +99,36 @@ class Queue:
             print "   [INF] no queu items loaded"
         for q in self.queue_data:
             print "\n\n {}  {}  {}  {} state:{}   evo:{}   simnode:{}  desc:{}".format(q.id, q.queue_item_name, q.prior,
-                                                                                       q.proj_id, q.state, "q.evo",
+                                                                                       q.proj_id, q.state, q.evolution,
                                                                                        q.sim_node, q.description,
-                                                                                       q.proj_id) # TODO "q.evo"
+                                                                                       q.proj_id)
         print "\n\n"
 
     @staticmethod
     def get_blank_queue_item():
-        return QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, "ver", "evo", 0, "scripttype", "script", 50,
-                         " 1 ", "", 0, "", 1, 3)
+        return QueueItem(0, "", 1, "M", 1, "", "", "", 10, 20, "NULL", 0, 1, "", 0, "", 50, " 1 ", "", 0, "", 1, 3)
 
-    def get_queue_index_by_id(self, get_id):
+    def get_index_by_id(self, get_id):
         for i, que in enumerate(self.queue_data):
             if que.id == get_id:
                 return i
         self.batch.logger.wrn(("(get index by ) no queue item with ID: ", get_id))
         return None
+
+    def update_current_from_id(self, queue_id):
+        for i, que in enumerate(self.queue_data):
+            if que.id == queue_id:
+                self.current_queue_index = i
+                self.current_queue_id = queue_id
+                self.current_queue = que
+                return i
+        self.clear_current_queue_item()
+        return False
+
+    def clear_current_queue_item(self):
+        self.current_queue_id = None
+        self.current_queue_index = None
+        self.current_queue = None
 
     def get_first_with_state(self, state_id, soft=0):
         for index, q in enumerate(self.queue_data):
@@ -128,9 +140,9 @@ class Queue:
                     return index, self.queue_data[index].id
         return -1, -1
 
-    def set_state(self, id, state, state_id, server_name="", server_id=-1, set_time=0, add_current_time=False):
+    def set_state(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=0, add_current_time=False):
         for i, q in enumerate(self.queue_data):
-            if q.id == id:
+            if q.id == queue_id:
                 self.queue_data[i].state = state
                 self.queue_data[i].state_id = state_id
                 self.queue_data[i].sim_node = server_name
@@ -140,8 +152,7 @@ class Queue:
                                                                        self.queue_data[i].description)
                 elif set_time > 0:
                     time_string = self.comfun.format_seconds_to_string(set_time)
-                    self.queue_data[i].description = "[{}]  {}".format(time_string,
-                                                                       self.queue_data[i].description)
+                    self.queue_data[i].description = "[{}]  {}".format(time_string, self.queue_data[i].description)
                 return True
         return False
 
@@ -178,29 +189,32 @@ class Queue:
                     return False
         return True
 
-    def add_to_queue(self, queue_item, do_save=False):
-        if queue_item.id > 0:
-            self.max_id = queue_item.id
-        else:
-            self.max_id += 1
-            queue_item.id = self.max_id
-        self.queue_data.append(queue_item)
-        self.total_queue_items += 1
+    def add_to_queue(self, queue_items, do_save=False):
+
+        last_queue_item_id = None
+        for queue_item in queue_items:
+            if queue_item.id > 0:
+                self.max_id = queue_item.id
+            else:
+                self.max_id += 1
+                queue_item.id = self.max_id
+            last_queue_item_id = self.max_id
+            self.queue_data.append(queue_item)
+            self.total_queue_items += 1
 
         if do_save is True:
             if self.save_queue():
-                return queue_item.id
+                return last_queue_item_id
             else:
                 return False
-        return queue_item.id
+        return last_queue_item_id
 
-
-    def remove_single_queue_item(self, index=None, id=None, do_save=False):
-        if index is None and id is None:
+    def remove_single_queue_item(self, index=None, queue_id=None, do_save=False):
+        if index is None and queue_id is None:
             return False
-        if id > 0:
+        if queue_id > 0:
             for i, que in enumerate(self.queue_data):
-                if que.id == id:
+                if que.id == queue_id:
                     del self.queue_data[i]
                     self.total_queue_items -= 1
                     break
@@ -212,13 +226,50 @@ class Queue:
         else:
             return True
 
+    def generate_template_queue_item(self, task_id, options=None):
+        # TODO
+        # TODO   WIP
+        task_index = self.batch.tsk.get_index_by_id(task_id)
+        if task_index is not None:
+            task_to_queued = self.batch.tsk.tasks_data[task_index]
+            schema_index = self.batch.sch.get_index_by_id(task_to_queued.schema_id)
+            schema_to_queued = self.batch.sch.schemas_data[schema_index]
+
+            task_to_queued.queue_ver += 1
+            current_time = ""
+
+            new_queue_item = QueueItem(0, "queue item 2", task_to_queued.id, "U", 0,
+                                       task_to_queued.sequence, task_to_queued.shot, task_to_queued.take,
+                                       task_to_queued.sim_frame_start, task_to_queued.sim_frame_end,
+                                       self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_WAITING],
+                                       self.batch.sts.INDEX_STATE_WAITING,
+                                       task_to_queued.queue_ver, "evo", 0, "evo_script",
+                                       task_to_queued.priority, "", "", -1, current_time, task_to_queued.project_id,
+                                       schema_to_queued.soft_name)
+
+            # TODO
+            # TODO
+            print "\n  !!! TODO compile2 ...  WIP ... ", task_id, options
+            return new_queue_item    # self.get_blank_queue_item()
+        else:
+            return None
+
     def generate_queue_items(self, task_id, options=None):
-        # TODO
-        # TODO
-        # TODO
-        # TODO
-        print "\n  !!! TODO compile2 ", task_id, options
-        return self.get_blank_queue_item()
+        # TODO   WIP
+        queue_items = []
+        template_queue_item = self.generate_template_queue_item(task_id, options=None)
+        evolutions = ["BND:4", "BND:5", "BND:7"]    # HACK TODO
+        for i, evo in enumerate(evolutions):
+            queue_item = copy.deepcopy(template_queue_item)
+            queue_item.evo = evo
+            queue_item.evo_nr = i
+            queue_item.evo_script = self.generate_evo_script(evo)
+            queue_item.description = evo
+            queue_items.append(queue_item)
+        return queue_items
+
+    def generate_evo_script(self, hymm):
+        return " eval("+hymm+") ...  WIP  TODO "
 
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):
@@ -244,14 +295,14 @@ class Queue:
     def create_example_queue_data(self, do_save=True):
         collect_ids = 0
         sample_queue_item_1 = QueueItem(0, "queue item 1", 1, "T", 1, "", "", "", 1, 2, "DONE", 11, 3, "", 0,
-                                        "scripttype", "script", 50, "first", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
+                                        "script", 50, "first", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
         sample_queue_item_2 = QueueItem(0, "queue item 2", 3, "T", 1, "", "", "", 3, 4, "WORKING", 4, 2, "", 0,
-                                        "scripttype", "script", 50, "second", "sim_01", 1, "2017_12_28 02:02:03", 1, 1)
+                                        "script", 50, "second", "sim_01", 1, "2017_12_28 02:02:03", 1, 1)
         sample_queue_item_3 = QueueItem(0, "queue item 3", 4, "T", 1, "", "", "", 5, 6, "WAITING", 2, 1, "", 0,
-                                        "scripttype", "script", 40, "third", "sim_01", 1, "2017_12_28 02:02:04", 1, 1)
-        collect_ids += self.add_to_queue(sample_queue_item_1)
-        collect_ids += self.add_to_queue(sample_queue_item_2)
-        collect_ids += self.add_to_queue(sample_queue_item_3, do_save=do_save)
+                                        "script", 40, "third", "sim_01", 1, "2017_12_28 02:02:04", 1, 1)
+        collect_ids += self.add_to_queue((sample_queue_item_1, ))
+        collect_ids += self.add_to_queue((sample_queue_item_2, ))
+        collect_ids += self.add_to_queue((sample_queue_item_3, ), do_save=do_save)
         self.sample_data_checksum = 6
         self.sample_data_total = 3
         return collect_ids
@@ -272,14 +323,17 @@ class Queue:
                 if json_nodes['queueItems']['meta']['total'] > 0:
                     for li in json_nodes['queueItems']['data'].values():
                         if len(li) == len(QUEUE_ITEM_FIELDS_NAMES):
-                            new_queue_item = QueueItem(int(li['id']), li['name'], int(li['taskId']), li['user'], int(li['userId']), li['sequence'], li['shot'], li['take'],
-                                                       int(li['frameFrom']), int(li['frameTo']),  li['state'], int(li['stateId']), li['ver'], 
-                                                       li['evo'], int(li['evoNr']),  li['evoScript'],
-                                                       int(li['prior']), li['desc'], li['simNode'],int(li['simNodeId']), li['time'], int(li['projId']), int(li['softId']) )
-                            self.add_to_queue(new_queue_item) 
+                            new_queue_item = QueueItem(int(li['id']), li['name'], int(li['taskId']), li['user'],
+                                                       int(li['userId']), li['sequence'], li['shot'], li['take'],
+                                                       int(li['frameFrom']), int(li['frameTo']),
+                                                       li['state'], int(li['stateId']), li['ver'],
+                                                       li['evo'], int(li['evoNr']), li['evoScript'], int(li['prior']),
+                                                       li['desc'], li['simNode'], int(li['simNodeId']),
+                                                       li['time'], int(li['projId']), "TMP")  # TODO int(li['softId'])
+                            self.add_to_queue((new_queue_item, ))
                         else:
-                            self.batch.logger.wrn(("queue json data not consistent:", len(li),
-                                                   len(QUEUE_ITEM_FIELDS_NAMES)))
+                            self.batch.logger.wrn(("queue json data not consistent:",
+                                                   len(li), len(QUEUE_ITEM_FIELDS_NAMES)))
                     return True
             else:
                 self.batch.logger.wrn(("no tasks data in : ", json_file))

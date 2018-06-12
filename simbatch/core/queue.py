@@ -34,6 +34,7 @@ class QueueItem:
                  frame_from, frame_to, state, state_id, ver, evo, evo_nr, evo_script, prior,
                  description, sim_node, sim_node_id, time, proj_id, soft_id):
         self.id = queue_item_id
+
         self.queue_item_name = queue_item_name
         self.task_id = task_id
         self.user = user
@@ -111,7 +112,7 @@ class Queue:
         for i, que in enumerate(self.queue_data):
             if que.id == get_id:
                 return i
-        self.batch.logger.wrn(("(get index by ) no queue item with ID: ", get_id))
+        self.batch.logger.wrn(("(get index by id) no queue item with id: ", get_id))
         return None
 
     def update_current_from_id(self, queue_id):
@@ -134,10 +135,10 @@ class Queue:
             if q.state_id == state_id:
                 if soft > 0:
                     if q.soft_id == soft:
-                        return index, self.queue_data[index].id
+                        return (index, self.queue_data[index].id)
                 else:
-                    return index, self.queue_data[index].id
-        return -1, -1
+                    return (index, self.queue_data[index].id)
+        return (-1, -1)
 
     def update_state_and_node(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=0,
                               add_current_time=False):
@@ -303,6 +304,7 @@ class Queue:
         collect_ids += self.add_to_queue((sample_queue_item_1, ))
         collect_ids += self.add_to_queue((sample_queue_item_2, ))
         collect_ids += self.add_to_queue((sample_queue_item_3, ), do_save=do_save)
+
         self.sample_data_checksum = 6
         self.sample_data_total = 3
         return collect_ids

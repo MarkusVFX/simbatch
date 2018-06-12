@@ -30,7 +30,6 @@ QUEUE_ITEM_FIELDS_NAMES = [
 
 
 class QueueItem:
-
     def __init__(self, queue_item_id, queue_item_name, task_id, user, user_id, sequence, shot, take,
                  frame_from, frame_to, state, state_id, ver, evo, evo_nr, evo_script, prior,
                  description, sim_node, sim_node_id, time, proj_id, soft_id):
@@ -83,16 +82,16 @@ class Queue:
     #  print project data, mainly for debug
     def print_header(self):
         print "\n QUEUE: "
-        print "     current project: id: {}     index: {}    total_projects: {}\n".format(self.current_queue_id,
-                                                                                          self.current_queue_index,
-                                                                                          self.total_queue_items)
+        print "     current queue item id: {}   index: {}   total queue items: {}\n".format(self.current_queue_id,
+                                                                                            self.current_queue_index,
+                                                                                            self.total_queue_items)
 
     def print_current(self):
         print "       current queue index:{}, id:{}, total:{}".format(self.current_queue_index, self.current_queue_id,
                                                                       self.total_queue_items)
         if self.current_queue_index is not None:
             cur_que = self.current_queue
-            print "       current queue name:{}".format(cur_que.queue_name)
+            print "       current queue name:{}".format(cur_que.queue_item_name)
 
     def print_all(self):
         if self.total_queue_items == 0:
@@ -130,7 +129,7 @@ class Queue:
         self.current_queue_index = None
         self.current_queue = None
 
-    def get_first_with_state(self, state_id, soft=0):
+    def get_first_with_state_id(self, state_id, soft=0):
         for index, q in enumerate(self.queue_data):
             if q.state_id == state_id:
                 if soft > 0:
@@ -140,7 +139,8 @@ class Queue:
                     return index, self.queue_data[index].id
         return -1, -1
 
-    def set_state(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=0, add_current_time=False):
+    def update_state_and_node(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=0,
+                              add_current_time=False):
         for i, q in enumerate(self.queue_data):
             if q.id == queue_id:
                 self.queue_data[i].state = state
@@ -190,7 +190,6 @@ class Queue:
         return True
 
     def add_to_queue(self, queue_items, do_save=False):
-
         last_queue_item_id = None
         for queue_item in queue_items:
             if queue_item.id > 0:
@@ -211,6 +210,7 @@ class Queue:
 
     def remove_single_queue_item(self, index=None, queue_id=None, do_save=False):
         if index is None and queue_id is None:
+            self.batch.logger.err("queue item data not removed, skipping, missing index or id")
             return False
         if queue_id > 0:
             for i, que in enumerate(self.queue_data):

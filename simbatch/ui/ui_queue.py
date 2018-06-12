@@ -248,7 +248,7 @@ class QueueUI:
         self.freeze_list_on_changed = 1
         index = self.batch.que.current_queue_index
         self.clear_list(with_freeze=False)
-        self.batch.init_queue(self.list_queue)   # TODO check
+        self.init_queue_items()
         self.batch.que.current_queue_index = index
         self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
         self.freeze_list_on_changed = 0
@@ -464,6 +464,9 @@ class QueueUI:
                 current_queue_item_id = self.array_visible_queue_items_ids[current_list_index]
                 self.batch.que.current_queue_id = current_queue_item_id
                 self.batch.que.update_current_from_id(current_queue_item_id)
+            else:
+                self.batch.logger.err(("Wrong current_list_index: ", current_list_index,
+                                       " or array_visible_queue_items_ids", len(self.array_visible_queue_items_ids)))
 
             current_queue_index = self.batch.que.current_queue_index
             if 0 <= current_queue_index < len(self.batch.que.queue_data):

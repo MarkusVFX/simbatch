@@ -158,55 +158,50 @@ class NodesUI:
         # self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
 
-    def on_menu_remove(self):    # TODO
-        if self.sts.deBugLevel >= 3:
-            print "  remove "
-
-    def on_menu_reset(self):
-        self.on_restart_node()
-        if self.sts.deBugLevel >= 3:
-            print " [db] menu Reset  "
-
     def show_right_click_menu(self, pos):
-        globalPos = self.qt_list_nodes.mapToGlobal(pos)
-        rightMenu = QMenu()
-        rightMenu.addAction("Reset Node", self.on_menu_reset)
-        rightMenu.addAction("Remove Node", self.on_menu_remove)
-        rightMenu.exec_( globalPos )
+        global_pos = self.qt_list_nodes.mapToGlobal(pos)
+        qt_right_menu = QMenu()
+        qt_right_menu.addAction("Reset Node", self.on_menu_reset)
+        qt_right_menu.addAction("Remove Node", self.on_menu_remove)
+        qt_right_menu.exec_(global_pos)
 
-    def clear_list(self, with_freeze=False):  # TODO   with freeze
+    def clear_list(self, with_freeze=False):  # TODO with freeze
         while self.qt_list_nodes.count() > 0:
             self.qt_list_nodes.takeItem(0)
 
     def add_node(self):    # TODO
         self.batch.logger.raw(" TODO: add_node ")
 
+    def on_menu_remove(self):    # TODO
+        self.batch.logger.db("on menu: Remove  TODO")
+
     def on_remove_node(self):    # TODO
         self.batch.logger.raw(" TODO: on_remove_node ")
 
     def on_restart_node(self):
-        if self.nod.currentNodeNr >=0:
-            currentNode = self.nod.nodes_data[self.nod.currentNodeNr]
-            srvName = self.nod.getServerNameFromFile(currentNode.stateFile)
-            if self.sts.deBugLevel >= 5:
-                print "    [db]   srvName  : ", srvName
-            self.nod.setNodeState( currentNode.stateFile, srvName, 2)
+        if self.nod.current_node_index >= 0:
+            current_node = self.nod.nodes_data[self.nod.current_node_index]
+            srv_name = self.nod.get_server_name_from_file(current_node.state_file)
+            self.batch.logger.db(("set IDLE to node:", srv_name))
+            self.nod.set_node_state(current_node.state_file, srv_name, 2)
         else:
-            if self.sts.deBugLevel >= 1:
-                print " [WRN] (restartNode)  SELECT ITEM ! "
-            self.top_ui.setTopInfo(" Select item first ", 7)
+            self.batch.logger.wrn("(on restart node) PLEASE SELECT ITEM FIRST")
+            self.top_ui.set_top_info(" Select item first ", 7)
+
+    def on_menu_reset(self):
+        self.batch.logger.db("on menu: Reset")
+        self.on_restart_node()
 
     def on_refresh_nodes(self):
-        print " [db] refreshNodes"
+        self.batch.logger.db("on_refresh_nodes")
         self.clear_list()
         self.nod.clear_all_nodes_data()
         self.nod.load_nodes()
         # self.nod.checkNodesState()     #TODO
         self.batch.initNodes(self.qt_list_nodes)
-        doUpdateNodeDataFile = self.nod.checkNodesStateFiles()
-        if doUpdateNodeDataFile == 1:     # TODO optimize  up
-            if self.sts.deBugLevel >= 5:
-                print "    [db]  EXE doUpdateNodeData !  "
+        do_update_node_data_file = self.nod.checkNodesStateFiles()
+        if do_update_node_data_file == 1:     # TODO optimize  up
+            self.batch.logger.db("do_update_node_data_file")
             self.nod.save_nodes()
             self.clear_list()
             self.nod.clear_all_nodes_data()
@@ -215,27 +210,25 @@ class NodesUI:
             self.batch.initNodes(self.qt_list_nodes)
 
     def on_list_nodes_current_changed(self, x):
-
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("simnodes chngd freeze_list_on_changed", self.qt_list_nodes.currentRow()))
         else:
             self.batch.logger.inf(("on_list_current_changed", self.qt_list_nodes.currentRow()))
 
-            self.last_node_index = self.batch.nod.current_node_index
+            self.last_node_list_index = self.batch.nod.current_node_index
             current_list_index = self.qt_list_nodes.currentRow() - 1
             self.batch.nod.current_node_index = current_list_index
             self.batch.nod.update_current_from_index(current_list_index)
 
             # update color of last item list
-            if self.last_node_index >= 0:
-                last_item = self.qt_list_nodes.item(self.last_node_index+1)
-                last_node_state_id = self.batch.nod.nodes_data[self.last_node_index].state_id
+            if self.last_node_list_index >= 0:
+                last_item = self.qt_list_nodes.item(self.last_node_list_index + 1)
+                last_node_state_id = self.batch.nod.nodes_data[self.last_node_list_index].state_id
                 color_index = last_node_state_id
                 if last_item is not None:
                     last_item.setBackground(self.batch.sts.state_colors[color_index].color())
 
             # update top info and color of current item list
-            cur_node = None
             if 0 <= current_list_index < len(self.batch.nod.nodes_data):
                 cur_node = self.batch.nod.nodes_data[current_list_index]
                 color_index = cur_node.state_id

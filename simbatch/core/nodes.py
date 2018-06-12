@@ -175,10 +175,10 @@ class SimNodes:
             return -1
 
     def set_node_state(self, state_file, server_name, state):
-        if self.comfun.fileExists(state_file, "set state file txs"):
+        if self.comfun.file_exists(state_file, "set state file txs"):
             self.batch.logger.deepdb((" [db] set state : ", state))
             f = open(state_file, 'w')
-            f.write(str(state) + ";" + server_name + ";" + self.comfun.getCurrentTime())
+            f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
             f.close()
         else:
             self.batch.logger.err(("[ERR] file set state not exist: ", state_file))

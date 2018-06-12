@@ -1,0 +1,3 @@
+1;SiNode_01;WAITING;2;68a5e1;8533FF;S:\sib_src\SimBatch_server\state.txt;main; 
+2;SiNode_02;OFFLINE;23;68a5e1;8533FF;S:\sib_src\SimBatch_server\state2.txt;test; 
+3;SiNode_03;OFFLINE;23;68a5e1;8533FF;S:\sib_src\SimBatch_server\state3.txt;test; 

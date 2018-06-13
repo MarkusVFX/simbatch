@@ -1,7 +1,8 @@
 import platform
 
 from settings import Settings
-from lib.common import CommonFunctions, Logger
+from lib.common import CommonFunctions
+from lib.logger import Logger
 from users import Users
 from definitions import Definitions
 from projects import Projects

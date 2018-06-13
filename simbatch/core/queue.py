@@ -34,7 +34,6 @@ class QueueItem:
                  frame_from, frame_to, state, state_id, ver, evo, evo_nr, evo_script, prior,
                  description, sim_node, sim_node_id, time, proj_id, soft_id):
         self.id = queue_item_id
-
         self.queue_item_name = queue_item_name
         self.task_id = task_id
         self.user = user
@@ -135,10 +134,10 @@ class Queue:
             if q.state_id == state_id:
                 if soft > 0:
                     if q.soft_id == soft:
-                        return (index, self.queue_data[index].id)
+                        return index, self.queue_data[index].id
                 else:
-                    return (index, self.queue_data[index].id)
-        return (-1, -1)
+                    return index, self.queue_data[index].id
+        return -1, -1
 
     def update_state_and_node(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=0,
                               add_current_time=False):
@@ -270,7 +269,8 @@ class Queue:
         return queue_items
 
     def generate_evo_script(self, hymm):
-        return " eval("+hymm+") ...  WIP  TODO "
+        self.batch.logger.wrn(" TODO generate_evo_script ")
+        return " eval("+hymm+") ...  WIP  TODO "   # TODO
 
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):

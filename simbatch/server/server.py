@@ -1,136 +1,162 @@
 import time
 import os
 
+
 class SimBatchServer:
     timerDelaySeconds = 3   # delay for each loop execution
     loopsLimit = 0          # 0 infinite loop
-    loopsCounter = 0        # total loop executions
+    loops_counter = 0        # total loop executions
 
-    dbMode = 1    #  0 debug OFF    1 debug ON
-    runExecutorState = 0  ####   0 idle   1 something to do     2 runnning      9 err
-    # currentSimNodeState = -1;    #  -1 ERR   0 off   1  server run   2 server exeute    3 proces run   4 process done   9 err
-    currentSimNodeState = -1;   # 23 OFFLINE   8 off(HOLD)  2  server run (WAITIG) 20 server exeutor(ACTIVE)  4 proces run  (WORKING)   11 process done   9 err
+    dbMode = 1    # 0 debug OFF    1 debug ON
+    runExecutorState = 0  # 0 idle   1 something to do     2 runnning      9 err
+    current_simnode_state = None
+    # 23 OFFLINE   8 off(HOLD)  2(WAITING)  20 server executor(ACTIVE)  4 proces run  (WORKING)  11 process done  9 err
 
     batch = None
     forceSoftware = 0
-    serverName = "SiNode_01"   # TODO  custom name on init
-    serverDir = ""
-    stateFileName = "state.txt"
+    server_name = "SimNode_01"   # TODO  custom name on init
+    server_dir = ""
+    state_file_name = "state.txt"
+    log_file_name = "log.txt"
+    script_execute = "script_execute.py"
 
-    currentSimNodeState = None
-
-    def __init__( self, batch ):
+    def __init__(self, batch):
         self.batch = batch
-        self.serverDir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
-        self.stateFileName   # TODO option
+        self.batch.que.load_queue()
+        if self.batch.que.total_queue_items == 0:
+            self.batch.logger.err("queue data is empty, nothing loaded")
+            self.batch.que.print_header()
 
-        self.currentSimNodeState = self.batch.nod.get_node_state( self.serverDir + self.stateFileName )
-        if self.currentSimNodeState == -1:
-            self.batch.comfun.save_to_file(self.serverDir+self.stateFileName,"2;"+self.serverName+";"+self.getDate())
-            self.setSimNodeState(2)
+        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
+        self.test_server_dir()
 
-        print "__init node state : ", self.currentSimNodeState
+        self.current_simnode_state = self.batch.nod.get_node_state(self.server_dir + self.state_file_name)
+        if self.current_simnode_state == -1:
+            simnode_state_file = self.server_dir + self.state_file_name
+            simnode_state_data = "{};{};{}".format(2, self.server_name, self.get_date())
+            self.batch.comfun.save_to_file(simnode_state_file, simnode_state_data)
+            self.set_simnode_state(2)
+        self.batch.logger.inf(("init server", self.server_dir))
 
-    def getDate (self):
+    def test_server_dir(self):
+        # TODO tesdt write acces   create data dir
+        pass
+
+    def get_date(self):  # TODO move to common
         return time.strftime("%Y-%m-%d_%H:%M:%S")
 
-    def setSimNodeState(self,state, dbMode = 0):
-        file=self.serverDirt+self.stateFileName
-        self.batch.nod.set_node_state(file, self.serverName, state, dbMode = dbMode)
+    def set_simnode_state(self, state):
+        file = self.server_dir + self.state_file_name
+        self.batch.nod.set_node_state(file, self.server_name, state)
 
-    def setStateAndAddToLog (self, stateName, stateID, serverName, withSave=True, addCurrentTime = False , setTime=""):
-        print " [INF] setStateAndAddToLog : ",  stateName, stateID, serverName
+    def add_to_log(self, info, log_file=None):   # TODO move to common
+        date = self.get_date()
+        if log_file == None:
+            log_file = self.server_dir + self.log_file_name
+        f = open(log_file, 'a')
+        f.write(date + info + '; \n')
+        f.close()
+        self.batch.logger.log(info)
 
-        self.batch.que.clearAllQueueItems()  # TODO  check REFERS ON LOCAL !!!!
-        self.batch.que.loadQueue()
-        self.batch.que.setState( self.executeQueueID , stateName, stateID, serverName=serverName, serverID=1, setTime=setTime, addCurrentTime = addCurrentTime )
+    def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
+        self.batch.logger.db(("set_state: ", state, state_id, server_name))
+        self.batch.que.clear_all_queue_items()  # TODO  check REFERS IF LOCAL !!!!
+        self.batch.que.load_queue()
+        self.batch.que.update_current_from_id(queue_id)
+        self.batch.que.update_state_and_node(queue_id, state, state_id, server_name=server_name, server_id=1,
+                                             set_time=set_time, add_current_time = add_current_time )
 
-        if self.batch.que.getQueueIndexFromID(self.executeQueueID) > 0:
-            qin = self.batch.que.queueData[   self.batch.que.getQueueIndexFromID(self.executeQueueID)   ].queueItemName
-            self.addToLog( " set qID "+stateName+" [" +  str( self.executeQueueID) +  "]   "+ qin +"   by server: " +  self.serverName  )
+        if self.batch.que.current_queue_index is not None:
+            qin = self.batch.que.current_queue.queue_item_name
+            self.add_to_log(" state:{}   id:{}    qin:{}   by server:{}".format(state, self.batch.que.current_queue_id,
+                                                                                qin, self.server_name))
         else:
-            self.addToLog( " set qID "+stateName+" [" +  str( self.executeQueueID) +  "]   by server: " +  self.serverName  )
-        if withSave == True:
-            self.saveUpdatedQueue()
+            self.add_to_log(" state:{}   id:{}   by server:{}".format(state, self.batch.que.current_queue_id,
+                                                                      self.server_name))
+        if with_save == True:
+            self.batch.que.save_queue()
+
+    def set_working(self, queue_id, server_name, with_save=True):  # setStatus
+        self.set_state(queue_id, "WORKING", 4, server_name, with_save=with_save, add_current_time=True)
+
+    def set_done(self, queue_id, server_name, with_save=True, set_time=""):  # setStatus
+        self.set_state(queue_id, "DONE", 11, server_name, with_save=with_save, set_time=set_time)
+
+    def set_error(self, queue_id, server_name, with_save = True):  # setStatus
+        self.set_state(queue_id, "ERR", 9, server_name, with_save = with_save, add_current_time=True)
 
 
+    def generate_script_for_external_software(self, pyFile, jobScript, jobDescription, jobID, local=False):
+        scritp_out = "'''   create time: "+self.get_date()+"   '''\n'''   create node: "+self.server_name+"   '''\n\n"
+        scritp_out += "\n# sys append script dir    " + self.server_dir   # TODO sys append script dir
+        scritp_out += "\nfrom SimBatch_executor import * \nSiBe = SimBatchExecutor(1, "+str(jobID)+" ) "  # TODO 1: id
+        scritp_out += "\nSiBe.addToLogWithNewLine( \"Soft START:"+jobDescription+"\" )  \n"    # TODO Soft + format + PEP
 
-    def setWorking (self, id, serverName, serverID, withSave = True  ):  # setStatus
-        self.setStateAndAddToLog ("WORKING", 4, serverName,  withSave = withSave , addCurrentTime = True)
+        script_lines = jobScript.split("|")
+        for li in script_lines :
+            li_slash = li.replace('\\', '\\\\')
+            scritp_out += li_slash + "\n"
 
-    def setDone (self, id, serverName, serverID, withSave = True, setTime="" ):  # setStatus
-        self.setStateAndAddToLog ("DONE", 11, serverName, withSave = withSave , setTime=setTime )
+        scritp_out+="\nSiBe.finalizeQueueJob()\n"
 
-    def setError (self, id, serverName, serverID, withSave = True ):  # setStatus
-        self.setStateAndAddToLog ("ERR", 9, serverName, withSave = withSave , addCurrentTime = True )
+        self.batch.comfun.save_to_file( pyFile, scritp_out)
+        return scritp_out
 
-
-
-    def isSomethingToDo (self, forceSoftware = 0 ):
-        ret = self.batch.que.get_first_with_state(1, soft = forceSoftware)  #  TODO   cnst state from settings
-        if ret[0]>=0:
-            # self.executeQueueIndex = ret[0]   #  TODO   ret check and  del
-            # self.executeQueueID   =  ret[1]   #  TODO   ret check and  del
-            print  "\n_[db] there isSomethingToDo " , ret[0]  ,  "      ",  ret[1]  # TODO
-            return (1 , ret[0], ret[1])
+    def is_something_to_do(self, force_software=0):
+        ret = self.batch.que.get_first_with_state_id(2, soft=force_software)  # TODO cnst state from settings
+        if ret[0] >= 0:
+            queue_item = self.batch.que.queue_data[ret[0]]
+            script = queue_item.evolution_script
+            soft_id = queue_item.soft_id
+            info = " id:{}  evo:{}  descr:{}".format(ret[1], queue_item.evolution, queue_item.description)
+            self.batch.logger.db(("there is_something_to_do: ", ret[0], ret[1], force_software))
+            return 1, ret[0], ret[1], script, soft_id, info
         else:
-            return (0, None, None)
-
-    def getJobFromQueue (self, queueID):
-        index = self.batch.que.get_queue_index_by_id(queueID)
-        if not index is None:
-            script = self.batch.que.queue_data[index].evolutionScript
-            softID = self.batch.que.queue_data[index].softID
-
-            info = str( " id:["+str(self.batch.que.queue_data[index].id)+"] " +" evo:["+str(self.batch.que.queue_data[index].evolution)+"] "  +" descr:"+ self.batch.que.queue_data[index].description   )
-            ret = [1, softID, script, info, self.batch.que.queue_data[index].id  ]
-            return ret
-        else:
-            ret = [0,"null","","err", -1]
-            return ret
+            return 0, None, None, None, None, None    # bool, index, id, script, soft_id  # TODO class
 
     def run(self):
-        self.loopsCounter += 1
-        if self.loopsCounter <= self.loopsLimit  or  self.loopsLimit < 1 :
-            if self.dbMode == 1:
-                if self.loopsLimit > 0 :
-                    print " [db] ", self.getDate(), "loop:" , self.loopsCounter  # , "    time:",  self.timerSecondsCounter
-                else:
-                    print " [db] ", self.getDate()
 
-        ############   MAIN EXECUTION    ##########
+        ############   MAIN EXECUTION LOOP    ##########
 
-        self.currentSimNodeState = self.batch.nod.get_node_state(self.serverDir + self.stateFileName )
+        self.loops_counter += 1
+        if self.loops_counter <= self.loopsLimit or self.loopsLimit < 1:
+            if self.loopsLimit > 0:
+                self.batch.logger.db((self.get_date(), "loop:", self.loops_counter))
+            else:
+                self.batch.logger.db(self.get_date())
+        self.current_simnode_state = self.batch.nod.get_node_state(self.server_dir + self.state_file_name)
 
-        print "zzz self.currentSimNodeState" , self.currentSimNodeState
-        print "zz2 self.serverDir + self.stateFileName " , self.serverDir , self.stateFileName
+        if self.current_simnode_state == 9:
+            self.batch.logger.err("file state not exist")
+            self.batch.logger.log(("file state not exist", self.server_dir, self.state_file_name))
 
-        if self.currentSimNodeState == 9 :
-            self.addToLog("[ERR] file state not exist: " + file)
-            print "[ERR] file state not exist: ", file
-
-
-
-        if self.currentSimNodeState == 8 or self.currentSimNodeState == 2 :  # 2  server run (WAITIG)
-
-            if self.currentSimNodeState == 8 :  # 8 off(HOLD)
-                self.currentSimNodeState = 2
-                # self.setSimNodeState(1)
-                self.setSimNodeState(2)
+        if self.current_simnode_state == 8 or self.current_simnode_state == 2:  # 2  server run (WAITING or HOLD)
+            if self.current_simnode_state == 8:  # 8 off(HOLD)
+                self.current_simnode_state = 2
+                self.set_simnode_state(2)
             self.batch.que.clear_all_queue_items()
             self.batch.que.load_queue()
 
-        is_something_to_compute = self.isSomethingToDo(forceSoftware = self.forceSoftware)
-        print "\n [db1] job_to_compute  ", is_something_to_compute  # TODO
+        # is_something_to_compute = self.isSomethingToDo(forceSoftware=self.forceSoftware)
+        is_something_to_compute = self.is_something_to_do()
+        print "\n [db1] is_something_to_compute  ", is_something_to_compute  # TODO
+        self.batch.logger.db(("is_something_to_compute", is_something_to_compute))
+        if is_something_to_compute[0] == 1:
+            execute_queue_index = is_something_to_compute[1]   #  TODO   ret check and  del     job_to_compute
+            execute_queue_id = is_something_to_compute[2]   #  TODO   ret check and  del
 
-        if is_something_to_compute[0] == 1 :
+            ret = self.batch.que.update_current_from_id(execute_queue_id)
+            if ret is False:
+                self.batch.logger.db(("queue item state not updated, id:", execute_queue_id))
 
-            executeQueueIndex = is_something_to_compute[1]   #  TODO   ret check and  del     job_to_compute
-            executeQueueID   =  s_something_to_compute[2]   #  TODO   ret check and  del
-            self.setWorking ( executeQueueID, "local" , self.serverID )
+            # set node state
+            self.set_simnode_state(20)
+            # set queue item state
+            self.set_working(execute_queue_id, "local", "self.serverID TODO")
 
-            job_to_compute = self.getJobFromQueue( self.executeQueueID )
-            print "job_to_compute : ", job_to_compute
+            job_id = is_something_to_compute[2]
+            job_script = is_something_to_compute[3]
+            job_description = is_something_to_compute[5]
 
-            if job_to_compute[0] == 1:
-                script_to_execute = self.generatePY ( 1, retJob[2], retJob[3], retJob[4] )
+            generate_script_file = self.server_dir + self.script_execute
+            self.generate_script_for_external_software(generate_script_file, job_script, job_description, job_id, local = True)

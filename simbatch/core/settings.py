@@ -21,6 +21,7 @@ except ImportError:
             def fromRgb(self, r, g, b, a=""):
                 pass
 
+            
 class Settings:
     logger = None                   # logger prints errors, warnings, info and db to console and to log file
     ini_file = None                 # fundamental config file, json format
@@ -39,7 +40,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.21"   # current version
+    SIMBATCH_VERSION = "v0.2.18"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -47,7 +48,6 @@ class Settings:
     JSON_SIMNODES_FILE_NAME = "data_simnodes.json"
 
     states_visible_names = {}
-
     INDEX_STATE_NULL = 0
     INDEX_STATE_INIT = 1
     INDEX_STATE_WAITING = 2
@@ -79,6 +79,7 @@ class Settings:
     states_visible_names[INDEX_STATE_SIM] = "SIM"
     states_visible_names[INDEX_STATE_CACHE] = "CACHE"
     states_visible_names[INDEX_STATE_RENDER] = "RENDER"
+    states_visible_names[INDEX_STATE_HOLD] = "HLD"
     states_visible_names[INDEX_STATE_ERROR] = "ERROR"
     states_visible_names[INDEX_STATE_OK] = "OK"
     states_visible_names[INDEX_STATE_DONE] = "DONE"
@@ -102,7 +103,7 @@ class Settings:
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
-    force_start_tab = 1     # if > 0 show tab with this index after run
+    force_start_tab = 2     # if > 0 show tab with this index after run
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1

@@ -280,12 +280,15 @@ class CommonFunctions:
             self.logger.err(("Unexpected error:", sys.exc_info()[0]))
             raise
 
-    def load_from_file(self, file_name):  # TODO rename it: load content from file
+    def load_from_file(self, file_name, force_no_lines=False):  # TODO rename it: load content from file
         if self.file_exists(file_name):
             try:
                 with open(file_name, 'r') as f:
-                    content = f.readlines()
-                    content = [x.strip() for x in content]
+                    if force_no_lines:
+                        content = f.readlines()
+                        content = [x.strip() for x in content]
+                    else:
+                        content = f.read()
                     return content
             except IOError:
                 self.logger.err(("Loading IOError error:", file_name))

@@ -146,9 +146,8 @@ class AnimatedBar(QWidget):
                     # debug
                     # print "          [{}] [{}]\n".format(intchar, offset) 
                 i_arr.append(j_arr)
-            # self.current_frame = ord(self.anim_data[self.current_frame_index])
+                
             frame = []
-
             self.current_frame = (self.current_frame_index, i_arr)
             self.cursor_index += w_len
             self.current_frame_index += 1
@@ -163,8 +162,13 @@ class AnimatedBar(QWidget):
     def get_random_color_palette(self, length):
         p=[]
         for i in range(0,length):
-            #p.append(QColor(random.randint(0,127),random.randint(0,127),random.randint(0,127)))
-            colo = i * 12
+            p.append(QColor(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        return p
+      
+    def get_grayscale_palette(self, length):
+        p=[]
+        for i in range(0,length):
+            colo = i * (int(255/lenght)-1)
             p.append(QColor(colo,colo,colo))
         return p
         
@@ -194,8 +198,7 @@ class AnimatedBar(QWidget):
     def play_anim(self):
         self.play_start = time.time()
         self.play_anim_data(self.qt_painter, self.anim_data)
-
-
+        
 
 class InstallerWindow(QMainWindow):
     top_ui = None
@@ -299,19 +302,15 @@ class InstallerWindow(QMainWindow):
         self.check()
         self.install()
 
+
     def load_anim(self, buffor_end = 100):
         
         anim_file = os.path.dirname(os.path.abspath(__file__)) + self.dir_separator + "anim.dat"
-        
-        
         print " anim_file  ", anim_file
         if self.comfun.file_exists(anim_file):
+            self.animated_bar.set_anim_format(4,40,100,double=False, pix_size=2, pix_offset=3)
             anim_data = self.comfun.load_from_file(anim_file)
-            
-            # print "loaded " , self.animated_bar.canvas[0], self.animated_bar.canvas[1]
-            # buffor_end = self.animated_bar.canvas[0]*self.animated_bar.canvas[1]
-            anim_data += anim_file+"  ".join(["!" for i in range(0, buffor_end )])
-            
+            anim_data += "  ".join(["!" for i in range(0,    self.animated_bar.canvas[0]*self.animated_bar.canvas[1]   )])
             self.animated_bar.load_anim(anim_data)
             
     def play_anim(self):
@@ -326,7 +325,8 @@ class InstallerWindow(QMainWindow):
     def install(self):
         # TODO
         pass
-
+      
+      
 if __name__ == "__main__":
     if env_maya:
         main_window = InstallerWindow(400, 200)

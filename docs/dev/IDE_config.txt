@@ -9,6 +9,14 @@ mainw
 snsn
 
 
+simnodes
+simnode
+
+maya
+
+mysql
+
+
 dirProj
 dirCach
 dirCust

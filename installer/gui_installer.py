@@ -46,6 +46,7 @@ except:
         pass
 
 
+
 class AnimatedBar(QWidget):
     anim_data = None
     welcome_text = "SimBatch Installer"
@@ -58,6 +59,7 @@ class AnimatedBar(QWidget):
     anim_data_length = 0
     canvas = None
     grayscale_4_colors = None
+    play_start = 0
     
 
     def __init__(self, comfun):
@@ -119,8 +121,8 @@ class AnimatedBar(QWidget):
 
                 if double:
                     qt_painter.setBrush(self.canvas[2][el_j[1]])
-                    qt_painter.drawRect(pix_offset*j+pix_offset*2, pix_offset * i +pix_offset*(self.canvas[0]+1), pix_size, pix_size)
-                    
+                    qt_painter.drawRect(pix_offset*j+pix_offset*2, pix_offset * i +pix_offset*(self.canvas[0]), pix_size, pix_size)
+
     def show_next_frame(self):  # triggered by timer !!!!
         w_len = self.canvas[0]*self.canvas[1]
         if self.cursor_index < self.anim_data_length - w_len:
@@ -131,7 +133,8 @@ class AnimatedBar(QWidget):
                 for j in range(0,self.canvas[1]):
                     intchar = ord(self.anim_data[self.cursor_index + i*self.canvas[0] + j])
                     
-                    print "db:[{}] [{}]".format(  self.anim_data[self.cursor_index + i*self.canvas[0] + j], intchar) 
+                    # debug
+                    # print "db:[{}] [{}]".format(  self.anim_data[self.cursor_index + i*self.canvas[0] + j], intchar) 
                     
                     offset = 0
                     while intchar > self.canvas[3]-1:
@@ -140,12 +143,11 @@ class AnimatedBar(QWidget):
 
                     j_arr.append((offset, intchar))
                     
-                    
-                    print "          [{}] [{}]\n".format(intchar, offset) 
+                    # debug
+                    # print "          [{}] [{}]\n".format(intchar, offset) 
                 i_arr.append(j_arr)
-            # self.current_frame = ord(self.anim_data[self.current_frame_index])
+                
             frame = []
-
             self.current_frame = (self.current_frame_index, i_arr)
             self.cursor_index += w_len
             self.current_frame_index += 1
@@ -154,12 +156,19 @@ class AnimatedBar(QWidget):
             self.update()
         else:
             self.timer.stop()
+            play_time = time.time()
+            print "play time : ", play_time - self.play_start
 
     def get_random_color_palette(self, length):
         p=[]
         for i in range(0,length):
-            #p.append(QColor(random.randint(0,127),random.randint(0,127),random.randint(0,127)))
-            colo = i * 12
+            p.append(QColor(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+        return p
+      
+    def get_grayscale_palette(self, length):
+        p=[]
+        for i in range(0,length):
+            colo = i * (int(255/lenght)-1)
             p.append(QColor(colo,colo,colo))
         return p
         
@@ -187,24 +196,28 @@ class AnimatedBar(QWidget):
         self.cursor_index = 0
         
     def play_anim(self):
+        self.play_start = time.time()
         self.play_anim_data(self.qt_painter, self.anim_data)
         
 
 class InstallerWindow(QMainWindow):
     top_ui = None
     qt_tab_widget = None
-    window_height = 220
-    window_width = 400
+    window_height = 400
+    window_width = 550
 
     animated_bar = None
     comfun = None
 
     dir_separator = "/"
 
-    def __init__(self):
+    def __init__(self, w , h):
         super(InstallerWindow, self).__init__()
         if platform.system() == "Windows":
             self.dir_separator = "\\"
+
+        self.window_height = h
+        self.window_width = w
         self.init_ui()
 
     def init_ui(self):
@@ -273,9 +286,6 @@ class InstallerWindow(QMainWindow):
         qt_lay_central.addWidget(qt_gbox_paths)
         qt_lay_central.addLayout(qt_lay_buttons)
         self.setCentralWidget(qt_central_widget)
-
-
-
     def on_click_get_source_dir(self):
         self.comfun.get_dialog_directory(self.qt_path_source_edit, QFileDialog, dir_separator=self.dir_separator)
     def on_click_get_destination_dir(self):
@@ -283,6 +293,7 @@ class InstallerWindow(QMainWindow):
 
     def on_click_info(self):
         self.load_anim()
+        self.play_anim()
 
     def on_click_check(self):
         pass
@@ -291,17 +302,21 @@ class InstallerWindow(QMainWindow):
         self.check()
         self.install()
 
-    def load_anim(self):
+
+    def load_anim(self, buffor_end = 100):
         
-        # anim_file = os.path.dirname(os.path.abspath(__file__)) + self.dir_separator + "anim.dat"
-        anim_file = "/job/anim.dat"
+        anim_file = os.path.dirname(os.path.abspath(__file__)) + self.dir_separator + "anim.dat"
         print " anim_file  ", anim_file
         if self.comfun.file_exists(anim_file):
             self.animated_bar.set_anim_format(4,40,100,double=False, pix_size=2, pix_offset=3)
             anim_data = self.comfun.load_from_file(anim_file)
             anim_data += "  ".join(["!" for i in range(0,    self.animated_bar.canvas[0]*self.animated_bar.canvas[1]   )])
             self.animated_bar.load_anim(anim_data)
-            self.animated_bar.play_anim()
+            
+    def play_anim(self):
+        self.animated_bar.set_anim_format(4,18,200,double=False, pix_size=2, pix_offset=3)
+        self.animated_bar.play_anim()
+
 
     def check(self):
         # TODO
@@ -310,11 +325,11 @@ class InstallerWindow(QMainWindow):
     def install(self):
         # TODO
         pass
-    
-    
+      
+      
 if __name__ == "__main__":
     if env_maya:
-        main_window = InstallerWindow()
+        main_window = InstallerWindow(400, 200)
         main_window.show()
     else:
         app = QApplication([])
@@ -323,4 +338,3 @@ if __name__ == "__main__":
         app.exec_()
 
     print ("env_maya", env_maya)
-        

@@ -39,7 +39,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.21"   # current version
+    SIMBATCH_VERSION = "v0.2.22"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -80,6 +80,7 @@ class Settings:
     states_visible_names[INDEX_STATE_CACHE] = "CACHE"
     states_visible_names[INDEX_STATE_RENDER] = "RENDER"
     states_visible_names[INDEX_STATE_ERROR] = "ERROR"
+    states_visible_names[INDEX_STATE_HOLD] = "HOLD"
     states_visible_names[INDEX_STATE_OK] = "OK"
     states_visible_names[INDEX_STATE_DONE] = "DONE"
     states_visible_names[INDEX_STATE_REVIEW] = "REVIEW"

@@ -58,6 +58,7 @@ class AnimatedBar(QWidget):
     anim_data_length = 0
     canvas = None
     grayscale_4_colors = None
+    
 
     def __init__(self, comfun):
         super(AnimatedBar, self).__init__()
@@ -77,7 +78,7 @@ class AnimatedBar(QWidget):
         self.qt_painter = qt_painter
         qt_painter.begin(self)
         if self.anim_state == 1:
-            self.draw_single_anim_frame(event, qt_painter)
+            self.draw_single_anim_frame(event, qt_painter, double = self.canvas[4], pix_size=self.canvas[5], pix_offset=self.canvas[6])
 
             self.anim_state = 2
         else:
@@ -85,16 +86,18 @@ class AnimatedBar(QWidget):
         qt_painter.end()
 
     def draw_welcome_text(self, event, qt_painter):
-        qt_painter.setPen(QColor(31, 40, 170))
+        qt_painter.setPen(QColor(130, 150, 170))
         qt_font = QFont('Veranda', 22)
         qt_font.setBold(True)
         qt_painter.setFont(qt_font)
         qt_painter.drawText(event.rect(), Qt.AlignCenter, self.welcome_text)
 
-    def draw_single_anim_frame(self, event, qt_painter):
-        pix_size = 4
-        pix_offset = 5
-        # self.current_frame
+    def draw_single_anim_frame(self, event, qt_painter, double = False, pix_size=4, pix_offset=5):
+        
+        pen=qt_painter.pen()
+        pen.setStyle(Qt.NoPen)
+        qt_painter.setPen(pen)
+
         cf = self.current_frame
         if cf[0] % 2 == 0 :
             qt_painter.setBrush(self.grayscale_4_colors[0])
@@ -107,7 +110,6 @@ class AnimatedBar(QWidget):
             qt_painter.setBrush(self.grayscale_4_colors[3])
         qt_painter.drawRect(pix_offset, pix_offset*2, pix_size, pix_size)
 
-        double = False
         # create pix
         for i, el_i in enumerate(cf[1]):
             for j, el_j in enumerate(el_i):
@@ -118,7 +120,7 @@ class AnimatedBar(QWidget):
                 if double:
                     qt_painter.setBrush(self.canvas[2][el_j[1]])
                     qt_painter.drawRect(pix_offset*j+pix_offset*2, pix_offset * i +pix_offset*(self.canvas[0]+1), pix_size, pix_size)
-
+                    
     def show_next_frame(self):  # triggered by timer !!!!
         w_len = self.canvas[0]*self.canvas[1]
         if self.cursor_index < self.anim_data_length - w_len:
@@ -128,12 +130,18 @@ class AnimatedBar(QWidget):
                 j_arr = []
                 for j in range(0,self.canvas[1]):
                     intchar = ord(self.anim_data[self.cursor_index + i*self.canvas[0] + j])
+                    
+                    print "db:[{}] [{}]".format(  self.anim_data[self.cursor_index + i*self.canvas[0] + j], intchar) 
+                    
                     offset = 0
                     while intchar > self.canvas[3]-1:
                         offset +=1
                         intchar -= self.canvas[3]-1
 
                     j_arr.append((offset, intchar))
+                    
+                    
+                    print "          [{}] [{}]\n".format(intchar, offset) 
                 i_arr.append(j_arr)
             # self.current_frame = ord(self.anim_data[self.current_frame_index])
             frame = []
@@ -154,25 +162,33 @@ class AnimatedBar(QWidget):
             colo = i * 12
             p.append(QColor(colo,colo,colo))
         return p
+        
+    def get_my_color_palette(self):
+        p=[]
+        colors_arr = ("3f32ae","efe305","e30ec2","baaaff","ffffff","bb0200","000000","6a8927","16ed75","057fc1","c98f4c","efe305")
+        for c in colors_arr:
+            p.append(QColor("#"+c))
+        return p
 
     def play_anim_data(self, qt_painter, anim_data):
-        # color_palette = (())
-        number_of_colors = 13
-        color_palette = self.get_random_color_palette(number_of_colors)
-        # print "\ncolor_palette ", color_palette
-        self.canvas = (4,10,color_palette, number_of_colors)
-        self.timer.start(200)
+        self.timer.start(self.delay)
+        
+    def set_anim_format(self, a_height=4, a_widht=40, delay=100, double=False, pix_size=4, pix_offset=5):
+        # number_of_colors = 13
+        # color_palette = self.get_random_color_palette(number_of_colors)
+        color_palette = self.get_my_color_palette()
+        self.canvas = (a_height, a_widht, color_palette, len(color_palette), double, pix_size, pix_offset)
+        self.delay = delay
 
     def load_anim(self, data):
         self.anim_data = data
         self.anim_data_length = len(data)
         self.current_frame_index = 0
         self.cursor_index = 0
-
+        
     def play_anim(self):
         self.play_anim_data(self.qt_painter, self.anim_data)
-
-
+        
 
 class InstallerWindow(QMainWindow):
     top_ui = None
@@ -276,11 +292,14 @@ class InstallerWindow(QMainWindow):
         self.install()
 
     def load_anim(self):
-        anim_file = os.path.dirname(os.path.abspath(__file__)) + self.dir_separator + "anim.dat"
+        
+        # anim_file = os.path.dirname(os.path.abspath(__file__)) + self.dir_separator + "anim.dat"
+        anim_file = "/job/anim.dat"
         print " anim_file  ", anim_file
         if self.comfun.file_exists(anim_file):
+            self.animated_bar.set_anim_format(4,40,100,double=False, pix_size=2, pix_offset=3)
             anim_data = self.comfun.load_from_file(anim_file)
-            anim_data += "  ".join(["Z" for i in range(0,400)])
+            anim_data += "  ".join(["!" for i in range(0,    self.animated_bar.canvas[0]*self.animated_bar.canvas[1]   )])
             self.animated_bar.load_anim(anim_data)
             self.animated_bar.play_anim()
 
@@ -291,11 +310,8 @@ class InstallerWindow(QMainWindow):
     def install(self):
         # TODO
         pass
-
-
-
-
-
+    
+    
 if __name__ == "__main__":
     if env_maya:
         main_window = InstallerWindow()
@@ -307,3 +323,4 @@ if __name__ == "__main__":
         app.exec_()
 
     print ("env_maya", env_maya)
+        

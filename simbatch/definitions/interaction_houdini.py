@@ -12,7 +12,7 @@ class Interaction:
 
     # framework interactions
     def schema_item_double_click(self, param):
-        self.maya_open_scene(param)
+        self.houdini_open_scene(param)
 
     def save_as_next_version(self, param):
         self.save_current_scene_as(param)

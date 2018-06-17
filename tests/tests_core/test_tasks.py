@@ -1,11 +1,13 @@
 from simbatch.core import core as batch
 import pytest
+import os
 
 
 @pytest.fixture(scope="module")
 def sib():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    sib = batch.SimBatch(5, ini_file="config_tests.ini")
+    settings_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + "config_tests.ini"
+    sib = batch.SimBatch(5, ini_file=settings_file)
     return sib
 
 

@@ -142,12 +142,6 @@ class CommonFunctions:
             else:
                 return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-
-    @staticmethod
-    def get_dateX():  # TODO move to common
-        return time.strftime("%Y-%m-%d_%H:%M:%S")
-
-    @staticmethod
     def format_seconds_to_string(self, seconds):
         if self.is_int(seconds):
             if seconds < 60:

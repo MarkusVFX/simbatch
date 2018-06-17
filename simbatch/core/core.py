@@ -140,12 +140,14 @@ class SimBatch:
                         ret_que = self.que.load_queue()
                         if ret_que is not False:
                             ret_nod = self.nod.load_nodes()
-                            if ret_tsk is not False:
+                            if ret_nod is not False:
                                 loading_err_count = 0     # count number errors while of loading external data
                                 loading_err_count = self.loading_errors(ret_def, loading_err_count, "definitions")
                                 loading_err_count = self.loading_errors(ret_prj, loading_err_count, "project")
                                 loading_err_count = self.loading_errors(ret_sch, loading_err_count, "schemas")
                                 loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "tasks")
+                                loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "queue")
+                                loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "simnodes")
 
                                 if loading_err_count == 0:
                                     return True

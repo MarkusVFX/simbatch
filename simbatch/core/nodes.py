@@ -80,9 +80,9 @@ class SimNodes:
 
     def load_nodes(self):
         if self.batch.sts.store_data_mode == 1:
-            self.load_nodes_from_json()
+            return self.load_nodes_from_json()
         if self.batch.sts.store_data_mode == 2:
-            self.load_nodes_from_mysql()
+            return self.load_nodes_from_mysql()
 
     def load_nodes_from_json(self, json_file=""):
         if len(json_file) == 0:

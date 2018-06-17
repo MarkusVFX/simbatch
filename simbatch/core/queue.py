@@ -318,9 +318,9 @@ class Queue:
 
     def load_queue(self):
         if self.sts.store_data_mode == 1:
-            self.load_queue_from_json()
+            return self.load_queue_from_json()
         if self.sts.store_data_mode == 2:
-            self.load_queue_from_mysql()
+            return self.load_queue_from_mysql()
 
     def load_queue_from_json(self, json_file=""):
         if len(json_file) == 0:

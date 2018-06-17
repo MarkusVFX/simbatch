@@ -1,12 +1,14 @@
 from simbatch.core import core
 from simbatch.core import settings
 import pytest
+import os
 
 
 @pytest.fixture(scope="module")
 def sib():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    return core.SimBatch("Stand-alone", ini_file="config_tests.ini")
+    settings_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + "config_tests.ini"
+    return core.SimBatch("Stand-alone", ini_file=settings_file)
 
 
 def test_init_simbatch(sib):
@@ -55,5 +57,16 @@ def test_check_loaded_data(sib):
     assert sib.tsk.total_tasks > 0
     assert sib.tsk.total_tasks == len(sib.tsk.tasks_data)
 
+def test_data_files(sib):
+    assert sib.sts.store_data_json_directory is not None
+    assert sib.sts.JSON_PROJECTS_FILE_NAME is not None
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_PROJECTS_FILE_NAME)
+
 def test_load_data(sib):
+    assert sib.prj.load_projects() is True
+    assert sib.sch.load_schemas() is True
+    assert sib.tsk.load_tasks() is True
+    assert sib.que.load_queue() is True
+    assert sib.nod.load_nodes() is True
+    assert sib.dfn.load_definitions() is True
     assert sib.load_data() is True

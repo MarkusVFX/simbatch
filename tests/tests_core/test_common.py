@@ -2,7 +2,7 @@ from random import randint
 from os import path
 from shutil import rmtree
 from time import sleep
-from simbatch.core import common
+from simbatch.core.lib import common
 import pytest
 
 

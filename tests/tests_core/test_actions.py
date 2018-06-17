@@ -1,6 +1,7 @@
 from simbatch.core import core
 from simbatch.core.actions import SingleAction, MultiAction
 import pytest
+import os
 
 
 # TODO check dir on prepare tests
@@ -10,7 +11,8 @@ TESTING_AREA_DIR = "S:\\simbatch\\data\\"
 @pytest.fixture(scope="module")
 def simbatch():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    sib = core.SimBatch(5, ini_file="config_tests.ini")
+    settings_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + "config_tests.ini"
+    sib = core.SimBatch(5, ini_file=settings_file)
     sib.clear_all_memory_data()
     sib.prj.create_example_project_data(do_save=False)
     sib.prj.update_current_from_index(1)
@@ -42,6 +44,7 @@ def test_exist_definitions_data(simbatch):
 
 
 def test_load_definitions(simbatch):
+    assert len(simbatch.sts.store_definitions_directory) > 0
     assert simbatch.dfn.load_definitions() is True
 
 # def test_load_definitions(sib):

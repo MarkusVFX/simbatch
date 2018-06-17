@@ -94,6 +94,11 @@ class StorageInOut:
                                    len(self.prj.projects_data)))
             return -1, ""
         else:
+            if len(schema_name) == 0:
+                if self.batch.sch.current_schema is not None:
+                    schema_name = self.batch.sch.current_schema.schema_name
+                else:
+                    self.batch.logger.err("generate_base_setup_file_name from schema: None")
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
             directory = proj_working_dir+schema_flat_name+self.sts.dir_separator+"base_setup"+self.sts.dir_separator

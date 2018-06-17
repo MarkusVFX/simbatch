@@ -158,6 +158,13 @@ class NodesUI:
         # self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
 
+    def on_menu_remove(self):    # TODO
+        self.batch.logger.db("on menu: Remove  TODO")
+
+    def on_menu_reset(self):
+        self.batch.logger.db("on menu: Reset")
+        self.on_restart_node()
+
     def show_right_click_menu(self, pos):
         global_pos = self.qt_list_nodes.mapToGlobal(pos)
         qt_right_menu = QMenu()
@@ -171,9 +178,6 @@ class NodesUI:
 
     def add_node(self):    # TODO
         self.batch.logger.raw(" TODO: add_node ")
-
-    def on_menu_remove(self):    # TODO
-        self.batch.logger.db("on menu: Remove  TODO")
 
     def on_remove_node(self):    # TODO
         self.batch.logger.raw(" TODO: on_remove_node ")

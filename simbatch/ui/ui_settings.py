@@ -63,7 +63,7 @@ class SettingsUI:
         if self.settings.current_os == 1:
             show_ini_file = settings.ini_file
         else:
-            show_ini_file = self.comfun.get_win_visual_path(settings.ini_file)
+            show_ini_file = self.comfun.convert_to_win_path(settings.ini_file)
         elwb_config_ini = EditLineWithButtons(show_ini_file, edit_text_string=None, text_on_button_1="Test Data",
                                               text_on_button_2="Test Acces", button_width=70)
 
@@ -109,7 +109,7 @@ class SettingsUI:
         if self.settings.current_os == 1:
             show_store_data_json_directory = settings.store_data_json_directory
         else:
-            show_store_data_json_directory = self.comfun.get_win_visual_path(settings.store_data_json_directory)
+            show_store_data_json_directory = self.comfun.convert_to_win_path(settings.store_data_json_directory)
         qt_settings_data_directory_edit = QLineEdit(show_store_data_json_directory)
         qt_settings_data_directory_button = QPushButton("Get")
         qt_settings_data_directory_button.setToolTip('Select directory for store data')
@@ -126,7 +126,7 @@ class SettingsUI:
         if self.settings.current_os == 1:
             show_store_definitions_directory = settings.store_definitions_directory
         else:
-            show_store_definitions_directory = self.comfun.get_win_visual_path(settings.store_definitions_directory)
+            show_store_definitions_directory = self.comfun.convert_to_win_path(settings.store_definitions_directory)
         qt_settings_definitions_directory_edit = QLineEdit(show_store_definitions_directory)
         qt_settings_definitions_directory_button = QPushButton("Get")
         qt_settings_definitions_directory_button.setToolTip('Select definitions directory')
@@ -367,7 +367,7 @@ class SettingsUI:
                         self.batch.logger.err(("missing key in config file ", ie))
                         print "missing key : ", ie
                 if vars_count == len(ini_elements):
-                    self.top_ui.set_top_info("config.ini OK ", 4)
+                    self.top_ui.set_top_info("config.ini integrity test OK ", 4)
                 else:
                     self.top_ui.set_top_info("config.ini missing keys, more info in log ", 8)
             else:
@@ -378,12 +378,15 @@ class SettingsUI:
             ret_W = os.access(self.settings.ini_file, os.W_OK)
             if ret_W:
                 self.top_ui.set_top_info("config.ini is writable ", 4)
+                self.batch.logger.inf("config.ini is writable")
             else:
                 ret_R = os.access(self.settings.ini_file, os.R_OK)
                 if ret_R:
-                    self.top_ui.set_top_info("config.ini is only readable ", 4)
+                    self.top_ui.set_top_info("config.ini is read only", 4)
+                    self.batch.logger.inf("config.ini is read only")
                 else:
                     self.top_ui.set_top_info("No access to config.ini", 7)
+                    self.batch.logger.inf("No access to config.ini")
 
     def test_exist_config_ini(self):
         ret_d = self.comfun.path_exists(self.comfun.get_path_from_full(self.settings.ini_file), info="config.ini dir")
@@ -391,12 +394,15 @@ class SettingsUI:
             ret_f = self.comfun.file_exists(self.settings.ini_file, info="config.ini")
             if ret_f:
                 self.top_ui.set_top_info("config.ini exist ", 4)
+                self.batch.logger.inf("config.ini exist")
                 return True
             else:
                 self.top_ui.set_top_info("config.ini file not exist !", 9)
+                self.batch.logger.wrn("config.ini file not exist !")
                 return False
         else:
             self.top_ui.set_top_info("config.ini dir not exist !", 9)
+            self.batch.logger.wrn("config.ini dir not exist !")
             return False
 
     def on_click_radio_data(self, index):

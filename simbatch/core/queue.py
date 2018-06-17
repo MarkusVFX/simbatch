@@ -210,21 +210,28 @@ class Queue:
 
     def remove_single_queue_item(self, index=None, queue_id=None, do_save=False):
         if index is None and queue_id is None:
-            self.batch.logger.err("queue item data not removed, skipping, missing index or id")
+            self.batch.logger.err("queue item data not removed, skipping, missing index or id!")
             return False
+        removed = False
         if queue_id > 0:
             for i, que in enumerate(self.queue_data):
                 if que.id == queue_id:
                     del self.queue_data[i]
                     self.total_queue_items -= 1
+                    removed = True
                     break
         if index >= 0:
             del self.queue_data[index]
             self.total_queue_items -= 1
-        if do_save is True:
-            return self.save_queue()
+            removed = True
+        if removed:
+            if do_save is True:
+                return self.save_queue()
+            else:
+                return True
         else:
-            return True
+            self.batch.logger.err("queue item data not removed, item not found!")
+            return False
 
     def generate_template_queue_item(self, task_id, options=None):
         # TODO
@@ -319,7 +326,7 @@ class Queue:
         if len(json_file) == 0:
             json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
-            self.batch.logger.inf(("loading queue items: ", json_file))
+            self.batch.logger.db(("loading queue items: ", json_file))
             json_nodes = self.comfun.load_json_file(json_file)
             if json_nodes is not None and "queueItems" in json_nodes.keys():
                 if json_nodes['queueItems']['meta']['total'] > 0:

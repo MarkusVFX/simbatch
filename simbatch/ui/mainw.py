@@ -89,6 +89,8 @@ class TopMenuUI:
         self.qt_but_refresh = qt_but_refresh
 
     def set_top_info(self, txt, mode=1, limit=0):  # 1 normal ...  9 error
+        if type(txt) is tuple:
+            txt = "  ".join([str(el) for el in txt])
         if mode > 1:
             txt = "     " + txt + "          "
         if limit > 0:
@@ -119,6 +121,7 @@ class TopMenuUI:
 
 class MainWindow(QMainWindow):
     batch = None
+    server = None
     comfun = None
     debug_level = None
 
@@ -134,9 +137,10 @@ class MainWindow(QMainWindow):
 
     qt_tab_widget = None
 
-    def __init__(self, batch, parent=None):
+    def __init__(self, batch, server, parent=None):
         super(MainWindow, self).__init__(parent)
         self.batch = batch
+        self.server = server
         self.comfun = batch.comfun
         self.sts = batch.sts
         self.debug_level = batch.sts.debug_level
@@ -320,8 +324,8 @@ class MainWindow(QMainWindow):
         self.batch.logger.inf("reload TASKS")
         self.tsk_ui.reload_tasks_data_and_refresh_list()
 
-        # self.batch.logger.inf("reload QUEUE")
-        # self.que_ui      # TODO reload !!!
+        self.batch.logger.inf("reload QUEUE")
+        self.que_ui.reload_queue_data_and_refresh_list()
 
         self.batch.logger.inf("reload SIMNODES")
         self.nod_ui.reload_simnodes_data_and_refresh_list()

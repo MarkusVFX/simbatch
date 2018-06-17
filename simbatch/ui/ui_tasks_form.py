@@ -111,13 +111,14 @@ class AddToQueueForm (QWidget):
         self.remove_all_action_widgets()
         current_sch = self.batch.sch.get_schema_by_id(current_task.schema_id)
         for act in current_sch.actions_array:
-            self.add_widget_action_to_form(act.name, act.actual_value)
+            # gen_script  = action.generate_script(action.scriptActionTemplates, vals, sub_type)
+            self.add_action_widget_to_form(act.name, act.actual_value)
 
-    def add_widget_action_to_form(self, info, edit_txt=None, evo=None):
+    def add_action_widget_to_form(self, info, edit_txt=None, evo=None):
         if edit_txt is None and evo is None:
             wi = SimpleLabel(info)
         else:
-            if edit_txt is not None:
+            if evo is not None:
                 wi = EditLineWithButtons(info, edit_txt)
             else:
                 # wi = ActionWidgetATQ()

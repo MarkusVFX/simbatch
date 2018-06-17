@@ -32,7 +32,10 @@ class SimBatchServer:
             self.is_batching_mode_framework = True
         self.batch = batch
         self.comfun = batch.comfun
-        self.batch.que.load_queue()
+        if force_local is False:
+            self.batch.que.load_queue()
+        # else:
+            # already loaded !
         if self.batch.que.total_queue_items == 0:
             self.batch.logger.err("queue data is empty, nothing loaded")
             self.batch.que.print_header()

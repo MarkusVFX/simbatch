@@ -15,6 +15,7 @@ class SimBatchServer:
     # 23 OFFLINE   8 off(HOLD)  2(WAITING)  20 server executor(ACTIVE)  4 proces run  (WORKING)  11 process done  9 err
 
     batch = None
+    is_batching_mode_framework = False
     forceSoftware = 0
     server_name = "SimNode_01"  # TODO  custom name on init
     server_dir = ""
@@ -23,7 +24,8 @@ class SimBatchServer:
     script_execute = "script_execute.py"
     forces_software = 0
     last_info = ""
-    is_batching_mode_framework = False
+    report_total_jobs = 0
+    report_done_jobs = 0
 
     def __init__(self, batch, force_software=0, loops_limit=0, force_local=False):
         self.force_software = force_software
@@ -67,6 +69,13 @@ class SimBatchServer:
         f.write(date + info + '; \n')
         f.close()
         self.batch.logger.log(info)
+
+    def reset_report(self):
+        self.report_total_jobs = 0
+        self.report_done_jobs = 0
+
+    def generate_report(self):   # TODO
+        return self.report_total_jobs, self.report_done_jobs
 
     def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.batch.logger.db(("set_state: ", state, state_id, server_name))

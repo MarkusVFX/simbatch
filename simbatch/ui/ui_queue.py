@@ -349,13 +349,13 @@ class QueueUI:
         self.remove_form_state = 0
 
     def run_server_from_framework(self, loops=0):
-        server = self.server.SimBatchServer(self.batch, force_local=True)
+        server = self.mainw.server  # .SimBatchServer(self.batch, force_local=True)
         server.force_local = True
         server.loopsLimit = loops
         server.timerDelaySeconds = 0
-        server.reset_report()
+        server.reset_report()  # TODO
         server.run()
-        report = server.generate_report()
+        report = server.generate_report()  # TODO
         if report[0] > 0:
             self.reload_queue_data_and_refresh_list()
             if report[0] == 1:

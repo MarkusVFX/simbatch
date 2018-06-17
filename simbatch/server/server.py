@@ -31,6 +31,7 @@ class SimBatchServer:
         if force_local:
             self.is_batching_mode_framework = True
         self.batch = batch
+        self.comfun = batch.comfun
         self.batch.que.load_queue()
         if self.batch.que.total_queue_items == 0:
             self.batch.logger.err("queue data is empty, nothing loaded")
@@ -42,7 +43,7 @@ class SimBatchServer:
         self.current_simnode_state = self.batch.nod.get_node_state(self.server_dir + self.state_file_name)
         if self.current_simnode_state == -1:
             simnode_state_file = self.server_dir + self.state_file_name
-            simnode_state_data = "{};{};{}".format(2, self.server_name, self.get_date())
+            simnode_state_data = "{};{};{}".format(2, self.server_name, self.comfun.get_current_time())
             self.batch.comfun.save_to_file(simnode_state_file, simnode_state_data)
             self.set_simnode_state(2)
         self.batch.logger.inf(("init server", self.server_dir))
@@ -51,16 +52,13 @@ class SimBatchServer:
         # TODO tesdt write acces   create data dir
         pass
 
-    def get_date(self):  # TODO move to common
-        return time.strftime("%Y-%m-%d_%H:%M:%S")
-
     def set_simnode_state(self, state):
-        file = self.server_dir + self.state_file_name
-        self.batch.nod.set_node_state(file, self.server_name, state)
+        file_and_path = self.server_dir + self.state_file_name
+        self.batch.nod.set_node_state(file_and_path, self.server_name, state)
 
     def add_to_log(self, info, log_file=None):  # TODO move to common
-        date = self.get_date()
-        if log_file == None:
+        date = self.comfun.get_current_time()
+        if log_file is None:
             log_file = self.server_dir + self.log_file_name
         f = open(log_file, 'a')
         f.write(date + info + '; \n')
@@ -83,7 +81,7 @@ class SimBatchServer:
             self.add_to_log(" state:{}   id:{}   by server:{}".format(state, self.batch.que.current_queue_id,
                                                                       self.server_name))
 
-        if with_save == True:
+        if with_save is True:
             ret = self.batch.que.save_queue()
             # TODO ret (OK, WRN ERR)
 
@@ -96,22 +94,21 @@ class SimBatchServer:
     def set_error(self, queue_id, server_name, with_save=True):  # setStatus
         self.set_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
-    def generate_script_for_external_software(self, pyFile, jobScript, jobDescription, jobID, local=False):
-        scritp_out = "'''   create time: " + self.get_date() + "   '''\n'''   create node: " + self.server_name + "   '''\n\n"
-        scritp_out += "\n# sys append script dir    " + self.server_dir  # TODO sys append script dir
-        scritp_out += "\nfrom SimBatch_executor import * \nSiBe = SimBatchExecutor(1, " + str(
-            jobID) + " ) "  # TODO 1: id
-        scritp_out += "\nSiBe.addToLogWithNewLine( \"Soft START:" + jobDescription + "\" )  \n"  # TODO Soft + format + PEP
+    def generate_script_for_external_software(self, py_file, job_script, job_description, job_id):
+        script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n\n"
+        script_out += "\n# sys append script dir    " + self.server_dir  # TODO sys append script dir
+        script_out += "\nfrom SimBatch_executor import * \nSiBe = SimBatchExecutor(1, " + str(job_id) + ")"  # TODO 1:id
+        script_out += "\nSiBe.addToLogWithNewLine( \"Soft START:" + job_description + "\")\n"  # TODO Soft+format+PEP
 
-        script_lines = jobScript.split("|")
+        script_lines = job_script.split("|")
         for li in script_lines:
             li_slash = li.replace('\\', '\\\\')
-            scritp_out += li_slash + "\n"
+            script_out += li_slash + "\n"
 
-        scritp_out += "\nSiBe.finalizeQueueJob()\n"
+        script_out += "\nSiBe.finalizeQueueJob()\n"
 
-        self.batch.comfun.save_to_file(pyFile, scritp_out)
-        return scritp_out
+        self.batch.comfun.save_to_file(py_file, script_out)
+        return script_out
 
     def is_something_to_do(self, force_software=0):
         ret = self.batch.que.get_first_with_state_id(2, soft=force_software)  # TODO cnst state from settings
@@ -143,11 +140,11 @@ class SimBatchServer:
         self.loops_counter += 1
         if self.loops_counter <= self.loopsLimit or self.loopsLimit < 1:
             if self.loopsLimit > 0:
-                self.batch.logger.db((self.get_date(), "loop:", self.loops_counter))
+                self.batch.logger.db((self.comfun.get_current_time(), "loop:", self.loops_counter))
             else:
-                self.batch.logger.db(self.get_date())
+                self.batch.logger.db(self.comfun.get_current_time())
 
-            ############   MAIN EXECUTION LOOP    ##########
+            """    MAIN EXECUTION LOOP    """
 
             self.current_simnode_state = self.batch.nod.get_node_state(self.server_dir + self.state_file_name)
 
@@ -166,8 +163,8 @@ class SimBatchServer:
 
                 if is_something_to_compute[0] == 1:
                     self.batch.logger.inf(
-                        (self.get_date(), "   there is_something_to_compute", is_something_to_compute))
-                    execute_queue_index = is_something_to_compute[1]  # TODO   ret check and  del     job_to_compute
+                        (self.comfun.get_current_time(), "   there is_something_to_compute", is_something_to_compute))
+                    # execute_queue_index = is_something_to_compute[1]  # TODO   ret check and  del   job_to_compute
                     execute_queue_id = is_something_to_compute[2]  # TODO   ret check and  del
 
                     ret = self.batch.que.update_current_from_id(execute_queue_id)
@@ -183,7 +180,7 @@ class SimBatchServer:
 
                     generate_script_file = self.server_dir + self.script_execute
 
-                    ##############  RUN SINGLE JOB  ####################
+                    """     RUN SINGLE JOB     """
                     if self.is_batching_mode_framework is True:  # run local
                         print "run_script(generate_script_file)"
                         print "run_script(generate_script_file)"
@@ -202,33 +199,27 @@ class SimBatchServer:
                         # set node state
                         self.set_simnode_state(20)
                         self.generate_script_for_external_software(generate_script_file, job_script, job_description,
-                                                                   job_id, local=True)
+                                                                   job_id)
 
                         self.run_external_software(generate_script_file)
-                        ##############  END SINGLE JOB  ####################
-
-
+                    """     END SINGLE JOB     """
 
                 else:
-                    self.batch.logger.inf((self.get_date(), "   there is nothing to compute"))
+                    self.batch.logger.inf((self.comfun.get_current_time(), "   there is nothing to compute"))
                     self.last_info = "there is nothing to compute"
             else:
                 if self.current_simnode_state == 9:
-                    print "  [INF] sim node ERROR [err_code:23] !!! \n"
-                    self.batch.logger.inf((self.get_date(), "   sim node ERROR ", self.server_name))
+                    self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
                 else:
-                    self.batch.logger.inf((self.get_date(), "   sim node", self.server_name, "looks bussy "))
-
-            ############   MAIN EXECUTION  FIN  ##########
+                    self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, "is busy"))
+            """    MAIN EXECUTION  FIN    """
 
             check_breaker = self.batch.comfun.file_exists(self.server_dir + "break.txt", info=False)
             if check_breaker:
-                print " [INF]  BREAK MAIN LOOP !"
+                self.batch.logger.inf(("breaking main loop", self.last_info))
                 os.rename(self.server_dir + "break.txt", self.server_dir + "break___.txt")
-                print "break loopopop", self.last_info
+
             else:
                 threading.Timer(self.timerDelaySeconds, self.run).start()
-
         else:
-            print "end loopopop", self.last_info
-
+            self.batch.logger.inf(("end main loop", self.last_info))

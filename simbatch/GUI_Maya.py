@@ -12,8 +12,8 @@ simbatch_config_ini = "S:/simbatch/config.ini"
 import sys
 sys.path.append(simbatch_installation_dir)
 
-import simbatch.core.core as simbatch_core
-import simbatch.ui.mainw as simbatch_ui
+import core.core as simbatch_core
+import ui.mainw as simbatch_ui
 
 import maya.OpenMayaUI as mui
 

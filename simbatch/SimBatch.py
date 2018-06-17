@@ -1,16 +1,19 @@
 from PySide.QtGui import *
 
-import simbatch.core.core as core
-import simbatch.ui.mainw as ui
+import core.core as core
+import ui.mainw as ui
+import server.server as simbatch_server
 
 app = QApplication([])
 
 #sim_batch = core.SimBatch("Stand-alone")
-sim_batch = core.SimBatch("Maya", ini_file="S:/simbatch/config.ini")
-loading_data_state = sim_batch.load_data()
 
-if sim_batch.sts.WITH_GUI == 1:
-    main_window = ui.MainWindow(sim_batch)
+simbatch = core.SimBatch("Maya", ini_file="S:/simbatch/config.ini")
+simbatch_server.SimBatchServer(simbatch, force_local=True)
+loading_data_state = simbatch.load_data()
+
+if simbatch.sts.WITH_GUI == 1:
+    main_window = ui.MainWindow(simbatch, simbatch_server)
     main_window.show()
     main_window.post_run(loading_data_state)
 

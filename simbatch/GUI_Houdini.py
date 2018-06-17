@@ -13,8 +13,8 @@ simbatch_config_ini = "S:/simbatch/config.ini"
 import sys
 sys.path.append(simbatch_instalation_dir)
 
-import simbatch.core.core as simbatch_core
-import simbatch.ui.mainw as simbatch_ui
+import core.core as simbatch_core
+import ui.mainw as simbatch_ui
 
     
 sim_batch = simbatch_core.SimBatch("Houdini", ini_file=simbatch_config_ini)

@@ -11,19 +11,25 @@ from logger import Logger
 class CommonFunctions:
     # debug_level = None
     logger = None
-
+    sep = "/"
     # def __init__(self, debug_level=3):
-    #     self.debug_level = debug_level
-    def __init__(self, logger=None):
+    # self.debug_level = debug_level
+
+    def __init__(self, logger=None, separator=None):
         if logger is not None:
             self.logger = logger
         else:
             self.logger = Logger(log_level=0, console_level=3)
+        if separator is None:
+            self.sep = os.sep
+
+    def set_separator(self, sep):
+        self.sep = sep
 
     def print_list(self, get_list, check_float=False):
         for index, val in enumerate(get_list):
             if check_float:
-                print "     ", index, " : ", val, "   ___  ", self.is_float(val)
+                print "     ", index, " : ", val, "  ___  ", self.is_float(val)
             else:
                 print "     ", index, " : ", val
 
@@ -136,19 +142,26 @@ class CommonFunctions:
             else:
                 return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+
     @staticmethod
-    def format_seconds_to_string(seconds):
-        if seconds < 60:
-            return str(int(seconds)) + "s"
-        elif seconds < 3600:
-            return "{:.1f}m".format(1.0 * seconds / 60)
+    def get_dateX():  # TODO move to common
+        return time.strftime("%Y-%m-%d_%H:%M:%S")
+
+    @staticmethod
+    def format_seconds_to_string(self, seconds):
+        if self.is_int(seconds):
+            if seconds < 60:
+                return str(int(seconds)) + "s"
+            elif seconds < 3600:
+                return "{:.1f}m".format(1.0 * seconds / 60)
+            else:
+                return "{:.1f}h".format(1.0 * seconds / 3600)
         else:
-            return "{:.1f}h".format(1.0 * seconds / 3600)
+            return "NaN[{}]".format(seconds)
 
     # files and directories ...
-    @staticmethod
-    def current_scripts_path():
-        return path.dirname(path.realpath(sys.argv[0])) + "\\"
+    def current_scripts_path(self):
+        return path.dirname(path.realpath(sys.argv[0])) + self.sep
 
     def file_exists(self, check_file, info="", check_not_empty=False):
         if path.exists(check_file):
@@ -162,10 +175,11 @@ class CommonFunctions:
                 return True
         else:
             if len(check_file) > 0:
-                if len(info) > 0:
-                    self.logger.wrn("File {} not exist !  ({})\n".format(check_file, info))
-                else:
-                    self.logger.wrn("File {} not exist !\n".format(check_file))
+                if info is not False:
+                    if len(info) > 0:
+                        self.logger.wrn("File {} not exist ! ({})\n".format(check_file, info))
+                    else:
+                        self.logger.wrn("File {} not exist !\n".format(check_file))
             else:
                 self.logger.err("File name length is zero! {}".format(info))
             return False
@@ -182,8 +196,9 @@ class CommonFunctions:
             self.logger.err(("(path_exists) wrong parameter!", check_path, info))
             return False
 
-    def get_win_visual_path(self, path):
-        return path.replace("/", "\\")
+    @staticmethod
+    def convert_to_win_path(path_to_convert):
+        return path_to_convert.replace("/", "\\")
 
     def get_proper_path(self, get_path, info=""):
         if len(get_path) > 0:
@@ -357,10 +372,10 @@ class CommonFunctions:
             return get_file
         return ""
 
-    def get_save_file(self, qt_edit_line, qt_file_dialog, dir_separator="/"):
+    def get_save_file(self, qt_edit_line, qt_file_dialog):
         get_directory = qt_file_dialog.getSaveFileName()
         if len(get_directory) > 0:
-            qt_edit_line.setText(get_directory + dir_separator)
+            qt_edit_line.setText(get_directory + self.sep)
 
     def get_incremented_name(self, name_in, db=False):
         last_not_digit = next((i for i, j in list(enumerate(name_in, 1))[::-1] if not j.isdigit()), -1)

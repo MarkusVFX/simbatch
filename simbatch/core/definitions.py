@@ -320,6 +320,8 @@ class Definitions:
                                             if "params" in ag:
                                                 new_action.parameters = ag["params"]
                                             new_group_action.add_single_action(new_action)
+                                    else:
+                                        self.batch.logger.err(("wrong action type : ", li['type']))
 
                                     new_definition.add_group_action(new_group_action)
                             else:

@@ -202,8 +202,8 @@ class MainWindow(QMainWindow):
         self.tsk_ui = TasksUI(batch, self, top)
         self.que_ui = QueueUI(batch, self, top)
         self.nod_ui = NodesUI(batch, self, top)
-        self.set_ui = SettingsUI(batch, self, top)
         self.dfn_ui = DefinitionsUI(batch, self, top)
+        self.set_ui = SettingsUI(batch, self, top)
 
         #
 
@@ -219,9 +219,8 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
         qt_tab_widget.addTab(self.que_ui.qt_widget_queue, "Queue")
         qt_tab_widget.addTab(self.nod_ui.qt_widget_nodes, "Sim Nodes")
+        qt_tab_widget.addTab(self.dfn_ui.qt_widget_definitions, "Definitions")
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
-        if self.sts.debug_level >= 4:
-            qt_tab_widget.addTab(self.dfn_ui.qt_widget_definitions, "Definitions")
         qt_tab_widget.setMinimumSize(220, 400)
 
         if self.sts.store_data_mode == 1:

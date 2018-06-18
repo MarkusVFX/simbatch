@@ -16,6 +16,8 @@ class DefinitionsUI:
     qt_widget_definitions = None
     qt_lay_definitions_main = None
 
+    current_selected = [0,0,0]
+
     batch = None
     top_ui = None
     mainw = None
@@ -121,21 +123,35 @@ class DefinitionsUI:
 
     def on_definitions_tree_changed(self, new, old):
         if new is not None:
+            parent_id = None
+            parent_parent_id = None
             full_path_element = new.text(0)
-            parent_str = ""
-            parent_parent_str = ""
+            root_id = new.text(1)
+            # parent_str = ""
+            # parent_parent_str = ""
             parent = new.parent()
             if parent is not None:
                 parent_str = parent.text(0)
-                parent_id = parent.text(1)
+
+                parent_id = root_id
+                root_id = parent.text(1)
+
                 full_path_element = "{}    {}".format(parent_str, full_path_element)
                 parent_parent = parent.parent()
                 if parent_parent is not None:
                     parent_parent_str = parent_parent.text(0)
-                    parent_parent_id = parent_parent.text(1)
-                    full_path_element = "{}    {}   {}{}{}".format(parent_parent_str, full_path_element,"[" ,new.text(1),"]")
+
+                    parent_parent_id = parent_id
+                    parent_id = root_id
+                    root_id = parent_parent.text(1)
+
+                    full_path_element = "{}    {}   {}{}{}".format(parent_parent_str, full_path_element,
+                                                                   "[", new.text(1), "]")
 
             self.qt_current.qt_edit_line.setText(full_path_element)
+            self.current_selected = [self.batch.comfun.int_or_val(root_id, None),
+                                     self.batch.comfun.int_or_val(parent_id, None),
+                                     self.batch.comfun.int_or_val(parent_parent_id, None)]
 
     def print_to_definition_info(self, txt):
         logger_raw = self.batch.logger.raw
@@ -157,16 +173,8 @@ class DefinitionsUI:
         self.qt_definition_content.append("\n\n\n")
 
     def on_click_print_current(self):
-        # TODO optimize algo !
-        current_str = self.qt_current.qt_edit_line.text()
-        if len(current_str) > 0:
-            current_str_split = current_str.split(")")
-            indexes = []
-            for i, el in enumerate(current_str_split):
-                if "(" in el:
-                    index = self.comfun.int_or_val(el.split("(")[1], -1)
-                    indexes.append(index)
-
+        if self.current_selected[0] is not None:
+            indexes = self.current_selected
             self.print_to_definition_info("Current definition :  {}".format(self.dfn.definitions_names[indexes[0]]))
             if len(indexes) > 1:
                 self.print_to_definition_info(" Current action :  {}".format(

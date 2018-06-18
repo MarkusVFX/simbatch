@@ -13,7 +13,6 @@ except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from widgets import *
-from simbatch.core.tasks import *
 from ui_tasks_form import AddToQueueForm
 
 
@@ -158,7 +157,7 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.schemas_id_array = []
 
-        self.form_task_item = TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
+        self.form_task_item = self.batch.tsk.get_default_task()
 
         self.init_ui_elements(batch.sch)
 
@@ -363,7 +362,7 @@ class TasksFormCreateOrEdit(QWidget):
             self.top_ui.set_top_info(" Can't detect frame range ", 7)
 
     def clear_vars(self):
-        self.form_task_item = TaskItem(0, "sample", 1, "NULL", 1, 1, "01", "001", "", 0, 100, 1, 1, 1, "", 1, 50, "")
+        self.form_task_item = self.batch.tsk.get_default_task()
 
 
 class TasksUI:

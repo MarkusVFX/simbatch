@@ -9,7 +9,7 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from simbatch.core.lib.common import CommonFunctions     # , Logger
+from simbatch.core.lib.common import CommonFunctions
 
 
 class SimpleLabel:
@@ -228,7 +228,6 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
         self.top_ui = top_ui
         self.logger = batch.logger
         self.interactions = batch.dfn.current_interactions      # connect  qt_button_1   or and   qt_button_1
-        self.comfun = CommonFunctions()
         self.widget_id = widget_id
         self.multi_action = multi_action
 
@@ -315,14 +314,14 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
         eval(str_to_eval)
 
     def defined_button_get_file(self):                # QFileDialog - protect common function to be independent library
-        ret_file = self.comfun.file_dialog_to_edit_line(self.qt_edit, QFileDialog,
-                                                        self.batch.prj.current_project.project_directory)
+        ret_file = self.batch.comfun.file_dialog_to_edit_line(self.qt_edit, QFileDialog,
+                                                              self.batch.prj.current_project.project_directory)
         return ret_file
 
     def defined_button_get_directory(self):           # QFileDialog - protect common function to be independent library
-        ret_dir = self.comfun.get_dialog_directory(self.qt_edit, QFileDialog,
-                                                   force_start_dir=self.batch.prj.current_project.project_directory,
-                                                   dir_separator=self.sts.dir_separator)
+        ret_dir = self.batch.comfun.get_dialog_directory(self.qt_edit, QFileDialog,
+                                                         force_start_dir=self.batch.prj.current_project.project_directory,
+                                                         dir_separator=self.sts.dir_separator)
         return ret_dir
 
     def defined_button_show_info(self, info):
@@ -367,8 +366,6 @@ class ActionWidgetATQ(QWidget):
     qt_widget_layout = None
     CMB = None   # ComboLabel
     ELWB = None  # EditLineWithButtons
-
-    comfun = CommonFunctions()
 
     def __init__(self, text_label, text_edit, combo_label=None, combo_items=None ):
 

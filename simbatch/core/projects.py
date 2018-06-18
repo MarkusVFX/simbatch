@@ -1,5 +1,4 @@
-import os
-from lib.common import CommonFunctions, Logger
+from lib.common import CommonFunctions
 from io import *
 
 # JSON Name Format, PEP8 Name Format
@@ -216,6 +215,13 @@ class Projects:
                 # PRO version with SQL
                 self.batch.logger.inf("PRO version with SQL")
                 return False
+
+    def create_project(self, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
+                 cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
+                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
+        return SingleProject(project_id, project_name, is_default, state_id, state, project_directory, working_directory,
+                 cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
+                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=zeros_in_version)
 
     #  add project to 'projects_data' list  on load  and on add by user
     def add_project(self, project_to_add, do_save=False, generate_directory_patterns=False):

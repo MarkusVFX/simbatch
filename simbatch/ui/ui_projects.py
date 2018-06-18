@@ -10,7 +10,6 @@ except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from widgets import *
-from simbatch.core.projects import *
 
 
 class ProjectListItem(QWidget):
@@ -440,9 +439,10 @@ class ProjectsUI:
             if self.batch.prj.total_projects == 0:
                 set_default = 1
 
-            new_project = SingleProject(0, new_project_name, set_default, self.sts.INDEX_STATE_ACTIVE, "ACTIVE",
-                                        project_directory, working_directory, cameras_directory, cache_directory,
-                                        "", "", "", "", "generate_directory_patterns=True", description)
+            new_project = self.batch.prj.create_project(0, new_project_name, set_default, self.sts.INDEX_STATE_ACTIVE,
+                                                        "ACTIVE", project_directory, working_directory,
+                                                        cameras_directory, cache_directory, "", "", "", "",
+                                                        "generate_directory_patterns=True", description)
 
             ret_id = self.batch.prj.add_project(new_project, do_save=True, generate_directory_patterns=True)
 
@@ -491,9 +491,9 @@ class ProjectsUI:
                 set_active = 0
 
             # using 'SingleProject' object only fof transfer data
-            mock_project = SingleProject(0, new_project_name, set_active, 1, "MOCK", project_directory,
-                                         working_directory, cameras_directory, cache_directory, "", "", "", "",
-                                         "MOCK", description)
+            mock_project = self.batch.prj.create_project(0, new_project_name, set_active, 1, "MOCK", project_directory,
+                                                         working_directory, cameras_directory, cache_directory,
+                                                         "", "", "", "", "MOCK", description)
             self.batch.prj.update_project(mock_project, do_save=True)
 
             if pin_checked is False:

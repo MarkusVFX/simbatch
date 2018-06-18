@@ -161,6 +161,9 @@ class Tasks:
         curr_task = self.tasks_data[self.current_task_index]
         return[self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]
 
+    def get_default_task(self):
+        return TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
+
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
         sample_task_1 = TaskItem(0, "tsk 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")

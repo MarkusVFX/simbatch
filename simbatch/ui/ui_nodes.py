@@ -10,7 +10,6 @@ except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from widgets import *
-# from simbatch.core.nodes import *
 
 
 class NodeListItem(QWidget):

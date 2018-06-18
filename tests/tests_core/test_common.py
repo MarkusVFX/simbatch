@@ -62,6 +62,11 @@ def test_remove3_string_as_list(comfun):
     assert comfun.string_as_list("a;bb;;;;cde;fghh", remove_empty=True, remove_shorter_than=3) == ["cde", "fghh"]
 
 
+def test_can_get_int(comfun):
+    assert comfun.can_get_int("a") == False
+    assert comfun.can_get_int('abc') == False
+    assert comfun.can_get_int(None) == False
+
 def test_int_or_val(comfun):
     assert comfun.int_or_val(1, 5) == 1
     assert comfun.int_or_val("1", 5) == 1

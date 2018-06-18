@@ -45,6 +45,8 @@ class CommonFunctions:
 
     @staticmethod
     def can_get_int(value):   # check can convert to int (e.g.: test string "1")   [for True return 1]
+        if value is None:
+            return False
         try:
             int(value)
             return True

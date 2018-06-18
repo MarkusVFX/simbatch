@@ -242,9 +242,10 @@ class ProjectsUI:
         qt_form_remove_layout = QFormLayout()
 
         wfr_buttons = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?")
-        wfr_buttons.button.setStyleSheet("""padding-top:7px;padding-bottom:7px;margin-top:10px;margin-bottom:10px""")
 
+        qt_form_remove_layout.addItem(QSpacerItem(0, 10))
         qt_form_remove_layout.addRow(" ", wfr_buttons.qt_widget_layout)
+        qt_form_remove_layout.addItem(QSpacerItem(0, 10))
 
         wfr_buttons.button.clicked.connect(lambda: self.on_click_confirm_remove_project())
 
@@ -426,7 +427,7 @@ class ProjectsUI:
 
     def on_click_add_project(self, new_project_name, project_directory, working_directory, cameras_directory,
                              cache_directory, description, pin_checked):
-        if len(new_project_name) > 0:
+        if len(new_project_name) > 0 and len(project_directory) > 0:
             cb_state = False   # TODO  get cb_state
             if cb_state:
                 set_default = 1
@@ -455,9 +456,11 @@ class ProjectsUI:
             self.batch.sio.create_project_working_directory(new_project.working_directory_absolute)
             self.batch.sio.create_project_working_directory(new_project.cameras_directory_absolute)
             self.batch.sio.create_project_working_directory(new_project.cache_directory_absolute)
-            # self.batch.sio.create_project_working_directory(new_project.env_directory_absolute)
-            # self.batch.sio.create_project_working_directory(new_project.props_directory_absolute)
-            # self.batch.sio.create_project_working_directory(new_project.scripts_directory_absolute)
+
+            self.batch.sio.create_project_working_directory(new_project.env_directory_absolute)
+            self.batch.sio.create_project_working_directory(new_project.props_directory_absolute)
+            self.batch.sio.create_project_working_directory(new_project.scripts_directory_absolute)
+            self.batch.sio.create_project_working_directory(new_project.custom_directory)
 
             if pin_checked is False:
                 self.clear_form_add()
@@ -467,7 +470,10 @@ class ProjectsUI:
             self.reset_list(set_active_id=self.batch.prj.current_project_id)
             self.mainw.sch_ui.hide_all_forms()
         else:
-            self.top_ui.set_top_info(" Fill project name !", 8)
+            if len(new_project_name) == 0:
+                self.top_ui.set_top_info(" Fill project name !", 8)
+            else:
+                self.top_ui.set_top_info(" Pick project directory !", 8)
 
     #  Edit
     #  Edit  Edit

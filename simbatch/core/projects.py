@@ -37,6 +37,15 @@ class SingleProject:
         self.working_directory = self.comfun.get_proper_path(working_directory, info="wrk dir")
         self.cameras_directory = self.comfun.get_proper_path(cameras_directory, info="cam dir")
         self.cache_directory = self.comfun.get_proper_path(cache_directory, info="ani cache dir")
+
+        if len(env_directory) == 0 :
+            env_directory = project_directory
+        if len(props_directory) == 0 :
+            props_directory = project_directory
+        if len(scripts_directory) == 0 :
+            scripts_directory = project_directory
+        if len(custom_directory) == 0 :
+            custom_directory = project_directory
         self.env_directory = self.comfun.get_proper_path(env_directory, info="env dir")
         self.props_directory = self.comfun.get_proper_path(props_directory, info="props dir")
         self.scripts_directory = self.comfun.get_proper_path(scripts_directory, info="scripts dir")
@@ -74,6 +83,8 @@ class SingleProject:
             self.cache_directory_absolute = self.project_directory + self.cache_directory
         else:
             self.cache_directory_absolute = self.cache_directory
+
+        # TODO standard directories on settings
         if self.comfun.is_absolute(self.env_directory) is False:
             self.env_directory_absolute = self.project_directory + self.env_directory
         else:
@@ -90,6 +101,7 @@ class SingleProject:
             self.custom_directory_absolute = self.project_directory + self.custom_directory
         else:
             self.custom_directory_absolute = self.custom_directory
+
 
 
 class Projects:
@@ -240,6 +252,7 @@ class Projects:
         if generate_directory_patterns:
             project_to_add.seq_shot_take_pattern = self.batch.sio.get_dir_patterns(project_to_add.cache_directory)
 
+        self.batch.logger.deepdb(("append project:", project_to_add.id, project_to_add.project_name))
         self.projects_data.append(project_to_add)
         self.total_projects += 1
         if project_to_add.is_default == 1:

@@ -110,6 +110,12 @@ class SingleDefinition:
     def get_prev_ext(self):
         return self.prev_ext
 
+    def get_multiaction_by_name(self, name):
+        for mac in self.multi_actions_array:
+            if mac.name == name:
+                return mac
+        return None
+
 
 class Definitions:
     batch = None
@@ -168,6 +174,21 @@ class Definitions:
 
     def get_definitions(self):
         return self.definitions_array
+
+    def get_definition_by_name(self, name):
+        for i, d in enumerate(self.definitions_array):
+            if d.name == name:
+                return d
+        return None
+
+    def is_singleaction(self, obj):
+        return isinstance(obj, SingleAction)
+
+    def create_singleaction(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
+        return SingleAction(name, description, default_value, template, actual_value=actual_value, mode=mode, ui=ui)
+
+    def create_multiaction(self, id, name):
+        return MultiAction(id, name)
 
     def get_current_setup_ext(self):    # TODO  env = self.sts.runtime_env
         if self.current_definition is not None:

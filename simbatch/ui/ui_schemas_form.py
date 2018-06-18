@@ -13,11 +13,11 @@ except ImportError:
 
 from widgets import *
 # from core.schemas import SingleAction
-from simbatch.core.actions import MultiAction, SingleAction
+from core.actions import MultiAction, SingleAction
 
 
 class SchemaFormCreateOrEdit(QWidget):
-    schema_item_form_object = None
+    local_schema_item = None
     save_as_base_state = 1
 
     form_mode = 1  # 1 create    2 edit
@@ -44,7 +44,7 @@ class SchemaFormCreateOrEdit(QWidget):
         # self.actions_array = []
         self.action_widgets = []
         self.batch = batch
-        self.schema_item_form_object = batch.sch.get_blank_schema()
+        self.local_schema_item = batch.sch.get_blank_schema()
         self.sts = self.batch.sts
         if mode == "edit":
             self.form_mode = 2
@@ -53,21 +53,21 @@ class SchemaFormCreateOrEdit(QWidget):
 
     def form_basic_print(self):
         self.batch.logger.raw("\n schema_item_form_object:")
-        self.schema_item_form_object.basic_print()
+        self.local_schema_item.basic_print()
         self.batch.logger.raw("\n form action_widgets count: {}".format(len(self.action_widgets)))
         for i, aw in enumerate(self.action_widgets):
             self.batch.logger.raw(" action_widget {}  {}".format(i, aw.qt_label.text()))
 
     def form_detailed_print(self):
         self.batch.logger.raw("\nschema_item_form_object:")
-        self.schema_item_form_object.detailed_print()
+        self.local_schema_item.detailed_print()
         self.batch.logger.raw("\nform action_widgets count:  {}".format(len(self.action_widgets)))
         for i, aw in enumerate(self.action_widgets):
             self.batch.logger.raw(" action_widget {}  id:{}  label:{}  edit_val:{}".format(i, aw.widget_id,
                                                                                            aw.qt_label.text(),
                                                                                            aw.edit_val, aw.ui_info))
-        self.batch.logger.raw("forms action_array count:  {}".format(len(self.schema_item_form_object.actions_array)))
-        for a in self.schema_item_form_object.actions_array:
+        self.batch.logger.raw("forms action_array count:  {}".format(len(self.local_schema_item.actions_array)))
+        for a in self.local_schema_item.actions_array:
             self.batch.logger.raw("action: {}   {}  {}".format(a.name, a.default_value, a.actual_value))
 
     def init_ui_elements(self):
@@ -219,10 +219,8 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.batch.logger.wrn("Current project undefined !")
 
-
-    def add_action_widget_to_form(self, multi_action):
+    def create_action_widget(self, multi_action):
         combo_items = []
-        qt_lay = self.qt_lay_fae_actions
         button_1_caption = None
         button_2_caption = None
         button_1_function_str = None
@@ -239,12 +237,11 @@ class SchemaFormCreateOrEdit(QWidget):
         batch = self.batch   # share logger and interaction from definition
         top = self.top_ui
         if multi_action.actions_count == 0:   # incorrectly defined action
-            action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", MultiAction(-1, "empty action"))
-            single_action = SingleAction(multi_action.name, "err", "incorrectly defined action", "null")
-
+            dummy_multiaction = self.batch.dfn.create_multiaction(-1, "empty action")
+            action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", dummy_multiaction)
+            first_action = self.batch.dfn.create_singleaction(multi_action.name, "err", "empty multiaction", "null")
         else:
-            single_action = SingleAction(multi_action.actions[0].name, multi_action.actions[0].description,
-                                         multi_action.actions[0].default_value, multi_action.actions[0].template)
+            first_action = multi_action.actions[0]
 
             if multi_action.actions_count == 1:   # single action, no combo
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.actions[0].name,
@@ -259,27 +256,34 @@ class SchemaFormCreateOrEdit(QWidget):
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                              button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
                                              combo_items=combo_items)
+        return action_widget, first_action
 
-        qt_lay.addWidget(action_widget)
-        self.action_widgets.append(action_widget)
-        self.schema_item_form_object.actions_array.append(single_action)
+    def add_action_widget_to_form(self, multi_action):
+        qt_lay = self.qt_lay_fae_actions
+
+        new_widget = self.create_action_widget(multi_action)
+
+        qt_lay.addWidget(new_widget[0])
+        self.action_widgets.append(new_widget[0])
+        self.local_schema_item.actions_array.append(new_widget[1])
         self.form_actions_count += 1
 
-    # on click one of horizontal button:
-    # ADD action widget to vertical list of schema's actions
+    """ on click one of horizontal button """
+    """ ADD action widget to vertical list of schema's actions """
     def on_click_defined_action_button(self, multi_action):
         self.add_action_widget_to_form(multi_action)
 
     # ACTIONS
     # ACTIONS
     # ACTIONS
+    """   create/update SCHEMA actions from current widgets """
     def compile_actions(self):
-        del self.schema_item_form_object.actions_array[:]
+        del self.local_schema_item.actions_array[:]
         for a_wi in self.action_widgets:
             if len(a_wi.multi_action.actions) > a_wi.current_action_index:
-                self.schema_item_form_object.actions_array.append(a_wi.multi_action.actions[a_wi.current_action_index])
+                self.local_schema_item.actions_array.append(a_wi.multi_action.actions[a_wi.current_action_index])
 
-    # remove horizontal row of defined actions buttons
+    """ remove horizontal row of defined actions buttons """
     def remove_all_defined_action_buttons(self):
         while self.qt_lay_fae_actions_buttons.count() > 0:
             b = self.qt_lay_fae_actions_buttons.itemAt(0)
@@ -306,17 +310,17 @@ class SchemaFormCreateOrEdit(QWidget):
     ##
     ###
     def on_edit_schema_name(self, txt):
-        self.schema_item_form_object.schema_name = txt
+        self.local_schema_item.schema_name = txt
         if self.form_mode == 1:
             self.qt_bg_schema_top.setTitle("Create Schema : " + txt)
         else:
             self.qt_bg_schema_top.setTitle("Edit Schema : " + txt)
 
     def on_edit_schema_description(self, txt):
-        self.schema_item_form_object.description = txt
+        self.local_schema_item.description = txt
 
     def on_edit_schema_version(self, txt):
-        self.schema_item_form_object.schemaVersion = int(txt)
+        self.local_schema_item.schemaVersion = int(txt)
 
     def on_changed_save_as_base_setup(self, state):
         if state:
@@ -324,29 +328,74 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.save_as_base_state = 0
 
-    # SCHEMA PROXY OBJECT
-    # SCHEMA PROXY OBJECT
-    # SCHEMA PROXY OBJECT
 
-    # clear helper form object (store schema data)
+    # SCHEMA ITEM  helper  FROM OBJECT
+
+    # clear
     def clear_vars(self):
-        self.schema_item_form_object = self.batch.sch.get_blank_schema()
+        self.local_schema_item = self.batch.sch.get_blank_schema()
 
-    def update_form_data(self, schema_item):   # old update_actions_ui
-        self.clear_vars()
-        self.schema_item_form_object.project_id = schema_item.project_id
-        self.schema_item_form_object.based_on_definition = schema_item.based_on_definition
+    def update_widgets(self, schema_item):
+        pass
+
+    """  on show form create / edit / change item """
+    def update_local_schema_item(self, schema_item):
+
+        # self.local_schema_item = get_schema_object_by_definition_name(schema_item.based_on_definition)
+        # update_schema_item_values_fromschema_item(self.local_schema_item)
+
+
+        self.local_schema_item.project_id = schema_item.project_id
+        self.local_schema_item.based_on_definition = schema_item.based_on_definition
         self.qt_fae_schema_name_edit.setText(schema_item.schema_name)
         self.qt_fae_schema_version_edit.setText(str(schema_item.schema_version))
         self.qt_fae_schema_description_edit.setText(schema_item.description)
-        self.schema_item_form_object.actions_array = copy.deepcopy(schema_item.actions_array)
+        self.local_schema_item.actions_array = copy.deepcopy(schema_item.actions_array)
 
-        self.remove_all_action_widgets()
-        for i, ac in enumerate(copy.deepcopy(self.schema_item_form_object.actions_array)):
-            #if isinstance(ac, SingleAction):
-            print "TODO SingleAction ", ac.name, len(self.schema_item_form_object.actions_array)  # TODO
+    def create_widgets(self, schema_item):
+        schema_definition = self.batch.dfn.get_definition_by_name(schema_item.based_on_definition)
+        if schema_definition is None:
+            self.batch.logger.err(("definition", schema_item.based_on_definition, "not exist"))
+        else:
+            # for mac in ret.multi_actions_array:
+            for act in schema_item.actions_array:
+
+                mac = schema_definition.get_multiaction_by_name(act.name)
+                if mac is not None:
+                    self.add_action_widget_to_form(mac)
+                else:
+                    self.batch.logger.err(("multiaction:", act.name, "in definition:", schema_item.based_on_definition,
+                                           "not exist"))
+
+        """ 
+        for i, ac in enumerate(copy.deepcopy(schema_item.actions_array)):
+            # if isinstance(ac, SingleAction):
+            print "TODO SingleAction ", ac.name, len(schema_item.actions_array)  # TODO
             mac = MultiAction(i, ac.name)
-            mac.add_single_action(copy.deepcopy(ac))
+            ret = mac.add_single_action(copy.deepcopy(ac))
+            ac.print_minimum()
+            print "   ccc : ", ac.__class__
+            print "   ret : "  , ret, ac ,  isinstance(ac, SingleAction),   isinstance(ac, list)
             self.add_action_widget_to_form(mac)
             # else:
-                # self.add_action_widget_to_form(ac)
+            # self.add_action_widget_to_form(ac)
+        """
+
+    def setup_widgets(self, schema_item):
+        for i in self.action_widgets:
+            pass
+
+    """ on change schema item """
+    def update_form(self, schema_item):
+        self.clear_vars()
+        self.remove_all_action_widgets()
+        self.create_widgets(schema_item)
+        self.setup_widgets(schema_item)
+        self.update_local_schema_item(schema_item)
+
+
+
+
+
+
+

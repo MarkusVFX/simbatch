@@ -10,8 +10,9 @@ except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from widgets import *
-from simbatch.core.schemas import *
-from simbatch.core.definitions import *
+# from simbatch.core.schemas import *
+# from simbatch.core.definitions import *
+import copy
 
 from ui_schemas_form import SchemaFormCreateOrEdit
 
@@ -141,11 +142,11 @@ class SchemasUI:
         schema_form_create = SchemaFormCreateOrEdit(self.batch, "create", self.top_ui)
         self.schema_form_create = schema_form_create
         if self.batch.prj.current_project_index >= 0:
-            schema_form_create.schema_item_form_object.project_name = self.batch.prj.projects_data[
+            schema_form_create.local_schema_item.project_name = self.batch.prj.projects_data[
                 self.batch.prj.current_project_index].project_name
-            schema_form_create.schema_item_form_object.projectID = self.batch.prj.current_project_id
+            schema_form_create.local_schema_item.projectID = self.batch.prj.current_project_id
         schema_form_create.execute_button.button.clicked.connect(
-            lambda: self.on_click_add_schema(schema_form_create.schema_item_form_object,
+            lambda: self.on_click_add_schema(schema_form_create.local_schema_item,
                                              save_as_base=schema_form_create.save_as_base_state))
 
         # COPY
@@ -183,7 +184,7 @@ class SchemasUI:
         schema_form_edit = SchemaFormCreateOrEdit(self.batch, "edit", self.top_ui)
         self.schema_form_edit = schema_form_edit
         schema_form_edit.execute_button.button.clicked.connect(
-            lambda: self.on_click_update_schema(schema_form_edit.schema_item_form_object))
+            lambda: self.on_click_update_schema(schema_form_edit.local_schema_item))
 
         # REMOVE
         # REMOVE REMOVE
@@ -408,7 +409,7 @@ class SchemasUI:
                 new_schema.based_on_definition = cur_dfn.name + "__" + str(cur_dfn.version)
             else:
                 self.batch.logger.wrn("(update_form_create) current_definition is None")
-            self.schema_form_create.update_form_data(new_schema)
+            self.schema_form_create.update_form(new_schema)
         else:
             self.batch.logger.wrn(("Wrong current project index", self.batch.prj.current_project_index))
 
@@ -422,13 +423,22 @@ class SchemasUI:
             self.schema_form_create.hide()
             self.create_form_state = 0
 
+    def update_form_edit(self):
+        if self.sch.current_schema_index >= 0:
+            self.schema_form_edit.update_form(self.sch.current_schema)
+        else:
+            self.batch.logger.wrn(("please select schema first", self.batch.prj.current_project_index))
+
     def on_click_show_form_edit(self):
         if self.edit_form_state == 0:
-            self.hide_all_forms()
-            self.schema_form_edit.show()
             if self.sch.current_schema_index >= 0:
-                self.schema_form_edit.update_form_data(self.sch.current_schema)
-            self.edit_form_state = 1
+                self.hide_all_forms()
+                self.schema_form_edit.show()
+                self.update_form_edit()
+                self.edit_form_state = 1
+            else:
+                self.batch.logger.wrn(("please select schema first", self.batch.prj.current_project_index))
+                self.top_ui.set_top_info("please select schema first",7)
         else:
             self.schema_form_edit.hide()
             self.edit_form_state = 0
@@ -492,9 +502,9 @@ class SchemasUI:
                                 is_unique = False
                     if is_unique:
                         curr = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
-                        copied_schema_item = SchemaItem(0, new_name, curr.state_id, curr.state, new_project_id,
-                                                        curr.schema_name, # "based_on"
-                                                        curr.actions_array, curr.schema_version, curr.description)
+                        copied_schema_item = copy.deepcopy(curr)
+                        copied_schema_item.schema_name = new_name
+                        copied_schema_item.project_id = new_project_id
                         self.on_click_add_schema(copied_schema_item)
                         self.schema_form_copy.hide()
                         self.copy_form_state = 0
@@ -653,7 +663,7 @@ class SchemasUI:
                 self.batch.logger.wrn(("(on sch chng) current_list_item_nr:", self.current_list_item_nr))
 
             if self.edit_form_state == 1:
-                self.schema_form_edit.update_form_data(self.sch.current_schema)
+                self.schema_form_edit.update_form(self.sch.current_schema)
                 self.batch.logger.db(("update edit form: ", self.sch.current_schema.schema_name))
 
             if self.copy_form_state == 1:

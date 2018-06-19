@@ -155,8 +155,8 @@ class MainWindow(QMainWindow):
                 screen_resolution = app.desktop().screenGeometry()
                 current_screen_width = screen_resolution.width()
                 current_screen_height = screen_resolution.height()
-            except:
-                pass   # TODO err   +  multi screen
+            except RuntimeError:
+                pass   # TODO multi screen
         if self.sts.current_os == 2:
             user32 = ctypes.windll.user32
             current_screen_width = user32.GetSystemMetrics(78)    # SM_CXVIRTUALSCREEN
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
         top.qt_but_refresh.clicked.connect(self.on_clicked_but_refresh)
 
         self.top_ui = top
-        self.wiz_ui = WizardUI(batch, self, top)        #  PRO version
+        self.wiz_ui = WizardUI(batch, self, top)        # PRO version
         self.pro_ui = ProjectsUI(batch, self, top)
         self.sch_ui = SchemasUI(batch, self, top)
         self.tsk_ui = TasksUI(batch, self, top)
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
         qt_tab_widget = QTabWidget(self)
         self.qt_tab_widget = qt_tab_widget
 
-        # qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")         # PRO version
+        # qt_tab_widget.addTab(self.wiz_ui.qt_widget_wizard, "Wizard")       # PRO version
         qt_tab_widget.addTab(self.pro_ui.qt_widget_projects, "Projects")
         qt_tab_widget.addTab(self.sch_ui.qt_widget_schema, "Schemas")
         qt_tab_widget.addTab(self.tsk_ui.qt_widget_tasks, "Tasks")
@@ -223,30 +223,30 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         qt_tab_widget.setMinimumSize(220, 400)
 
-        if self.sts.store_data_mode == 1:
-            if self.comfun.path_exists(self.sts.store_data_json_directory):
-                if self.sts.ui_edition_mode == 0:
-                    qt_tab_widget.setCurrentIndex(2)  # STANDARD TAB
-                else:
-                    qt_tab_widget.setCurrentIndex(3)  # STANDARD TAB (PRO version)
+        print "\n\n LO ______ ",  self.sts.loading_state
+        if self.sts.loading_state >= 4:
+            """ force start tab index by settings """
+            if self.sts.force_start_tab > 0:
+                qt_tab_widget.setCurrentIndex(self.sts.force_start_tab)
             else:
+                """ STANDARD START TAB """
                 if self.sts.ui_edition_mode == 0:
-                    qt_tab_widget.setCurrentIndex(4)  # NO data dir : show settings
+                    qt_tab_widget.setCurrentIndex(2)
                 else:
-                    qt_tab_widget.setCurrentIndex(5)  # NO data dir : show settings  (PRO version)
+                    qt_tab_widget.setCurrentIndex(3)  # PRO version with Wizard tab
         else:
-            # PRO version  with SQL
-            pass
-
-        if self.sts.force_start_tab > 0:
-            qt_tab_widget.setCurrentIndex(self.sts.force_start_tab)
+            """ settings not loaded properly """
+            if self.sts.ui_edition_mode == 0:
+                qt_tab_widget.setCurrentIndex(6)  # wrong config data: show settings
+            else:
+                qt_tab_widget.setCurrentIndex(7)  # wrong config data: show settings  (PRO version)
 
         qt_lay_central.addWidget(qt_tab_widget)
         qt_central_widget.setLayout(qt_lay_central)
         qt_tab_widget.currentChanged.connect(self.on_tab_change)
 
         # status after init main window and load settings and data
-        if self.sts.loading_state < 3:
+        if self.sts.loading_state < 4:
             top.set_top_info("Settings loaded not properly", 7)
             self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state))
 
@@ -254,7 +254,11 @@ class MainWindow(QMainWindow):
         if loading_data_state is True:
             self.top_ui.set_top_info(self.batch.sts.random_welcome_message())
         elif loading_data_state is False:
-            self.top_ui.set_top_info("Settings not loaded config.ini file not exists!", 9)
+            # self.top_ui.set_top_info("Settings not loaded config.ini file not exists!", 9)
+            if self.sts.loading_state == 3:
+                self.top_ui.set_top_info(self.sts.settings_err_info, 6)
+            else:
+                self.top_ui.set_top_info(self.sts.settings_err_info, 6)
         else:
             if loading_data_state == 1:
                 self.top_ui.set_top_info("Loaded with one data error")

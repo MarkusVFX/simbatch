@@ -1,8 +1,0 @@
-1;Simple  Burn;0;21;HOLD;P:\SiB_SimpleBurn\;P:\SiB_SimpleBurn\fx\;P:\SiB_SimpleBurn\cam\;P:\SiB_SimpleBurn\ani\;9769e3;1278ff;Wizard from file: SimpleBurn.hipnc;;; 
-2;Multi Shot Example;0;1;INIT;P:\SiB_MultipleShots\;P:\SiB_MultipleShots\fx\;P:\SiB_MultipleShots\cam\;P:\SiB_MultipleShots\ani\;9769e3;1278ff;Wizard from file: MultiShotExample.mb;seq<seq##>\seq<seq##>_sh<sh###>;seq<seq##>\seq<seq##>_sh<sh###>; 
-3;Test Schemas For Import;0;1;INIT;P:\SiB_SchTests\;P:\SiB_SchTests\fx\;P:\SiB_SchTests\cam\;P:\SiB_SchTests\ani\;9769e3;1278ff;sch import;;<seq##>\<seq##>_<sh###>; 
-4;5_clicks_setup;0;1;INIT;P:\SiB_PromoAnim\;P:\SiB_PromoAnim\fx\;P:\SiB_PromoAnim\cam\;P:\SiB_PromoAnim\ani\;9769e3;1278ff;Wizard from file: 5_clicks_setup.max;<seq##>\<seq##>_<sh###>;<seq##>\<seq##>_<sh###>; 
-5;5_clicks_setup;0;1;INIT;P:\SiB_PromoAnim\;P:\SiB_PromoAnim\fx\;P:\SiB_PromoAnim\cam\;P:\SiB_PromoAnim\ani\;9769e3;1278ff;Wizard from file: 5_clicks_setup.max;<seq##>\<seq##>_<sh###>;<seq##>\<seq##>_<sh###>; 
-6;5_clicks_setup;0;1;INIT;P:\SiB_PromoAnim\;P:\SiB_PromoAnim\fx\;P:\SiB_PromoAnim\cam\;P:\SiB_PromoAnim\ani\;9769e3;1278ff;Wizard from file: 5_clicks_setup.max;<seq##>\<seq##>_<sh###>;<seq##>\<seq##>_<sh###>; 
-7;s02_06_clothSim_13;0;1;INIT;D:\SOBA\ClothSim\;D:\SOBA\ClothSim\fx\;D:\SOBA\ClothSim\cam\;D:\SOBA\ClothSim\ani\;9769e3;1278ff;Wizard from file: s02_06_clothSim_13.mb;;; 
-8;Finn_CLT__v06;1;1;ACTIVE;D:\SOBA\mqs_proj\;D:\SOBA\mqs_proj\fx\;D:\SOBA\mqs_proj\cam\;D:\SOBA\mqs_proj\ani\;9769e3;1278ff;Wizard from file: Finn_CLT__v06.mb;;; 

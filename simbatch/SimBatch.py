@@ -8,7 +8,7 @@ app = QApplication([])
 
 #sim_batch = core.SimBatch("Stand-alone")
 
-simbatch = core.SimBatch("Maya", ini_file="S:/simbatch/config.ini")
+simbatch = core.SimBatch("Maya", ini_file="config.ini")
 server = simbatch_server.SimBatchServer(simbatch, force_local=True)
 loading_data_state = simbatch.load_data()
 

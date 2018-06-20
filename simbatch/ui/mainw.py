@@ -223,7 +223,6 @@ class MainWindow(QMainWindow):
         qt_tab_widget.addTab(self.set_ui.qt_widget_settings, "Settings")
         qt_tab_widget.setMinimumSize(220, 400)
 
-        print "\n\n LO ______ ",  self.sts.loading_state
         if self.sts.loading_state >= 4:
             """ force start tab index by settings """
             if self.sts.force_start_tab > 0:
@@ -248,7 +247,7 @@ class MainWindow(QMainWindow):
         # status after init main window and load settings and data
         if self.sts.loading_state < 4:
             top.set_top_info("Settings loaded not properly", 7)
-            self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state))
+            self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state, self.sts.settings_err_info))
 
     def post_run(self, loading_data_state):  # show welcome message or error info
         if loading_data_state is True:
@@ -272,7 +271,7 @@ class MainWindow(QMainWindow):
         self.batch.print_important_values()
 
     def on_clicked_but_print_details(self):
-        self.batch.print_current_detailed_values(self.qt_tab_widget.currentIndex())  # valid for: P S T Q N
+        self.batch.print_current_detailed_values(self.qt_tab_widget.currentIndex())  # valid for: P C T Q N D S
 
     def on_clicked_but_debug(self):
         self.batch.logger.inf("but_debug clicked")

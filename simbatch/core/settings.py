@@ -160,6 +160,12 @@ class Settings:
             self.ini_file = ini_file
         else:
             self.ini_file = os.path.abspath(ini_file)
+
+        """ check and force DEV config """
+        if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file),"config_dev.ini")):
+            self.ini_file = os.path.join(os.path.dirname(self.ini_file),"config_dev.ini")
+            self.logger.inf(("force DEV config:", self.ini_file))
+
         self.sql = [None, None, None, None]
         self.clear_state_colors()
 
@@ -169,7 +175,7 @@ class Settings:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
         else:
-            print " [WRN]  Settings not loaded !!!", self.loading_state
+            self.logger.wrn(("Settings not loaded !!!", self.loading_state))
 
     def print_all(self):
         print " loading_state: ", self.loading_state
@@ -231,25 +237,40 @@ class Settings:
             self.store_data_json_directory_abs = ""
         else:
             if self.comfun.is_absolute(data_path):
-                self.store_data_json_directory_abs = data_path
                 if data_path[-1:] == "\\" or data_path[-1:] == "/":
+                    self.store_data_json_directory_abs = data_path
                     self.store_data_backup_directory_abs = data_path + "backup" + self.dir_separator
                 else:
-                    self.store_data_backup_directory_abs = data_path + self.dir_separator + "backup" + self.dir_separator
+                    self.store_data_json_directory = data_path + self.dir_separator
+                    self.store_data_json_directory_abs = data_path + self.dir_separator
+                    self.store_data_backup_directory_abs = data_path + self.dir_separator + "backup" + \
+                                                           self.dir_separator
             else:
-                self.store_data_json_directory_abs = self.store_abs_dir + data_path
                 if data_path[-1:] == "\\" or data_path[-1:] == "/":
-                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup"
+                    self.store_data_json_directory_abs = self.store_abs_dir + data_path
+                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup" + \
+                                                           self.dir_separator
                 else:
-                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + self.dir_separator + "backup"
+                    self.store_data_json_directory_abs = self.store_abs_dir + data_path + self.dir_separator
+                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + self.dir_separator + \
+                                                           "backup" + self.dir_separator
 
-        if len(self.store_definitions_directory) == 0:
+        definitions_path = self.store_definitions_directory
+        if len(definitions_path) == 0:
             self.store_definitions_directory_abs = ""
         else:
-            if self.comfun.is_absolute(self.store_definitions_directory):
-                self.store_definitions_directory_abs = self.store_definitions_directory
+            if self.comfun.is_absolute(definitions_path):
+                if definitions_path[-1:] == "\\" or definitions_path[-1:] == "/":
+                    self.store_definitions_directory_abs = definitions_path
+                else:
+                    self.store_definitions_directory = definitions_path + self.dir_separator
+                    self.store_definitions_directory_abs = definitions_path + self.dir_separator
             else:
-                self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory
+                if definitions_path[-1:] == "\\" or definitions_path[-1:] == "/":
+                    self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory
+                else:
+                    self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory + \
+                                                           self.dir_separator
 
     def load_settings(self):
         self.settings_err_info = ""

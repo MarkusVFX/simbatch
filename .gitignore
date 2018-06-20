@@ -1,13 +1,14 @@
 .idea
 .cache/
 
-config.ini
-/data
+simbatch/config_dev.ini
+simbatch/data
 /prv
 /data_test
 /definitions_test
 simbatch/data_test
 simbatch/definitions_test
+simbatch/definitions/interaction_example.json
 
 env/
 build/

@@ -152,6 +152,8 @@ class Settings:
         else:
             self.dir_separator = "\\"
 
+        self.store_abs_dir = os.path.abspath("") + self.dir_separator  # os.path.dirname(os.path.realpath(__file__))
+
         self.comfun = CommonFunctions()
         self.runtime_env = runtime_env
         if self.comfun.is_absolute(ini_file):
@@ -225,19 +227,28 @@ class Settings:
     def update_absolute_directories(self):
         data_path = self.store_data_json_directory
 
-        if self.comfun.is_absolute(data_path):
-            self.store_data_json_directory_abs = data_path
-            if data_path[-1:] == "\\" or data_path[-1:] == "/":
-                self.store_data_backup_directory_abs = data_path + "backup" + self.dir_separator
-            else:
-                self.store_data_backup_directory_abs = data_path + self.dir_separator + "backup" + self.dir_separator
+        if len(data_path) == 0:
+            self.store_data_json_directory_abs = ""
         else:
-            self.store_data_json_directory_abs = self.store_abs_dir + data_path
-            if data_path[-1:] == "\\" or data_path[-1:] == "/":
-                self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup"
+            if self.comfun.is_absolute(data_path):
+                self.store_data_json_directory_abs = data_path
+                if data_path[-1:] == "\\" or data_path[-1:] == "/":
+                    self.store_data_backup_directory_abs = data_path + "backup" + self.dir_separator
+                else:
+                    self.store_data_backup_directory_abs = data_path + self.dir_separator + "backup" + self.dir_separator
             else:
-                self.store_data_backup_directory_abs = self.store_abs_dir + data_path + self.dir_separator + "backup"
+                self.store_data_json_directory_abs = self.store_abs_dir + data_path
+                if data_path[-1:] == "\\" or data_path[-1:] == "/":
+                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup"
+                else:
+                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + self.dir_separator + "backup"
 
+        if len(self.store_definitions_directory) == 0:
+            self.store_definitions_directory_abs = ""
+        else:
+            if self.comfun.is_absolute(self.store_definitions_directory):
+                self.store_definitions_directory_abs = self.store_definitions_directory
+            else:
                 self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory
 
     def load_settings(self):

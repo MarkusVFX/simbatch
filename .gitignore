@@ -1,7 +1,7 @@
 .idea
 .cache/
 
-simbatch/config.ini
+config.ini
 /data
 /prv
 /data_test

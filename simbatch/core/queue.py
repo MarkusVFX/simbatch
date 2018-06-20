@@ -305,9 +305,9 @@ class Queue:
         sample_queue_item_1 = QueueItem(0, "queue item 1", 1, "T", 1, "", "", "", 1, 2, "DONE", 11, 3, "", 0,
                                         "script", 50, "first", "sim_01", 1, "2017_12_28 02:02:02", 1, 1)
         sample_queue_item_2 = QueueItem(0, "queue item 2", 3, "T", 1, "", "", "", 3, 4, "WORKING", 4, 2, "", 0,
-                                        "script", 50, "second", "sim_01", 1, "2017_12_28 02:02:03", 1, 1)
+                                        "script", 50, "second", "sim_01", 1, "2018_06_20 02:02:03", 1, 1)
         sample_queue_item_3 = QueueItem(0, "queue item 3", 4, "T", 1, "", "", "", 5, 6, "WAITING", 2, 1, "", 0,
-                                        "script", 40, "third", "sim_01", 1, "2017_12_28 02:02:04", 1, 1)
+                                        "script", 40, "third", "sim_01", 1, "2018_06_20 02:02:04", 1, 1)
         collect_ids += self.add_to_queue((sample_queue_item_1, ))
         collect_ids += self.add_to_queue((sample_queue_item_2, ))
         collect_ids += self.add_to_queue((sample_queue_item_3, ), do_save=do_save)

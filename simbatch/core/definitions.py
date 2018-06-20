@@ -190,6 +190,25 @@ class Definitions:
     def create_multiaction(self, id, name):
         return MultiAction(id, name)
 
+    def create_example_definition(self, do_save=False):
+        content ={"definition": {"meta": {"name": "Dfn Example 1","software": "Example", "totalActions": 3},
+                                          "actions": {"1": {"id": 1, "type": "single", "name": "Print1",
+                                                            "desc": "p1", "ui": [], "default": "print 1",
+                                                            "template": ["print 111"]},
+                                                      "2": {"id": 1, "type": "single", "name": "Print2",
+                                                            "desc": "p2", "ui": [], "default": "print 2",
+                                                            "template": ["print 222"]},
+                                                      "3": {"id": 1, "type": "single", "name": "Print3",
+                                                            "desc": "p3", "ui": [], "default": "print 3",
+                                                            "template": ["print 333"]}
+                                                      }
+                                 }}
+        if do_save:
+            return self.save_definition("example", content)
+        else:
+            return content
+
+
     def get_current_setup_ext(self):    # TODO  env = self.sts.runtime_env
         if self.current_definition is not None:
             return self.current_definition.setup_ext
@@ -220,6 +239,29 @@ class Definitions:
             else:
                 self.batch.logger.wrn("No definition loaded!")
         return ret
+
+    def save_definition(self, defi_name, defi_content):
+        if self.sts.store_data_mode == 1:
+            ret = self.save_definition_to_json(defi_name, defi_content)
+            if ret == 0:   # return number of errors
+                return True
+            else:
+                return ret
+        elif self.sts.store_data_mode == 2:
+            ret = self.save_definitions_to_mysql()
+        else:
+            ret = False
+
+    def save_definition_to_json(self, json_file, content):
+        if json_file is None or len(json_file) == 0:
+            return False
+        if self.comfun.is_absolute(json_file) is False:
+            json_file = self.sts.store_definitions_directory_abs + "interaction_" + json_file + ".json"
+        return self.comfun.save_json_file(json_file, content)
+
+    def save_definitions_to_mysql(self):
+        # PRO version
+        return False
 
     @staticmethod
     def get_ui_values(li):
@@ -267,7 +309,6 @@ class Definitions:
         if len(definitions_dir) == 0:
             definitions_dir = self.sts.store_definitions_directory_abs
         loading_errors = 0
-
         if self.comfun.file_exists(definitions_dir):
             for file_nr, json_file in enumerate(self.batch.sio.get_files_from_dir(definitions_dir, types="json")):
                 self.batch.logger.inf(("loading definition: ", json_file))

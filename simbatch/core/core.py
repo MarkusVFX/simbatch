@@ -152,23 +152,22 @@ class SimBatch:
                                 loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "tasks")
                                 loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "queue")
                                 loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "simnodes")
-
                                 if loading_err_count == 0:
-                                    return True
+                                    return True, ""
                                 else:
-                                    return loading_err_count
+                                    return loading_err_count, "error info in log"
                             else:
-                                return -5
+                                return -5, "SimNodes not loaded"
                         else:
-                            return -4
+                            return -4, "Queue not loaded"
                     else:
-                        return -1
+                        return -1, "Tasks not loaded"
                 else:
-                    return -2
+                    return -2, "Schemas not loaded"
             else:
-                return -3
+                return -3, "Projects not loaded"
         else:
-            return False
+            return False, "config.ini not loaded"
 
     def create_example_data(self):
         self.prj.create_example_project_data()

@@ -116,6 +116,7 @@ class SettingsUI:
         qt_settings_data_directory_button.clicked.connect(self.on_click_get_data_dir)
 
         self.qt_settings_data_directory_edit = qt_settings_data_directory_edit
+        qt_settings_data_directory_edit.textChanged.connect(self.on_change_data_dir)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_label)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_edit)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_button)
@@ -133,6 +134,7 @@ class SettingsUI:
         qt_settings_definitions_directory_button.clicked.connect(self.on_click_get_definitions_dir)
 
         self.qt_settings_definitions_directory_edit = qt_settings_definitions_directory_edit
+        qt_settings_definitions_directory_edit.textChanged.connect(self.on_change_definitions_dir)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_label)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_edit)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_button)
@@ -350,6 +352,7 @@ class SettingsUI:
         qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
         # qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
 
+
     def test_data_config_ini(self):
         if self.test_exist_config_ini():
             ini = self.comfun.load_from_file(self.settings.ini_file)
@@ -374,7 +377,7 @@ class SettingsUI:
                 self.top_ui.set_top_info("config.ini wrong format ! ", 8)
 
     def test_acces_config_ini(self):
-        if self.test_exist_config_ini:
+        if self.test_exist_config_ini():
             ret_W = os.access(self.settings.ini_file, os.W_OK)
             if ret_W:
                 self.top_ui.set_top_info("config.ini is writable ", 4)
@@ -414,6 +417,16 @@ class SettingsUI:
             # PRO version
             self.top_ui.set_top_info("MySQL will be supported with the PRO version", 4)
             self.batch.logger.inf("MySQL will be supported with the PRO version")
+
+    def on_change_data_dir(self, txt):
+        self.batch.logger.deepdb(("on_change_data_dir: ", txt))
+        self.batch.sts.store_data_json_directory = txt
+        self.batch.sts.update_absolute_directories()
+
+    def on_change_definitions_dir(self, txt):
+        self.batch.logger.deepdb(("on_change_data_dir: ", txt))
+        self.batch.sts.store_definitions_directory = txt
+        self.batch.sts.update_absolute_directories()
 
     def on_clicked_radio_colors(self, index):
         self.batch.logger.db(("on_clicked_radio_colors ", index))
@@ -474,13 +487,43 @@ class SettingsUI:
 
     def on_click_create_example_data(self):
         batch = self.batch
-        batch.prj.create_example_project_data(do_save=True)
-        batch.sch.create_example_schemas_data(do_save=True)
-        batch.tsk.create_example_tasks_data(do_save=True)
-        # batch.que.createSampleData(taskID, projID)  # TODO
-        # batch.nod.createSampleData()  # TODO
-        self.batch.logger.inf("Created sample data")
-        self.mainw.refresh_ui_with_reload_data()
+        if len(self.batch.sts.store_data_json_directory_abs) == 0:
+            self.batch.logger.wrn("Sample not created, directory not defined!")
+            self.top_ui.set_top_info("Sample not created, directory not defined!", 7)
+        else:
+            if self.comfun.path_exists(self.batch.sts.store_data_json_directory_abs) is False:
+                self.comfun.create_directory(self.batch.sts.store_data_json_directory_abs)
+
+            if self.comfun.path_exists(self.batch.sts.store_data_json_directory_abs) is True:
+                batch.prj.create_example_project_data(do_save=True)
+                batch.sch.create_example_schemas_data(do_save=True)
+                batch.tsk.create_example_tasks_data(do_save=True)
+                # batch.que.createSampleData(taskID, projID)  # TODO
+                # batch.nod.createSampleData()  # TODO
+                batch.que.create_example_queue_data(do_save=True)
+                batch.nod.save_nodes()
+                self.batch.logger.inf("Created sample data")
+                self.mainw.refresh_ui_with_reload_data()
+            else:
+                msg = "Sample not created, directory {} not exists".format(self.batch.sts.store_data_json_directory)
+                self.batch.logger.wrn(msg)
+                self.top_ui.set_top_info(msg, 7)
+
+        if len(self.batch.sts.store_definitions_directory_abs) == 0:
+            self.batch.logger.wrn("Sample definition not created, directory not defined!")
+            self.top_ui.set_top_info("Sample definition not created, directory not defined!", 7)
+        else:
+            if self.comfun.path_exists(self.batch.sts.store_definitions_directory_abs) is False:
+                self.comfun.create_directory(self.batch.sts.store_definitions_directory_abs)
+            if self.comfun.path_exists(self.batch.sts.store_definitions_directory_abs) is True:
+
+                batch.dfn.create_example_definition(do_save=True)
+                self.batch.logger.inf("Created sample definition")
+            else:
+                msg = "Definition not created, directory {} not exists".format(self.batch.sts.store_definitions_directory_abs)
+                self.batch.logger.wrn(msg)
+                self.top_ui.set_top_info(msg, 7)
+
 
     def on_click_clear_all_data(self):
         batch = self.batch
@@ -498,16 +541,28 @@ class SettingsUI:
 
     def on_click_save_settings(self):
         data_path = str(self.qt_settings_data_directory_edit.text())
+        if len(data_path) == 0:
+            self.batch.logger.wrn(" data path is empty, please fill path or select directory")
+            self.top_ui.set_top_info("data path is empty, please select directory ", 7)
+            return False
         definitions_path = str(self.qt_settings_definitions_directory_edit.text())
-        self.batch.logger.db(("Save settings data_path :", data_path))
-        if self.comfun.path_exists(data_path, info="Data Path"):
-            if self.comfun.path_exists(definitions_path, info="Definitions Path"):
-                self.settings.store_data_json_directory = data_path
-                self.settings.store_data_backup_directory = data_path + "backup\\"
-                self.settings.store_definitions_directory = definitions_path
+        if len(definitions_path) == 0:
+            self.batch.logger.wrn(" definitions path is empty, please fill path or pick directory")
+            self.top_ui.set_top_info("definitions path is empty, please select directory", 7)
+            return False
+
+        # self.batch.logger.db(("Save data path :", data_path))
+        if self.comfun.path_exists(self.settings.store_data_json_directory_abs) is False:
+            self.comfun.create_directory(self.settings.store_data_json_directory_abs)
+        if self.comfun.path_exists(self.settings.store_definitions_directory_abs) is False:
+            self.comfun.create_directory(self.settings.store_definitions_directory_abs)
+        if self.comfun.path_exists(self.settings.store_data_json_directory_abs, info="Data Path"):
+            if self.comfun.path_exists(self.settings.store_definitions_directory_abs, info="Definitions Path"):
+                # self.settings.store_data_json_directory = data_path
+                # self.settings.store_definitions_directory = definitions_path
+                # self.batch.sts.update_absolute_directories()
                 self.settings.save_settings()
             else:
-                print " [ERR] wrong definitions path !!!"
                 self.batch.logger.err(("Wrong definitions path, directory not exist  :", definitions_path))
         else:
             self.batch.logger.err((" Wrong data path, directory not exist :", data_path))

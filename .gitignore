@@ -1,9 +1,11 @@
 .idea
 .cache/
 
+simbatch/config.ini
 /data
 /prv
-simbatch/config.ini
+/data_test
+/definitions_test
 
 env/
 build/
@@ -17,3 +19,4 @@ __pycache__/
 .pytest_cache/
 
 Thumbs.db
+

@@ -224,13 +224,23 @@ class CommonFunctions:
                     check_drive = directory[0] + ":\\"
                     if os.path.exists(check_drive):   # TODO os.access
                         os.makedirs(directory)
-                        return True
+                        if os.path.exists(directory):
+                            self.logger.deepdb(("directory created ", directory))
+                            return True
+                        else:
+                            self.logger.wrn(("directory not created ", directory))
+                            return False
                     else:
                         self.logger.err(("drive: ", directory[0], " NOT EXIST !!!"))
                         return False
                 else:  # linux /     or     win server \\
                     os.makedirs(directory)
-                    return True
+                    if os.path.exists(directory):
+                        self.logger.deepdb(("directory created ", directory))
+                        return True
+                    else:
+                        self.logger.wrn(("directory not created ", directory))
+                        return False
             else:
                 self.logger.inf(("directory EXIST, not created:  ", directory))
                 return False

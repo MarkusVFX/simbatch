@@ -88,6 +88,7 @@ class SimBatch:
         if index == 0:
             print " WIZARD: "
         if index == 1:
+            print " PROJECTS: "
             self.prj.print_all()
             self.prj.print_current()
         if index == 2:
@@ -102,12 +103,15 @@ class SimBatch:
             print " QUEUE: "
             self.que.print_all()
             self.que.print_current()
-        # if index == 5:
-            # TODO NODES !!!!
-            # self.nod.print_all()
-            # self.nod.print_current()
-
-        if index == 5:  # TODO NODES  index 4 vs 5 !
+        if index == 5:
+            print " SIMNODES: "
+            self.nod.print_all()
+            self.nod.print_current()
+        if index == 6:
+            print " DEFINITIONS: "
+            self.dfn.print_all()
+            self.dfn.print_current()
+        if index == 7:
             print " SETTINGS: "
             self.sts.print_all()
 

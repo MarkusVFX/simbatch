@@ -373,7 +373,7 @@ class Projects:
     #  load projects data form json
     def load_projects_from_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file, info="projects file"):
             self.batch.logger.inf(("loading projects: ", json_file))
             json_projects = self.comfun.load_json_file(json_file)
@@ -413,7 +413,7 @@ class Projects:
     #  save projects data as json
     def save_projects_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
         content = self.format_projects_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
@@ -446,7 +446,7 @@ class Projects:
     #  delete json file from storage
     def delete_json_project_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -455,7 +455,7 @@ class Projects:
     #  clear json file content
     def clear_json_project_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return self.comfun.save_to_file(json_file, "")
         else:

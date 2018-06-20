@@ -158,7 +158,7 @@ class Queue:
 
     def delete_json_queue_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -324,7 +324,7 @@ class Queue:
 
     def load_queue_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
             self.batch.logger.db(("loading queue items: ", json_file))
             json_nodes = self.comfun.load_json_file(json_file)
@@ -364,7 +364,7 @@ class Queue:
 
     def save_queue_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_QUEUE_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_QUEUE_FILE_NAME
         content = self.format_queue_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 

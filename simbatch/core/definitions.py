@@ -265,7 +265,7 @@ class Definitions:
 
     def load_definitions_from_jsons(self, definitions_dir=""):
         if len(definitions_dir) == 0:
-            definitions_dir = self.sts.store_definitions_directory
+            definitions_dir = self.sts.store_definitions_directory_abs
         loading_errors = 0
 
         if self.comfun.file_exists(definitions_dir):

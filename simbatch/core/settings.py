@@ -24,7 +24,8 @@ except ImportError:
 class Settings:
     logger = None                   # logger prints errors, warnings, info and db to console and to log file
     ini_file = None                 # fundamental config file, json format
-    loading_state = 0               # check fundamental config # TODO data loading and GUI init
+    loading_state = 0               # check fundamental config.ini
+    settings_err_info = ""          # store last err/wrn when loading config.ini
     json_settings_data = None       # basic config data
 
     # fundamental settings (config.ini)
@@ -33,13 +34,17 @@ class Settings:
     store_data_mode = None                      # 1 json     2 MySQL (PRO version)
     debug_level = None                          # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
     store_data_json_directory = None            # dir basic config settings (def:config.ini)
+    store_data_json_directory_abs = None        # dir basic config settings (def:config.ini)
     store_data_backup_directory = None          # dir backup data
+    store_data_backup_directory_abs = None      # dir backup data
     store_definitions_directory = None          # dir with software, actions, engines and param definitions
+    store_definitions_directory_abs = None      # dir with software, actions, engines and param definitions
+    store_abs_dir = ""                          #
     sql = [None, None, None, None]              # "db"  "pass" "port" "user" (PRO version)
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.22"   # current version
+    SIMBATCH_VERSION = "v0.2.30"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -96,7 +101,7 @@ class Settings:
 
     # GUI settings
     runtime_env = ""        # runtime environment as software name display on frame and set active definition
-    ui_edition_mode = 0     # 0 open source    1 Pro
+    ui_edition_mode = 0     # 0 open source    1 Pro version (with Wizard tab as first)
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
     ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors
@@ -122,9 +127,9 @@ class Settings:
                         "debugLevel":
                             {"current": 4, "levels": "1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL "},
                         "storeData":
-                            {"dataDirectory": "\\\\simbatch\\dataDir\\",
-                             "backupDirectory": "\\\\simbatch\\backups\\",
-                             "definitionsDirectory": "\\\\simbatch\\definitions\\"},
+                            {"dataDirectory": "/server/simbatch/dataDir/",
+                             "backupDirectory": "/server/simbatch/backups/",
+                             "definitionsDirectory": "/server/simbatch/definitions/"},
                         "sql":
                             {"db": "127.0.1.220", "user": "default", "pass": "default", "port": "3306"},
                         "adminUser":
@@ -147,15 +152,18 @@ class Settings:
         else:
             self.dir_separator = "\\"
 
-        self.runtime_env = runtime_env
-        self.ini_file = ini_file
         self.comfun = CommonFunctions()
+        self.runtime_env = runtime_env
+        if self.comfun.is_absolute(ini_file):
+            self.ini_file = ini_file
+        else:
+            self.ini_file = os.path.abspath(ini_file)
         self.sql = [None, None, None, None]
         self.clear_state_colors()
 
         self.load_settings()
 
-        if self.loading_state >= 3:
+        if self.loading_state >= 4:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
         else:
@@ -187,8 +195,14 @@ class Settings:
         print " store_data_mode: ", self.store_data_mode
         print " debug_level: ", self.debug_level
         print " store_data_json_directory: ", self.store_data_json_directory
+        if self.store_data_json_directory != self.store_data_json_directory_abs:
+            print " store_data_json_directory_abs: ", self.store_data_json_directory_abs
         print " store_data_backup_directory: ", self.store_data_backup_directory
+        if self.store_data_backup_directory != self.store_data_backup_directory_abs:
+            print " store_data_backup_directory_abs: ", self.store_data_backup_directory_abs
         print " store_definitions_directory: ", self.store_definitions_directory
+        if self.store_definitions_directory != self.store_definitions_directory_abs:
+            print " store_definitions_directory_abs: ", self.store_definitions_directory_abs
         print " sql settings: ", self.sql
         print " admin_user: ", self.admin_user
         print " window:", self.window
@@ -208,7 +222,26 @@ class Settings:
             self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
             self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
 
+    def update_absolute_directories(self):
+        data_path = self.store_data_json_directory
+
+        if self.comfun.is_absolute(data_path):
+            self.store_data_json_directory_abs = data_path
+            if data_path[-1:] == "\\" or data_path[-1:] == "/":
+                self.store_data_backup_directory_abs = data_path + "backup" + self.dir_separator
+            else:
+                self.store_data_backup_directory_abs = data_path + self.dir_separator + "backup" + self.dir_separator
+        else:
+            self.store_data_json_directory_abs = self.store_abs_dir + data_path
+            if data_path[-1:] == "\\" or data_path[-1:] == "/":
+                self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup"
+            else:
+                self.store_data_backup_directory_abs = self.store_abs_dir + data_path + self.dir_separator + "backup"
+
+                self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory
+
     def load_settings(self):
+        self.settings_err_info = ""
         if self.comfun.file_exists(self.ini_file, info="settings init"):
             self.loading_state = 1
             with open(self.ini_file) as f:
@@ -223,6 +256,8 @@ class Settings:
                     self.store_data_backup_directory = self.json_settings_data["storeData"]["backupDirectory"]
                     self.store_definitions_directory = self.json_settings_data["storeData"]["definitionsDirectory"]
 
+                    self.update_absolute_directories()
+
                     s1 = self.json_settings_data["sql"]["db"]
                     s2 = self.json_settings_data["sql"]["user"]
                     s3 = self.json_settings_data["sql"]["pass"]
@@ -233,20 +268,47 @@ class Settings:
                     wnd = self.json_settings_data["window"]
                     self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]
                     self.always_on_top = wnd["alwaysOnTop"]
-                    self.loading_state = 3
 
-                    if self.debug_level >= 3:
-                        print "\n\n [INF] settings init"
+
+                    if self.comfun.int_or_val(self.store_data_mode, 0):
+                        if self.store_data_mode == 1:
+                            if self.comfun.path_exists(self.store_data_json_directory_abs) is False:
+                                if len(self.store_data_json_directory_abs) == 0:
+                                    self.settings_err_info = "Data directory not defined!"
+                                else:
+                                    self.settings_err_info = "Data directory not exists!"
+                            elif self.comfun.path_exists(self.store_definitions_directory_abs) is False:
+                                if len(self.store_definitions_directory_abs) == 0:
+                                    self.settings_err_info = "Definitions directory not defined!"
+                                else:
+                                    self.settings_err_info = "Definitions directory not exists!"
+                            else:
+                                """ SETTINGS VALUES ARE OK"""
+                                self.loading_state = 4
+                                if self.debug_level >= 3:
+                                    print "\n\n [INF] settings loaded ", self.ini_file
+                                return True
+
+                        elif self.store_data_mode == 2:
+                            # PRO VERSION
+                            self.loading_state = 3
+                            self.settings_err_info = "MySQL will be supported with the PRO version"
+                        else:
+                            self.loading_state = 3
+                            self.settings_err_info = "Store data mode: {} incorrect value".format(self.store_data_mode)
                 else:
                     print " [WRN] json data inconsistency:", self.ini_file
                     self.loading_state = 2
         else:
-            print " [ERR] config.ini file not exists: ", self.ini_file
+            self.settings_err_info = " [ERR] config.ini file not exists: {}".format(self.ini_file)
             self.loading_state = -1
+
+        print self.settings_err_info
+        return False
 
     def save_settings(self, settings_file=""):
         comfun = self.comfun
-        data_path = self.store_data_json_directory
+        data_path = self.store_data_json_directory_abs
 
         self.default_settings["dataMode"]["current"] = self.store_data_mode
         self.default_settings["colorMode"]["current"] = self.ui_color_mode
@@ -300,17 +362,17 @@ class Settings:
             return False
 
     def update_ui_colors(self):
-        if self.store_definitions_directory is not None:
+        if self.store_definitions_directory_abs is not None:
             palette_id = self.ui_color_mode
             if palette_id == 1:
-                color_file = self.store_definitions_directory + "colors/" + self.COLORS_GRAY_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_GRAY_FILE_NAME
             elif palette_id == 2:
-                color_file = self.store_definitions_directory + "colors/" + self.COLORS_PASTEL_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_PASTEL_FILE_NAME
             elif palette_id == 3:
-                color_file = self.store_definitions_directory + "colors/" + self.COLORS_DARK_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_DARK_FILE_NAME
             else:
                 #  palette_id == 4:
-                color_file = self.store_definitions_directory + "colors/" + self.COLORS_CUSTOM_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_CUSTOM_FILE_NAME
 
             if self.comfun.file_exists(color_file, info="colors file"):
                 self.clear_state_colors()

@@ -86,7 +86,7 @@ class SimNodes:
 
     def load_nodes_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.batch.sts.store_data_json_directory + self.batch.sts.JSON_SIMNODES_FILE_NAME
+            json_file = self.batch.sts.store_data_json_directory_abs + self.batch.sts.JSON_SIMNODES_FILE_NAME
         if self.comfun.file_exists(json_file, info="simnodes file"):
             self.batch.logger.inf(("loading simnode items: ", json_file))
             json_nodes = self.comfun.load_json_file(json_file)

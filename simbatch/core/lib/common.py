@@ -194,7 +194,10 @@ class CommonFunctions:
 
     @staticmethod
     def convert_to_win_path(path_to_convert):
-        return path_to_convert.replace("/", "\\")
+        if path_to_convert is not None:
+            return path_to_convert.replace("/", "\\")
+        else:
+            return None
 
     def get_proper_path(self, get_path, info=""):
         if len(get_path) > 0:

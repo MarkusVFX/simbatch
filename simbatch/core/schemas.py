@@ -298,7 +298,7 @@ class Schemas:
 
     def delete_json_schema_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -306,7 +306,7 @@ class Schemas:
 
     def clear_json_schema_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file):
             return self.comfun.save_to_file(json_file, "")
         else:
@@ -366,7 +366,7 @@ class Schemas:
 
     def load_schemas_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SCHEMAS_FILE_NAME
         if self.comfun.file_exists(json_file, info="schemas file"):
             self.batch.logger.inf(("loading schemas: ", json_file))
             json_schemas = self.comfun.load_json_file(json_file)
@@ -439,7 +439,7 @@ class Schemas:
     #  save projects data as json
     def save_schemas_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_SCHEMAS_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SCHEMAS_FILE_NAME
         content = self.format_schemas_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 

@@ -82,7 +82,7 @@ class SimBatch:
 
     def print_current_detailed_values(self, index):
         print "  \n\n"
-        if self.sts.ui_edition_mode == 0:    # open source hide wizard tab
+        if self.sts.ui_edition_mode == 0:    # open source no wizard tab
             index += 1                       # index compensation
 
         if index == 0:
@@ -128,7 +128,7 @@ class SimBatch:
         return counter
 
     def load_data(self):
-        if self.sts.loading_state >= 3:
+        if self.sts.loading_state >= 4:
             ret_def = self.dfn.load_definitions()
             ret_prj = self.prj.load_projects()
             if ret_prj is not False:

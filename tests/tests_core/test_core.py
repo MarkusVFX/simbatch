@@ -58,9 +58,10 @@ def test_check_loaded_data(sib):
     assert sib.tsk.total_tasks == len(sib.tsk.tasks_data)
 
 def test_data_files(sib):
-    assert sib.sts.store_data_json_directory is not None
+    assert sib.sts.store_data_json_directory_abs is not None
+    assert len(sib.sts.store_data_json_directory_abs) > 0
     assert sib.sts.JSON_PROJECTS_FILE_NAME is not None
-    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_PROJECTS_FILE_NAME)
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_PROJECTS_FILE_NAME)
 
 def test_load_data(sib):
     assert sib.prj.load_projects() is True

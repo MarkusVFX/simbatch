@@ -16,7 +16,7 @@ def sib():
 def test_prepare_data_directory_by_delete_all_files(sib):
     assert sib.sts.store_data_mode is not None
     if sib.sts.store_data_mode == 1:
-        assert sib.comfun.path_exists(sib.sts.store_data_json_directory) is True
+        assert sib.comfun.path_exists(sib.sts.store_data_json_directory_abs) is True
     else:
         # PRO version with sql
         pass
@@ -30,7 +30,7 @@ def test_print_repr_str(sib):
 
 
 def test_no_proj_data(sib):
-    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_PROJECTS_FILE_NAME) is False
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_PROJECTS_FILE_NAME) is False
 
 
 def test_create_example_project_data(sib):
@@ -40,7 +40,7 @@ def test_create_example_project_data(sib):
 
 
 def test_exist_proj_data(sib):
-    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_PROJECTS_FILE_NAME) is True
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_PROJECTS_FILE_NAME) is True
 
 
 def test_clear_all_projects_data(sib):
@@ -52,7 +52,7 @@ def test_clear_all_projects_data(sib):
 def test_json_projects_data(sib):
     assert sib.sts.store_data_mode is not None
     if sib.sts.store_data_mode == 1:
-        json_file = sib.sts.store_data_json_directory + sib.sts.JSON_PROJECTS_FILE_NAME
+        json_file = sib.sts.store_data_json_directory_abs + sib.sts.JSON_PROJECTS_FILE_NAME
         json_projects = sib.comfun.load_json_file(json_file)
         jskon_keys = json_projects.keys()
         assert ("projects" in jskon_keys) is True

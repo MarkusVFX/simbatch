@@ -17,7 +17,7 @@ def test_settings_file(sett):
 
 
 def test_loading_state(sett):
-    assert sett.loading_state == 3
+    assert sett.loading_state == 4
 
 
 def test_settings_data(sett):
@@ -31,10 +31,10 @@ def test_settings_mode(sett):
 
 def test_check_data_access(sett):
     if sett.store_data_mode == 1:
-        print "\n [INF] json dir:", sett.store_data_json_directory
-        if sett.comfun.path_exists(sett.store_data_json_directory) is False:
-            sett.comfun.create_directory(sett.store_data_json_directory)
-        assert sett.comfun.path_exists(sett.store_data_json_directory) is True
+        print "\n [INF] json dir:", sett.store_data_json_directory_abs
+        if sett.comfun.path_exists(sett.store_data_json_directory_abs) is False:
+            sett.comfun.create_directory(sett.store_data_json_directory_abs)
+        assert sett.comfun.path_exists(sett.store_data_json_directory_abs) is True
     else:
         # PRO version with sql
         pass

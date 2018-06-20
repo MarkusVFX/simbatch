@@ -40,11 +40,12 @@ def test_multi_action():
 
 
 def test_exist_definitions_data(simbatch):
-    assert simbatch.comfun.file_exists(simbatch.sts.store_definitions_directory) is True
+    assert simbatch.comfun.file_exists(simbatch.sts.store_definitions_directory_abs) is True
 
 
 def test_load_definitions(simbatch):
-    assert len(simbatch.sts.store_definitions_directory) > 0
+    assert simbatch.sts.store_definitions_directory_abs is not None
+    assert len(simbatch.sts.store_definitions_directory_abs) > 0
     assert simbatch.dfn.load_definitions() is True
 
 # def test_load_definitions(sib):

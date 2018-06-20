@@ -14,7 +14,7 @@ def sib():
 def test_prepare_data_directory_by_delete_all_files(sib):
     assert sib.sts.store_data_mode is not None
     if sib.sts.store_data_mode == 1:
-        assert sib.comfun.path_exists(sib.sts.store_data_json_directory) is True
+        assert sib.comfun.path_exists(sib.sts.store_data_json_directory_abs) is True
     else:
         # PRO version with sql
         pass
@@ -23,9 +23,9 @@ def test_prepare_data_directory_by_delete_all_files(sib):
 
 
 def test_no_task_data(sib):
-    assert len(sib.sts.store_data_json_directory) > 0
+    assert len(sib.sts.store_data_json_directory_abs) > 0
     assert len(sib.sts.JSON_TASKS_FILE_NAME) > 0
-    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_TASKS_FILE_NAME) is False
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_TASKS_FILE_NAME) is False
 
 
 def test_create_example_tasks_data(sib):
@@ -36,7 +36,7 @@ def test_create_example_tasks_data(sib):
 
 
 def test_exist_proj_data(sib):
-    assert sib.comfun.file_exists(sib.sts.store_data_json_directory + sib.sts.JSON_TASKS_FILE_NAME) is True
+    assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_TASKS_FILE_NAME) is True
 
 
 def test_clear_all_tasks_data(sib):
@@ -48,7 +48,7 @@ def test_clear_all_tasks_data(sib):
 def test_json_schemas_data(sib):
     assert sib.sts.store_data_mode is not None
     if sib.sts.store_data_mode == 1:
-        json_file = sib.sts.store_data_json_directory + sib.sts.JSON_TASKS_FILE_NAME
+        json_file = sib.sts.store_data_json_directory_abs + sib.sts.JSON_TASKS_FILE_NAME
         json_tasks = sib.comfun.load_json_file(json_file)
         json_keys = json_tasks.keys()
         assert ("tasks" in json_keys) is True
@@ -59,7 +59,7 @@ def test_get_none_index_from_id(sib):
 
 
 def test_load_tasks_from_json(sib):
-    json_file = sib.sts.store_data_json_directory + sib.sts.JSON_TASKS_FILE_NAME
+    json_file = sib.sts.store_data_json_directory_abs + sib.sts.JSON_TASKS_FILE_NAME
     assert sib.comfun.file_exists(json_file) is True
     assert sib.tsk.load_tasks_from_json(json_file=json_file) is True
     assert sib.tsk.total_tasks == sib.tsk.sample_data_total

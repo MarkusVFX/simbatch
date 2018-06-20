@@ -6,6 +6,8 @@ simbatch/config.ini
 /prv
 /data_test
 /definitions_test
+simbatch/data_test
+simbatch/definitions_test
 
 env/
 build/

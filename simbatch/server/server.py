@@ -226,11 +226,14 @@ class SimBatchServer:
                     self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, "is busy"))
             """    MAIN EXECUTION  FIN    """
 
-            check_breaker = self.batch.comfun.file_exists(self.server_dir + "break.txt", info=False)
+            external_breaker = self.server_dir + "break.txt"
+            external_breaker_off = self.server_dir + "break__.txt"
+            check_breaker = self.batch.comfun.file_exists(external_breaker, info=False)
             if check_breaker:
                 self.batch.logger.inf(("breaking main loop", self.last_info))
-                os.rename(self.server_dir + "break.txt", self.server_dir + "break___.txt")
-
+                if self.batch.comfun.file_exists(external_breaker_off):
+                    os.remove(external_breaker_off)
+                os.rename(external_breaker, external_breaker_off)
             else:
                 threading.Timer(self.timerDelaySeconds, self.run).start()
         else:

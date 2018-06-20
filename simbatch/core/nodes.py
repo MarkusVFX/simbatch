@@ -115,13 +115,13 @@ class SimNodes:
 
     def save_nodes(self):
         if self.batch.sts.store_data_mode == 1:
-            self.save_nodes_to_json()
+            return self.save_nodes_to_json()
         if self.batch.sts.store_data_mode == 2:
-            self.save_nodes_to_myqsl()
+            return self.save_nodes_to_myqsl()
 
     def save_nodes_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory + self.sts.JSON_SIMNODES_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SIMNODES_FILE_NAME
         content = self.format_nodes_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 

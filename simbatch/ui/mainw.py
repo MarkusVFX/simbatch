@@ -250,19 +250,16 @@ class MainWindow(QMainWindow):
             self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state, self.sts.settings_err_info))
 
     def post_run(self, loading_data_state):  # show welcome message or error info
-        if loading_data_state is True:
+        if loading_data_state[0] is True:
             self.top_ui.set_top_info(self.batch.sts.random_welcome_message())
-        elif loading_data_state is False:
-            # self.top_ui.set_top_info("Settings not loaded config.ini file not exists!", 9)
-            if self.sts.loading_state == 3:
-                self.top_ui.set_top_info(self.sts.settings_err_info, 6)
-            else:
-                self.top_ui.set_top_info(self.sts.settings_err_info, 6)
+        elif loading_data_state[0] is False:
+            self.top_ui.set_top_info(self.sts.settings_err_info, 6)
         else:
-            if loading_data_state == 1:
-                self.top_ui.set_top_info("Loaded with one data error")
+            if loading_data_state[0] > 1:
+                self.top_ui.set_top_info(("Loaded with errors({}): {}".format(loading_data_state[0]),
+                                          loading_data_state[1]), 7)
             else:
-                self.top_ui.set_top_info("Loaded with data errors ({})".format(loading_data_state))
+                self.top_ui.set_top_info("Loading error. {}".format(loading_data_state[1]), 7)
 
     def on_tab_change(self, tab):
         self.batch.logger.inf(("tab change: ", tab))

@@ -9,8 +9,6 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from simbatch.core.lib.common import CommonFunctions
-
 
 class SimpleLabel:
     qt_widget_layout = None
@@ -196,8 +194,7 @@ class RadioButtons:
 class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    For add to queue use: ActionWidgetATQ
     # action_name = ""
     # action_sub_mode = ""
-    # group_of_actions = None  # GroupAction
-    multi_action = None  # MultiAction
+    multi_action = None  # MultiAction  # GroupAction
     qt_id = None
     qt_layout = None
     qt_label = None
@@ -213,7 +210,6 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
     widget_id = None
 
     current_action_index = 0   # current index from GroupAction;  0 for single action
-    # sub_action_data = []     # depreciated
 
     batch = None
     logger = None

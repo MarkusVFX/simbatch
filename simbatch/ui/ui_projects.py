@@ -144,6 +144,7 @@ class ProjectsUI:
             lambda: self.on_click_add_project(wfa_project_name_edit.get_txt(), wfa_project_dir_edit.get_txt(),
                                               wfa_working_dir_edit.get_txt(), wfa_cam_dir_edit.get_txt(),
                                               wfa_ani_dir_edit.get_txt(), wfa_descr_edit.get_txt(),
+                                              wfa_buttons.qt_pin_check_box.isChecked(),
                                               wfa_buttons.qt_second_check_box.isChecked()))
 
         qt_form_add_layout.addLayout(wfa_proj_name_label.qt_widget_layout)
@@ -426,7 +427,7 @@ class ProjectsUI:
             self.add_form_state = 0
 
     def on_click_add_project(self, new_project_name, project_directory, working_directory, cameras_directory,
-                             cache_directory, description, pin_checked):
+                             cache_directory, description, pin_checked, as_default_checked):
         if len(new_project_name) > 0 and len(project_directory) > 0:
             cb_state = False   # TODO  get cb_state
             if cb_state:
@@ -444,6 +445,8 @@ class ProjectsUI:
                                                         "ACTIVE", project_directory, working_directory,
                                                         cameras_directory, cache_directory, "", "", "", "",
                                                         "generate_directory_patterns=True", description)
+            if as_default_checked:
+                new_project.is_default = 1
 
             ret_id = self.batch.prj.add_project(new_project, do_save=True, generate_directory_patterns=True)
 
@@ -469,6 +472,7 @@ class ProjectsUI:
 
             self.reset_list(set_active_id=self.batch.prj.current_project_id)
             self.mainw.sch_ui.hide_all_forms()
+            self.mainw.sch_ui.reload_schemas_data_and_refresh_list()
         else:
             if len(new_project_name) == 0:
                 self.top_ui.set_top_info(" Fill project name !", 8)

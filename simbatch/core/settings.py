@@ -108,7 +108,7 @@ class Settings:
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
-    force_start_tab = 1     # if > 0 show tab with this index after run
+    force_start_tab = 0     # if > 0 show tab with this index after run
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1
@@ -300,6 +300,11 @@ class Settings:
                     wnd = self.json_settings_data["window"]
                     self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]
                     self.always_on_top = wnd["alwaysOnTop"]
+
+                    if "startup" in self.json_settings_data.keys():
+                        if "tab" in self.json_settings_data["startup"].keys():
+                            self.force_start_tab = self.json_settings_data["startup"]["tab"]
+                            self.logger.inf("forced startup tab index: {}".format(self.force_start_tab))
 
 
                     if self.comfun.int_or_val(self.store_data_mode, 0):

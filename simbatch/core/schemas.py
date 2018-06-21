@@ -76,7 +76,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
         self.add_action_to_schema(SingleAction("virtual action", "virt descr", "<def_val>", "template <f>",
-                                               ui=(("ui", "interaction.ui_fun()"))))
+                                               ui=("ui", "interaction.ui_fun()")))
         return True
 
     def add_action_to_schema(self, single_action_object):
@@ -119,22 +119,33 @@ class Schemas:
 
     @staticmethod
     def get_blank_schema():
-        return SchemaItem(0, "", 1, "NULL", 1, "blank defi", [], 1, "")
+        return SchemaItem(0, "", 1, "NULL", 1, "blank defn", [], 1, "")
 
     #  print schema data, for debug
+    def print_schema(self, schema=None):
+        prefix = ""
+        if schema is None:
+            prefix = "current"
+            if self.current_schema_id is not None:
+                print "\n       current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
+                                                                                 self.current_schema_index,
+                                                                                 self.total_schemas)
+                schema = self.current_schema
+            else:
+                self.batch.logger.wrn("current schema undefined, nothing to print")
+                return False
+
+        print "\n       {} schema name:{}".format(prefix, schema.schema_name)
+        print "       definition id:{}   project id:{}".format(schema.based_on_definition, schema.project_id)
+        for a in schema.actions_array:
+            print "       __a: name:{}  def_val:{}  actual_val:{}  descr:{}  mode:{}".format(a.name,
+                                                                                             a.default_value,
+                                                                                             a.actual_value,
+                                                                                             a.description,
+                                                                                             a.mode)
+
     def print_current(self):
-        print "       current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
-                                                                         self.current_schema_index,
-                                                                         self.total_schemas)
-        if self.current_schema_id is not None:
-            cur_sch = self.current_schema
-            print "       current schema name: ", cur_sch.schema_name
-            print "       definition id:{}   project id:{}".format(cur_sch.based_on_definition, cur_sch.project_id)
-            for a in cur_sch.actions_array:
-                print "       __a: name:{}  default_value:{}  actual_value:{}  description:{}".format(a.name,
-                                                                                                      a.default_value,
-                                                                                                      a.actual_value,
-                                                                                                      a.description)
+        self.print_schema()
 
     def print_all(self):
         if self.total_schemas == 0:
@@ -277,12 +288,12 @@ class Schemas:
         else:
             self.batch.logger.err("(increase_current_schema_version) current schema undefined")
 
-    def remove_single_schema(self, index=None, id=None, do_save=False):
-        if index is None and id is None:
+    def remove_single_schema(self, index=None, sch_id=None, do_save=False):
+        if index is None and sch_id is None:
             return False
-        if id > 0:
+        if sch_id > 0:
             for i, q in enumerate(self.schemas_data):
-                if q.id == id:
+                if q.id == sch_id:
                     del self.schemas_data[i]
                     self.total_schemas -= 1
                     break
@@ -378,7 +389,9 @@ class Schemas:
                             if "actions" in li:
                                 for lia in li['actions'].values():
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                    new_action = SingleAction(lia["name"], lia["desc"], lia["default"], lia["template"])
+                                    av = lia["actual"]
+                                    new_action = SingleAction(lia["name"], lia["desc"], lia["default"],
+                                                              lia["template"], actual_value=av, mode=lia["mode"])
                                     new_schema_actions.append(new_action)
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), li['definition'], new_schema_actions,
@@ -408,7 +421,7 @@ class Schemas:
 
     #  prepare 'schemas_data' for backup or save
     def format_schemas_data(self, json=False, sql=False, backup=False):
-        if json == sql == backup == False:
+        if json == sql == backup is False:
             self.batch.logger.err("(format_projects_data) no format param !")
         else:
             if json or backup:

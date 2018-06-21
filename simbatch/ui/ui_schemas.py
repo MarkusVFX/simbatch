@@ -317,7 +317,8 @@ class SchemasUI:
 
     def on_menu_open(self):
         current_schema_id = self.sch.current_schema_id
-        base_setup = self.batch.sio.generate_base_setup_file_name(self.sch.current_schema.schema_name, ver=self.sch.current_schema.schema_version)
+        base_setup = self.batch.sio.generate_base_setup_file_name(self.sch.current_schema.schema_name,
+                                                                  ver=self.sch.current_schema.schema_version)
         self.batch.logger.db(("double clicked  schema id :", current_schema_id, base_setup))
         if base_setup[0] == 1:
             self.batch.dfn.current_interactions.schema_item_double_click(base_setup[1])
@@ -377,13 +378,13 @@ class SchemasUI:
         qt_menu_right = QMenu()
         qt_menu_right.addAction("Open base schema", self.on_menu_open)
         qt_menu_right.addAction("Save current scene as next version", self.on_menu_save_as_next_version)
-        qt_menu_right.addAction("________", self.on_menu_spacer)
+        qt_menu_right.addSeparator()
         qt_menu_right.addAction("Locate base setup", self.on_menu_locate_base_setup)
-        qt_menu_right.addAction("________", self.on_menu_spacer)
+        qt_menu_right.addSeparator()
         qt_menu_right.addAction("Set ACTIVE", self.on_menu_set_active)
         qt_menu_right.addAction("Set SUSPEND", self.on_menu_set_suspended)
         qt_menu_right.addAction("Set HOLD", self.on_menu_set_hold)
-        qt_menu_right.addAction("________", self.on_menu_spacer)
+        qt_menu_right.addSeparator()
         qt_menu_right.addAction("Remove", self.on_menu_remove)
         qt_menu_right.exec_(global_pos)
 
@@ -406,7 +407,7 @@ class SchemasUI:
             new_schema.project_id = self.batch.prj.current_project_id
             cur_dfn = self.batch.dfn.current_definition
             if cur_dfn is not None:
-                new_schema.based_on_definition = cur_dfn.name + "__" + str(cur_dfn.version)
+                new_schema.based_on_definition = cur_dfn.name  # TODO defi versions + "__" + str(cur_dfn.version)
             else:
                 self.batch.logger.wrn("(update_form_create) current_definition is None")
             self.schema_form_create.update_form(new_schema)
@@ -438,7 +439,7 @@ class SchemasUI:
                 self.edit_form_state = 1
             else:
                 self.batch.logger.wrn(("please select schema first", self.batch.prj.current_project_index))
-                self.top_ui.set_top_info("please select schema first",7)
+                self.top_ui.set_top_info("please select schema first", 7)
         else:
             self.schema_form_edit.hide()
             self.edit_form_state = 0
@@ -551,7 +552,7 @@ class SchemasUI:
                                           new_schema_item.description, str(new_schema_item.schema_version))
         self.list_schemas.addItem(list_item)
         self.list_schemas.setItemWidget(list_item, list_item_widget)
-        self.batch.logger.db(("add schema:", new_schema_item.schema_name,
+        self.batch.logger.db(("added schema:", new_schema_item.schema_name,
                               "   to proj :", self.batch.prj.current_project_id))
 
         sch_dir = self.batch.prj.current_project.working_directory_absolute
@@ -570,12 +571,12 @@ class SchemasUI:
             new_schema_item.state = "ACTIVE"
             if self.comfun.is_float(new_schema_item.schema_version) is False:
                 new_schema_item.schema_version = 1
-            self.add_single_schema(copy.copy(new_schema_item))
+            self.add_single_schema(copy.deepcopy(new_schema_item))
 
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.deepdb(("with saveAs:  ", save_as))
-                if save_as[0] == 1 :
+                if save_as[0] == 1:
                     if self.batch.dfn.current_interactions is not None:
                         self.batch.dfn.current_interactions.save_current_scene_as(save_as[1])
                 else:
@@ -599,8 +600,12 @@ class SchemasUI:
     def on_click_update_schema(self, edited_schema_item):
         self.schema_form_edit.compile_actions()
         if edited_schema_item is None or len(edited_schema_item.schema_name) == 0:
-            self.top_ui.set_top_info(" Insert schema name ! ", 8)
-            self.batch.logger.wrn("insert schema name ! ")
+            if edited_schema_item is None:
+                self.top_ui.set_top_info(" Schema undefined ! ", 8)
+                self.batch.logger.err("schema undefined! ")
+            else:
+                self.top_ui.set_top_info(" Insert schema name ! ", 8)
+                self.batch.logger.wrn("insert schema name ! ")
         else:
             self.sch.update_schema(edited_schema_item, do_save=True)
 
@@ -630,7 +635,7 @@ class SchemasUI:
             self.batch.logger.deepdb(("sch chngd freeze_list_on_changed", self.list_schemas.currentRow()))
         else:
             self.batch.logger.inf(("schemas item changed: ", self.list_schemas.currentRow(),
-                                   "   last: ",self.last_list_item_nr,
+                                   "   last: ", self.last_list_item_nr,
                                    "   current: ", self.current_list_item_nr))
 
             self.last_list_item_nr = self.current_list_item_nr

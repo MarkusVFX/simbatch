@@ -29,7 +29,6 @@ class SingleAction:
     user_value = ""
     logger = None  # TODO  @classmethod
 
-
     def __init__(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
         # self.id = action_id
         self.name = name
@@ -57,17 +56,18 @@ class SingleAction:
         print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
 
     @staticmethod
-    def unicode_arr_to_asci_str(arr):
+    def unicode_arr_to_asci_str(arr):    # TODO std lib !
         ret = ""
         for a in arr:
             ret += a
         return ret
 
     def print_action(self):
-        print "   action: {}   default_value: {}   actual_value: {}   template: {}".format(self.name,
+        print "   action: {}   def_val: {}   actual_val: {}   templ: {}   mode: {}".format(self.name,
                                                                                            self.default_value,
                                                                                            self.actual_value,
-                                                                                           self.template)
+                                                                                           self.template,
+                                                                                           self.mode)
 
         self.logger.clear_buffer()
         self.logger.buffering_on()

@@ -454,7 +454,7 @@ class TasksUI:
         qt_form_remove_layout = QFormLayout()
 
         wfr_buttons = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?        ")
-        wfr_buttons.button.clicked.connect(self.on_click_confirmed_remove_project)
+        wfr_buttons.button.clicked.connect(self.on_click_confirmed_remove_task)
 
         qt_form_remove_layout.addRow(" ", QLabel("   "))
         qt_form_remove_layout.addRow(" ", wfr_buttons.qt_widget_layout)
@@ -563,7 +563,7 @@ class TasksUI:
         self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
 
     def on_click_menu_remove(self):
-        self.on_click_confirmed_remove_project()
+        self.on_click_confirmed_remove_task()
 
     def on_click_menu_sch_ver_from_schema(self):
         cur_sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
@@ -763,10 +763,10 @@ class TasksUI:
             self.batch.logger.err("Task exist [{}], skiping update".format(check_task))
             self.top_ui.set_top_info("Task exist, id:{}. Skiping update!".format(check_task), 7)
 
-    def on_click_confirmed_remove_project(self):
-        self.batch.logger.db(("remove_project", self.batch.tsk.current_task_index,
+    def on_click_confirmed_remove_task(self):
+        self.batch.logger.db(("remove_task", self.batch.tsk.current_task_index, self.batch.tsk.current_task_id,
                               self.current_list_item_index))
-        if self.current_list_item_index >= 0:
+        if self.batch.tsk.current_task_index >= 0:
             take_item_list = self.current_list_item_index + 1
             self.batch.tsk.remove_single_task(index=self.batch.tsk.current_task_index, do_save=True)
             self.last_list_item_index = None
@@ -775,6 +775,8 @@ class TasksUI:
             self.list_tasks.takeItem(take_item_list)
             self.qt_form_remove.hide()
             self.remove_form_state = 0
+        else:
+            self.top_ui.set_top_info("Please select task first", 7)
 
     def print_form_add(self):
         form_add = self.qt_form_add

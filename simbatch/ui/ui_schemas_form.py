@@ -354,7 +354,6 @@ class SchemaFormCreateOrEdit(QWidget):
             self.batch.logger.err(("definition", schema_item.based_on_definition, "not exist"))
         else:
             for act in schema_item.actions_array:
-
                 mac = schema_definition.get_multiaction_by_name(act.name)
                 if mac is not None:
                     self.add_action_widget_to_form(mac)

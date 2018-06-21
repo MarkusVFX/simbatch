@@ -181,6 +181,16 @@ class Tasks:
         self.save_tasks()
         return collect_ids
 
+    def check_is_task_exist(self, task_item):
+        for ta in self.tasks_data:
+            if ta.schema_id == task_item.schema_id:
+                if ta.sequence == task_item.sequence:
+                    if ta.shot == task_item.shot:
+                        if ta.take == task_item.take:
+                            if ta.id != task_item.id:
+                                return ta.id
+        return False
+
     def add_task(self, task_item, do_save=False):
         if task_item.id > 0:
             self.max_id = task_item.id

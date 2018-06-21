@@ -174,29 +174,29 @@ class TasksFormCreateOrEdit(QWidget):
         qt_combo_state = ComboLabel("", ["NULL", "INIT", "WAITING", "HOLD", "QUEUED", "DONE"])
         self.qt_combo_state_names = qt_combo_state.combo
 
-        qt_edit_buton_sequence = EditLineWithButtons("Sequence ", label_minimum_size=70)
+        qt_edit_buton_sequence = EditLineWithButtons("Sequence") #, label_minimum_size=70)
         self.qt_edit_line_sequence = qt_edit_buton_sequence.qt_edit_line
-        qt_edit_buton_shot = EditLineWithButtons("Shot ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_shot = EditLineWithButtons("Shot") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_shot = qt_edit_buton_shot.qt_edit_line
-        qt_edit_buton_take = EditLineWithButtons("Take ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_take = EditLineWithButtons("Take") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_take = qt_edit_buton_take.qt_edit_line
-        qt_edit_buton_prior = EditLineWithButtons("Prior ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_prior = EditLineWithButtons("Prior") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_priority = qt_edit_buton_prior.qt_edit_line
-        qt_edit_buton_version = EditLineWithButtons("Ver ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_version = EditLineWithButtons("Ver") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_version = qt_edit_buton_version.qt_edit_line
 
-        qt_edit_buton_sim_start = EditLineWithButtons("Start ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_sim_start = EditLineWithButtons("Start") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_sim_frame_start = qt_edit_buton_sim_start.qt_edit_line
-        qt_edit_buton_sim_end = EditLineWithButtons("End ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_sim_end = EditLineWithButtons("End") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_sim_frame_end = qt_edit_buton_sim_end.qt_edit_line
 
-        qt_edit_buton_prev_start = EditLineWithButtons("Start ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_prev_start = EditLineWithButtons("Start") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_prev_frame_start = qt_edit_buton_prev_start.qt_edit_line
-        qt_edit_buton_prev_end = EditLineWithButtons("End ", label_minimum_size=50, align_right=1)
+        qt_edit_buton_prev_end = EditLineWithButtons("End") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_prev_frame_end = qt_edit_buton_prev_end.qt_edit_line
 
-        qt_button_lay_detect_framerange = ButtonOnLayout("Detect from cache")
-        qt_button_lay_get_framerange = ButtonOnLayout("Get from scene")
+        qt_button_lay_detect_framerange = ButtonOnLayout("From cache", width=70)    # TODO
+        qt_button_lay_get_framerange = ButtonOnLayout("Get from scene", width=85)
 
         qt_button_lay_detect_framerange.button.clicked.connect(self.get_frame_range_from_cache)
         qt_button_lay_get_framerange.button.clicked.connect(self.get_frame_range_from_scene)
@@ -205,7 +205,8 @@ class TasksFormCreateOrEdit(QWidget):
                                             qt_edit_buton_take, qt_edit_buton_prior, qt_edit_buton_version])
         qt_widget_group_time_range = WidgetGroup([qt_edit_buton_sim_start, qt_edit_buton_sim_end,
                                                   qt_edit_buton_prev_start, qt_edit_buton_prev_end,
-                                                  qt_button_lay_detect_framerange, qt_button_lay_get_framerange])
+                                                  #qt_button_lay_detect_framerange,
+                                                  qt_button_lay_get_framerange])
 
         qt_edit_buton_description = EditLineWithButtons("Description ")
         self.qt_fae_schema_description_edit = qt_edit_buton_description.qt_edit_line
@@ -293,7 +294,7 @@ class TasksFormCreateOrEdit(QWidget):
         if combo_current_index is not None:
             self.qt_schema_name_combo.setCurrentIndex(combo_current_index)
 
-    def compile_imputs(self):
+    def compile_inputs(self):
         self.form_task_item.task_name = self.qt_schema_name_combo.currentText()
         if self.qt_schema_name_combo.currentIndex() >= 0:
             self.batch.logger.db(("comlpile inputs", self.qt_schema_name_combo.currentIndex(), self.schemas_id_array))
@@ -305,6 +306,11 @@ class TasksFormCreateOrEdit(QWidget):
                 if self.sts.debug_level >= 1:
                     self.batch.logger.err(("Comlpile err", len(self.schemas_id_array)))
                     self.batch.logger.err(("Comlpile err", self.qt_schema_name_combo.currentIndex()))
+
+            if self.batch.sch.current_schema_index is None:
+                if self.form_task_item.schema_id >=0:
+                    self.batch.sch.update_current_from_id(self.form_task_item.schema_id)
+
         else:
             self.form_task_item.schema_id = -1
             self.batch.logger.wrn(("Wrong index, schema_name_combo:", self.qt_schema_name_combo.currentIndex()))
@@ -331,10 +337,7 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item.prev_frame_start = self.batch.comfun.int_or_val(self.qt_edit_line_prev_frame_start.text(), 0)
         self.form_task_item.prev_frame_end = self.batch.comfun.int_or_val(self.qt_edit_line_prev_frame_end.text(), 0)
 
-        if self.qt_edit_line_priority.text().isdigit():
-            self.form_task_item.prior = int(self.qt_edit_line_priority.text())
-        else:
-            self.form_task_item.prior = 50
+        self.form_task_item.priority = self.batch.comfun.int_or_val(self.qt_edit_line_priority.text(), 50)
 
         self.form_task_item.schema_ver = self.batch.comfun.int_or_val(self.qt_edit_line_version.text(), 1)
 
@@ -705,45 +708,60 @@ class TasksUI:
     def on_click_add_task(self, new_task_tem):
         if self.batch.prj.current_project_id >= 0:
             if self.qt_form_create.qt_schema_name_combo.currentIndex() >= 0:
-                self.qt_form_create.compile_imputs()
+                print "erer er 1 ", new_task_tem.priority
+                self.qt_form_create.compile_inputs()
+
+                print "erer er 3 ", new_task_tem.priority
                 if new_task_tem.schema_id < 0:
                     self.batch.logger.err(("(on_click_add_task) wrong schema_id: ", new_task_tem.schema_id))
 
-                new_task_id = self.add_single_task(copy.copy(new_task_tem))
-                self.top_ui.set_top_info(" [INF] Task created, active task: [{}] {}".format(new_task_id,
-                                                                                            new_task_tem.task_name))
+                check_task = self.batch.tsk.check_is_task_exist(new_task_tem)
+                if check_task is False:
+                    new_task_id = self.add_single_task(copy.copy(new_task_tem))
+                    self.top_ui.set_top_info(" [INF] Task created, active task: [{}] {}".format(new_task_id,
+                                                                                                new_task_tem.task_name))
 
-                self.qt_form_add.hide()
-                self.add_form_state = 0
+                    self.qt_form_add.hide()
+                    self.add_form_state = 0
 
-                self.reload_tasks_data_and_refresh_list()
+                    self.reload_tasks_data_and_refresh_list()
 
-                self.batch.tsk.update_current_from_id(new_task_id)
+                    self.batch.tsk.update_current_from_id(new_task_id)
+                else:
+                    self.batch.logger.err("Task exist [{}], nothing added".format(check_task))
+                    self.top_ui.set_top_info("Task exist, id:{}. Skiping add!".format(check_task), 7)
             else:
                 self.batch.logger.err("(on_click_add_task) PLEASE SELECT SCHEMA ")
                 self.top_ui.set_top_info(" [INF] PLEASE SELECT SCHEMA !", 8)
         else:
             self.batch.logger.wrn(("(on_click_add_task) wrong current_project_id: ", self.batch.prj.current_project_id))
-            self.top_ui.set_top_info(" [INF] PLEASE SELECT PROJECT !", 8)
+            self.top_ui.set_top_info("Please select project first !", 8)
 
     def on_click_update_task(self, edited_task_item):
-        self.qt_form_edit.compile_imputs()
-        self.batch.tsk.update_task(copy.copy(edited_task_item), do_save=True)
+        self.qt_form_edit.compile_inputs()
 
-        current_list_index = self.list_tasks.currentRow()
-        ed_item = self.list_tasks.item(current_list_index)
-        list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name,
-                                        str(edited_task_item.user_id),
-                                        edited_task_item.sequence, edited_task_item.shot, edited_task_item.take,
-                                        edited_task_item.state, str(edited_task_item.schema_ver),
-                                        str(edited_task_item.queue_ver), edited_task_item.options,
-                                        edited_task_item.description)
+        check_task = self.batch.tsk.check_is_task_exist(edited_task_item)
+        if check_task is False:
+            self.batch.tsk.update_task(copy.copy(edited_task_item), do_save=True)
 
-        self.list_tasks.setItemWidget(ed_item, list_item_widget)
+            current_list_index = self.list_tasks.currentRow()
+            ed_item = self.list_tasks.item(current_list_index)
+            list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name,
+                                            str(edited_task_item.user_id),
+                                            edited_task_item.sequence, edited_task_item.shot, edited_task_item.take,
+                                            edited_task_item.state, str(edited_task_item.schema_ver),
+                                            str(edited_task_item.queue_ver), edited_task_item.options,
+                                            edited_task_item.description)
 
-        self.qt_form_add.hide()
-        self.add_form_state = 0
-        self.batch.logger.inf("task updated")
+            self.list_tasks.setItemWidget(ed_item, list_item_widget)
+
+            self.qt_form_add.hide()
+            self.add_form_state = 0
+            self.batch.logger.inf("task updated")
+            self.top_ui.set_top_info("Task id:{} updated".format(check_task), 4)
+        else:
+            self.batch.logger.err("Task exist [{}], skiping update".format(check_task))
+            self.top_ui.set_top_info("Task exist, id:{}. Skiping update!".format(check_task), 7)
 
     def on_click_confirmed_remove_project(self):
         self.batch.logger.db(("remove_project", self.batch.tsk.current_task_index,

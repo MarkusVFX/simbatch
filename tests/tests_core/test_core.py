@@ -70,4 +70,5 @@ def test_load_data(sib):
     assert sib.que.load_queue() is True
     assert sib.nod.load_nodes() is True
     assert sib.dfn.load_definitions() is True
-    assert sib.load_data() is True
+    lo = sib.load_data()
+    assert lo[0] is True

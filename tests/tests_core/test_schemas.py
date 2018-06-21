@@ -118,7 +118,7 @@ def test_current_schema_details(sib):
 
 
 def test_remove_single_schema_by_id(sib):
-    assert sib.sch.remove_single_schema(id=1) is True
+    assert sib.sch.remove_single_schema(sch_id=1) is True
     assert sib.sch.total_schemas == 3
     assert len(sib.sch.schemas_data) == 3
 

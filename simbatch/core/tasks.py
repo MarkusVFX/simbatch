@@ -65,6 +65,8 @@ class Tasks:
     sample_data_checksum = None
     sample_data_total = None
 
+    proxy_task = None         # used on add to queue process
+
     def __init__(self, batch):
         self.batch = batch
         self.sts = batch.sts
@@ -73,21 +75,32 @@ class Tasks:
 
     @staticmethod
     def get_blank_task():
-        return TaskItem(0, "", 1, "NULL", 1, 1, 1, [], "", 0, 0, 0, 0, 1, 0, 0, "", 0, 50, "")
+        return TaskItem(0, "", 1, "NULL", 1, 1, "01", "001", "", 100, 101, 100, 101, 1, 1, 1, "", 1, 50, "")
 
     #  print project data, mainly for debug
+    def print_task(self, task=None):
+        prefix = ""
+        if task is None:
+            prefix = "current "
+            if self.current_task_id is not None:
+                print "       current task index:{}, id:{}, total:{}".format(self.current_task_index,
+                                                                             self.current_task_id,
+                                                                             self.total_tasks)
+                task = self.current_task
+            else:
+                self.batch.logger.wrn("current task undefined, nothing to print")
+                return False
+
+            print "       {}task name:{}".format(prefix, task.task_name)
+            print "       schemaID:{}        projID:{}".format(task.schema_id,task.project_id)
+            print "       seq/shot/take: {} {} {}".format(task.sequence, task.shot, task.take)
+            print "       sim frame range {} {} ".format(task.sim_frame_start, task.sim_frame_end)
+            print "       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end)
+            print "       state:{}   state_id:{} ".format(task.state, task.state_id)
+            print "       options ", task.options
+
     def print_current(self):
-        print "       current task index:{}, id:{}, total:{}".format(self.current_task_index, self.current_task_id,
-                                                                     self.total_tasks)
-        if self.current_task_id is not None:
-            cur_tsk = self.current_task
-            print "       current task name:{}".format(cur_tsk.task_name)
-            print "       schemaID:", cur_tsk.schema_id, "       projID:", cur_tsk.project_id
-            print "       shotDetails ", cur_tsk.sequence, "   ", cur_tsk.shot, "   ", cur_tsk.take
-            print "       sim framerange  ", cur_tsk.sim_frame_start, cur_tsk.sim_frame_end
-            print "       prev framerange  ", cur_tsk.prev_frame_start, cur_tsk.prev_frame_end
-            print "       state  state_id ", cur_tsk.state, "    ", cur_tsk.state_id
-            print "       options ", cur_tsk.options
+        self.print_task()
 
     def print_all(self):
         if self.total_tasks == 0:
@@ -161,9 +174,6 @@ class Tasks:
         curr_task = self.tasks_data[self.current_task_index]
         return[self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]
 
-    def get_default_task(self):
-        return TaskItem(0, "def", 1, "NULL", 1, 1, "01", "001", "", 4, 8, 5, 8, 1, 1, 1, "", 1, 50, "")
-
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
         sample_task_1 = TaskItem(0, "tsk 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")
@@ -225,12 +235,12 @@ class Tasks:
                 break
             index += 1
 
-    def remove_single_task(self, index=None, id=None, do_save=False):
-        if index is None and id is None:
+    def remove_single_task(self, index=None, task_id=None, do_save=False):
+        if index is None and task_id is None:
             return False
-        if id > 0:
+        if task_id > 0:
             for i, tsk in enumerate(self.tasks_data):
-                if tsk.id == id:
+                if tsk.id == task_id:
                     del self.tasks_data[i]
                     self.total_tasks -= 1
                     break
@@ -330,7 +340,7 @@ class Tasks:
             return self.save_tasks_to_mysql()
 
     def format_tasks_data(self, json=False, sql=False, backup=False):
-        if json == sql == backup == False:
+        if json == sql == backup is False:
             self.batch.logger.err("(format_projects_data) no format param !")
         else:
             if json or backup:
@@ -361,3 +371,58 @@ class Tasks:
         # PRO VERSION
         self.batch.logger.inf("MySQL will be supported with the PRO version")
         return None
+
+    #
+    ##
+    ###
+    ### adding task to queue
+
+    def clear_proxy_task(self):
+        self.proxy_task = None
+
+    def update_proxy_task(self, from_task=None, task_ver=None, priority=None, sim_frame_start=None, sim_frame_end=None,
+                          prev_frame_start=None, prev_frame_end=None, description=None):
+        if from_task is not None:
+            self.proxy_task = copy.deepcopy(from_task)
+        else:
+            if self.proxy_task is None:
+                self.proxy_task = self.get_blank_task()
+            if task_ver is not None:
+                self.proxy_task.task_ver = task_ver
+            if priority is not None:
+                self.proxy_task.priority = priority
+            if sim_frame_start is not None:
+                self.proxy_task.sim_frame_start = sim_frame_start
+            if sim_frame_end is not None:
+                self.proxy_task.sim_frame_end =sim_frame_end
+            if prev_frame_start is not None:
+                self.proxy_task.prev_frame_start = prev_frame_start
+            if prev_frame_end is not None:
+                self.proxy_task.prev_frame_end = prev_frame_end
+            if description is not None:
+                self.proxy_task.description = description
+
+    def apply_evolutions_to_task(self, evo, task=None):
+        if task is None:
+            task = self.proxy_task
+
+        task.schema_id
+        task.schema_ver
+
+        # add_to_queue
+        # get_blank_task
+        # self.batch.que.add_to_queue()
+
+    def transpose_task_to_queue_items(self, task):
+        for t in task :
+            pass
+
+    def generate_evo_script(self, hymm):
+        self.batch.logger.wrn(" TODO generate_evo_script ")
+        return " eval("+hymm+") ...  WIP  TODO "   # TODO
+
+
+
+
+
+

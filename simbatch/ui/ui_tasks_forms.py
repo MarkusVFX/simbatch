@@ -58,7 +58,7 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.schemas_id_array = []
 
-        self.form_task_item = self.batch.tsk.get_default_task()
+        self.form_task_item = self.batch.tsk.get_blank_task()
 
         self.init_ui_elements(batch.sch)
 
@@ -266,7 +266,7 @@ class TasksFormCreateOrEdit(QWidget):
             self.top_ui.set_top_info(" Can't detect frame range ", 7)
 
     def clear_vars(self):
-        self.form_task_item = self.batch.tsk.get_default_task()
+        self.form_task_item = self.batch.tsk.get_blank_task()
 
 
 class AddToQueueForm (QWidget):

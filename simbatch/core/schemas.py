@@ -125,7 +125,7 @@ class Schemas:
     def print_schema(self, schema=None):
         prefix = ""
         if schema is None:
-            prefix = "current"
+            prefix = "current "
             if self.current_schema_id is not None:
                 print "\n       current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
                                                                                  self.current_schema_index,
@@ -135,7 +135,7 @@ class Schemas:
                 self.batch.logger.wrn("current schema undefined, nothing to print")
                 return False
 
-        print "\n       {} schema name:{}".format(prefix, schema.schema_name)
+        print "\n       {}schema name:{}".format(prefix, schema.schema_name)
         print "       definition id:{}   project id:{}".format(schema.based_on_definition, schema.project_id)
         for a in schema.actions_array:
             print "       __a: name:{}  def_val:{}  actual_val:{}  descr:{}  mode:{}".format(a.name,

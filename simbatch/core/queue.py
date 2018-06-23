@@ -275,10 +275,6 @@ class Queue:
             queue_items.append(queue_item)
         return queue_items
 
-    def generate_evo_script(self, hymm):
-        self.batch.logger.wrn(" TODO generate_evo_script ")
-        return " eval("+hymm+") ...  WIP  TODO "   # TODO
-
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:

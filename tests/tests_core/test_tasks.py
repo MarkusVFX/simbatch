@@ -127,7 +127,7 @@ def test_current_task_details(sib):
 
 
 def test_remove_single_schema_by_id(sib):
-    assert sib.tsk.remove_single_task(id=1) is True
+    assert sib.tsk.remove_single_task(task_id=1) is True
     assert sib.tsk.total_tasks == 4
     assert len(sib.tsk.tasks_data) == 4
 
@@ -135,6 +135,27 @@ def test_remove_single_schema_by_index(sib):
     assert sib.tsk.remove_single_task(index=1) is True
     assert sib.tsk.total_tasks == 3
     assert len(sib.tsk.tasks_data) == 3
+
+def test_proxy_task(sib):
+    sib.tsk.clear_proxy_task()
+    assert sib.tsk.proxy_task is None
+    sib.tsk.update_proxy_task()
+    assert sib.tsk.proxy_task is not None
+    assert len(sib.tsk.proxy_task.task_name) == 0
+    sib.tsk.update_proxy_task(task_ver=4)
+    assert sib.tsk.proxy_task.task_ver == 4
+    sib.tsk.update_proxy_task(priority=5)
+    assert sib.tsk.proxy_task.priority == 5
+    sib.tsk.update_proxy_task(sim_frame_start=101)
+    assert sib.tsk.proxy_task.sim_frame_start == 101
+    sib.tsk.update_proxy_task(sim_frame_end=102)
+    assert sib.tsk.proxy_task.sim_frame_end == 102
+    sib.tsk.update_proxy_task(prev_frame_start=103)
+    assert sib.tsk.proxy_task.prev_frame_start == 103
+    sib.tsk.update_proxy_task(prev_frame_end=104)
+    assert sib.tsk.proxy_task.prev_frame_end == 104
+    sib.tsk.update_proxy_task(description="test")
+    assert sib.tsk.proxy_task.description == "test"
 
 
 def test_print_current(sib):

@@ -1,5 +1,6 @@
 import copy
 import os
+from queue import QueueItem
 
 # JSON Name Format, PEP8 Name Format
 TASK_ITEM_FIELDS_NAMES = [
@@ -66,9 +67,11 @@ class Tasks:
     sample_data_total = None
 
     proxy_task = None         # used on add to queue process
+    proxy_task_evos = None    # store current evolutions
 
     def __init__(self, batch):
         self.batch = batch
+        self.logger = batch.logger
         self.sts = batch.sts
         self.comfun = batch.comfun
         self.tasks_data = []
@@ -91,13 +94,13 @@ class Tasks:
                 self.batch.logger.wrn("current task undefined, nothing to print")
                 return False
 
-            print "       {}task name:{}".format(prefix, task.task_name)
-            print "       schemaID:{}        projID:{}".format(task.schema_id,task.project_id)
-            print "       seq/shot/take: {} {} {}".format(task.sequence, task.shot, task.take)
-            print "       sim frame range {} {} ".format(task.sim_frame_start, task.sim_frame_end)
-            print "       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end)
-            print "       state:{}   state_id:{} ".format(task.state, task.state_id)
-            print "       options ", task.options
+        print "       {}task name:{}".format(prefix, task.task_name)
+        print "       schemaID:{}        projID:{}".format(task.schema_id,task.project_id)
+        print "       seq/shot/take: {} {} {}".format(task.sequence, task.shot, task.take)
+        print "       sim frame range {} {} ".format(task.sim_frame_start, task.sim_frame_end)
+        print "       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end)
+        print "       state:{}   state_id:{} ".format(task.state, task.state_id)
+        print "       options ", task.options
 
     def print_current(self):
         self.print_task()
@@ -128,7 +131,7 @@ class Tasks:
         self.current_task_index = None
         self.current_task_id = None
         self.current_task = None
-        self.batch.logger.wrn(("no task with ID: ", get_id))
+        self.logger.wrn(("no task with ID: ", get_id))
         return None
 
     def update_current_from_index(self, index):
@@ -224,7 +227,7 @@ class Tasks:
                 return self.save_tasks()
             return True
         else:
-            self.batch.logger.err(("wrong current_task_id:", self.current_task_index))
+            self.logger.err(("wrong current_task_id:", self.current_task_index))
             return False
 
     def set_state(self, task_id, state):
@@ -270,7 +273,7 @@ class Tasks:
 
     def clear_tasks_in_mysql(self):
         # PRO VERSION with sql
-        self.batch.logger.inf("MySQL will be supported with the PRO version")
+        self.logger.inf("MySQL will be supported with the PRO version")
         return False
 
     def clear_all_tasks_data(self, clear_stored_data=False):
@@ -303,7 +306,7 @@ class Tasks:
         if len(json_file) == 0:
             json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_TASKS_FILE_NAME
         if self.comfun.file_exists(json_file, info="tasks file"):
-            self.batch.logger.inf(("loading tasks: ", json_file))
+            self.logger.inf(("loading tasks: ", json_file))
             json_tasks = self.comfun.load_json_file(json_file)
             if json_tasks is not None and "tasks" in json_tasks.keys():
                 if json_tasks['tasks']['meta']['total'] > 0:
@@ -318,19 +321,19 @@ class Tasks:
                                                      li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
                         else:
-                            self.batch.logger.wrn(("task json data not consistent:", len(li),
+                            self.logger.wrn(("task json data not consistent:", len(li),
                                                    len(TASK_ITEM_FIELDS_NAMES)))
                     return True
             else:
-                self.batch.logger.wrn(("no tasks data in : ", json_file))
+                self.logger.wrn(("no tasks data in : ", json_file))
                 return False
         else:
-            self.batch.logger.wrn(("no schema file: ", json_file))
+            self.logger.wrn(("no schema file: ", json_file))
             return False
 
     def load_tasks_from_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL will be supported with the PRO version")
+        self.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     def save_tasks(self):
@@ -341,7 +344,7 @@ class Tasks:
 
     def format_tasks_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:
-            self.batch.logger.err("(format_projects_data) no format param !")
+            self.logger.err("(format_projects_data) no format param !")
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
@@ -369,7 +372,7 @@ class Tasks:
 
     def save_tasks_to_mysql(self):
         # PRO VERSION
-        self.batch.logger.inf("MySQL will be supported with the PRO version")
+        self.logger.inf("MySQL will be supported with the PRO version")
         return None
 
     #
@@ -384,9 +387,14 @@ class Tasks:
                           prev_frame_start=None, prev_frame_end=None, description=None):
         if from_task is not None:
             self.proxy_task = copy.deepcopy(from_task)
+            self.logger.db(("update_proxy_task copy id:", from_task.task_id))
         else:
-            if self.proxy_task is None:
+            if self.current_task is not None:
+                self.proxy_task = copy.deepcopy(self.current_task)
+                self.logger.db(("update_proxy_task from current:", self.current_task.id))
+            else:
                 self.proxy_task = self.get_blank_task()
+                self.logger.db("update_proxy_task from blank")
             if task_ver is not None:
                 self.proxy_task.task_ver = task_ver
             if priority is not None:
@@ -394,7 +402,7 @@ class Tasks:
             if sim_frame_start is not None:
                 self.proxy_task.sim_frame_start = sim_frame_start
             if sim_frame_end is not None:
-                self.proxy_task.sim_frame_end =sim_frame_end
+                self.proxy_task.sim_frame_end = sim_frame_end
             if prev_frame_start is not None:
                 self.proxy_task.prev_frame_start = prev_frame_start
             if prev_frame_end is not None:
@@ -402,12 +410,55 @@ class Tasks:
             if description is not None:
                 self.proxy_task.description = description
 
+    def generate_proxy_queue_item(self, task_id, options=None):
+        # TODO
+        # TODO   WIP
+        task_index = self.batch.tsk.get_index_by_id(task_id)
+        if task_index is not None:
+            task_to_add = self.batch.tsk.tasks_data[task_index]
+            schema_index = self.batch.sch.get_index_by_id(task_to_add.schema_id)
+            schema_to_queued = self.batch.sch.schemas_data[schema_index]
+
+            task_to_add.queue_ver += 1
+            current_time = ""
+
+            proxy_queue_item = QueueItem(0, "proxy queue item", task_to_add.id, "U", 0, task_to_add.sequence,
+                                         task_to_add.shot, task_to_add.take, task_to_add.sim_frame_start,
+                                         task_to_add.sim_frame_end,
+                                         self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_WAITING],
+                                         self.batch.sts.INDEX_STATE_WAITING, task_to_add.queue_ver,
+                                         "evo", 0, "evo_script", task_to_add.priority,
+                                         "", "", -1, current_time, task_to_add.project_id, schema_to_queued.soft_name)
+
+            # TODO
+            # TODO
+            print "\n  !!! TODO compile2 ...  WIP ... ", task_id, options
+            return proxy_queue_item    # self.get_blank_queue_item()
+        else:
+            return None
+
+    def generate_queue_items(self, task_id, options=None):
+        # TODO   WIP
+        queue_items = []
+        template_queue_item = self.generate_proxy_queue_item(task_id, options=None)
+        evolutions = ["BND:4", "BND:5", "BND:7"]    # HACK TODO
+        for i, evo in enumerate(evolutions):
+            queue_item = copy.deepcopy(template_queue_item)
+            queue_item.evo = evo
+            queue_item.evo_nr = i
+            queue_item.evo_script = self.generate_evo_script(evo)
+            queue_item.description = evo
+            queue_items.append(queue_item)
+        return queue_items
+
     def apply_evolutions_to_task(self, evo, task=None):
         if task is None:
             task = self.proxy_task
 
         task.schema_id
         task.schema_ver
+
+        self.proxy_task_evos
 
         # add_to_queue
         # get_blank_task
@@ -420,6 +471,7 @@ class Tasks:
     def generate_evo_script(self, hymm):
         self.batch.logger.wrn(" TODO generate_evo_script ")
         return " eval("+hymm+") ...  WIP  TODO "   # TODO
+
 
 
 

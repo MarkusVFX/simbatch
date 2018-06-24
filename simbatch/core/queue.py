@@ -233,48 +233,6 @@ class Queue:
             self.batch.logger.err("queue item data not removed, item not found!")
             return False
 
-    def generate_template_queue_item(self, task_id, options=None):
-        # TODO
-        # TODO   WIP
-        task_index = self.batch.tsk.get_index_by_id(task_id)
-        if task_index is not None:
-            task_to_queued = self.batch.tsk.tasks_data[task_index]
-            schema_index = self.batch.sch.get_index_by_id(task_to_queued.schema_id)
-            schema_to_queued = self.batch.sch.schemas_data[schema_index]
-
-            task_to_queued.queue_ver += 1
-            current_time = ""
-
-            new_queue_item = QueueItem(0, "queue item 2", task_to_queued.id, "U", 0,
-                                       task_to_queued.sequence, task_to_queued.shot, task_to_queued.take,
-                                       task_to_queued.sim_frame_start, task_to_queued.sim_frame_end,
-                                       self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_WAITING],
-                                       self.batch.sts.INDEX_STATE_WAITING,
-                                       task_to_queued.queue_ver, "evo", 0, "evo_script",
-                                       task_to_queued.priority, "", "", -1, current_time, task_to_queued.project_id,
-                                       schema_to_queued.soft_name)
-
-            # TODO
-            # TODO
-            print "\n  !!! TODO compile2 ...  WIP ... ", task_id, options
-            return new_queue_item    # self.get_blank_queue_item()
-        else:
-            return None
-
-    def generate_queue_items(self, task_id, options=None):
-        # TODO   WIP
-        queue_items = []
-        template_queue_item = self.generate_template_queue_item(task_id, options=None)
-        evolutions = ["BND:4", "BND:5", "BND:7"]    # HACK TODO
-        for i, evo in enumerate(evolutions):
-            queue_item = copy.deepcopy(template_queue_item)
-            queue_item.evo = evo
-            queue_item.evo_nr = i
-            queue_item.evo_script = self.generate_evo_script(evo)
-            queue_item.description = evo
-            queue_items.append(queue_item)
-        return queue_items
-
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:

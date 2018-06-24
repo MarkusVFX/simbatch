@@ -106,7 +106,7 @@ class TasksFormCreateOrEdit(QWidget):
                                             qt_edit_buton_take, qt_edit_buton_prior, qt_edit_buton_version])
         qt_widget_group_time_range = WidgetGroup([qt_edit_buton_sim_start, qt_edit_buton_sim_end,
                                                   qt_edit_buton_prev_start, qt_edit_buton_prev_end,
-                                                  #qt_button_lay_detect_framerange,
+                                                  # qt_button_lay_detect_framerange,
                                                   qt_button_lay_get_framerange])
 
         qt_edit_buton_description = EditLineWithButtons("Description ")
@@ -209,7 +209,7 @@ class TasksFormCreateOrEdit(QWidget):
                     self.batch.logger.err(("Comlpile err", self.qt_schema_name_combo.currentIndex()))
 
             if self.batch.sch.current_schema_index is None:
-                if self.form_task_item.schema_id >=0:
+                if self.form_task_item.schema_id >= 0:
                     self.batch.sch.update_current_from_id(self.form_task_item.schema_id)
 
         else:
@@ -304,6 +304,16 @@ class AddToQueueForm (QWidget):
     def init_ui_elements(self):
         qt_form_add_layout = QVBoxLayout()
 
+        if self.batch.sts.debug_level > 3:  # debug proxy SchemaItem object (used when adding or editing schema)
+            db_buttons_group = QGroupBox()
+            db_b1 = ButtonOnLayout("basic print", width=140)
+            # db_b2 = ButtonOnLayout("detailed print", width=170)
+            qt_debug_buttons = WidgetGroup([SimpleLabel("debug buttons"), db_b1])   # , db_b2
+            db_buttons_group.setLayout(qt_debug_buttons.qt_widget_layout)
+            qt_form_add_layout.addWidget(db_buttons_group)
+            db_b1.button.clicked.connect(self.form_basic_db_print)
+            # db_b2.button.clicked.connect(self.form_detailed_db_print)
+
         # qt_action_empty = ActionWidget(None, label_txt="    Select Task")
         qt_lay_actions = QVBoxLayout()
         self.qt_lay_actions = qt_lay_actions
@@ -353,6 +363,10 @@ class AddToQueueForm (QWidget):
         # qt_edit_button_sim_to.qt_edit_line.textChanged.connect(self.on_change_sim_to)
         # qt_edit_button_frame_from.qt_edit_line.textChanged.connect(self.on_change_render_from)
         # qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)
+
+    def form_basic_db_print(self):
+        print "\n"
+        self.batch.tsk.print_task(self.batch.tsk.proxy_task)
 
     def update_add_ui(self):
         current_task = self.batch.tsk.current_task

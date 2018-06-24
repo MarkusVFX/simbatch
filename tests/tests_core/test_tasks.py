@@ -156,6 +156,7 @@ def test_proxy_task(sib):
     assert sib.tsk.proxy_task.prev_frame_end == 104
     sib.tsk.update_proxy_task(description="test")
     assert sib.tsk.proxy_task.description == "test"
+    sib.tsk.print_task(sib.tsk.proxy_task)
 
 
 def test_print_current(sib):

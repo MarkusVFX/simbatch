@@ -426,6 +426,7 @@ class TasksUI:
                 self.hide_all_forms()
                 self.qt_form_add.show()
                 self.qt_form_add.update_add_ui()
+                self.batch.tsk.update_proxy_task()
                 self.add_form_state = 1
             else:
                 self.batch.logger.wrn("(on_click_show_add_to_queue_form) Please Select Task")
@@ -533,15 +534,21 @@ class TasksUI:
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
         current_task_id = self.batch.tsk.current_task_id
-        if current_task_id is not None:
+        current_task = self.batch.tsk.current_task
+        if current_task is not None:
             ret = form_atq.create_directories()
             if ret:
+                # self.batch.tsk.update_proxy_task()
+
+
+
                 self.batch.tsk.current_task.queue_ver += 1
                 self.batch.tsk.current_task.state_id = self.sts.INDEX_STATE_QUEUED
                 self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_QUEUED]
                 self.batch.tsk.save_tasks()
 
-                form_queue_items = self.batch.que.generate_queue_items(current_task_id, options=form_atq.options)
+
+                form_queue_items = self.batch.tsk.generate_queue_items(current_task_id, options=form_atq.options)
                 self.batch.que.add_to_queue(form_queue_items, do_save=True)
                 self.mainw.que_ui.update_all_queue()
 
@@ -550,7 +557,8 @@ class TasksUI:
                 self.reset_list()
 
                 self.freeze_list_on_changed = 0
-                self.qt_form_add.update_add_ui()
+                # self.qt_form_add.update_add_ui()
+                self.batch.tsk.update_proxy_task()
 
                 self.batch.logger.inf(" add to queue !")
                 self.top_ui.set_top_info(" add to queue ", 2)
@@ -636,7 +644,6 @@ class TasksUI:
                     item_c.setBackground(cur_color)
 
                 # update SCHEMA
-                self.batch.sch.lastSchemaIndex = None  # TODO  check it ui
                 self.batch.sch.current_schema_id = cur_task.schema_id
                 self.batch.sch.update_current_from_id(cur_task.schema_id)
 
@@ -647,7 +654,7 @@ class TasksUI:
                     self.qt_form_edit.update_edit_ui(cur_task)                 # update edit form
                 if self.add_form_state == 1:
                     self.qt_form_add.update_add_ui()                           # update add to queue form
-
+                    self.batch.tsk.update_proxy_task()
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
                                                                          len(self.batch.tsk.tasks_data)))

@@ -12,9 +12,11 @@ except ImportError:
 
 class SimpleLabel:
     qt_widget_layout = None
+    label = None
 
     def __init__(self, label_text, label_minimum_size=0, label_maximum=0):
         label = QLabel(label_text)
+        self.label = label
         if label_minimum_size > 0:
             label.setMinimumWidth(label_minimum_size)
         if label_maximum > 0:
@@ -22,6 +24,14 @@ class SimpleLabel:
 
         self.qt_widget_layout = QHBoxLayout()
         self.qt_widget_layout.addWidget(label)
+
+    def hide(self):
+        self.label.setVisible(False)
+
+    def show(self, txt=None):
+        if txt is not None:
+            self.label.setText(txt)
+        self.label.setVisible(True)
 
 
 class ComboLabel:

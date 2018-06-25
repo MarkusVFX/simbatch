@@ -380,19 +380,49 @@ class AddToQueueForm (QWidget):
 
         self.remove_all_action_widgets()
         current_sch = self.batch.sch.get_schema_by_id(current_task.schema_id)
-        for act in current_sch.actions_array:
-            # gen_script  = action.generate_script(action.scriptActionTemplates, vals, sub_type)
-            self.add_action_widget_to_form(act.name, act.actual_value)
+        current_dfn = self.batch.dfn.current_definition
+        if current_dfn is None:
+            self.batch.logger.wrn("(on update form) current definition is undefined")
+            for act in current_sch.actions_array:
+                # gen_script  = action.generate_script(action.scriptActionTemplates, vals, sub_type)
+                self.add_action_widget_to_form(act.name, act.actual_value)
+        else:
+            for act in current_sch.actions_array:
+                evolution = None
+                mac = current_dfn.get_multiaction_by_name(act.name)
+                print "wy wy wy wy ", mac , act.name, act.mode
+                if act.mode is not None:
+                    if len(act.mode) > 0:
+                        act_name_sufix = " "+act.mode
+
+                    if mac is not None:
+                        action_index = mac.get_action_index_by_mode(act.mode)
+                        if action_index is not None:
+                            evolution = []
+                            for p in mac.actions[action_index].parameters.param_list:
+                                evolution.append(p.abbrev)
+                else:
+                    act_name_sufix = ""
+
+                # if mac is not None:
+                #     evolution = []
+                #     for a in mac.actions:
+                #         evolution.append(a.parameters.name)
+
+                self.add_action_widget_to_form(act.name+act_name_sufix, act.actual_value, evo=evolution)
 
     def add_action_widget_to_form(self, info, edit_txt=None, evo=None):
         if edit_txt is None and evo is None:
             wi = SimpleLabel(info)
         else:
             if evo is not None:
-                wi = EditLineWithButtons(info, edit_txt)
+                if len(evo) <= 1:
+                    wi = ActionWidgetATQ(info, edit_txt)
+                else:
+                    wi = ActionWidgetATQ("     evolutions(1)", edit_txt,  combo_label=info, combo_items=evo)
+                # wi = EditLineWithButtons("evo_" + info, edit_txt)  # TODO
             else:
-                # wi = ActionWidgetATQ()
-                wi = EditLineWithButtons("evo_" + info, edit_txt)  # TODO
+                wi = SimpleLabel("ERR")
         qt_widget = QWidget()
         qt_widget.setLayout(wi.qt_widget_layout)
         self.qt_lay_actions.addWidget(qt_widget)

@@ -32,16 +32,17 @@ class ComboLabel:
     def __init__(self, label_text, combo_items_arr, combo_current_index=0, label_minimum_size=0, text_on_button_1="",
                  button_size=0):
         self.qt_widget_layout = QHBoxLayout()
-        if len(label_text) > 0:
+        if label_text is not None and len(label_text) > 0:
             label = QLabel(label_text)
             if label_minimum_size > 0:
                 label.setMinimumWidth(label_minimum_size)
             self.qt_widget_layout.addWidget(label)
 
         combo = QComboBox()
-        for it in combo_items_arr:
-            combo.addItem(it)
-        combo.setCurrentIndex(combo_current_index)
+        if combo_items_arr is not None:
+            for it in combo_items_arr:
+                combo.addItem(it)
+            combo.setCurrentIndex(combo_current_index)
         self.qt_widget_layout.addWidget(combo)
         self.combo = combo
 
@@ -358,17 +359,24 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
                 self.qt_button_2.clicked.connect(lambda: self.eval_button_fun(self.qt_edit, button_2_fun_str))
 
 
-class ActionWidgetATQ(QWidget):
+class ActionWidgetATQ(QWidget):  # QWidget
     qt_widget_layout = None
-    CMB = None   # ComboLabel
-    ELWB = None  # EditLineWithButtons
+    qt_combo_param = None   # ComboLabel
+    qt_edit_line_widget = None  # EditLineWithButtons
 
-    def __init__(self, text_label, text_edit, combo_label=None, combo_items=None ):
-        self.CMB = ComboLabel(combo_label, combo_items, text_on_button_1=comboBut, button_size=comboButSize)
-        self.ELWB = EditLineWithButtons(text_label, text_edit)
+    def __init__(self, text_label, text_edit, combo_label=None, combo_items=None):
+        super(ActionWidgetATQ, self).__init__()
+        # QWidget.__init__(self)
+        self.qt_widget_layout = QVBoxLayout()
+        correct_button_caption = ""
+        if combo_label is not None:
+            self.qt_combo_param = ComboLabel(combo_label, combo_items, text_on_button_1="Add evo", button_size=70)
+            self.qt_widget_layout.addLayout(self.qt_combo_param.qt_widget_layout)
+            correct_button_caption = "Correct"
 
-        self.qt_widget_layout.addLayout( self.CMB.widget_layout)
-        self.qt_widget_layout.addLayout( self.ELWB.widget_layout)
+        self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit, text_on_button_1=correct_button_caption,
+                                                       button_width=70)
+        self.qt_widget_layout.addLayout(self.qt_edit_line_widget.qt_widget_layout)
 
 
 class WidgetGroup:

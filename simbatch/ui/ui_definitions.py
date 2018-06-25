@@ -16,7 +16,7 @@ class DefinitionsUI:
     qt_widget_definitions = None
     qt_lay_definitions_main = None
 
-    current_selected = [0,0,0]
+    current_selected = [0, 0, 0]
 
     batch = None
     top_ui = None
@@ -58,8 +58,8 @@ class DefinitionsUI:
         qt_tree_lay.addWidget(qt_definitions_tree)
 
         qt_print_lay = QVBoxLayout()
-        qt_print_lay_A = QHBoxLayout()
-        qt_print_lay_B = QHBoxLayout()
+        qt_print_lay_a = QHBoxLayout()
+        qt_print_lay_b = QHBoxLayout()
         # current_name = EditLineWithButtons("Project Name:", label_minimum_size=94)
         qt_current = EditLineWithButtons("Current:")
         self.qt_current = qt_current
@@ -73,13 +73,13 @@ class DefinitionsUI:
         qt_print_all.button.clicked.connect(self.on_click_print_all)
         qt_clear_info.button.clicked.connect(self.on_click_clear_info)
 
-        self.comfun.add_layouts(qt_print_lay_A, [qt_current.qt_widget_layout])
-        self.comfun.add_layouts(qt_print_lay_B, [qt_print_base.qt_widget_layout,
+        self.comfun.add_layouts(qt_print_lay_a, [qt_current.qt_widget_layout])
+        self.comfun.add_layouts(qt_print_lay_b, [qt_print_base.qt_widget_layout,
                                                  qt_print_current.qt_widget_layout,
                                                  qt_print_all.qt_widget_layout,
                                                  qt_clear_info.qt_widget_layout])
-        qt_print_lay.addLayout(qt_print_lay_A)
-        qt_print_lay.addLayout(qt_print_lay_B)
+        qt_print_lay.addLayout(qt_print_lay_a)
+        qt_print_lay.addLayout(qt_print_lay_b)
 
         qt_show_lay = QVBoxLayout()
         qt_definition_content = QTextEdit()
@@ -103,9 +103,9 @@ class DefinitionsUI:
                 tree_child_action = QTreeWidgetItem(tree_item_soft)
                 tree_child_action.setText(0, ac)
                 tree_child_action.setText(1, str(j))
-                if self.dfn.definitions_array[i].multi_actions_array[j].actions_count > 0:
-                    tree_child_action.setText(2, str(self.dfn.definitions_array[i].multi_actions_array[j].actions_count))
-
+                multi_actions_count = self.dfn.definitions_array[i].multi_actions_array[j].actions_count
+                if multi_actions_count > 0:
+                    tree_child_action.setText(2, str(multi_actions_count))
 
                 tree_child_action.setForeground(0, qt_dark_brush)
                 tree_child_action.setForeground(1, qt_dark_brush)

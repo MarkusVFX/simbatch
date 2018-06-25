@@ -364,8 +364,7 @@ class ActionWidgetATQ(QWidget):
     ELWB = None  # EditLineWithButtons
 
     def __init__(self, text_label, text_edit, combo_label=None, combo_items=None ):
-
-        self.CMB = ComboLabel(combo_label, comboItemsArr, button1=comboBut, buttonSize=comboButSize)
+        self.CMB = ComboLabel(combo_label, combo_items, text_on_button_1=comboBut, button_size=comboButSize)
         self.ELWB = EditLineWithButtons(text_label, text_edit)
 
         self.qt_widget_layout.addLayout( self.CMB.widget_layout)

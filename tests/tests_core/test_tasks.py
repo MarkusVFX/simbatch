@@ -139,7 +139,7 @@ def test_remove_single_schema_by_index(sib):
 def test_proxy_task(sib):
     sib.tsk.clear_proxy_task()
     assert sib.tsk.proxy_task is None
-    sib.tsk.update_proxy_task()
+    sib.tsk.update_proxy_task(from_task=sib.tsk.get_blank_task())
     assert sib.tsk.proxy_task is not None
     assert len(sib.tsk.proxy_task.task_name) == 0
     sib.tsk.update_proxy_task(task_ver=4)

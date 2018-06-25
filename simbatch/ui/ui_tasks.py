@@ -452,10 +452,7 @@ class TasksUI:
     def on_click_add_task(self, new_task_tem):
         if self.batch.prj.current_project_id >= 0:
             if self.qt_form_create.qt_schema_name_combo.currentIndex() >= 0:
-                print "erer er 1 ", new_task_tem.priority
                 self.qt_form_create.compile_inputs()
-
-                print "erer er 3 ", new_task_tem.priority
                 if new_task_tem.schema_id < 0:
                     self.batch.logger.err(("(on_click_add_task) wrong schema_id: ", new_task_tem.schema_id))
 
@@ -464,7 +461,6 @@ class TasksUI:
                     new_task_id = self.add_single_task(copy.copy(new_task_tem))
                     self.top_ui.set_top_info(" [INF] Task created, active task: [{}] {}".format(new_task_id,
                                                                                                 new_task_tem.task_name))
-
                     self.qt_form_add.hide()
                     self.add_form_state = 0
 
@@ -619,7 +615,6 @@ class TasksUI:
                     self.batch.logger.deepdb(("vis ids FIXED: len(array_visible_tasks_ids):",
                                               len(self.array_visible_tasks_ids),
                                               "vs current_list_index:", current_list_index))
-
                 else:
                     self.batch.logger.err(("vis ids NOT FIXED: len(array_visible_tasks_ids):",
                                            len(self.array_visible_tasks_ids),

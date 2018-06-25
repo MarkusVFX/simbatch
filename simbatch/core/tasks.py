@@ -95,7 +95,7 @@ class Tasks:
                 return False
 
         print "       {}task name:{}".format(prefix, task.task_name)
-        print "       schemaID:{}        projID:{}".format(task.schema_id,task.project_id)
+        print "       schemaID:{}        projID:{}".format(task.schema_id, task.project_id)
         print "       seq/shot/take: {} {} {}".format(task.sequence, task.shot, task.take)
         print "       sim frame range {} {} ".format(task.sim_frame_start, task.sim_frame_end)
         print "       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end)
@@ -321,8 +321,7 @@ class Tasks:
                                                      li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
                         else:
-                            self.logger.wrn(("task json data not consistent:", len(li),
-                                                   len(TASK_ITEM_FIELDS_NAMES)))
+                            self.logger.wrn(("task json data not consistent:", len(li), len(TASK_ITEM_FIELDS_NAMES)))
                     return True
             else:
                 self.logger.wrn(("no tasks data in : ", json_file))
@@ -376,9 +375,10 @@ class Tasks:
         return None
 
     #
-    ##
-    ###
-    ### adding task to queue
+    # #
+    # # # #
+    # # # # #
+    # section #      adding task to queue
 
     def clear_proxy_task(self):
         self.proxy_task = None
@@ -387,7 +387,7 @@ class Tasks:
                           prev_frame_start=None, prev_frame_end=None, description=None):
         if from_task is not None:
             self.proxy_task = copy.deepcopy(from_task)
-            self.logger.db(("update_proxy_task copy id:", from_task.task_id))
+            self.logger.db(("update_proxy_task copy id:", from_task.id))
         else:
             if self.current_task is not None:
                 self.proxy_task = copy.deepcopy(self.current_task)

@@ -446,11 +446,15 @@ class QueueUI:
         if with_freeze:
             self.freeze_list_on_changed = 0
 
-    def update_list_of_visible_ids(self):
+    def update_list_of_visible_ids(self, filters=None):
         array_visible_queue_items_ids = []
         for que in self.batch.que.queue_data:
-            if que.proj_id == self.batch.prj.current_project_id:
+            if filters is None:
                 array_visible_queue_items_ids.append(que.id)
+            else:
+                # TODO filter project, limit, user, ...
+                if que.proj_id == self.batch.prj.current_project_id:
+                    array_visible_queue_items_ids.append(que.id)
         self.array_visible_queue_items_ids = array_visible_queue_items_ids
 
     def on_current_item_changed(self, current_queue_item):
@@ -458,7 +462,6 @@ class QueueUI:
             self.batch.logger.deepdb(("que chngd freeze_list_on_changed", self.list_queue.currentRow()))
         else:
             self.batch.logger.inf(("list_queue_current_item_changed: ", self.list_queue.currentRow()))
-
             self.last_list_item_index = self.current_list_item_index
             current_list_index = self.list_queue.currentRow() - 1
             self.current_list_item_index = current_list_index

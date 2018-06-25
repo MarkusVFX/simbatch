@@ -453,7 +453,7 @@ class ProjectsUI:
             self.batch.prj.current_project_id = ret_id
 
             list_item = QListWidgetItem(self.qt_list_projects)
-            list_item_widget = ProjectListItem(str(new_project.id), new_project_name, working_directory, description)
+            # list_item_widget = ProjectListItem(str(new_project.id), new_project_name, working_directory, description)
             self.qt_list_projects.addItem(list_item)
             self.batch.sio.create_project_working_directory(new_project.project_directory)
             self.batch.sio.create_project_working_directory(new_project.working_directory_absolute)

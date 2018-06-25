@@ -32,11 +32,6 @@ except ImportError:
     pass
 
 
-def getMayaWindow():
-    pointer = mui.MQtUtil.mainWindow()
-    return shiboken.wrapInstance(long(pointer), QtGui.QWidget)
-
-
 try:    # Maya 2016
     import shiboken
 except:

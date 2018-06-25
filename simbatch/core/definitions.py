@@ -8,7 +8,7 @@ try:
 except ImportError:
     pass
 
-from actions import MultiAction, SingleAction
+from actions import MultiAction, SingleAction, ActionParameters
 
 # JSON Name Format, PEP8 Name Format
 DEFINITION_ITEM_FIELDS_NAMES = [
@@ -208,7 +208,6 @@ class Definitions:
         else:
             return content
 
-
     def get_current_setup_ext(self):    # TODO  env = self.sts.runtime_env
         if self.current_definition is not None:
             return self.current_definition.setup_ext
@@ -354,12 +353,18 @@ class Definitions:
                                         new_group_action.add_single_action(new_action)
 
                                     elif li['type'] == "multi":
+
+                                        print "pppp type ", li["type"]
                                         for ag in li["subActions"].values():
                                             ag_ui = self.get_ui_values(ag)
                                             new_action = SingleAction(li['name'], ag['desc'], ag['default'],
                                                                       ag['template'], mode=ag['mode'], ui=ag_ui)
                                             if "params" in ag:
-                                                new_action.parameters = ag["params"]
+                                                template = ag["params"]["paramsTemplate"]
+                                                new_action.parameters = ActionParameters(ag['mode'], template)
+                                                for key, val in ag["params"]["paramsList"].items():
+                                                    new_action.parameters.add_param_to_list(key, val[0], val[1],
+                                                                                            val[2], val[3])
                                             new_group_action.add_single_action(new_action)
                                     else:
                                         self.batch.logger.err(("wrong action type : ", li['type']))

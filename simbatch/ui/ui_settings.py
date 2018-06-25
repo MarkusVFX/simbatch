@@ -64,12 +64,16 @@ class SettingsUI:
             show_ini_file = settings.ini_file
         else:
             show_ini_file = self.comfun.convert_to_win_path(settings.ini_file)
+        err_info_config_ini = SimpleLabel("")   #  err info hidden on start
+        self.err_info_config_ini = err_info_config_ini
+        err_info_config_ini.hide()
         elwb_config_ini = EditLineWithButtons(show_ini_file, edit_text_string=None, text_on_button_1="Test Data",
-                                              text_on_button_2="Test Acces", button_width=70)
+                                              text_on_button_2="Test Access", button_width=70)
 
         elwb_config_ini.button_1.clicked.connect(self.test_data_config_ini)
         elwb_config_ini.button_2.clicked.connect(self.test_acces_config_ini)
         qt_lay_config_ini.addLayout(elwb_config_ini.qt_widget_layout)
+        qt_lay_config_ini.addLayout(err_info_config_ini.qt_widget_layout)
         qt_group_config_ini.setLayout(qt_lay_config_ini)
 
         ''' MODE '''
@@ -402,10 +406,13 @@ class SettingsUI:
             else:
                 self.top_ui.set_top_info("config.ini file not exist !", 9)
                 self.batch.logger.wrn("config.ini file not exist !")
+                self.err_info_config_ini.show("Please initialize SimBatch with proper startup config file")
                 return False
+
         else:
             self.top_ui.set_top_info("config.ini dir not exist !", 9)
             self.batch.logger.wrn("config.ini dir not exist !")
+            self.err_info_config_ini.show("Please initialize SimBatch with proper startup config file")
             return False
 
     def on_click_radio_data(self, index):

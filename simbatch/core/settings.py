@@ -175,7 +175,7 @@ class Settings:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
         else:
-            self.logger.wrn(("Settings not loaded !!!", self.loading_state))
+            self.logger.err(("Settings not loaded !!!", self.loading_state))
 
     def print_all(self):
         print " loading_state: ", self.loading_state

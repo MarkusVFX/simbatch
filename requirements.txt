@@ -1,7 +1,7 @@
 ###  SimBatch
 python 2.7
 
-###  SimBatch with GIU
+###  SimBatch with GUI
 python 2.7
 pyside or pyside2
 

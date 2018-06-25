@@ -179,6 +179,9 @@ class MainWindow(QMainWindow):
                 y_wnd_pos = wnd[1]
             self.batch.logger.inf(("set wind pos :", x_wnd_pos, y_wnd_pos,  wnd[2],  wnd[3]))
             self.setGeometry(x_wnd_pos, y_wnd_pos, wnd[2], wnd[3])
+        else:
+            self.setMinimumSize(480, 700)
+            self.sts.window = [40, 40, 480, 700]
 
         self.setWindowTitle("SimBatch " + self.sts.SIMBATCH_VERSION + "     " + self.sts.runtime_env)
         if self.sts.always_on_top:

@@ -14,6 +14,45 @@ ACTION_DATA_FIELDS_NAMES = (
 )
 
 
+class SingleParameter:    # "STR": ["stretch", "stretchResistance", 40, "stretch Resistance"],
+    abbrev = ""
+    name = ""
+    execution_name = ""
+    def_val = ""
+    description = ""
+
+    def __init__(self, abbrev, name, execution_name, def_val, description):
+        self.abbrev = abbrev
+        self.name = name
+        self.execution_name = execution_name
+        self.def_val = def_val
+        self.description = description
+
+    def __str__(self):
+        return "SingleParameter"
+
+    def print_minimum(self):
+        print "   {}   name: {}".format(self.abbrev, self.name)
+
+
+class ActionParameters:
+    name = None
+    template = None
+    param_list = None
+
+    def __init__(self, name, template):
+        self.name = name
+        self.template = template
+        self.param_list = []
+
+    def print_params(self):
+        for p in self.param_list:
+            print "  {}   {}      {}".format(p.abbrev, p.name, p.description)
+
+    def add_param_to_list(self, abbrev, name, execution_name, def_val, description):
+        self.param_list.append(SingleParameter(abbrev, name, execution_name, def_val, description))
+
+
 class SingleAction:
     """ Single action with template"""
     name = ""
@@ -115,14 +154,6 @@ class MultiAction:    # old GroupedActions
     def __str__(self):
         return "MultiAction"
 
-    def add_single_action(self, new_action):
-        if isinstance(new_action, SingleAction):
-            self.actions.append(new_action)
-            self.actions_count += 1
-            return True
-        else:
-            return False
-
     def print_actions(self):
         self.logger.clear_buffer()
         self.logger.buffering_on()
@@ -133,3 +164,17 @@ class MultiAction:    # old GroupedActions
 
         self.logger.buffering_off()
         return self.logger.get_buffer()
+
+    def add_single_action(self, new_action):
+        if isinstance(new_action, SingleAction):
+            self.actions.append(new_action)
+            self.actions_count += 1
+            return True
+        else:
+            return False
+
+    def get_action_index_by_mode(self, mode):
+        for i, a in enumerate(self.actions):
+            if a.mode == mode:
+                return i
+        return None

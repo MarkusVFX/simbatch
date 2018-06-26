@@ -374,19 +374,105 @@ class ActionWidgetATQ(QWidget):  # QWidget
     qt_combo_param = None   # ComboLabel
     qt_edit_line_widget = None  # EditLineWithButtons
 
-    def __init__(self, text_label, text_edit, combo_label=None, combo_items=None):
+    batch = None
+
+    evos_array = None
+    evos_count = None
+
+    def __init__(self, batch, text_label, text_edit, combo_label=None, combo_items=None):
         super(ActionWidgetATQ, self).__init__()
         # QWidget.__init__(self)
+        self.batch = batch
         self.qt_widget_layout = QVBoxLayout()
         correct_button_caption = ""
         if combo_label is not None:
-            self.qt_combo_param = ComboLabel(combo_label, combo_items, text_on_button_1="Add evo", button_size=70)
+            self.qt_combo_param = ComboLabel(combo_label+" "+text_edit, combo_items, text_on_button_1="Add evo",
+                                             button_size=70)
             self.qt_widget_layout.addLayout(self.qt_combo_param.qt_widget_layout)
             correct_button_caption = "Correct"
 
-        self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit, text_on_button_1=correct_button_caption,
-                                                       button_width=70)
+            self.qt_edit_line_widget = EditLineWithButtons(text_label, "", text_on_button_1=correct_button_caption,
+                                                           button_width=70)
+            if self.qt_combo_param is not None:
+                self.qt_combo_param.button_1.clicked.connect(lambda: self.add_evo_to_line())
+
+            if self.qt_edit_line_widget.button_1 is not None:
+                self.qt_edit_line_widget.button_1.clicked.connect(lambda: self.correct_params())
+                self.qt_edit_line_widget.qt_edit_line.textChanged.connect(lambda: self.check_evos())
+
+        else:
+            self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit,
+                                                           text_on_button_1=correct_button_caption, button_width=70)
         self.qt_widget_layout.addLayout(self.qt_edit_line_widget.qt_widget_layout)
+
+    def add_evo_to_line(self):
+        evo_abbreviation = self.qt_combo_param.combo.currentText()[:3]
+        el = self.qt_edit_line_widget.qt_edit_line
+
+        print "aaaaddddd ", evo_abbreviation
+
+        exist = el.text().find(evo_abbreviation)
+        if exist >= 0:
+            el.setText(el.text()[:exist+4] + "_" + el.text()[exist+4:])
+        else:
+            if len(el.text()) < 3:
+                el.setText( evo_abbreviation + "  ")
+            else:
+                el.setText( el.text() + "; " + evo_abbreviation + "  ")
+        self.check_evos()
+
+    def check_evos(self):
+        el = self.qt_edit_line_widget.qt_edit_line
+        evos_arr = el.text().split(";")
+
+        self.evos_array = []
+        evo_count_all = 1
+        for e in evos_arr:              # TODO   optimize !!!
+            e = e.replace("_", "")
+            e_arr = e.split()
+            counter = 0
+            clean_arrr = []
+            evo_count_param_vals = 0
+            passed_abbreviation = False
+            for eee in e_arr:
+                counter += 1
+                if counter > 1:
+                    if passed_abbreviation:
+                        if self.batch.comfun.can_get_float(eee):
+                            exist = 0
+                            for c in clean_arrr:
+                                if c == str(float(eee)):
+                                    exist = 1
+                            if exist == 0:
+                                clean_arrr.append(str(float(eee)))
+                                evo_count_param_vals += 1
+                else:
+                    if len(eee) == 3:
+                        eee = eee.upper()
+                        clean_arrr.append(eee)
+                        passed_abbreviation = True
+
+            if evo_count_param_vals > 0:
+                evo_count_all *= evo_count_param_vals
+
+            if passed_abbreviation:
+                self.evos_array.append(clean_arrr)
+
+        self.show_number_evolutions(evo_count_all)
+        self.evos_count = evo_count_all
+
+    def show_number_evolutions(self, nr):
+        if nr <= 1:
+            self.qt_edit_line_widget.label.setText("    {} evolution: ".format(nr))
+        else:
+            self.qt_edit_line_widget.label.setText("    {} evolutions:".format(nr))
+
+    def correct_params(self):
+        self.check_evos()
+        ee = []
+        for e in self.evos_array:
+            ee.append("  ".join(e))
+        self.qt_edit_line_widget.qt_edit_line.setText("  ; ".join(ee))
 
 
 class WidgetGroup:

@@ -187,22 +187,22 @@ class Definitions:
     def create_singleaction(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
         return SingleAction(name, description, default_value, template, actual_value=actual_value, mode=mode, ui=ui)
 
-    def create_multiaction(self, id, name):
-        return MultiAction(id, name)
+    def create_multiaction(self, mac_id, name):
+        return MultiAction(mac_id, name)
 
     def create_example_definition(self, do_save=False):
-        content ={"definition": {"meta": {"name": "Dfn Example 1","software": "Example", "totalActions": 3},
-                                          "actions": {"1": {"id": 1, "type": "single", "name": "Print1",
-                                                            "desc": "p1", "ui": [], "default": "print 1",
-                                                            "template": ["print 111"]},
-                                                      "2": {"id": 1, "type": "single", "name": "Print2",
-                                                            "desc": "p2", "ui": [], "default": "print 2",
-                                                            "template": ["print 222"]},
-                                                      "3": {"id": 1, "type": "single", "name": "Print3",
-                                                            "desc": "p3", "ui": [], "default": "print 3",
-                                                            "template": ["print 333"]}
-                                                      }
-                                 }}
+        content = {"definition": {"meta": {"name": "Dfn Example 1", "software": "Example", "totalActions": 3},
+                                  "actions": {"1": {"id": 1, "type": "single", "name": "Print1",
+                                                    "desc": "p1", "ui": [], "default": "print 1",
+                                                    "template": ["print 111"]},
+                                              "2": {"id": 1, "type": "single", "name": "Print2",
+                                                    "desc": "p2", "ui": [], "default": "print 2",
+                                                    "template": ["print 222"]},
+                                              "3": {"id": 1, "type": "single", "name": "Print3",
+                                                    "desc": "p3", "ui": [], "default": "print 3",
+                                                    "template": ["print 333"]}
+                                              }
+                                  }}
         if do_save:
             return self.save_definition("example", content)
         else:
@@ -353,8 +353,6 @@ class Definitions:
                                         new_group_action.add_single_action(new_action)
 
                                     elif li['type'] == "multi":
-
-                                        print "pppp type ", li["type"]
                                         for ag in li["subActions"].values():
                                             ag_ui = self.get_ui_values(ag)
                                             new_action = SingleAction(li['name'], ag['desc'], ag['default'],

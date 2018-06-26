@@ -390,7 +390,6 @@ class AddToQueueForm (QWidget):
             for act in current_sch.actions_array:
                 evolution = None
                 mac = current_dfn.get_multiaction_by_name(act.name)
-                print "wy wy wy wy ", mac , act.name, act.mode
                 if act.mode is not None:
                     if len(act.mode) > 0:
                         act_name_sufix = " "+act.mode
@@ -417,12 +416,13 @@ class AddToQueueForm (QWidget):
         else:
             if evo is not None:
                 if len(evo) <= 1:
-                    wi = ActionWidgetATQ(info, edit_txt)
+                    wi = ActionWidgetATQ(self.batch, info, edit_txt)
                 else:
-                    wi = ActionWidgetATQ("     evolutions(1)", edit_txt,  combo_label=info, combo_items=evo)
+                    wi = ActionWidgetATQ(self.batch,"    1 evolution :", edit_txt,  combo_label=info, combo_items=evo)
                 # wi = EditLineWithButtons("evo_" + info, edit_txt)  # TODO
             else:
-                wi = SimpleLabel("ERR")
+                wi = ActionWidgetATQ(self.batch, info, edit_txt)
+
         qt_widget = QWidget()
         qt_widget.setLayout(wi.qt_widget_layout)
         self.qt_lay_actions.addWidget(qt_widget)
@@ -441,3 +441,19 @@ class AddToQueueForm (QWidget):
     def create_directories(self):
         # TODO
         return True
+
+
+    # def add_evo_to_line(self):
+    #     evoAbbreviation = self.CMB.combo.currentText()[:3]
+    #     el= self.ELWB.editLine
+    #
+    #     exist = el.text().find( evoAbbreviation )
+    #     if exist >= 0 :
+    #         el.setText( el.text()[:exist+4] +"_"+ el.text()[exist+4:] )
+    #     else:
+    #         if len(el.text()) < 3:
+    #             el.setText( evoAbbreviation + "  " )
+    #         else:
+    #             el.setText( el.text()+ "; "+ evoAbbreviation + "  " )
+    #
+    #     self.checkEvos()

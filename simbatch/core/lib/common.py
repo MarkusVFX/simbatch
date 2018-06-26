@@ -54,6 +54,16 @@ class CommonFunctions:
             return False
 
     @staticmethod
+    def can_get_float(value):   # check can convert to int (e.g.: test string "1")   [for True return 1]
+        if value is None:
+            return False
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
     def is_float(value):
         try:
             if type(value) == float:

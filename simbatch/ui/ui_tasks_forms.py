@@ -398,8 +398,9 @@ class AddToQueueForm (QWidget):
                         action_index = mac.get_action_index_by_mode(act.mode)
                         if action_index is not None:
                             evolution = []
-                            for p in mac.actions[action_index].parameters.param_list:
-                                evolution.append(p.abbrev)
+                            if mac.actions[action_index].parameters is not None:
+                                for p in mac.actions[action_index].parameters.param_list:
+                                    evolution.append(p.abbrev)
                 else:
                     act_name_sufix = ""
 

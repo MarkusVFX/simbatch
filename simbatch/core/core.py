@@ -52,7 +52,7 @@ class SimBatch:
         self.prj.print_all()
 
     def print_important_values(self):
-        print "  \n\n  Current runtime_env: {}", self.sts.runtime_env
+        print "  \n\n  Current runtime_env: {}".format(self.sts.runtime_env)
 
         # projects
         print "\n PROJECTS: "

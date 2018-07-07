@@ -162,7 +162,7 @@ class Settings:
             self.ini_file = os.path.abspath(ini_file)
 
         """ check and force DEV config """
-        if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file),"config_dev.ini")):
+        if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file),"config_dev.ini"), info=False):
             self.ini_file = os.path.join(os.path.dirname(self.ini_file),"config_dev.ini")
             self.logger.inf(("force DEV config:", self.ini_file))
 
@@ -323,7 +323,7 @@ class Settings:
                                 """ SETTINGS VALUES ARE OK"""
                                 self.loading_state = 4
                                 if self.debug_level >= 3:
-                                    print "\n\n [INF] settings loaded ", self.ini_file
+                                    print "\n\n    [INF] settings loaded ", self.ini_file
                                 return True
 
                         elif self.store_data_mode == 2:
@@ -402,14 +402,14 @@ class Settings:
         if self.store_definitions_directory_abs is not None:
             palette_id = self.ui_color_mode
             if palette_id == 1:
-                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_GRAY_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + self.COLORS_GRAY_FILE_NAME
             elif palette_id == 2:
-                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_PASTEL_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors"+ self.dir_separator + self.COLORS_PASTEL_FILE_NAME
             elif palette_id == 3:
-                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_DARK_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors"+ self.dir_separator + self.COLORS_DARK_FILE_NAME
             else:
                 #  palette_id == 4:
-                color_file = self.store_definitions_directory_abs + "colors/" + self.COLORS_CUSTOM_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors"+ self.dir_separator + self.COLORS_CUSTOM_FILE_NAME
 
             if self.comfun.file_exists(color_file, info="colors file"):
                 self.clear_state_colors()
@@ -426,7 +426,7 @@ class Settings:
                 f.close()
 
                 if self.debug_level >= 3:
-                    print " [INF] loaded colors: ", color_file
+                    print "    [INF] loaded colors: ", color_file
                 return True
             else:
                 for i in range(0, 40):

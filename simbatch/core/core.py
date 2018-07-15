@@ -3,6 +3,7 @@ import platform
 from settings import Settings
 from lib.common import CommonFunctions
 from lib.logger import Logger
+from lib.patterns import Patterns
 from users import Users
 from definitions import Definitions
 from projects import Projects
@@ -44,6 +45,7 @@ class SimBatch:
         self.nod = SimNodes(self)      # nod
         self.dfn = Definitions(self)   # dfn
         self.sio = StorageInOut(self)  # sio
+        self.pat = Patterns()          # pat
         #  abbreviation  END
 
         self.logger.inf("SimBatch started")

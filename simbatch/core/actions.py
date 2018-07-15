@@ -56,7 +56,7 @@ class ActionParameters:
 class SingleAction:
     """ Single action with template"""
     name = ""
-    mode = None
+    mode = None         # one of nCloth, nHair, Fume ...   for Maya simulate
     default_value = ""  # pattern changed when add to queue
     actual_value = ""   # var set by user or default_value, finally used for generate action_script from template
     template = ""       # use template for create absolute ...
@@ -72,7 +72,7 @@ class SingleAction:
         # self.id = action_id
         self.name = name
         # self.type = type
-        self.mode = mode  # subaction mode
+        self.mode = mode  # subaction mode : nCloth, nHair, Fume
         self.ui = ui
         self.description = description
         self.default_value = default_value
@@ -118,6 +118,7 @@ class SingleAction:
         self.logger.buffering_off()
         return self.logger.get_buffer()
 
+    """
     def get_action(self):
         # TODO
         return self
@@ -125,10 +126,27 @@ class SingleAction:
     def get_action_as_string(self):
         # TODO
         return ""
+    """
 
-    def complie_action(self, opions):
-        # TODO
-        return self.template
+    def generate_script(self, batch, evos=None, evo_index=None, hack_NL=False):
+        # TODO optimize + mixed var     <dir>\custom_file.bin
+        scr = "".join(self.template)
+
+        st = self.default_value.find("<")
+        if st >= 0:
+            en = self.default_value.find(">")
+            val = self.default_value[st+1:en]
+            # TODO detect multi <option>
+            ret = batch.sio.predefined.convert_var_to_val(val, scr)
+            if ret is not None:
+                scr = ret
+
+        scr = batch.sio.predefined.convert_undefined_to_default(scr)
+
+        if hack_NL:
+            scr += "\n"
+
+        return scr
 
 
 class MultiAction:    # old GroupedActions

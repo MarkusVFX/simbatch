@@ -383,73 +383,106 @@ class Tasks:
     def clear_proxy_task(self):
         self.proxy_task = None
 
-    def update_proxy_task(self, from_task=None, task_ver=None, priority=None, sim_frame_start=None, sim_frame_end=None,
-                          prev_frame_start=None, prev_frame_end=None, description=None):
-        if from_task is not None:
-            self.proxy_task = copy.deepcopy(from_task)
-            self.logger.db(("update_proxy_task copy id:", from_task.id))
+    def update_proxy_task_form_current(self):
+        if self.current_task is not None:
+            self.update_proxy_task(self.current_task.id)
+            self.logger.db(("update_proxy_task from current:", self.current_task.id))
         else:
-            if self.current_task is not None:
-                self.proxy_task = copy.deepcopy(self.current_task)
-                self.logger.db(("update_proxy_task from current:", self.current_task.id))
-            else:
-                self.proxy_task = self.get_blank_task()
-                self.logger.db("update_proxy_task from blank")
-            if task_ver is not None:
-                self.proxy_task.task_ver = task_ver
-            if priority is not None:
-                self.proxy_task.priority = priority
-            if sim_frame_start is not None:
-                self.proxy_task.sim_frame_start = sim_frame_start
-            if sim_frame_end is not None:
-                self.proxy_task.sim_frame_end = sim_frame_end
-            if prev_frame_start is not None:
-                self.proxy_task.prev_frame_start = prev_frame_start
-            if prev_frame_end is not None:
-                self.proxy_task.prev_frame_end = prev_frame_end
-            if description is not None:
-                self.proxy_task.description = description
+            self.logger.err("skipped update_proxy_task_form_current , current task is None")
 
-    def generate_proxy_queue_item(self, task_id, options=None):
+    def update_proxy_task(self, task_id=None, task_ver=None, priority=None, sim_frame_start=None, sim_frame_end=None,
+                          prev_frame_start=None, prev_frame_end=None, description=None):
+        if task_id is not None:
+            if self.comfun.is_int(task_id):
+                index = self.get_index_by_id(task_id)
+                self.proxy_task = copy.deepcopy(self.tasks_data[index])
+                self.logger.db(("update_proxy_task from id:", task_id))
+            else:
+                self.logger.err(("skipped update_proxy_task, wrong id:", task_id))
+        if task_ver is not None:
+            self.proxy_task.task_ver = task_ver
+        if priority is not None:
+            self.proxy_task.priority = priority
+        if sim_frame_start is not None:
+            self.proxy_task.sim_frame_start = sim_frame_start
+        if sim_frame_end is not None:
+            self.proxy_task.sim_frame_end = sim_frame_end
+        if prev_frame_start is not None:
+            self.proxy_task.prev_frame_start = prev_frame_start
+        if prev_frame_end is not None:
+            self.proxy_task.prev_frame_end = prev_frame_end
+        if description is not None:
+            self.proxy_task.description = description
+
+    def generate_template_queue_item(self, task, schema):
         # TODO
         # TODO   WIP
-        task_index = self.batch.tsk.get_index_by_id(task_id)
-        if task_index is not None:
-            task_to_add = self.batch.tsk.tasks_data[task_index]
-            schema_index = self.batch.sch.get_index_by_id(task_to_add.schema_id)
-            schema_to_queued = self.batch.sch.schemas_data[schema_index]
+        # task_index = self.batch.tsk.get_index_by_id(task_id)
+        # if task_index is not None:
 
-            task_to_add.queue_ver += 1
+        if self.proxy_task is not None:
             current_time = ""
-
-            proxy_queue_item = QueueItem(0, "proxy queue item", task_to_add.id, "U", 0, task_to_add.sequence,
-                                         task_to_add.shot, task_to_add.take, task_to_add.sim_frame_start,
-                                         task_to_add.sim_frame_end,
+            proxy_queue_item = QueueItem(0, "template queue item", task.id, "U", 0, task.sequence,
+                                         task.shot, task.take, task.sim_frame_start,
+                                         task.sim_frame_end,
                                          self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_WAITING],
-                                         self.batch.sts.INDEX_STATE_WAITING, task_to_add.queue_ver,
-                                         "evo", 0, "evo_script", task_to_add.priority,
-                                         "", "", -1, current_time, task_to_add.project_id, schema_to_queued.soft_name)
-
-            # TODO
-            # TODO
-            print "\n  !!! TODO compile2 ...  WIP ... ", task_id, options
-            return proxy_queue_item    # self.get_blank_queue_item()
+                                         self.batch.sts.INDEX_STATE_WAITING, task.queue_ver,
+                                         "evo", 0, "evo_script", task.priority,
+                                         "", "", -1, current_time, task.project_id, schema.soft_name)
+            return proxy_queue_item
         else:
             return None
 
-    def generate_queue_items(self, task_id, options=None):
+    def generate_evo_script(self, hymm):
+        self.batch.logger.wrn(" TODO generate_evo_script ")
+        return " eval("+hymm+") ...  WIP  TODO "   # TODO
+
+    def generate_queue_items_from_proxy_task(self, evolutions=None):
         # TODO   WIP
         queue_items = []
-        template_queue_item = self.generate_proxy_queue_item(task_id, options=None)
-        evolutions = ["BND:4", "BND:5", "BND:7"]    # HACK TODO
-        for i, evo in enumerate(evolutions):
-            queue_item = copy.deepcopy(template_queue_item)
-            queue_item.evo = evo
-            queue_item.evo_nr = i
-            queue_item.evo_script = self.generate_evo_script(evo)
-            queue_item.description = evo
-            queue_items.append(queue_item)
+
+        if self.proxy_task is not None:
+            task_to_add = self.proxy_task  # self.batch.tsk.tasks_data[task_index]
+            schema_index = self.batch.sch.get_index_by_id(task_to_add.schema_id)
+            schema_to_queued = self.batch.sch.schemas_data[schema_index]
+            task_definition = self.batch.dfn.get_definition_by_name(schema_to_queued.based_on_definition)
+            if task_definition is None:
+                self.batch.logger.err(("Missing definition: ", schema_to_queued.based_on_definition))
+                return None
+
+            template_queue_item = self.generate_template_queue_item(task_to_add, schema_to_queued)
+
+            if template_queue_item is not None:
+                if evolutions is None:
+                    template_queue_item.generate_queue_item_name(task_to_add, with_update=True)
+                    template_queue_item.evolution = ""
+                    template_queue_item.evolution_script = schema_to_queued.generate_script_from_actions(self.batch)
+                    queue_items.append(template_queue_item)
+
+                else:
+                    # evolutions = ["BND 4 5 ; DMP 7"    ,      "BRN: 1 2 3"]    # example for 2 engines !!!
+
+                    for i, evos in enumerate(evolutions):
+
+                        evo_scr_arr = schema_to_queued.get_evo_scripts_array(self.batch, evos, i)
+                        for j, evo_scr in enumerate(evo_scr_arr[1]):
+                            queue_item = copy.deepcopy(template_queue_item)
+
+                            queue_item.generate_queue_item_name(task_to_add, with_update=True,
+                                                                with_sufix=" [e:"+str(j+1)+"]")
+                            # queue_item.evolution = "["+str(i)+"] "+evo_scr[0]
+                            queue_item.evolution = evo_scr_arr[0][j]
+                            queue_item.evolution_nr = i
+                            queue_item.evolution_script = schema_to_queued.generate_script_from_actions(self.batch,
+                                                                                                        evos=evo_scr,
+                                                                                                        evo_index=j)
+                            # queue_item.description = "["+evo_scr[0]+"] "+queue_item.description
+                            queue_items.append(queue_item)
         return queue_items
+
+    def generate_queue_items_from_task(self, task_id, evolutions=None):
+        self.update_proxy_task(task_id)
+        return self.generate_queue_items_from_proxy_task(evolutions=evolutions)
 
     def apply_evolutions_to_task(self, evo, task=None):
         if task is None:
@@ -463,14 +496,6 @@ class Tasks:
         # add_to_queue
         # get_blank_task
         # self.batch.que.add_to_queue()
-
-    def transpose_task_to_queue_items(self, task):
-        for t in task :
-            pass
-
-    def generate_evo_script(self, hymm):
-        self.batch.logger.wrn(" TODO generate_evo_script ")
-        return " eval("+hymm+") ...  WIP  TODO "   # TODO
 
 
 

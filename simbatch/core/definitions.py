@@ -89,12 +89,12 @@ class SingleDefinition:
             logger_raw("  arr action_names: {}  {} ".format(i, an))
         for i, ga in enumerate(self.multi_actions_array):
             if ga.actions_count == len(ga.actions):
-                logger_raw("  _group_name: {} {}  count: {}".format(i, ga.name, ga.actions_count))
+                logger_raw("   group_name: {} {}  count: {}".format(i, ga.name, ga.actions_count))
             else:
-                logger_raw("  _group_name: {} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
+                logger_raw("   group_name: {} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
                                                                                 len(ga.actions)))
             for j, sa in enumerate(ga.actions):
-                logger_raw("    ___action {}  name: {}  default_value: {}  ui: {}".format(j, sa.name,
+                logger_raw("       action {}  name: {}  default_value: {}  ui: {}".format(j, sa.name,
                                                                                           sa.default_value, sa.ui))
         self.logger.buffering_off()
         return self.logger.get_buffer()
@@ -215,6 +215,13 @@ class Definitions:
             self.batch.logger.err("get_current_setup_ext unknown, current_definition is None")
             return ".err"
 
+    def get_current_prev_ext(self):    # TODO  env = self.sts.runtime_env
+        if self.current_definition is not None:
+            return self.current_definition.prev_ext
+        else:
+            self.batch.logger.err("get_current_prev_ext unknown, current_definition is None")
+            return ".err"
+
     def add_definition(self, defi):
         self.definitions_array.append(defi)
         self.total_definitions += 1
@@ -284,7 +291,7 @@ class Definitions:
             content = f.read()
         try:
             exec content
-            return eval("Interaction")
+            return eval("Interactions")
         except SyntaxError:
             self.batch.logger.err(("syntax error definition file:", filename))
             return None
@@ -396,15 +403,20 @@ class Definitions:
         return ret
 
     def update_current_definition(self, index):
-        self.batch.logger.deepdb(("update_current_definition ", index))
-        if len(self.definitions_array) > index:
-            self.current_definition_index = index
-            self.current_definition = self.definitions_array[index]
-            self.current_definition_name = self.definitions_array[index].name
-            self.current_interactions = self.definitions_array[index].interactions
+        if index is not None:
+            self.batch.logger.deepdb(("update_current_definition ", index))
+            if len(self.definitions_array) > index:
+                self.current_definition_index = index
+                self.current_definition = self.definitions_array[index]
+                self.current_definition_name = self.definitions_array[index].name
+                self.current_interactions = self.definitions_array[index].interactions
+            else:
+                self.batch.logger.wrn(("update current definition is not possible, definitions count:  ",
+                                       len(self.definitions_array), "  try set:", index))
         else:
-            self.batch.logger.wrn(("update current definition is not possible, definitions count:  ",
-                                   len(self.definitions_array), "  try set:", index))
+            self.batch.logger.wrn("trying update_current_definition by None")
 
-        # if self.current_interactions is not None:
-        #    self.current_interactions.test()
+    def update_current_definition_by_name(self, name):
+        for i, d in enumerate(self.definitions_array):
+            if d.name == name:
+                self.update_current_definition(i)

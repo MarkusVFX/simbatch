@@ -38,13 +38,13 @@ class SingleProject:
         self.cameras_directory = self.comfun.get_proper_path(cameras_directory, info="cam dir")
         self.cache_directory = self.comfun.get_proper_path(cache_directory, info="ani cache dir")
 
-        if len(env_directory) == 0 :
+        if len(env_directory) == 0:
             env_directory = project_directory
-        if len(props_directory) == 0 :
+        if len(props_directory) == 0:
             props_directory = project_directory
-        if len(scripts_directory) == 0 :
+        if len(scripts_directory) == 0:
             scripts_directory = project_directory
-        if len(custom_directory) == 0 :
+        if len(custom_directory) == 0:
             custom_directory = project_directory
         self.env_directory = self.comfun.get_proper_path(env_directory, info="env dir")
         self.props_directory = self.comfun.get_proper_path(props_directory, info="props dir")
@@ -101,7 +101,6 @@ class SingleProject:
             self.custom_directory_absolute = self.project_directory + self.custom_directory
         else:
             self.custom_directory_absolute = self.custom_directory
-
 
 
 class Projects:

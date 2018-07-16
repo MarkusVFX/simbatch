@@ -21,6 +21,7 @@ except ImportError:
             def fromRgb(self, r, g, b, a=""):
                 pass
 
+
 class Settings:
     logger = None                   # logger prints errors, warnings, info and db to console and to log file
     ini_file = None                 # fundamental config file, json format
@@ -44,7 +45,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.30"   # current version
+    SIMBATCH_VERSION = "v0.2.40"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -108,7 +109,7 @@ class Settings:
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
-    force_start_tab = 0     # if > 0 show tab with this index after run
+    force_start_tab = 3     # if > 0 show tab with this index after run
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1
@@ -152,7 +153,11 @@ class Settings:
         else:
             self.dir_separator = "\\"
 
+        """  STANDALONE """
         self.store_abs_dir = os.path.abspath("") + self.dir_separator  # os.path.dirname(os.path.realpath(__file__))
+
+        """  MAYA win  C:\Program Files\Autodesk\Maya2014\ """
+        # TODO check abs
 
         self.comfun = CommonFunctions()
         self.runtime_env = runtime_env
@@ -306,14 +311,14 @@ class Settings:
                             self.force_start_tab = self.json_settings_data["startup"]["tab"]
                             self.logger.inf("forced startup tab index: {}".format(self.force_start_tab))
 
-
-                    if self.comfun.int_or_val(self.store_data_mode, 0):
+                    if self.comfun.can_get_int(self.store_data_mode):
                         if self.store_data_mode == 1:
                             if self.comfun.path_exists(self.store_data_json_directory_abs) is False:
                                 if len(self.store_data_json_directory_abs) == 0:
                                     self.settings_err_info = "Data directory not defined!"
                                 else:
-                                    self.settings_err_info = "Data directory not exists!"
+                                    self.settings_err_info = "Data directory not exists!   (" + \
+                                                             self.store_data_json_directory_abs + ")"
                             elif self.comfun.path_exists(self.store_definitions_directory_abs) is False:
                                 if len(self.store_definitions_directory_abs) == 0:
                                     self.settings_err_info = "Definitions directory not defined!"

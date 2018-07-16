@@ -272,7 +272,7 @@ class TasksFormCreateOrEdit(QWidget):
 class AddToQueueForm (QWidget):
     batch = None
     # form_atq_local_item = None    # obsolete
-    options = []                  # all inputted user's options with parameters
+    options = []                    # all user's inputs options with parameters
 
     qt_edit_button_frame_from = None
     qt_edit_button_frame_to = None
@@ -334,7 +334,7 @@ class AddToQueueForm (QWidget):
 
         qt_edit_button_description = EditLineWithButtons("desc", label_minimum_size=60)
 
-        qt_button_cb_add_to_queue = ButtonWithCheckBoxes("Add To Queue Now!", label_text="  pin ?  ")
+        qt_button_cb_add_to_queue = ButtonWithCheckBoxes("Add To Queue Now!", pin_text="pin ")
 
         qt_widget_group_frame_range = WidgetGroup(
             [qt_edit_button_version, qt_edit_button_prior, qt_edit_button_sim_from, qt_edit_button_sim_to,
@@ -368,7 +368,7 @@ class AddToQueueForm (QWidget):
         print "\n"
         self.batch.tsk.print_task(self.batch.tsk.proxy_task)
 
-    def update_add_ui(self):
+    def update_form(self):
         current_task = self.batch.tsk.current_task
         self.qt_edit_button_sim_from.qt_edit_line.setText(str(current_task.sim_frame_start))
         self.qt_edit_button_sim_to.qt_edit_line.setText(str(current_task.sim_frame_end))
@@ -400,7 +400,7 @@ class AddToQueueForm (QWidget):
                             evolution = []
                             if mac.actions[action_index].parameters is not None:
                                 for p in mac.actions[action_index].parameters.param_list:
-                                    evolution.append(p.abbrev)
+                                    evolution.append(p.abbrev + "   " + p.description)
                 else:
                     act_name_sufix = ""
 

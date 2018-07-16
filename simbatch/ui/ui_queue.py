@@ -198,19 +198,19 @@ class QueueUI:
 
         self.hide_all_forms()
 
-        qt_button_sim_one = QPushButton("Simulate One")
-        qt_button_sim_all = QPushButton("Simulate All")
+        self.qt_button_sim_one = QPushButton("Simulate One")
+        self.qt_button_sim_all = QPushButton("Simulate All")
         qt_button_queue_edit = QPushButton("Edit")
         qt_button_queue_remove = QPushButton("Remove from Queue")
 
-        qt_button_sim_one.clicked.connect(self.on_click_sim_one)
-        qt_button_sim_all.clicked.connect(self.on_click_sim_all)
+        self.qt_button_sim_one.clicked.connect(self.on_click_sim_one)
+        self.qt_button_sim_all.clicked.connect(self.on_click_sim_all)
         qt_button_queue_edit.clicked.connect(self.on_click_edit)
         qt_button_queue_remove.clicked.connect(self.on_click_remove)
 
         qt_lay_queue_list.addWidget(list_queue)
-        self.comfun.add_wigdets(qt_lay_queue_buttons,
-                                [qt_button_sim_one, qt_button_sim_all, qt_button_queue_edit, qt_button_queue_remove])
+        self.comfun.add_wigdets(qt_lay_queue_buttons, [self.qt_button_sim_one, self.qt_button_sim_all,
+                                                       qt_button_queue_edit, qt_button_queue_remove])
         self.comfun.add_layouts(qt_lay_queue_main, [qt_lay_queue_list, qt_lay_forms, qt_lay_queue_buttons])
 
         self.init_queue_items()
@@ -347,12 +347,18 @@ class QueueUI:
         self.edit_form_state = 0
         self.remove_form_state = 0
 
+    def simulate_buttons_state(self, state):
+        self.qt_button_sim_one.setEnabled(state)
+        self.qt_button_sim_all.setEnabled(state)
+
     def run_server_from_framework(self, loops=0):
         server = self.mainw.server  # .SimBatchServer(self.batch, force_local=True)
         server.force_local = True
-        server.loopsLimit = loops
-        server.timerDelaySeconds = 0
+        server.loops_counter = 0
+        server.loops_limit = loops
+        server.timer_delay_seconds = 0
         server.reset_report()  # TODO
+        self.simulate_buttons_state(False)
         server.run()
         report = server.generate_report()  # TODO
         if report[0] > 0:
@@ -364,6 +370,7 @@ class QueueUI:
         else:
             if len(server.last_info) > 0:
                 self.top_ui.set_top_info(server.last_info, 1)
+        self.simulate_buttons_state(True)
 
     def on_click_sim_one(self):
         self.run_server_from_framework(loops=1)

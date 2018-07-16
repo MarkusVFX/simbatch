@@ -48,10 +48,11 @@ class SettingsUI:
             qt_scroll_widget.setMinimumWidth(settings.window[2]-self.scroll_margin)
         else:
             qt_scroll_widget.setMinimumWidth(400)
-        if self.settings.current_os == 1:
-            qt_scroll_widget.setMinimumHeight(750)   # Linux
+
+        if self.settings.runtime_env == "Maya":      # if self.settings.current_os == 1:
+            qt_scroll_widget.setMinimumHeight(750)
         else:
-            qt_scroll_widget.setMinimumHeight(650)   # win7
+            qt_scroll_widget.setMinimumHeight(400)
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
 
@@ -411,7 +412,8 @@ class SettingsUI:
 
         else:
             self.top_ui.set_top_info("config.ini dir not exist !", 9)
-            self.batch.logger.wrn("config.ini dir not exist !")
+            self.batch.logger.wrn(("config.ini dir not exist !   ", self.settings.ini_file,
+                                   self.comfun.get_path_from_full(self.settings.ini_file)))
             self.err_info_config_ini.show("Please initialize SimBatch with proper startup config file")
             return False
 

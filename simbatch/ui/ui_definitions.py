@@ -153,7 +153,7 @@ class DefinitionsUI:
                                      self.batch.comfun.int_or_val(parent_id, None),
                                      self.batch.comfun.int_or_val(parent_parent_id, None)]
 
-    def print_to_definition_info(self, txt):
+    def print_info(self, txt):
         logger_raw = self.batch.logger.raw
         self.qt_definition_content.append(txt)
         logger_raw(txt)
@@ -161,26 +161,26 @@ class DefinitionsUI:
     def on_click_print_base(self):
 
         if self.dfn.current_definition_name is None:
-            self.print_to_definition_info("\n total_defn:{} current:None".format(self.dfn.total_definitions))
+            self.print_info("\n definitions count: {}    current: None".format(self.dfn.total_definitions))
         else:
-            self.print_to_definition_info("\n total_defn:{} current:{}".format(self.dfn.total_definitions,
-                                                                               self.dfn.current_definition_name))
-            self.print_to_definition_info(" dfn count:{} dfn names count:{}".format(len(self.dfn.definitions_array),
-                                                                                    len(self.dfn.definitions_names)))
+            self.print_info("\n definitions count: {}    current: {}".format(self.dfn.total_definitions,
+                                                                             self.dfn.current_definition_name))
+            self.print_info(" definitions count:: {}    names count: {}".format(len(self.dfn.definitions_array),
+                                                                                len(self.dfn.definitions_names)))
         for d in self.dfn.definitions_array:
-            self.print_to_definition_info(" _name:{} total_actions:{} names count:{}".format(d.name, d.total_actions,
-                                                                                             len(d.action_names)))
+            self.print_info("  name: {}     total actions: {}    names count: {}".format(d.name, d.total_actions,
+                                                                                         len(d.action_names)))
         self.qt_definition_content.append("\n\n\n")
 
     def on_click_print_current(self):
         if self.current_selected[0] is not None:
             indexes = self.current_selected
-            self.print_to_definition_info("Current definition :  {}".format(self.dfn.definitions_names[indexes[0]]))
+            self.print_info("Current definition :  {}".format(self.dfn.definitions_names[indexes[0]]))
             if len(indexes) > 1:
-                self.print_to_definition_info(" Current action :  {}".format(
+                self.print_info(" Current action :  {}".format(
                     self.dfn.definitions_array[indexes[0]].action_names[indexes[1]]))
             if len(indexes) > 2:
-                self.print_to_definition_info("  Current subaction :  {}".format(
+                self.print_info("  Current subaction :  {}".format(
                     self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]].name))
 
             if len(indexes) == 1:

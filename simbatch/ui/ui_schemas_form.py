@@ -307,7 +307,7 @@ class SchemaFormCreateOrEdit(QWidget):
         cur_index = self.batch.dfn.current_definition_index
         self.remove_all_defined_action_buttons()
         self.remove_all_action_widgets()
-        self.batch.dfn.current_definition_index = cur_index
+        self.batch.dfn.update_current_definition(cur_index)
         self.add_defined_action_buttons(nr=cur_index)
 
     #

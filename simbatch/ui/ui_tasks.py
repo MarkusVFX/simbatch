@@ -425,8 +425,8 @@ class TasksUI:
             if self.batch.tsk.current_task_id is not None:
                 self.hide_all_forms()
                 self.qt_form_add.show()
-                self.qt_form_add.update_add_ui()
-                self.batch.tsk.update_proxy_task()
+                self.qt_form_add.update_form()
+                self.batch.tsk.update_proxy_task_form_current()
                 self.add_form_state = 1
             else:
                 self.batch.logger.wrn("(on_click_show_add_to_queue_form) Please Select Task")
@@ -518,6 +518,7 @@ class TasksUI:
         else:
             self.top_ui.set_top_info("Please select task first", 7)
 
+    """
     def print_form_add(self):
         form_add = self.qt_form_add
         self.comfun.print_list(form_add.actionsAllArray)
@@ -526,6 +527,7 @@ class TasksUI:
                 self.batch.logger.deepdb((" is_evo:", ak.is_evo,  "   scr:", ak.script_type, ak.script))
             else:
                 self.batch.logger.deepdb(("not is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script))
+    """
 
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
@@ -534,17 +536,14 @@ class TasksUI:
         if current_task is not None:
             ret = form_atq.create_directories()
             if ret:
-                # self.batch.tsk.update_proxy_task()
-
-
+                # self.batch.tsk.update_proxy_task_form_current()
 
                 self.batch.tsk.current_task.queue_ver += 1
                 self.batch.tsk.current_task.state_id = self.sts.INDEX_STATE_QUEUED
                 self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_QUEUED]
                 self.batch.tsk.save_tasks()
 
-
-                form_queue_items = self.batch.tsk.generate_queue_items(current_task_id, options=form_atq.options)
+                form_queue_items = self.batch.tsk.generate_queue_items_from_proxy_task(evolutions=form_atq.options)
                 self.batch.que.add_to_queue(form_queue_items, do_save=True)
                 self.mainw.que_ui.update_all_queue()
 
@@ -553,8 +552,8 @@ class TasksUI:
                 self.reset_list()
 
                 self.freeze_list_on_changed = 0
-                # self.qt_form_add.update_add_ui()
-                self.batch.tsk.update_proxy_task()
+                # self.qt_form_add.update_form()
+                self.batch.tsk.update_proxy_task_form_current()
 
                 self.batch.logger.inf(" add to queue !")
                 self.top_ui.set_top_info(" add to queue ", 2)
@@ -648,8 +647,8 @@ class TasksUI:
                 if self.edit_form_state == 1:
                     self.qt_form_edit.update_edit_ui(cur_task)                 # update edit form
                 if self.add_form_state == 1:
-                    self.qt_form_add.update_add_ui()                           # update add to queue form
-                    self.batch.tsk.update_proxy_task()
+                    self.qt_form_add.update_form()                           # update add to queue form
+                    self.batch.tsk.update_proxy_task_form_current()
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
                                                                          len(self.batch.tsk.tasks_data)))

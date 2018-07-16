@@ -97,6 +97,81 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
     #             arr_out.append(SingleAction(int(arr2[0]), int(arr2[1]), arr2[2], arr2[3], arr2[4]))
     #     self.actions_array = arr_out
 
+    def get_evo_scripts_array(self, batch, evos_str, engine_index):
+        count_actions_with_evos = 0
+        for act in self.actions_array:
+            parameters = None
+            # TODO optimize  -> is evo !!!!
+            current_dfn = batch.dfn.get_definition_by_name(self.based_on_definition)
+            mac = current_dfn.get_multiaction_by_name(act.name)
+            if act.mode is not None:
+                if mac is not None:
+                    action_index = mac.get_action_index_by_mode(act.mode)
+                    if action_index is not None:
+                        if mac.actions[action_index].parameters is not None:
+                            parameters = mac.actions[action_index].parameters
+
+            if parameters is not None:
+                if count_actions_with_evos == engine_index:
+                    ret = batch.pat.get_evolutions_from_string(evos_str)
+                    tmp2_arr = []
+                    tmp2i_arr = []
+                    for ev_params in ret[1]:
+                        tmp_arr = []
+                        tmpi_arr = []
+                        for i, ev_param in enumerate(ev_params):
+                            if i > 0:
+                                for par in parameters.param_list:
+                                    if par.abbrev == ev_params[0]:
+                                        ap = ("obj." + par.execution_name + " = " + str(ev_param)+"; ")
+                                        api = (par.abbrev + " " + str(ev_param)+" ")
+                                        tmp_arr.append(ap)
+                                        tmpi_arr.append(api)
+                        tmp2_arr.append(tmp_arr)
+                        tmp2i_arr.append(tmpi_arr)
+
+                    out_arr = []
+                    outi_arr = []
+                    len_arr = []
+                    idx_arr = []
+                    sum_len = 1
+                    for i, ev in enumerate(tmp2_arr):
+                        idx_arr.append(0)
+                        len_arr.append(len(ev))
+                        sum_len *= len(ev)
+
+                    for sl in range(0, sum_len):
+                        combi = ""
+                        combii = ""
+                        for i, ev in enumerate(tmp2_arr):
+                            combi += ev[idx_arr[i]]
+                            combii += tmp2i_arr[i][idx_arr[i]]
+                        idx_arr[0] += 1
+
+                        for j, dx in enumerate(idx_arr):
+                            if dx > len_arr[j]-1:
+                                if j+1 < len(idx_arr):
+                                    idx_arr[j+1] += 1
+                                idx_arr[j] = 0
+
+                        out_arr.append(combi)
+                        outi_arr.append(combii)
+
+                    # print "zz",  len(out_arr), sum_len , out_arr
+                    # print "zzi",  len(outi_arr), sum_len , outi_arr
+                    return outi_arr, out_arr
+
+                count_actions_with_evos += 1
+
+        return [], []
+
+    def generate_script_from_actions(self, batch, evos=None, evo_index=None):
+        scr = ""
+        for act in self.actions_array:
+            # print act
+            scr += act.generate_script(batch, evos=evos, evo_index=evo_index, hack_NL=True)+"; "
+        return scr
+
 
 class Schemas:
     """ All schemas from all projects, TODO project schemas for PRO """
@@ -226,12 +301,19 @@ class Schemas:
         self.current_schema_index = None
         self.current_schema = None
 
+    def update_current_definition_on_schema_change(self):
+        if self.current_schema.based_on_definition != self.batch.dfn.current_definition_name:
+            # update DEFINITION
+            if self.current_schema.based_on_definition is not None:
+                self.batch.dfn.update_current_definition_by_name(self.current_schema.based_on_definition)
+
     def update_current_from_id(self, schema_id):
         for i, sch in enumerate(self.schemas_data):
             if sch.id == schema_id:
                 self.current_schema_index = i
                 self.current_schema_id = schema_id
                 self.current_schema = sch
+                self.update_current_definition_on_schema_change()
                 return i
         self.clear_current_schema()
         return False
@@ -241,6 +323,7 @@ class Schemas:
             self.current_schema_index = index
             self.current_schema_id = self.schemas_data[index].id
             self.current_schema = self.schemas_data[index]
+            self.update_current_definition_on_schema_change()
             return self.current_schema_id
         else:
             self.clear_current_schema()

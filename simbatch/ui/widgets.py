@@ -409,7 +409,7 @@ class ActionWidgetATQ(QWidget):  # QWidget
         evo_abbreviation = self.qt_combo_param.combo.currentText()[:3]
         el = self.qt_edit_line_widget.qt_edit_line
 
-        print "aaaaddddd ", evo_abbreviation
+        # print "[DB] add_evo_to_line: ", evo_abbreviation
 
         exist = el.text().find(evo_abbreviation)
         if exist >= 0:
@@ -422,44 +422,12 @@ class ActionWidgetATQ(QWidget):  # QWidget
         self.check_evos()
 
     def check_evos(self):
-        el = self.qt_edit_line_widget.qt_edit_line
-        evos_arr = el.text().split(";")
 
-        self.evos_array = []
-        evo_count_all = 1
-        for e in evos_arr:              # TODO   optimize !!!
-            e = e.replace("_", "")
-            e_arr = e.split()
-            counter = 0
-            clean_arrr = []
-            evo_count_param_vals = 0
-            passed_abbreviation = False
-            for eee in e_arr:
-                counter += 1
-                if counter > 1:
-                    if passed_abbreviation:
-                        if self.batch.comfun.can_get_float(eee):
-                            exist = 0
-                            for c in clean_arrr:
-                                if c == str(float(eee)):
-                                    exist = 1
-                            if exist == 0:
-                                clean_arrr.append(str(float(eee)))
-                                evo_count_param_vals += 1
-                else:
-                    if len(eee) == 3:
-                        eee = eee.upper()
-                        clean_arrr.append(eee)
-                        passed_abbreviation = True
+        ret = self.batch.pat.get_evolutions_from_string(self.qt_edit_line_widget.qt_edit_line.text())
 
-            if evo_count_param_vals > 0:
-                evo_count_all *= evo_count_param_vals
-
-            if passed_abbreviation:
-                self.evos_array.append(clean_arrr)
-
-        self.show_number_evolutions(evo_count_all)
-        self.evos_count = evo_count_all
+        self.evos_array = ret[1]
+        self.show_number_evolutions(ret[0])
+        self.evos_count = ret[0]
 
     def show_number_evolutions(self, nr):
         if nr <= 1:

@@ -313,6 +313,7 @@ class MainWindow(QMainWindow):
     def refresh_ui_with_reload_data(self):
         self.batch.logger.inf("reload PROJECTS")
         self.pro_ui.reload_projects_data_and_refresh_list()
+        self.pro_ui.hide_all_forms()
 
         self.batch.logger.inf("reload SCHEMAS")
         self.sch_ui.reload_schemas_data_and_refresh_list()
@@ -322,9 +323,11 @@ class MainWindow(QMainWindow):
         ret = self.batch.dfn.reload_definitions()
         self.batch.dfn.current_definition_index = cur_index
         self.sch_ui.schema_form_create.refresh_actions_ui()
+        self.sch_ui.hide_all_forms()
 
         self.batch.logger.inf("reload TASKS")
         self.tsk_ui.reload_tasks_data_and_refresh_list()
+        self.tsk_ui.hide_all_forms()
 
         self.batch.logger.inf("reload QUEUE")
         self.que_ui.reload_queue_data_and_refresh_list()

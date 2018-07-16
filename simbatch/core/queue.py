@@ -57,6 +57,24 @@ class QueueItem:
         self.proj_id = proj_id   # TODO  change to project_id
         self.soft_id = soft_id
 
+    def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
+        name = task.task_name + " "
+        if len(task.sequence) > 0:
+            name += task.sequence + "_"
+        if len(task.shot) > 0:
+            name += task.shot + "_"
+        if len(task.take) > 0:
+            name += task.take
+
+        if name[-1] == "_":
+            name = name[:-1]
+        name += "  v:"+str(task.queue_ver+1)
+        if with_sufix is not None:
+            name += with_sufix
+        if with_update:
+            self.queue_item_name = name
+        return name
+
 
 class Queue:
     batch = None
@@ -90,8 +108,14 @@ class Queue:
         print "       current queue index:{}, id:{}, total:{}".format(self.current_queue_index, self.current_queue_id,
                                                                       self.total_queue_items)
         if self.current_queue_index is not None:
-            cur_que = self.current_queue
-            print "       current queue name:{}".format(cur_que.queue_item_name)
+            self.print_queue_item(self.current_queue)
+
+    @staticmethod
+    def print_queue_item(qi):
+        print "       queue item:{}    {} {} {}     {} {}   script:{} ".format(qi.queue_item_name,
+                                                                               qi.sequence, qi.shot, qi.take,
+                                                                               qi.frame_from, qi.frame_to,
+                                                                               qi.evolution_script)
 
     def print_all(self):
         if self.total_queue_items == 0:
@@ -139,7 +163,7 @@ class Queue:
                     return index, self.queue_data[index].id
         return -1, -1
 
-    def update_state_and_node(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=0,
+    def update_state_and_node(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=None,
                               add_current_time=False):
         for i, q in enumerate(self.queue_data):
             if q.id == queue_id:
@@ -148,9 +172,19 @@ class Queue:
                 self.queue_data[i].sim_node = server_name
                 self.queue_data[i].sim_node_id = server_id
                 if add_current_time:
+                    if len(self.queue_data[i].description) > 3:
+                        if self.queue_data[i].description[0] == "[":
+                            en = self.queue_data[i].description.find("]")
+                            if en > 0:
+                                self.queue_data[i].description = self.queue_data[i].description[en+1:]
                     self.queue_data[i].description = "[{}]  {}".format(self.comfun.get_current_time(only_time=True),
                                                                        self.queue_data[i].description)
-                elif set_time > 0:
+                elif set_time is not None:
+                    if len(self.queue_data[i].description) > 3:
+                        if self.queue_data[i].description[0] == "[":
+                            en = self.queue_data[i].description.find("]")
+                            if en > 0:
+                                self.queue_data[i].description = self.queue_data[i].description[en+1:]
                     time_string = self.comfun.format_seconds_to_string(set_time)
                     self.queue_data[i].description = "[{}]  {}".format(time_string, self.queue_data[i].description)
                 return True

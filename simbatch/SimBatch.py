@@ -14,7 +14,7 @@ server = simbatch_server.SimBatchServer(simbatch, force_local=True)
 
 
 if simbatch.sts.WITH_GUI == 1:
-    main_window = ui.MainWindow(simbatch, server)
+    main_window = ui.MainWindow(server)
     main_window.show()
     main_window.post_run(loading_data_state)
 

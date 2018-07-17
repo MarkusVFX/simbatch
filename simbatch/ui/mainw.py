@@ -92,7 +92,9 @@ class TopMenuUI:
         if type(txt) is tuple:
             txt = "  ".join([str(el) for el in txt])
         if mode > 1:
-            txt = "     " + txt + "          "
+            txt = "    " + txt + "      "
+        else:
+            txt = "  " + txt
         if limit > 0:
             if len(txt) > limit:
                 txt = txt[:limit] + "  ..."
@@ -137,14 +139,14 @@ class MainWindow(QMainWindow):
 
     qt_tab_widget = None
 
-    def __init__(self, batch, server, parent=None):
+    def __init__(self, server, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.batch = batch
         self.server = server
-        self.comfun = batch.comfun
-        self.sts = batch.sts
-        self.debug_level = batch.sts.debug_level
-        self.init_ui(batch)
+        self.batch = server.batch
+        self.comfun = server.batch.comfun
+        self.sts = server.batch.sts
+        self.debug_level = server.batch.sts.debug_level
+        self.init_ui(server.batch)
 
     def init_ui(self, batch):
         current_screen_width = 800

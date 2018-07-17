@@ -320,7 +320,7 @@ class QueueUI:
             self.batch.logger.wrn(("file_to_load not exist: ", file_to_load[1]))
 
     def on_click_menu_queue_item_remove(self):
-        self.remove_queue_item()
+        self.on_click_confirmed_remove_queue_item()
 
     @staticmethod
     def on_click_menu_spacer():
@@ -351,32 +351,34 @@ class QueueUI:
         self.qt_button_sim_one.setEnabled(state)
         self.qt_button_sim_all.setEnabled(state)
 
-    def run_server_from_framework(self, loops=0):
+    def run_server_from_framework(self, mode):
         server = self.mainw.server  # .SimBatchServer(self.batch, force_local=True)
         server.force_local = True
         server.loops_counter = 0
-        server.loops_limit = loops
         server.timer_delay_seconds = 0
         server.reset_report()  # TODO
         self.simulate_buttons_state(False)
-        server.run()
+        server.run(mode)
         report = server.generate_report()  # TODO
         if report[0] > 0:
-            self.reload_queue_data_and_refresh_list()
             if report[0] == 1:
                 self.top_ui.set_top_info(server.last_info, 1)
             else:
                 self.top_ui.set_top_info(("total computed:", report[0], "   last", server.last_info), 6)
+
+            self.reload_queue_data_and_refresh_list()  # TODO check threads, pararell DB print !!!
+            self.reload_queue_data_and_refresh_list()  # TODO solve doubled refresh protection q list dupicates !!!
+
         else:
             if len(server.last_info) > 0:
                 self.top_ui.set_top_info(server.last_info, 1)
         self.simulate_buttons_state(True)
 
     def on_click_sim_one(self):
-        self.run_server_from_framework(loops=1)
+        self.run_server_from_framework("single")
 
     def on_click_sim_all(self):
-        self.run_server_from_framework()
+        self.run_server_from_framework("all")
 
     def on_click_edit(self):
         if self.edit_form_state == 0:

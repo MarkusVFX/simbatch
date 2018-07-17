@@ -529,6 +529,14 @@ class TasksUI:
                 self.batch.logger.deepdb(("not is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script))
     """
 
+    def gathering_options_from_action_widgets(self):
+        del self.qt_form_add.options[:]
+        for i, wa in enumerate(self.qt_form_add.actions_widgets_array):
+            if wa.qt_combo_param is not None:
+                opt = wa.qt_edit_line_widget.qt_edit_line.text()
+                if len(opt) >= 5:   # "BND 4"...
+                    self.qt_form_add.options.append(opt)
+
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
         current_task_id = self.batch.tsk.current_task_id
@@ -543,7 +551,13 @@ class TasksUI:
                 self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_QUEUED]
                 self.batch.tsk.save_tasks()
 
+                self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver
+
+                self.gathering_options_from_action_widgets()
+
                 form_queue_items = self.batch.tsk.generate_queue_items_from_proxy_task(evolutions=form_atq.options)
+                self.batch.logger.db((" generated !", form_queue_items, form_queue_items[0].description))
+
                 self.batch.que.add_to_queue(form_queue_items, do_save=True)
                 self.mainw.que_ui.update_all_queue()
 
@@ -553,9 +567,9 @@ class TasksUI:
 
                 self.freeze_list_on_changed = 0
                 # self.qt_form_add.update_form()
-                self.batch.tsk.update_proxy_task_form_current()
+                # self.batch.tsk.update_proxy_task_form_current()
 
-                self.batch.logger.inf(" add to queue !")
+                self.batch.logger.db(" add to queue !!!")
                 self.top_ui.set_top_info(" add to queue ", 2)
             else:
                 self.batch.logger.err("Add to queue: cant create directory !")

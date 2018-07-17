@@ -386,7 +386,6 @@ class Tasks:
     def update_proxy_task_form_current(self):
         if self.current_task is not None:
             self.update_proxy_task(self.current_task.id)
-            self.logger.db(("update_proxy_task from current:", self.current_task.id))
         else:
             self.logger.err("skipped update_proxy_task_form_current , current task is None")
 
@@ -451,21 +450,23 @@ class Tasks:
                 return None
 
             template_queue_item = self.generate_template_queue_item(task_to_add, schema_to_queued)
-
+            print "evolutions:" , evolutions
             if template_queue_item is not None:
-                if evolutions is None:
+                if evolutions is None or len(evolutions) == 0:
                     template_queue_item.generate_queue_item_name(task_to_add, with_update=True)
                     template_queue_item.evolution = ""
                     template_queue_item.evolution_script = schema_to_queued.generate_script_from_actions(self.batch)
+                    template_queue_item.description = self.proxy_task.description
                     queue_items.append(template_queue_item)
 
                 else:
                     # evolutions = ["BND 4 5 ; DMP 7"    ,      "BRN: 1 2 3"]    # example for 2 engines !!!
 
                     for i, evos in enumerate(evolutions):
-
+                        print "eeevvvooooo" , evos
                         evo_scr_arr = schema_to_queued.get_evo_scripts_array(self.batch, evos, i)
                         for j, evo_scr in enumerate(evo_scr_arr[1]):
+                            print "eeevvvo_scr ", evo_scr
                             queue_item = copy.deepcopy(template_queue_item)
 
                             queue_item.generate_queue_item_name(task_to_add, with_update=True,
@@ -476,8 +477,12 @@ class Tasks:
                             queue_item.evolution_script = schema_to_queued.generate_script_from_actions(self.batch,
                                                                                                         evos=evo_scr,
                                                                                                         evo_index=j)
-                            # queue_item.description = "["+evo_scr[0]+"] "+queue_item.description
+                            queue_item.description = "[{}] {}".format(j, self.proxy_task.description)
                             queue_items.append(queue_item)
+            else:
+                self.batch.logger.wrn("template_queue_item is None")
+        else:
+            self.batch.logger.wrn("Proxy task is None")
         return queue_items
 
     def generate_queue_items_from_task(self, task_id, evolutions=None):

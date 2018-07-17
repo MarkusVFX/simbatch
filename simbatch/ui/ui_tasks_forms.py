@@ -160,7 +160,7 @@ class TasksFormCreateOrEdit(QWidget):
         arr_index = 0
         for arrEl in self.schemas_id_array:
             if arrEl == cur_task.schema_id:
-                print " ____set edit  ", arr_index
+                # print " ____set edit  ", arr_index
                 self.qt_schema_name_combo.setCurrentIndex(arr_index)
             arr_index += 1
 
@@ -269,7 +269,7 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item = self.batch.tsk.get_blank_task()
 
 
-class AddToQueueForm (QWidget):
+class AddToQueueForm(QWidget):
     batch = None
     # form_atq_local_item = None    # obsolete
     options = []                    # all user's inputs options with parameters
@@ -284,7 +284,6 @@ class AddToQueueForm (QWidget):
     qt_lay_actions = None
 
     qt_edit_button_description = None
-    FoQuWiEvolve = None
     execute_button = None
 
     actions_widgets_array = []
@@ -333,6 +332,7 @@ class AddToQueueForm (QWidget):
         qt_edit_button_frame_to = EditLineWithButtons("end")
 
         qt_edit_button_description = EditLineWithButtons("desc", label_minimum_size=60)
+        qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_desc)
 
         qt_button_cb_add_to_queue = ButtonWithCheckBoxes("Add To Queue Now!", pin_text="pin ")
 
@@ -427,6 +427,7 @@ class AddToQueueForm (QWidget):
         qt_widget = QWidget()
         qt_widget.setLayout(wi.qt_widget_layout)
         self.qt_lay_actions.addWidget(qt_widget)
+        self.actions_widgets_array.append(wi)
         # self.qt_lay_actions.addLayout(wi.qt_widget_layout)
 
     def remove_all_action_widgets(self):
@@ -458,3 +459,8 @@ class AddToQueueForm (QWidget):
     #             el.setText( el.text()+ "; "+ evoAbbreviation + "  " )
     #
     #     self.checkEvos()
+
+    def on_edit_desc(self, txt):
+        self.batch.tsk.proxy_task.description = txt
+
+

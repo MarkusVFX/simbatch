@@ -405,6 +405,9 @@ class ActionWidgetATQ(QWidget):  # QWidget
                                                            text_on_button_1=correct_button_caption, button_width=70)
         self.qt_widget_layout.addLayout(self.qt_edit_line_widget.qt_widget_layout)
 
+    def __str__(self):
+        return "ActionWidgetATQ"
+
     def add_evo_to_line(self):
         evo_abbreviation = self.qt_combo_param.combo.currentText()[:3]
         el = self.qt_edit_line_widget.qt_edit_line
@@ -416,9 +419,9 @@ class ActionWidgetATQ(QWidget):  # QWidget
             el.setText(el.text()[:exist+4] + "_" + el.text()[exist+4:])
         else:
             if len(el.text()) < 3:
-                el.setText( evo_abbreviation + "  ")
+                el.setText(evo_abbreviation + "  ")
             else:
-                el.setText( el.text() + "; " + evo_abbreviation + "  ")
+                el.setText(el.text() + "; " + evo_abbreviation + "  ")
         self.check_evos()
 
     def check_evos(self):

@@ -158,8 +158,8 @@ class TasksFormCreateOrEdit(QWidget):
         self.qt_combo_state_names.setCurrentIndex(self.qt_combo_state_names.findText(cur_task.state))
 
         arr_index = 0
-        for arrEl in self.schemas_id_array:
-            if arrEl == cur_task.schema_id:
+        for sch_id in self.schemas_id_array:
+            if sch_id == cur_task.schema_id:
                 # print " ____set edit  ", arr_index
                 self.qt_schema_name_combo.setCurrentIndex(arr_index)
             arr_index += 1
@@ -289,7 +289,7 @@ class AddToQueueForm(QWidget):
     actions_widgets_array = []
     form_actions_count = 0
 
-    all_actions_array = []
+    all_actions_array = []   # TODO check, currently not used !!!
     comfun = None
 
     def __init__(self, batch):
@@ -419,7 +419,7 @@ class AddToQueueForm(QWidget):
                 if len(evo) <= 1:
                     wi = ActionWidgetATQ(self.batch, info, edit_txt)
                 else:
-                    wi = ActionWidgetATQ(self.batch,"    1 evolution :", edit_txt,  combo_label=info, combo_items=evo)
+                    wi = ActionWidgetATQ(self.batch, "    1 evolution :", edit_txt,  combo_label=info, combo_items=evo)
                 # wi = EditLineWithButtons("evo_" + info, edit_txt)  # TODO
             else:
                 wi = ActionWidgetATQ(self.batch, info, edit_txt)
@@ -431,8 +431,9 @@ class AddToQueueForm(QWidget):
         # self.qt_lay_actions.addLayout(wi.qt_widget_layout)
 
     def remove_all_action_widgets(self):
-        # self.actionsWidgetasArray = []
-        # self.actionsAllArray = []
+        del self.actions_widgets_array[:]
+        del self.all_actions_array[:]
+        self.form_actions_count = 0
         while self.qt_lay_actions.count() > 0:
             b = self.qt_lay_actions.itemAt(0)
             b.widget().deleteLater()
@@ -443,7 +444,6 @@ class AddToQueueForm(QWidget):
     def create_directories(self):
         # TODO
         return True
-
 
     # def add_evo_to_line(self):
     #     evoAbbreviation = self.CMB.combo.currentText()[:3]
@@ -461,6 +461,7 @@ class AddToQueueForm(QWidget):
     #     self.checkEvos()
 
     def on_edit_desc(self, txt):
-        self.batch.tsk.proxy_task.description = txt
+        if self.batch.tsk.proxy_task is not None:
+            self.batch.tsk.proxy_task.description = txt
 
 

@@ -52,7 +52,7 @@ class DefinitionsUI:
         qt_definitions_tree.setColumnWidth(1, 40)
         qt_definitions_tree.setColumnWidth(2, 70)
         # qt_definitions_tree.setHeaderHidden(True)
-        qt_definitions_tree.setHeaderLabels(["Name", "ID", "elments", "description"])
+        qt_definitions_tree.setHeaderLabels(["name", "id", "elements", "description"])
         qt_definitions_tree.currentItemChanged.connect(self.on_definitions_tree_changed)
         self.qt_definitions_tree = qt_definitions_tree
         qt_tree_lay.addWidget(qt_definitions_tree)

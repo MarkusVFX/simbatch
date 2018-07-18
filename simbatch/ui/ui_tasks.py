@@ -394,9 +394,8 @@ class TasksUI:
     def on_click_show_edit_form(self):
         if self.edit_form_state == 0:
             self.hide_all_forms()
-            if self.batch.tsk.current_task_index >= 0:
-                curr_task = self.batch.tsk.current_task
-                self.qt_form_edit.update_edit_ui(curr_task)
+            if self.batch.tsk.current_task_index is not None:
+                self.qt_form_edit.update_edit_ui(self.batch.tsk.current_task)
                 self.qt_form_edit.show()
                 self.edit_form_state = 1
             else:
@@ -420,7 +419,6 @@ class TasksUI:
             self.remove_form_state = 0
 
     def on_click_show_add_to_queue_form(self):
-        self.batch.logger.db(("on_click_add_to_queue  proj: ", self.batch.prj.current_project_id))
         if self.add_form_state == 0:
             if self.batch.tsk.current_task_id is not None:
                 self.hide_all_forms()
@@ -442,7 +440,7 @@ class TasksUI:
                                         new_task_item.sequence, new_task_item.shot, new_task_item.take,
                                         new_task_item.state, str(new_task_item.schema_ver),
                                         str(new_task_item.queue_ver), new_task_item.options, new_task_item.description)
-        qt_list_item.setBackground(QBrush(QColor("#ff8555")))   # TODO  settings color !
+        qt_list_item.setBackground(QBrush(QColor("#ff8555")))   # TODO  settings cnst val color !
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
         qt_list_item.setSizeHint(QSize(1, 24))
         self.list_tasks.addItem(qt_list_item)

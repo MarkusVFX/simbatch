@@ -14,6 +14,8 @@ except ImportError:
 
 from widgets import *
 
+from ui_queue_forms import QueueFormEdit, QueueFormRemove
+
 
 class QueueListItem(QWidget):
     def __init__(self, txt_id, txt_name, txt_user, txt_prior, txt_state, txt_evo, txt_node, txt_desc):
@@ -94,11 +96,6 @@ class QueueUI:
     edit_form_state = 0
     remove_form_state = 0
 
-    qt_edit_fe_name = None
-    qt_edit_fe_pror = None
-    qt_edit_fe_state = None
-    qt_fe_description = None
-
     freeze_list_on_changed = 0
 
     array_visible_queue_items_ids = []
@@ -140,59 +137,14 @@ class QueueUI:
         # EDIT
         # EDIT EDIT
         # EDIT EDIT EDIT
-        qt_form_edit = QWidget()
+        qt_form_edit = QueueFormEdit(self.batch, self.mainw)
         self.qt_form_edit = qt_form_edit
-        qt_form_edit_layout_ext = QVBoxLayout()
-        qt_form_edit.setLayout(qt_form_edit_layout_ext)
-
-        qt_form_edit_layout = QVBoxLayout()
-
-        # fe   form edit
-        qt_edit_button_fe_name = EditLineWithButtons("Queue item name: ")
-        qt_edit_button_fe_prior = EditLineWithButtons("Priority: ", label_minimum_size=65)
-        qt_edit_button_fe_state = EditLineWithButtons("State: ", label_minimum_size=65)
-        qt_edit_button_fe_descr = EditLineWithButtons("Description:  ", label_minimum_size=65)
-        self.qt_edit_fe_name = qt_edit_button_fe_name.qt_edit_line
-        self.qt_edit_fe_pror = qt_edit_button_fe_prior.qt_edit_line
-        self.qt_edit_fe_state = qt_edit_button_fe_state.qt_edit_line
-        self.qt_fe_description = qt_edit_button_fe_descr.qt_edit_line
-
-        qt_cb_button_save = ButtonWithCheckBoxes("Save changes", pin_text="pin")
-        qt_cb_button_save.button.clicked.connect(
-            lambda: self.on_click_save_changes(qt_edit_button_fe_name.get_txt(), qt_edit_button_fe_prior.get_txt(),
-                                               qt_edit_button_fe_state.get_txt(), qt_edit_button_fe_descr.get_txt()))
-
-        qt_form_edit_layout.addLayout(qt_edit_button_fe_name.qt_widget_layout)
-        qt_form_edit_layout.addLayout(qt_edit_button_fe_prior.qt_widget_layout)
-        qt_form_edit_layout.addLayout(qt_edit_button_fe_state.qt_widget_layout)
-        qt_form_edit_layout.addLayout(qt_edit_button_fe_descr.qt_widget_layout)
-        qt_form_edit_layout.addLayout(qt_cb_button_save.qt_widget_layout)
-
-        # TODO
-        qt_gb_edit = QGroupBox()
-        qt_gb_edit.setLayout(qt_form_edit_layout)
-        qt_form_edit_layout_ext.addWidget(qt_gb_edit)
 
         # REMOVE
         # REMOVE REMOVE
         # REMOVE REMOVE REMOVE
-        qt_form_remove = QWidget()
+        qt_form_remove = QueueFormRemove(self.batch, self.mainw)
         self.qt_form_remove = qt_form_remove
-        qt_form_remove_layout_ext = QVBoxLayout()
-        qt_form_remove.setLayout(qt_form_remove_layout_ext)
-
-        qt_form_remove_layout = QFormLayout()
-
-        qt_cb_button_remove = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?        ")
-
-        qt_form_remove_layout.addRow(" ", QLabel("   "))
-        qt_form_remove_layout.addRow(" ", qt_cb_button_remove.qt_widget_layout)
-        qt_form_remove_layout.addRow(" ", QLabel("   "))
-        qt_cb_button_remove.button.clicked.connect(self.on_click_confirmed_remove_queue_item)
-
-        qt_gb_remove = QGroupBox()
-        qt_gb_remove.setLayout(qt_form_remove_layout)
-        qt_form_remove_layout_ext.addWidget(qt_gb_remove)
 
         self.comfun.add_wigdets(qt_lay_forms, [qt_form_edit, qt_form_remove])
 
@@ -264,6 +216,7 @@ class QueueUI:
         self.batch.que.load_queue()
         self.reset_list()
         self.update_list_of_visible_ids()
+        self.hide_all_forms()
 
     def _change_current_queue_item_state_and_reset_list(self, state_id):
         self.batch.que.current_queue.state = self.sts.states_visible_names[state_id]
@@ -347,6 +300,20 @@ class QueueUI:
         self.edit_form_state = 0
         self.remove_form_state = 0
 
+    def add_queue_item_to_list(self, new_queue_item):
+        wigdet_list = self.list_queue
+        qt_list_item = QListWidgetItem(wigdet_list)
+        qt_list_item.setBackground(QBrush(QColor("#ddd")))
+        qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
+        new_queue_item = new_queue_item
+        list_item_widget = QueueListItem(str(new_queue_item.id), new_queue_item.queue_item_name, new_queue_item.user,
+                                         str(new_queue_item.prior), new_queue_item.state, new_queue_item.evolution,
+                                         new_queue_item.sim_node, new_queue_item.description)
+
+        wigdet_list.addItem(qt_list_item)
+        wigdet_list.setItemWidget(qt_list_item, list_item_widget)
+        qt_list_item.setSizeHint(QSize(1, 24))
+
     def simulate_buttons_state(self, state):
         self.qt_button_sim_one.setEnabled(state)
         self.qt_button_sim_all.setEnabled(state)
@@ -366,9 +333,8 @@ class QueueUI:
             else:
                 self.top_ui.set_top_info(("total computed:", report[0], "   last", server.last_info), 6)
 
-            self.reload_queue_data_and_refresh_list()  # TODO check threads, pararell DB print !!!
-            self.reload_queue_data_and_refresh_list()  # TODO solve doubled refresh protection q list dupicates !!!
-
+            self.reload_queue_data_and_refresh_list()  # TODO check threads, pararell DB print, duplicate items !!!
+            self.reload_queue_data_and_refresh_list()  # TODO solve doubled refresh protection (que list dupicates) !!!
         else:
             if len(server.last_info) > 0:
                 self.top_ui.set_top_info(server.last_info, 1)
@@ -382,47 +348,30 @@ class QueueUI:
 
     def on_click_edit(self):
         if self.edit_form_state == 0:
-            self.hide_all_forms()
-            self.qt_form_edit.show()
-            self.on_click_form_edit_fill()
-            self.edit_form_state = 1
+            if self.batch.que.current_queue_index is not None:
+                self.hide_all_forms()
+                self.qt_form_edit.update_edit_ui()
+                self.qt_form_edit.show()
+                self.edit_form_state = 1
+            else:
+                self.batch.logger.wrn("(on_click_edit) Please Select Queue Item")
+                self.top_ui.set_top_info("Please select queue item first", 7)
         else:
             self.qt_form_edit.hide()
             self.edit_form_state = 0
 
-    def on_click_form_edit_fill(self):
-        if self.batch.que.current_queue_index >= 0:
-            curr_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
-            self.qt_edit_fe_name.setText(curr_queue_item.queue_item_name)
-            self.qt_edit_fe_pror.setText(str(curr_queue_item.prior))
-            self.qt_edit_fe_state.setText(curr_queue_item.state)
-            self.qt_fe_description.setText(curr_queue_item.description)
-        else:
-            self.batch.logger.wrn("Please Select Queue Item")
-            self.top_ui.set_top_info(" Please Select Queue Item", 7)
-
-    def add_queue_item_to_list(self, new_queue_item):
-        wigdet_list = self.list_queue
-        qt_list_item = QListWidgetItem(wigdet_list)
-        qt_list_item.setBackground(QBrush(QColor("#ddd")))
-        qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
-        new_queue_item = new_queue_item
-        list_item_widget = QueueListItem(str(new_queue_item.id), new_queue_item.queue_item_name, new_queue_item.user,
-                                         str(new_queue_item.prior), new_queue_item.state, new_queue_item.evolution,
-                                         new_queue_item.sim_node, new_queue_item.description)
-
-        wigdet_list.addItem(qt_list_item)
-        wigdet_list.setItemWidget(qt_list_item, list_item_widget)
-        qt_list_item.setSizeHint(QSize(1, 24))
-
-    # def add_to_queue_and_update_list(self, form_atq):
-    #     pass      TODO cleanup
-
-    def on_click_save_changes(self, updated_queue_name, updated_prior, updated_state, updated_description):
-        pass
-
     def on_click_remove(self):
-        self.qt_form_remove.show()
+        if self.remove_form_state == 0:
+            if self.batch.que.current_queue_index is not None:
+                self.hide_all_forms()
+                self.qt_form_remove.show()
+                self.remove_form_state = 1
+            else:
+                self.batch.logger.wrn("(on_click_edit) Please Select Queue Item")
+                self.top_ui.set_top_info("Please select queue item first", 7)
+        else:
+            self.qt_form_remove.hide()
+            self.remove_form_state = 0
     
     def remove_queue_item(self):
         if self.current_list_item_index >= 0:

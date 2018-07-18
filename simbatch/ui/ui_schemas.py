@@ -211,7 +211,7 @@ class SchemasUI:
         ######
         #########
         self.comfun.add_wigdets(qt_lay_schema_forms, [schema_form_create, schema_form_copy, schema_form_edit,
-                                                      schema_form_remove])  # , FormTask] )
+                                                      schema_form_remove])
 
         self.hide_all_forms()
 

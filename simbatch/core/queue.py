@@ -267,6 +267,14 @@ class Queue:
             self.batch.logger.err("queue item data not removed, item not found!")
             return False
 
+    def remove_all_queue_items(self, only_done=False):
+        if only_done:
+            for qi in copy.deepcopy(self.queue_data):
+                if qi.state_id == self.batch.sts.INDEX_STATE_DONE:
+                    self.remove_single_queue_item(queue_id=qi.id)
+        else:
+            self.clear_all_queue_items(clear_stored_data=True)
+
     # prepare 'queue_data' for backup or save
     def format_queue_data(self, json=False, sql=False, backup=False):
         if json == sql == backup is False:

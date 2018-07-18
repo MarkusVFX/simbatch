@@ -123,7 +123,8 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
                             if i > 0:
                                 for par in parameters.param_list:
                                     if par.abbrev == ev_params[0]:
-                                        ap = ("obj." + par.execution_name + " = " + str(ev_param)+"; ")
+                                        ap = "<o>." + par.execution_name + " = " + str(ev_param)
+                                        ap = "interactions.set_evo_param(" + ap + "); "
                                         api = (par.abbrev + " " + str(ev_param)+" ")
                                         tmp_arr.append(ap)
                                         tmpi_arr.append(api)
@@ -165,11 +166,18 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
 
         return [], []
 
-    def generate_script_from_actions(self, batch, evos=None, evo_index=None):
+    def generate_script_from_actions(self, batch, evo_scr=None, engine_index=None):
         scr = ""
+        engines_counter = 0
         for act in self.actions_array:
-            # print act
-            scr += act.generate_script(batch, evos=evos, evo_index=evo_index, hack_NL=True)+"; "
+            if act.evos_possible is True:
+                print "zzzzeezzeezez    ", act.mode, engine_index, engines_counter
+                if engines_counter == engine_index:
+                    scr += evo_scr
+                    print "zzzeeezzz adddd", evo_scr
+                engines_counter += 1
+            scr += act.generate_script(batch, hack_NL=False) + "; "
+
         return scr
 
 
@@ -202,7 +210,7 @@ class Schemas:
         if schema is None:
             prefix = "current "
             if self.current_schema_id is not None:
-                print "\n       current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
+                print "\n     current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
                                                                                  self.current_schema_index,
                                                                                  self.total_schemas)
                 schema = self.current_schema
@@ -473,8 +481,9 @@ class Schemas:
                                 for lia in li['actions'].values():
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
                                     av = lia["actual"]
-                                    new_action = SingleAction(lia["name"], lia["desc"], lia["default"],
-                                                              lia["template"], actual_value=av, mode=lia["mode"])
+                                    new_action = SingleAction(lia["name"], lia["desc"], lia["default"], lia["template"],
+                                                              actual_value=av, mode=lia["mode"],
+                                                              evos_possible=lia["evos"])
                                     new_schema_actions.append(new_action)
                             new_schema_item = SchemaItem(int(li['id']), li['name'], int(li['stateId']), li['state'],
                                                          int(li['projId']), li['definition'], new_schema_actions,

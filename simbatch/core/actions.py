@@ -4,7 +4,7 @@ from lib.common import Logger
 ACTION_DATA_FIELDS_NAMES = (
     # ('id', 'id'),
     ('name', 'name'),
-    # ('type', 'type'),            # "single" or "group",
+    ('evos', 'evos_possible'),            # "single" or "group",
     ('mode', 'mode'),        # "ANI", "CAM", "OBJ" for 'Import' action
     # ('ui', 'ui'),        # array [["1","2"],["3","4"]]  1 primary button caption 2 function 3 secondary butt 4 sec fun
     ('default', 'default_value'),
@@ -56,7 +56,8 @@ class ActionParameters:
 class SingleAction:
     """ Single action with template"""
     name = ""
-    mode = None         # one of nCloth, nHair, Fume ...   for Maya simulate
+    evos_possible = False  # True for sim engines with evolutions possible BND, DMP, ...
+    mode = None         # one of nCloth, nHair, Fume ...   for Maya simulate    BLAST, RENDER for prev
     default_value = ""  # pattern changed when add to queue
     actual_value = ""   # var set by user or default_value, finally used for generate action_script from template
     template = ""       # use template for create absolute ...
@@ -68,10 +69,10 @@ class SingleAction:
     user_value = ""
     logger = None  # TODO  @classmethod
 
-    def __init__(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
-        # self.id = action_id
+    def __init__(self, name, description, default_value, template, actual_value=None, mode=None, ui=None,
+                 evos_possible=False):
         self.name = name
-        # self.type = type
+        self.evos_possible = evos_possible
         self.mode = mode  # subaction mode : nCloth, nHair, Fume
         self.ui = ui
         self.description = description
@@ -93,6 +94,9 @@ class SingleAction:
 
     def print_minimum(self):
         print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
+
+    def set_evos_possible(self, bool_val):
+        self.evos_possible = bool_val
 
     @staticmethod
     def unicode_arr_to_asci_str(arr):    # TODO std lib !
@@ -128,7 +132,7 @@ class SingleAction:
         return ""
     """
 
-    def generate_script(self, batch, evos=None, evo_index=None, hack_NL=False):
+    def generate_script(self, batch, hack_NL=False):
         # TODO optimize + mixed var     <dir>\custom_file.bin
         scr = "".join(self.template)
 
@@ -141,7 +145,7 @@ class SingleAction:
             if ret is not None:
                 scr = ret
 
-        scr = batch.sio.predefined.convert_undefined_to_default(scr)
+        # scr = batch.sio.predefined.convert_undefined_to_default(scr)
 
         if hack_NL:
             scr += "\n"
@@ -178,7 +182,7 @@ class MultiAction:    # old GroupedActions
         logger_raw = self.logger.raw
         logger_raw("\nname:  {}     total_actions:  {} ".format(self.name, self.actions_count))
         for i, ac in enumerate(self.actions):
-            logger_raw("  _action:  {}    desc: {} ".format(ac.name, ac.description))
+            logger_raw("   action:  {}    desc: {} ".format(ac.name, ac.description))
 
         self.logger.buffering_off()
         return self.logger.get_buffer()

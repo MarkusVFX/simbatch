@@ -370,6 +370,7 @@ class Definitions:
                                                 for key, val in ag["params"]["paramsList"].items():
                                                     new_action.parameters.add_param_to_list(key, val[0], val[1],
                                                                                             val[2], val[3])
+                                                new_action.set_evos_possible(True)
                                             new_group_action.add_single_action(new_action)
                                     else:
                                         self.batch.logger.err(("wrong action type : ", li['type']))

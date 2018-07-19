@@ -18,18 +18,21 @@ SCHEMA_ITEM_FIELDS_NAMES = [
     ]
 
 
-#  this class definition goes to definition
-# class SingleAction:
-#     def __init__(self, action_id, action_name, action_type, action_sub_type, action_param, soft_id):
-#         self.id = action_id
-#         self.action_name = action_name
-#         self.action_type = action_type    # "single" or "group"
-#         self.action_sub_type = action_sub_type
-#         self.action_param = action_param
-#         self.soft_id = soft_id
+class SchemaOptions:
+    proxy_schema = None
+
+    def __init__(self, task):
+        self.proxy_schema = copy.deepcopy(task)
+
+    def set_action_value(self, action_name, val, occurrence):
+        # TODO  try , check attrib exist....
+        action_index = self.proxy_schema.get_action_index_by_name(action_name, occurrence=occurrence)
+        action_value = self.proxy_schema.actions_array[action_index].actual_value
+        setattr(action_value, param, val)
+        return True  # TODO
 
 
-class SchemaItem:   # TODO SingleSchema name refactor !?!?
+class SchemaItem:
     """ Single schema """
     id = None
     schema_name = None
@@ -82,6 +85,18 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
     def add_action_to_schema(self, single_action_object):
         self.actions_array.append(single_action_object)
 
+    def get_action_index_by_name(self, name, occurrence=None):
+        occurr_count = 0
+        for i, act in enumerate(self.actions_array):
+            if act.name == name:
+                if occurrence is None:
+                    return i
+                else:
+                    occurr_count += 1
+                    if occurr_count == occurrence:
+                        return i
+        return None
+
     # def actions_to_string(self):
     #     for a in self.actions_array:
     #         self.actions_string += a + "|"
@@ -97,6 +112,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
     #             arr_out.append(SingleAction(int(arr2[0]), int(arr2[1]), arr2[2], arr2[3], arr2[4]))
     #     self.actions_array = arr_out
 
+    """ marker ATQ 212   get evo scripts   """
     def get_evo_scripts_array(self, batch, evos_str, engine_index):
         count_actions_with_evos = 0
         for act in self.actions_array:
@@ -123,6 +139,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
                             if i > 0:
                                 for par in parameters.param_list:
                                     if par.abbrev == ev_params[0]:
+                                        """ marker ATQ 214   generate evo param script   """
                                         ap = "<o>." + par.execution_name + " = " + str(ev_param)
                                         ap = "interactions.set_evo_param(" + ap + "); "
                                         api = (par.abbrev + " " + str(ev_param)+" ")
@@ -166,6 +183,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
 
         return [], []
 
+    """ marker ATQ 230   generate script from actions  """
     def generate_script_from_actions(self, batch, evo_scr=None, engine_index=None):
         scr = ""
         engines_counter = 0
@@ -176,7 +194,7 @@ class SchemaItem:   # TODO SingleSchema name refactor !?!?
                     scr += evo_scr
                     print "zzzeeezzz adddd", evo_scr
                 engines_counter += 1
-            scr += act.generate_script(batch, hack_NL=False) + "; "
+            scr += act.generate_script_from_template(batch, hack_NL=False) + "; "
 
         return scr
 
@@ -575,3 +593,8 @@ class Schemas:
                 self.batch.logger.err(("wrong proj ID: ", proj_target_id))
         else:
             self.batch.logger.err(("wrong sch nr: ", source_schema_index))
+
+    def create_schema_options_object(self, schema):
+        if schema is None:
+            schema = self.current_schema
+        return SchemaOptions(schema)

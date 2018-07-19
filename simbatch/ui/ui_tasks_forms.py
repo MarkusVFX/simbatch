@@ -271,7 +271,7 @@ class TasksFormCreateOrEdit(QWidget):
 
 class AddToQueueForm(QWidget):
     batch = None
-    # form_atq_local_item = None    # obsolete
+    comfun = None
     options = []                    # all user's inputs options with parameters
 
     qt_edit_button_frame_from = None
@@ -289,8 +289,7 @@ class AddToQueueForm(QWidget):
     actions_widgets_array = []
     form_actions_count = 0
 
-    all_actions_array = []   # TODO check, currently not used !!!
-    comfun = None
+    # all_actions_array = []   # TODO check, currently not used !!!
 
     def __init__(self, batch):
         QWidget.__init__(self)
@@ -432,7 +431,7 @@ class AddToQueueForm(QWidget):
 
     def remove_all_action_widgets(self):
         del self.actions_widgets_array[:]
-        del self.all_actions_array[:]
+        # del self.all_actions_array[:]
         self.form_actions_count = 0
         while self.qt_lay_actions.count() > 0:
             b = self.qt_lay_actions.itemAt(0)

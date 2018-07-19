@@ -30,11 +30,73 @@ class PredefinedVariables:
     def __init__(self, batch):
         self.batch = batch
 
-    # convert predefined variable into final value
-    def convert_var_to_val(self, var, template):
+    """ marker ATQ 242   convert var to val in command   """
+    def convert_var_to_val_in_command(self, command, ei_str):
+        for key, predefined_item in self.predefined.items():
+            print "______", key, predefined_item, "___ comm:", command
+            key_plus = "<"+key+">"
+            if command.find(key_plus) > 0:
+                function_to_eval = "self.{}({})".format(predefined_item["function"], ei_str)
+                print "\n\n found var to val ",  key_plus  ,  function_to_eval
+                try:
+                    eval_ret = eval(function_to_eval)
+                    print "    eval_ret found var to val ", eval_ret
+                    # return template.replace("<" + self.predefined[var]["type"] + ">", eval_ret)
+
+                    print "    ommand  ", command, predefined_item["function"],  predefined_item["type"] , eval_ret
+                    print "    rrreeee  ", command.replace("<" + predefined_item["type"] + ">", eval_ret)
+                    return command.replace("<" + predefined_item["type"] + ">", eval_ret)
+                except ValueError:
+                    # TODO ex
+                    return command
+            return command
+
+
+    # convert predefined variable into final value command by command
+    """ marker ATQ 240   convert var to val in script  """
+    def convert_var_to_val_in_script(self, script, evo_index=None):
+        script_out = ""
+        if evo_index is None:
+            ei_str = ""
+        else:
+            ei_str = "evo_index=" + str(evo_index)
+
+        script_splited_arr = script.split(";")
+        for scr_command in script_splited_arr:   # protect replace key according to type
+            if len(scr_command) > 2:
+                script_out += self.convert_var_to_val_in_command(scr_command, ei_str) + ";"
+                zzz = self.convert_var_to_val_in_command(scr_command, ei_str)
+                print " ccc c ccccccc c c c c c c c c c cc ",len(scr_command) , "___" , zzz , "mmm\n"
+        return script_out
+
+
+
+        #def convert_var_to_val(self, var, template, evo_index=None):
+
+        """
+        st = self.default_value.find("<")
+        if st >= 0:
+            en = self.default_value.find(">")
+            val = self.default_value[st + 1:en]
+            # TODO detect multi <option>
+            ret = batch.sio.predefined.convert_var_to_val(val, scr)
+            if ret is not None:
+                scr = ret
+        """
+
+
         #  TODO multi val in var
+
+
+        """
+        if evo_index is None:
+            ei_str = ""
+        else:
+            ei_str = "evo_index=" + str(evo_index)
+            
+        var = "xxxxx"
         if var in self.predefined:
-            function_to_eval = "self." + self.predefined[var]["function"] + "()"
+            function_to_eval = "self.{}({})".format(self.predefined[var]["function"], ei_str)
             try:
                 eval_ret = eval(function_to_eval)
                 return template.replace("<"+self.predefined[var]["type"]+">", eval_ret)
@@ -43,109 +105,117 @@ class PredefinedVariables:
                 return None
         else:
             return None
+        """
 
-    def convert_undefined_to_default(self, template):
+    """ marker ATQ 250   convert undefined to default   """
+    def convert_undefined_to_default(self, template, evo_index=None):
         # TODO optimize !
         # for de in self.defaults:
-        for key, get_default in self.defaults.items():
-            check = "<"+key+">"
-            if template.find(check) > 0:
-                # print "check", check ,  "   get_default: " , get_default
-                try:
-                    function_to_eval = "self." + get_default + "()"
-                    eval_ret = eval(function_to_eval)
-                    # print "eval_ret", eval_ret
-                    template = template.replace(check, str(eval_ret))
-                except ValueError:
-                    # TODO ex
-                    pass
+        if evo_index is None:
+            ei_str = ""
+        else:
+            ei_str = "evo_index=" + str(evo_index)
+
+        if template is not None:
+            for key, get_default in self.defaults.items():
+                check = "<"+key+">"
+                if template.find(check) > 0:
+                    # print "check", check ,  "   get_default: " , get_default
+                    try:
+                        function_to_eval = "self.{}({})".format(get_default, ei_str)
+                        eval_ret = eval(function_to_eval)
+                        # print "eval_ret", eval_ret
+                        template = template.replace(check, str(eval_ret))
+                    except ValueError:
+                        # TODO ex
+                        pass
         return template
 
-    def get_schema_base_setup(self):
+    def get_schema_base_setup(self, evo_index=None):
         ret = self.batch.sio.generate_base_setup_file_name()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_cache_dir(self):
+    def get_shot_cache_dir(self, evo_index=None):
         ret = self.batch.sio.generate_shot_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_cam_dir(self):
+    def get_shot_cam_dir(self, evo_index=None):
         ret = self.batch.sio.generate_shot_cam_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_camera_file(self):
+    def get_shot_camera_file(self, evo_index=None):
         ret = self.batch.sio.generate_shot_camera_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_prev_file(self):
+    def get_shot_prev_file(self, evo_index=None):
         ret = self.batch.sio.generate_shot_prev_file()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_props_path(self):
+    def get_project_props_path(self, evo_index=None):
         ret = self.batch.sio.generate_project_props_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_simed_setup(self):
-        ret = self.batch.sio.generate_shot_simed_setup()
+    def get_shot_simed_setup(self, evo_index=None):
+        ret = self.batch.sio.generate_shot_simed_setup(evo_index=evo_index)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_scripts_path(self):
+    def get_scripts_path(self, evo_index=None):
         ret = self.batch.sio.generate_scripts_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_sim_time_start(self):
+    def get_sim_time_start(self, evo_index=None):
         return self.batch.tsk.current_task.sim_frame_start
 
-    def get_sim_time_end(self):
+    def get_sim_time_end(self, evo_index=None):
         return self.batch.tsk.current_task.sim_frame_end
 
-    def get_prev_time_start(self):
+    def get_prev_time_start(self, evo_index=None):
         return self.batch.tsk.current_task.prev_frame_start
 
-    def get_prev_time_end(self):
+    def get_prev_time_end(self, evo_index=None):
         return self.batch.tsk.current_task.prev_frame_end
 
-    def get_working_directory(self):
+    def get_working_directory(self, evo_index=None):
         ret = self.batch.prj.current_project.working_directory_absolute
         if ret is not None:
             return ret
         else:
             return ""
 
-    def get_default_file(self):
+    def get_default_file(self, evo_index=None):
         return "[default_file]"
 
-    def get_default_object(self):
+    def get_default_object(self, evo_index=None):
         return "[default_object]"
 
-    def get_default_param(self):
+    def get_default_param(self, evo_index=None):
         return "[default_param]"
 
-    def get_default_value(self):
+    def get_default_value(self, evo_index=None):
         return "[default_value]"
 
 
@@ -278,10 +348,13 @@ class StorageInOut:
 
             return 1, shot_dir
 
-    def generate_shot_simed_setup(self, ver=0):
+    def generate_shot_simed_setup(self, ver=0, evo_index=None):
         ret = self.generate_shot_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1]
+            evo_inject =""
+            if evo_index is not None:
+                evo_inject = "evo_"+str(evo_index)+"__"
             schema_name = self.batch.sch.current_schema.schema_name
             schema_flat_name = self.get_flat_name(schema_name)
             ret_file_and_path += "simed_setup"+self.dir_separator
@@ -289,7 +362,7 @@ class StorageInOut:
                 ver = self.batch.tsk.current_task.queue_ver
             file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_setup_ext()
-            ret_file_and_path += schema_flat_name + "__simed__v" + file_version + "." + file_ext
+            ret_file_and_path += schema_flat_name + "__simed__" + evo_inject + "v" + file_version + "." + file_ext
             return ret[0], ret_file_and_path
         return ret
 

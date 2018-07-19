@@ -527,17 +527,19 @@ class TasksUI:
                 self.batch.logger.deepdb(("not is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script))
     """
 
+    """ marker ATQ 100   gathering options   """
     def gathering_options_from_action_widgets(self):
         del self.qt_form_add.options[:]
         for i, wa in enumerate(self.qt_form_add.actions_widgets_array):
             if wa.qt_combo_param is not None:
                 opt = wa.qt_edit_line_widget.qt_edit_line.text()
-                if len(opt) >= 5:   # "BND 4"...
+                if len(opt) >= 5:   # "BND 4"...  # TODO  protection empty BND; SHR;
                     self.qt_form_add.options.append(opt)
 
+    """ marker ATQ 010   on click add   """
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
-        current_task_id = self.batch.tsk.current_task_id
+        # current_task_id = self.batch.tsk.current_task_id
         current_task = self.batch.tsk.current_task
         if current_task is not None:
             ret = form_atq.create_directories()

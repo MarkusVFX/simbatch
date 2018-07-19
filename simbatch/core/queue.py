@@ -57,6 +57,7 @@ class QueueItem:
         self.proj_id = proj_id   # TODO  change to project_id
         self.soft_id = soft_id
 
+    """ marker ATQ 220   generate name   """
     def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
         name = task.task_name + " "
         if len(task.sequence) > 0:
@@ -68,7 +69,7 @@ class QueueItem:
 
         if name[-1] == "_":
             name = name[:-1]
-        name += "  v:"+str(task.queue_ver+1)
+        name += "  v:"+str(task.queue_ver)
         if with_sufix is not None:
             name += with_sufix
         if with_update:

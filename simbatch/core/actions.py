@@ -132,24 +132,12 @@ class SingleAction:
         return ""
     """
 
-    def generate_script(self, batch, hack_NL=False):
+    """ marker ATQ 235   generate script from temlpate   """
+    def generate_script_from_template(self, batch, hack_NL=False):
         # TODO optimize + mixed var     <dir>\custom_file.bin
         scr = "".join(self.template)
-
-        st = self.default_value.find("<")
-        if st >= 0:
-            en = self.default_value.find(">")
-            val = self.default_value[st+1:en]
-            # TODO detect multi <option>
-            ret = batch.sio.predefined.convert_var_to_val(val, scr)
-            if ret is not None:
-                scr = ret
-
-        # scr = batch.sio.predefined.convert_undefined_to_default(scr)
-
         if hack_NL:
             scr += "\n"
-
         return scr
 
 

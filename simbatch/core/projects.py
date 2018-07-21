@@ -128,7 +128,7 @@ class Projects:
         return "Projects(SimBatch())"
 
     def __str__(self):
-        return "current_project_id:{}   total_projects:{}".format(self.current_project_id, self.total_projects)
+        return "Projects, current_project_id:{}  total_projects:{}".format(self.current_project_id, self.total_projects)
 
     #  print project data, for debug
     def print_current(self):

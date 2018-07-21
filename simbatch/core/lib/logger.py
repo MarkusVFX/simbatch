@@ -35,13 +35,13 @@ class Logger:
             indent = ""
             prefix = "ERR"
         elif level == 4:
-            indent = "    _"
+            indent = "     "
             prefix = "DB"
         elif level == 5:
-            indent = "    ___"
+            indent = "     __"
             prefix = "deep"
         elif level == 6:
-            indent = "    ___"
+            indent = "     __"
             prefix = "LOG"
         else:
             indent = "'"
@@ -52,9 +52,9 @@ class Logger:
         elif console_print:
             if type(message) is tuple:
                 out = "  ".join([str(el) for el in message])
-                print "{}[{}] {}".format(indent, prefix, out)
+                print "{}[{}]  {}".format(indent, prefix, out)
             else:
-                print "{}[{}] {}".format(indent, prefix, message)
+                print "{}[{}]  {}".format(indent, prefix, message)
 
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)

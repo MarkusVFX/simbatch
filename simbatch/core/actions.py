@@ -29,7 +29,7 @@ class SingleParameter:    # "STR": ["stretch", "stretchResistance", 40, "stretch
         self.description = description
 
     def __str__(self):
-        return "SingleParameter"
+        return "SingleParameter    name:" + self.name
 
     def print_minimum(self):
         print "   {}   name: {}".format(self.abbrev, self.name)
@@ -90,7 +90,7 @@ class SingleAction:
                                                                                          self.actual_value, self.ui)
 
     def __str__(self):
-        return "SingleAction"
+        return "SingleAction  " + self.name
 
     def print_minimum(self):
         print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
@@ -162,7 +162,7 @@ class MultiAction:    # old GroupedActions
         return "MultiAction({},{})".format(self.name, self.name)
 
     def __str__(self):
-        return "MultiAction"
+        return "MultiAction  name:" + self.name
 
     def print_actions(self):
         self.logger.clear_buffer()

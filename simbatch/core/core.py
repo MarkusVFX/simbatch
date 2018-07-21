@@ -37,15 +37,15 @@ class SimBatch:
                 self.os = None
 
         # abbreviation for very often used variables, helping with identification the main modules
-        self.usr = Users(self)         # usr
-        self.prj = Projects(self)      # prj
-        self.sch = Schemas(self)       # sch
-        self.tsk = Tasks(self)         # tsk
-        self.que = Queue(self)         # que
-        self.nod = SimNodes(self)      # nod
-        self.dfn = Definitions(self)   # dfn
-        self.sio = StorageInOut(self)  # sio
-        self.pat = Patterns()          # pat
+        self.usr = Users(self, mode=1)  # usr  """ users are fully implemented in Pro version """
+        self.prj = Projects(self)       # prj
+        self.sch = Schemas(self)        # sch
+        self.tsk = Tasks(self)          # tsk
+        self.que = Queue(self)          # que
+        self.nod = SimNodes(self)       # nod
+        self.dfn = Definitions(self)    # dfn
+        self.sio = StorageInOut(self)   # sio
+        self.pat = Patterns()           # pat
         #  abbreviation  END
 
         self.logger.inf("SimBatch started")

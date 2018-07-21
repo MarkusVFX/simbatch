@@ -19,16 +19,20 @@ SCHEMA_ITEM_FIELDS_NAMES = [
 
 
 class SchemaOptions:
+    """ class used for store and exchange options on "add to queue process" """
+    """ marker SO (SchemaOptions)   class   """
+
     proxy_schema = None
 
-    def __init__(self, task):
-        self.proxy_schema = copy.deepcopy(task)
+    def __init__(self, schema):
+        self.proxy_schema = copy.deepcopy(schema)
 
-    def set_action_value(self, action_name, val, occurrence):
+    def set_action_value(self, action_name, val, occurrence=None):
         # TODO  try , check attrib exist....
         action_index = self.proxy_schema.get_action_index_by_name(action_name, occurrence=occurrence)
-        action_value = self.proxy_schema.actions_array[action_index].actual_value
-        setattr(action_value, param, val)
+        # action_value = self.proxy_schema.actions_array[action_index].actual_value
+        self.proxy_schema.actions_array[action_index].actual_value = val
+        # setattr(action_value, param, val)
         return True  # TODO
 
 
@@ -60,6 +64,9 @@ class SchemaItem:
         self.description = description
         # self.actions_to_string()
         soft_name = "Maya_TODO"  # TODO
+
+    def __str__(self):
+        return "SchemaItem   id:{}  name:{}".format(self.id, self.schema_name)
 
     def basic_print(self):
         print "\n [INF] basic print: "
@@ -182,21 +189,6 @@ class SchemaItem:
                 count_actions_with_evos += 1
 
         return [], []
-
-    """ marker ATQ 230   generate script from actions  """
-    def generate_script_from_actions(self, batch, evo_scr=None, engine_index=None):
-        scr = ""
-        engines_counter = 0
-        for act in self.actions_array:
-            if act.evos_possible is True:
-                print "zzzzeezzeezez    ", act.mode, engine_index, engines_counter
-                if engines_counter == engine_index:
-                    scr += evo_scr
-                    print "zzzeeezzz adddd", evo_scr
-                engines_counter += 1
-            scr += act.generate_script_from_template(batch, hack_NL=False) + "; "
-
-        return scr
 
 
 class Schemas:
@@ -594,7 +586,8 @@ class Schemas:
         else:
             self.batch.logger.err(("wrong sch nr: ", source_schema_index))
 
-    def create_schema_options_object(self, schema):
+    """ marker SO (SchemaOptions)   create object   """
+    def create_schema_options_object(self, schema=None):
         if schema is None:
             schema = self.current_schema
         return SchemaOptions(schema)

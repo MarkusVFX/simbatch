@@ -27,6 +27,8 @@ TASK_ITEM_FIELDS_NAMES = [
 
 
 class TaskOptions:
+    """ class used for store and exchange options on "add to queue process" """
+    """ marker TO (TaskOptions)   class   """
     proxy_task = None
 
     def __init__(self, task):
@@ -132,6 +134,11 @@ class Tasks:
                 return i
         self.batch.logger.wrn(("no task with ID: ", get_id))
         return None
+
+    def get_task_by_id(self, task_id):
+        index = self.get_index_by_id(task_id)
+        if index is not None:
+            return self.tasks_data[index]
 
     def update_current_from_id(self, get_id):
         for i, tsk in enumerate(self.tasks_data):
@@ -392,6 +399,12 @@ class Tasks:
     # # # # #
     # section #      adding task to queue
 
+    """ marker TO (TaskOptions)   create object   """
+    def create_task_options_object(self, task=None):
+        if task is None:
+            task = self.current_task
+        return TaskOptions(task)
+
     def clear_proxy_task(self):
         self.proxy_task = None
 
@@ -425,32 +438,14 @@ class Tasks:
         if description is not None:
             self.proxy_task.description = description
 
-    """ marker ATQ 210   generate template   """
-    def generate_template_queue_item(self, task, schema, task_options):
-        # TODO
-        # TODO   WIP
-        # task_index = self.batch.tsk.get_index_by_id(task_id)
-        # if task_index is not None:
-
-        if self.proxy_task is not None:
-            current_time = ""
-            proxy_queue_item = QueueItem(0, "template queue item", task.id, "U", 0, task.sequence,
-                                         task.shot, task.take, task.sim_frame_start,
-                                         task.sim_frame_end,
-                                         self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_WAITING],
-                                         self.batch.sts.INDEX_STATE_WAITING, task.queue_ver,
-                                         "evo", 0, "evo_script", task.priority,
-                                         "", "", -1, current_time, task.project_id, schema.soft_name)
-            return proxy_queue_item
-        else:
-            return None
-
+    """
     def generate_evo_script(self, hymm):
         self.batch.logger.wrn(" TODO generate_evo_script ")
         return " eval("+hymm+") ...  WIP  TODO "   # TODO
+    """
 
-    """ marker ATQ 200   generate queue items   """
-    def generate_queue_items_from_proxy_task(self, evolutions=None, schema_options=None, task_options=None):
+    """
+    def generate_queue_items_from_proxy_task_XXX(self, evolutions=None, schema_options=None, task_options=None):
         # TODO   WIP
         queue_items = []
 
@@ -465,23 +460,26 @@ class Tasks:
 
             if schema_options is None:
                 schema_options = self.batch.sch.create_schema_options_object(schema_to_queued)
+            schema_options_proxy = schema_options.proxy_schema
 
             if task_options is None:
                 task_options = self.batch.tsk.create_task_options_object(task_to_add)
+            task_options_proxy = task_options.proxy_task
 
-            template_queue_item = self.generate_template_queue_item(task_to_add, schema_to_queued, task_options)
+            "" marker SO (SchemaOptions)   send to compile   ""
+            "" marker TO (TaskOptions)   send to compile   ""
+            template_queue_item = self.generate_template_queue_item(task_to_add, schema_to_queued, task_options_proxy)
             print "evolutions:" , evolutions  ### ['Bnd 111 222']
             if template_queue_item is not None:
                 if evolutions is None or len(evolutions) == 0:
                     template_queue_item.generate_queue_item_name(task_to_add, with_update=True)
                     template_queue_item.evolution = ""
 
-
+                    #script = schema_to_queued.generate_script_from_actions(self.batch)
+                    #script = self.batch.sio.predefined.convert_var_to_val_in_script(script)
+                    #script = self.batch.sio.predefined.convert_undefined_to_default(script)
                     script = schema_to_queued.generate_script_from_actions(self.batch)
-                    script = self.batch.sio.predefined.convert_var_to_val_in_script(script)
-                    script = self.batch.sio.predefined.convert_undefined_to_default(script)
                     template_queue_item.evolution_script = script
-
 
                     template_queue_item.description = self.proxy_task.description
                     queue_items.append(template_queue_item)
@@ -490,8 +488,11 @@ class Tasks:
                     # evolutions = [  "BND 4 5; DMP 7"  ,      "BRN: 1 2 3"  ]    # example for 2 engines !!!
                     for engine_index, evos in enumerate(evolutions):
                         print "eeevvvooooo" , evos  ### Bnd 111 222
-                        evo_scr_arr = schema_to_queued.get_evo_scripts_array(self.batch, evos, engine_index)
-                        for j, evo_scr in enumerate(evo_scr_arr[1]):
+                        inject_evo_scr_arr = schema_to_queued.get_evo_scripts_array(self.batch, evos, engine_index)
+                        print "schema_to_queued ", schema_to_queued
+                        print "schema_to_queued a arr ", schema_to_queued.actions_array
+                        print "evo_scr_arr ", inject_evo_scr_arr
+                        for j, evo_scr in enumerate(inject_evo_scr_arr[1]):
                             j1 = j+1
                             print "eeevvvo_scr ", evo_scr   ### interactions.set_evo_param(<o>.bendResistance = 111.0);
                             queue_item = copy.deepcopy(template_queue_item)
@@ -499,24 +500,17 @@ class Tasks:
                             queue_item.generate_queue_item_name(task_to_add, with_update=True,
                                                                 with_sufix=" [e:"+str(j1)+"]")
                             # queue_item.evolution = "["+str(i)+"] "+evo_scr[0]
-                            queue_item.evolution = evo_scr_arr[0][j]
+                            queue_item.evolution = inject_evo_scr_arr[0][j]
                             queue_item.evolution_nr = engine_index
 
                             script = schema_to_queued.generate_script_from_actions(self.batch, evo_scr=evo_scr,
                                                                                    engine_index=engine_index)
 
-
-
+                            print "\n\n zzzz SCR : \n", script
 
                             script = self.batch.sio.predefined.convert_var_to_val_in_script(script, evo_index=j1)
                             # script = self.batch.sio.predefined.convert_undefined_to_default(script, evo_index=j1)
                             queue_item.evolution_script = script
-
-
-
-
-
-
 
                             # queue_item.description = "[{}] {}".format(j, self.proxy_task.description)
                             queue_item.description = self.proxy_task.description
@@ -526,28 +520,28 @@ class Tasks:
         else:
             self.batch.logger.wrn("Proxy task is None")
         return queue_items
+    """
 
-    def generate_queue_items_from_task(self, task_id, evolutions=None):
+    """ marker ATQ 010b   on API command   """
+    """
+    def generate_queue_items_from_task(self, task_id, evolutions=None, schema_options=None, task_options=None):
         self.update_proxy_task(task_id)
-        return self.generate_queue_items_from_proxy_task(evolutions=evolutions)
+        return self.generate_queue_items_from_proxy_task(evolutions=evolutions, schema_options=schema_options,
+                                                         task_options=task_options)
+    """
+    # def apply_evolutions_to_task(self, evo, task=None):
+        # if task is None:
+        #     task = self.proxy_task
 
-    def apply_evolutions_to_task(self, evo, task=None):
-        if task is None:
-            task = self.proxy_task
+        # task.schema_id
+        #  task.schema_ver
 
-        task.schema_id
-        task.schema_ver
-
-        self.proxy_task_evos
+        # self.proxy_task_evos
 
         # add_to_queue
         # get_blank_task
         # self.batch.que.add_to_queue()
 
-    def create_task_options_object(self, task):
-        if task is None:
-            task = self.current_task
-        return TaskOptions(task)
 
 
 

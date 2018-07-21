@@ -245,7 +245,9 @@ class SchemaFormCreateOrEdit(QWidget):
             # first_action = multi_action.actions[0]
 
             if multi_action.actions_count == 1:   # single action, no combo
-                multi_action.actions[0].actual_value = multi_action.actions[0].default_value   # TODO actual vs user val
+                # print "ui ui ui ", multi_action.actions[0].actual_value , "___" , multi_action.actions[0]
+                if len(multi_action.actions[0].actual_value) == 0:
+                    multi_action.actions[0].actual_value = multi_action.actions[0].default_value   # TODO actual vs user val
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.actions[0].name,
                                              copy.deepcopy(multi_action),
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
@@ -254,6 +256,7 @@ class SchemaFormCreateOrEdit(QWidget):
             else:            # multi action :  import ANI, CAM, ENV
                 for i, a in enumerate(multi_action.actions):
                     combo_items.append(a.mode)
+
                     a.actual_value = a.default_value    # TODO actual vs user val
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.name,
                                              copy.deepcopy(multi_action),
@@ -367,6 +370,9 @@ class SchemaFormCreateOrEdit(QWidget):
                 act = schema_item.actions_array[i]
                 ret = wi.qt_combo.findText(act.mode)
                 wi.qt_combo.setCurrentIndex(ret)
+                wi.qt_edit.setText(act.actual_value)
+            else:
+                act = schema_item.actions_array[i]
                 wi.qt_edit.setText(act.actual_value)
 
     """ on change schema item and show form """

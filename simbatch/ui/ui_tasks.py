@@ -536,7 +536,7 @@ class TasksUI:
                 if len(opt) >= 5:   # "BND 4"...  # TODO  protection empty BND; SHR;
                     self.qt_form_add.options.append(opt)
 
-    """ marker ATQ 010   on click add   """
+    """ marker ATQ 010a   on click add   """
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
         # current_task_id = self.batch.tsk.current_task_id
@@ -555,11 +555,22 @@ class TasksUI:
 
                 self.gathering_options_from_action_widgets()
 
-                form_queue_items = self.batch.tsk.generate_queue_items_from_proxy_task(evolutions=form_atq.options)
-                self.batch.logger.db((" generated !", form_queue_items, form_queue_items[0].description))
-
-                self.batch.que.add_to_queue(form_queue_items, do_save=True)
-                self.mainw.que_ui.update_all_queue()
+                """ marker TO     TODO"""
+                schema_options = None
+                task_options = None
+                form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id,
+                                                                       evolutions=form_atq.options,
+                                                                       schema_options=schema_options,
+                                                                       task_options=task_options)
+                if form_queue_items is not None:
+                    self.batch.logger.db((" generated !", form_queue_items, form_queue_items[0].description))
+                    self.batch.que.add_to_queue(form_queue_items, do_save=True)
+                    self.mainw.que_ui.update_all_queue()
+                else:
+                    self.batch.logger.wrn((" queue items NOT generated !", self.batch.tsk.current_task.id))
+                    self.batch.tsk.current_task.state_id = self.sts.INDEX_STATE_ERROR
+                    self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_ERROR]
+                    self.batch.tsk.save_tasks()
 
                 self.freeze_list_on_changed = 1
                 self.last_task_list_index = -1
@@ -569,8 +580,11 @@ class TasksUI:
                 # self.qt_form_add.update_form()
                 # self.batch.tsk.update_proxy_task_form_current()
 
-                self.batch.logger.db(" add to queue !!!")
-                self.top_ui.set_top_info(" add to queue ", 2)
+                if form_queue_items is not None:
+                    self.batch.logger.db(" add to queue !!!")
+                    self.top_ui.set_top_info(" added to queue ", 2)
+                else:
+                    self.top_ui.set_top_info("Items not added to queue !", 9)
             else:
                 self.batch.logger.err("Add to queue: cant create directory !")
                 self.top_ui.set_top_info(" ERR: cant create directory ", 9)

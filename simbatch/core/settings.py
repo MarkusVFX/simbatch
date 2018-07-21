@@ -45,7 +45,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.40"   # current version
+    SIMBATCH_VERSION = "v0.2.42"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -109,7 +109,7 @@ class Settings:
     state_colors_up = []    # selected item list colors
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
-    force_start_tab = 3     # if > 0 show tab with this index after run
+    force_start_tab = 0     # if > 0 show tab with this index after run
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1

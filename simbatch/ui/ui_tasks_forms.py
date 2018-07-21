@@ -408,7 +408,15 @@ class AddToQueueForm(QWidget):
                 #     for a in mac.actions:
                 #         evolution.append(a.parameters.name)
 
-                self.add_action_widget_to_form(act.name+act_name_sufix, act.actual_value, evo=evolution)
+                check_str = str(act.default_value)
+                check_str = str(act.actual_value)
+                val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str)
+                print " ret ret ret" , val_str
+                if val_str is None:
+                    val_str = "None"
+                # act.actual_value = ret
+
+                self.add_action_widget_to_form(act.name+act_name_sufix, val_str, evo=evolution)
 
     def add_action_widget_to_form(self, info, edit_txt=None, evo=None):
         if edit_txt is None and evo is None:

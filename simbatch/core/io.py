@@ -8,12 +8,17 @@ class PredefinedVariables:
     predefined = {
         "schema_base_setup": {"type": "f", "function": "get_schema_base_setup"},
         "shot_cache_dir": {"type": "d", "function": "get_shot_cache_dir"},
+        "project_cache_dir": {"type": "d", "function": "get_project_cache_dir"},
         "shot_cam_dir": {"type": "d", "function": "get_shot_cam_dir"},
         "project_props_dir": {"type": "d", "function": "get_project_props_dir"},
         "shot_camera_file": {"type": "f", "function": "get_shot_camera_file"},
         "shot_prev_file": {"type": "f", "function": "get_shot_prev_file"},
         "shot_simed_setup": {"type": "f", "function": "get_shot_simed_setup"},
-        "scripts_dir": {"type": "d", "function": "get_scripts_dir"}
+        "scripts_dir": {"type": "d", "function": "get_scripts_dir"},
+        "shot_dir": {"type": "x", "function": "get_shot_dir"},
+        "working_dir": {"type": "x", "function": "get_working_dir"},
+        "schema_name": {"type": "x", "function": "get_schema_name"},
+        "shot_name": {"type": "x", "function": "get_shot_name"}
     }
     defaults = {
         "sim_ts": "get_sim_time_start",
@@ -30,17 +35,36 @@ class PredefinedVariables:
     def __init__(self, batch):
         self.batch = batch
 
+    def convert_predefined_variables_to_values(self, check_str, param=""):
+        for key, predefined_item in self.predefined.items():
+            key_plus = "<" + key + ">"
+            if check_str.find(key_plus) >= 0:
+                function_to_eval = "self.{}({})".format(predefined_item["function"], param)
+                print "\n\n found var to val ", key_plus, function_to_eval , "___  in ___" , check_str
+                try:
+                    eval_ret = eval(function_to_eval)
+                    # print "    ommand  ", check_str, predefined_item["function"],  predefined_item["type"] , eval_ret
+                    # print "    orrreeee  ", check_str.replace("<" + predefined_item["type"] + ">", eval_ret)
+                    check_str = check_str.replace(key_plus, eval_ret)
+                    # "<" + predefined_item["type"] + ">"
+                except ValueError:
+                    pass
+                    # TODO ex
+                    # return check_str
+        return check_str
+
+
     """ marker ATQ 242   convert var to val in command   """
     def convert_var_to_val_in_command(self, command, ei_str):
         for key, predefined_item in self.predefined.items():
-            print "______", key, predefined_item, "___ comm:", command
+            # print "______", key, predefined_item, "___ comm:", command
             key_plus = "<"+key+">"
             if command.find(key_plus) > 0:
                 function_to_eval = "self.{}({})".format(predefined_item["function"], ei_str)
                 print "\n\n found var to val ",  key_plus  ,  function_to_eval
                 try:
                     eval_ret = eval(function_to_eval)
-                    print "    eval_ret found var to val ", eval_ret
+                    # print "    eval_ret found var to val ", eval_ret
                     # return template.replace("<" + self.predefined[var]["type"] + ">", eval_ret)
 
                     print "    ommand  ", command, predefined_item["function"],  predefined_item["type"] , eval_ret
@@ -66,7 +90,7 @@ class PredefinedVariables:
             if len(scr_command) > 2:
                 script_out += self.convert_var_to_val_in_command(scr_command, ei_str) + ";"
                 zzz = self.convert_var_to_val_in_command(scr_command, ei_str)
-                print " ccc c ccccccc c c c c c c c c c cc ",len(scr_command) , "___" , zzz , "mmm\n"
+                # print " ccc c ccccccc c c c c c c c c c cc ",len(scr_command) , "___" , zzz , "mmm\n"
         return script_out
 
 
@@ -82,29 +106,6 @@ class PredefinedVariables:
             ret = batch.sio.predefined.convert_var_to_val(val, scr)
             if ret is not None:
                 scr = ret
-        """
-
-
-        #  TODO multi val in var
-
-
-        """
-        if evo_index is None:
-            ei_str = ""
-        else:
-            ei_str = "evo_index=" + str(evo_index)
-            
-        var = "xxxxx"
-        if var in self.predefined:
-            function_to_eval = "self.{}({})".format(self.predefined[var]["function"], ei_str)
-            try:
-                eval_ret = eval(function_to_eval)
-                return template.replace("<"+self.predefined[var]["type"]+">", eval_ret)
-            except ValueError:
-                # TODO ex
-                return None
-        else:
-            return None
         """
 
     """ marker ATQ 250   convert undefined to default   """
@@ -133,6 +134,13 @@ class PredefinedVariables:
 
     def get_schema_base_setup(self, evo_index=None):
         ret = self.batch.sio.generate_base_setup_file_name()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    def get_project_cache_dir(self, evo_index=None):
+        ret = self.batch.sio.generate_project_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
@@ -180,12 +188,45 @@ class PredefinedVariables:
         else:
             return ""
 
-    def get_scripts_path(self, evo_index=None):
-        ret = self.batch.sio.generate_scripts_path()
+    def get_scripts_dir(self, evo_index=None):
+        ret = self.batch.sio.generate_scripts_dir()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
+
+    def get_shot_dir(self, evo_index=None):
+        ret = self.batch.sio.generate_shot_dir()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    def get_working_dir(self, evo_index=None):
+        if self.batch.prj.current_project is not None:
+            return self.batch.prj.current_project.working_directory_absolute
+        else:
+            return ""
+
+    def get_schema_name(self, evo_index=None):
+        schema_name = self.batch.sch.current_schema.schema_name
+        return self.batch.sio.get_flat_name(schema_name)
+
+    def get_shot_name(self, evo_index=None):
+        ret = self.batch.sio.generate_shot_name()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
 
     def get_sim_time_start(self, evo_index=None):
         return self.batch.tsk.current_task.sim_frame_start
@@ -329,6 +370,24 @@ class StorageInOut:
             file_ext = self.batch.dfn.get_current_setup_ext()
             return 1, directory + schema_flat_name + file_version + "." + file_ext
 
+    def generate_shot_name(self):
+        if self.prj.current_project is None or \
+                self.batch.sch.current_schema is None or \
+                self.batch.tsk.current_task is None:
+            return -1, ""
+        else:
+            shot_name = ""
+            cur_tsk = self.batch.tsk.current_task
+            if len(cur_tsk.sequence) > 0:
+                shot_name += cur_tsk.sequence + "_"
+            if len(cur_tsk.shot) > 0:
+                shot_name += cur_tsk.shot + "_"
+            if len(cur_tsk.take) > 0:
+                shot_name += cur_tsk.take + "_"
+            shot_name = shot_name[:-1]
+            return 1, shot_name
+
+
     def generate_shot_dir(self):
         if self.prj.current_project is None or \
                 self.batch.sch.current_schema is None or \
@@ -357,7 +416,7 @@ class StorageInOut:
                 evo_inject = "evo_"+str(evo_index)+"__"
             schema_name = self.batch.sch.current_schema.schema_name
             schema_flat_name = self.get_flat_name(schema_name)
-            ret_file_and_path += "simed_setup"+self.dir_separator
+            ret_file_and_path += "simed_setup" + self.dir_separator
             if ver == 0:
                 ver = self.batch.tsk.current_task.queue_ver
             file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
@@ -366,22 +425,29 @@ class StorageInOut:
             return ret[0], ret_file_and_path
         return ret
 
+    def get_project_data_dir(self):
+        return 1, self.batch.prj.current_project.project_directory
+
+    def generate_project_cache_path(self):
+        ret = self.get_project_data_dir()
+        return ret[0], ret[1] + "cache" + self.dir_separator
+
     def generate_shot_cache_path(self):
         ret = self.generate_shot_dir()
-        return ret[0], ret[1] + "cache"
+        return ret[0], ret[1] + "cache" + self.dir_separator
 
     def generate_shot_cam_path(self):
         ret = self.generate_shot_dir()
-        return ret[0], ret[1] + "cam"
+        return ret[0], ret[1] + "cam" + self.dir_separator
 
     def generate_project_props_path(self):
         ret = self.generate_shot_dir()
-        return ret[0], ret[1] + "props"
+        return ret[0], ret[1] + "props" + self.dir_separator
 
     def generate_shot_prev_file(self):
         ret = self.generate_shot_dir()
         if ret[0] == 1:
-            ret_file_and_path = ret[1] + "prev" +self.dir_separator
+            ret_file_and_path = ret[1] + "prev" + self.dir_separator
             schema_name = self.batch.sch.current_schema.schema_name
             schema_flat_name = self.get_flat_name(schema_name)
             ver = self.batch.tsk.current_task.queue_ver
@@ -391,9 +457,9 @@ class StorageInOut:
             return ret[0], ret_file_and_path
         return ret
 
-    def generate_scripts_path(self):
+    def generate_scripts_dir(self):
         ret = self.generate_shot_dir()
-        return ret[0], ret[1] + "scripts"
+        return ret[0], ret[1] + "scripts" + self.dir_separator
 
 
     #  get directory pattern for current project

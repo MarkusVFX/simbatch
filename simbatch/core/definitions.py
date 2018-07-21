@@ -68,7 +68,7 @@ class SingleDefinition:
         return "SingleDefinition({})".format(self.software)
 
     def __str__(self):
-        return "SingleDefinition"
+        return "SingleDefinition  name:" + self.name
 
     def print_total(self, prefix=""):
         print "   [INF] {} total actions:{}".format(prefix, self.total_actions)
@@ -147,7 +147,7 @@ class Definitions:
         return "Definitions({})".format(self.batch)
 
     def __str__(self):
-        return "Definitions"
+        return "Definitions,  current_definition:" + str(self.current_definition)
 
     #  print project data, for debug
     def print_current(self):

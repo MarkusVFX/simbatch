@@ -253,7 +253,10 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
 
         if edit_txt is None:
             if len(multi_action.actions) > 0:
-                edit_txt = multi_action.actions[0].default_value
+                if len(multi_action.actions[0].actual_value) > 0:
+                    edit_txt = multi_action.actions[0].actual_value
+                else:
+                    edit_txt = multi_action.actions[0].default_value
 
         if edit_txt is not False:
             if edit_txt == " ":
@@ -406,7 +409,7 @@ class ActionWidgetATQ(QWidget):  # QWidget
         self.qt_widget_layout.addLayout(self.qt_edit_line_widget.qt_widget_layout)
 
     def __str__(self):
-        return "ActionWidgetATQ"
+        return "ActionWidgetATQ   evos_count:" + str(self.evos_count)
 
     def add_evo_to_line(self):
         evo_abbreviation = self.qt_combo_param.combo.currentText()[:3]

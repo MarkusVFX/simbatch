@@ -18,6 +18,7 @@
             "default": "<def_val>", 
             "mode": null, 
             "template": "template <f>", 
+            "evos" : "",
             "desc": "virt descr"
           }
         }, 
@@ -38,6 +39,7 @@
             "default": "<def_val>", 
             "mode": null, 
             "template": "template <f>", 
+            "evos" : "",
             "desc": "virt descr"
           }
         }, 
@@ -58,6 +60,7 @@
             "default": "<def_val>", 
             "mode": null, 
             "template": "template <f>", 
+            "evos" : "",
             "desc": "virt descr"
           }
         }, 
@@ -78,6 +81,7 @@
             "default": "<def_val>", 
             "mode": null, 
             "template": "template <f>", 
+            "evos" : "",
             "desc": "virt descr"
           }
         }, 

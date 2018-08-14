@@ -1,0 +1,52 @@
+
+1 go to https://www.python.org/downloads/release/python-2713/
+
+
+2 download Windows X86-64 MSI Installer  (https://www.python.org/ftp/python/2.7.13/python-2.7.13.amd64.msi)
+
+
+3 run installer: python-2.7.13.amd64.msi
+
+
+4 Install PySide with PIP*
+	c:\Python27\Scripts\pip install -U PySide
+
+	
+5a install SimBATCH with PIP*
+  c:\Python27\Scripts\pip install -U PySide
+  
+5b install SimBATCH  manual installation
+	go to https://github.com/MarkusVFX/simbatch
+	find clone or download button
+	download zip
+	
+	or
+	
+	download directly: https://codeload.github.com/MarkusVFX/simbatch/zip/master
+	
+	
+	unpack directory  simbatch  to   your_dir	
+	
+	run command:  your_dir\SimBatch.py
+  
+
+  
+  
+
+###################################################
+#############    Adnotations     ##################
+################################################### 
+    
+
+*PIP is a tool for installing Python packages, starting with Python 2.7.9, PIP is included
+  
+HOW TO check current version of python on Windows:
+	Menu Start -> cmd
+	command: cd c:\Python27 (or yours custom path)
+	command: python --version
+	
+PIP manual installation:
+	https://pip.pypa.io/en/stable/installing/
+	
+PYSIDE docs:
+	https://pypi.org/project/PySide/

@@ -28,6 +28,16 @@
 	unpack directory  simbatch  to   your_dir	
 	
 	run command:  your_dir\SimBatch.py
+	
+	
+5c installation for developement
+	for information about installing PyTest, Git please read:
+	https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/installing_development_environment.txt
+
+	
+	
+	
+
   
 
   

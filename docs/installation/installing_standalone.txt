@@ -6,6 +6,7 @@
 
 
 3 run installer: python-2.7.13.amd64.msi
+	recomended: during installation check "Add python.exe to Path"
 
 
 4 Install PySide with PIP*

@@ -1,5 +1,6 @@
 import os
 import re
+import lib.common as comfun
 
 
 class PredefinedVariables:
@@ -296,6 +297,13 @@ class StorageInOut:
                 else:
                     files.append(fi)
         return files
+        
+    
+    def check_any_data_to_load_exisit(self):
+        if self.sts.store_data_mode == 1:
+            return self.get_files_from_dir(self.sts.store_data_json_directory_abs, types="json")
+        else:
+            return True   # TODO POR VERSION
 
     def get_files_from_dir_by_object_names(self, directory, obj_list, file_type="", crowd_mode=False,
                                            crowd_mode_data=("pre", "post", 2, 10)):   # TODO  crowd_mode_data  as class

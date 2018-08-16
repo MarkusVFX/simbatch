@@ -136,38 +136,41 @@ class SimBatch:
     def load_data(self):
         if self.sts.loading_state >= 4:
             ret_def = self.dfn.load_definitions()
-            ret_prj = self.prj.load_projects()
-            if ret_prj is not False:
-                self.prj.init_default_proj()
-                ret_sch = self.sch.load_schemas()
-                if ret_sch is not False:
-                    ret_tsk = self.tsk.load_tasks()
-                    if ret_tsk is not False:
-                        ret_que = self.que.load_queue()
-                        if ret_que is not False:
-                            ret_nod = self.nod.load_nodes()
-                            if ret_nod is not False:
-                                loading_err_count = 0     # count number errors while of loading external data
-                                loading_err_count = self.loading_errors(ret_def, loading_err_count, "definitions")
-                                loading_err_count = self.loading_errors(ret_prj, loading_err_count, "project")
-                                loading_err_count = self.loading_errors(ret_sch, loading_err_count, "schemas")
-                                loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "tasks")
-                                loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "queue")
-                                loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "simnodes")
-                                if loading_err_count == 0:
-                                    return True, ""
+            if self.sio.check_any_data_to_load_exisit(): 
+                ret_prj = self.prj.load_projects()
+                if ret_prj is not False:
+                    self.prj.init_default_proj()
+                    ret_sch = self.sch.load_schemas()
+                    if ret_sch is not False:
+                        ret_tsk = self.tsk.load_tasks()
+                        if ret_tsk is not False:
+                            ret_que = self.que.load_queue()
+                            if ret_que is not False:
+                                ret_nod = self.nod.load_nodes()
+                                if ret_nod is not False:
+                                    loading_err_count = 0     # count number errors while of loading external data
+                                    loading_err_count = self.loading_errors(ret_def, loading_err_count, "definitions")
+                                    loading_err_count = self.loading_errors(ret_prj, loading_err_count, "project")
+                                    loading_err_count = self.loading_errors(ret_sch, loading_err_count, "schemas")
+                                    loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "tasks")
+                                    loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "queue")
+                                    loading_err_count = self.loading_errors(ret_tsk, loading_err_count, "simnodes")
+                                    if loading_err_count == 0:
+                                        return True, ""
+                                    else:
+                                        return loading_err_count, "error info in log"
                                 else:
-                                    return loading_err_count, "error info in log"
+                                    return -5, "SimNodes not loaded"
                             else:
-                                return -5, "SimNodes not loaded"
+                                return -4, "Queue items not loaded"
                         else:
-                            return -4, "Queue not loaded"
+                            return -1, "Tasks data not loaded"
                     else:
-                        return -1, "Tasks not loaded"
+                        return -2, "Schemas data not loaded"
                 else:
-                    return -2, "Schemas not loaded"
+                    return -3, "Projects data not loaded"
             else:
-                return -3, "Projects not loaded"
+                return -100, "No data exist"
         else:
             return False, "config.ini not loaded"
 

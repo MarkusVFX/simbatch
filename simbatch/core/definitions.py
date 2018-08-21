@@ -340,12 +340,15 @@ class Definitions:
                                 new_definition.version = json_definition['definition']['meta']['version']
                             self.definitions_names.append(json_definition['definition']['meta']["name"])
                             self.add_definition(new_definition)
+                            
 
                             if "interactionScript" in json_definition['definition']['meta']:
                                 inters_f = definitions_dir + json_definition['definition']['meta']["interactionScript"]
                                 new_definition.interactions = self.load_interaction_file(inters_f)
                                 if new_definition.interactions is None:
                                     loading_errors += 1
+                                    self.batch.logger.err(("interaction file not loaded: ", inters_f))
+                                    
 
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():

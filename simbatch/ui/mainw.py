@@ -261,8 +261,8 @@ class MainWindow(QMainWindow):
             self.top_ui.set_top_info(self.sts.settings_err_info, 6)
         else:
             if loading_data_state[0] > 1:
-                self.top_ui.set_top_info(("Loaded with errors({}): {}".format(loading_data_state[0]),
-                                          loading_data_state[1]), 7)
+                self.top_ui.set_top_info(("Loaded with errors ({}): {}".format(loading_data_state[0],
+                                          loading_data_state[1])), 7)
             else:
                 self.top_ui.set_top_info("Loading error. {}".format(loading_data_state[1]), 7)
 

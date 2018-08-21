@@ -7,7 +7,7 @@
 			"totalActions": 6,
 			"setupExt" : "hipnc",
 			"prevExt" : "jpg",
-			"interactionScript": "interaction_houdini.py",
+			"interactionScript": "interactions_houdini.py",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},
 		"actions": {

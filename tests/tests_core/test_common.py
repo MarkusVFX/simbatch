@@ -11,9 +11,11 @@ TESTING_AREA_DIR = "S:/simbatch/data/tests_data/"
 TEST_DIR = "test_dir/"
 random_file = None
 
+
 @pytest.fixture
 def comfun():
     return common.CommonFunctions()
+
 
 def test_prepare_env():
     if path.exists(TESTING_AREA_DIR+TEST_DIR) is True: # clear TESTING_AREA_DIR
@@ -63,9 +65,10 @@ def test_remove3_string_as_list(comfun):
 
 
 def test_can_get_int(comfun):
-    assert comfun.can_get_int("a") == False
-    assert comfun.can_get_int('abc') == False
-    assert comfun.can_get_int(None) == False
+    assert comfun.can_get_int("a") is False
+    assert comfun.can_get_int('abc') is False
+    assert comfun.can_get_int(None) is False
+
 
 def test_int_or_val(comfun):
     assert comfun.int_or_val(1, 5) == 1

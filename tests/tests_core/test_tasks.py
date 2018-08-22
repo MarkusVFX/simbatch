@@ -131,10 +131,12 @@ def test_remove_single_schema_by_id(sib):
     assert sib.tsk.total_tasks == 4
     assert len(sib.tsk.tasks_data) == 4
 
+
 def test_remove_single_schema_by_index(sib):
     assert sib.tsk.remove_single_task(index=1) is True
     assert sib.tsk.total_tasks == 3
     assert len(sib.tsk.tasks_data) == 3
+
 
 def test_proxy_task(sib):
     sib.tsk.clear_proxy_task()

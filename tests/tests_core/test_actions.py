@@ -5,7 +5,7 @@ import os
 
 
 # TODO check dir on prepare tests
-TESTING_AREA_DIR = "S:\\simbatch\\data\\"
+TESTING_AREA_DIR = "S:/simbatch/data/"
 
 
 @pytest.fixture(scope="module")

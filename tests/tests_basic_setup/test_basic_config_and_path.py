@@ -16,6 +16,16 @@ def test_settings_file(sett):
     assert sett.comfun.file_exists(sett.ini_file) is True
 
 
+def test_data_json_directory_abs(sett):
+    print "\n [db] store_data_json_directory_abs :", sett.store_data_json_directory_abs
+    assert sett.comfun.path_exists(sett.store_data_json_directory_abs) is True
+
+
+def test_definitions_directory_abs(sett):
+    print "\n [db] store_definitions_directory_abs :", sett.store_definitions_directory_abs
+    assert sett.comfun.path_exists(sett.store_definitions_directory_abs) is True
+
+
 def test_loading_state(sett):
     assert sett.loading_state == 4
 

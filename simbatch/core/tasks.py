@@ -415,7 +415,7 @@ class Tasks:
             self.logger.err("skipped update_proxy_task_form_current , current task is None")
 
     def update_proxy_task(self, task_id=None, task_ver=None, priority=None, sim_frame_start=None, sim_frame_end=None,
-                          prev_frame_start=None, prev_frame_end=None, description=None):
+                          prev_frame_start=None, prev_frame_end=None, description=None, from_task=None):
         if task_id is not None:
             if self.comfun.is_int(task_id):
                 index = self.get_index_by_id(task_id)
@@ -437,6 +437,8 @@ class Tasks:
             self.proxy_task.prev_frame_end = prev_frame_end
         if description is not None:
             self.proxy_task.description = description
+        if from_task is not None:
+            self.proxy_task = copy.deepcopy(from_task)
 
     """
     def generate_evo_script(self, hymm):

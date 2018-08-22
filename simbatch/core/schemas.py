@@ -490,8 +490,6 @@ class Schemas:
                             if "actions" in li:
                                 for lia in li['actions'].values():
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
-                                    print lia
-                                    print "zzzz\n\n\n"+ json_file + "!!!\n\n"
                                     av = lia["actual"]
                                     new_action = SingleAction(lia["name"], lia["desc"], lia["default"], lia["template"],
                                                               actual_value=av, mode=lia["mode"],

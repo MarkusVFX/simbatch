@@ -100,7 +100,7 @@ class SimNodes:
                         else:
                             self.batch.logger.wrn(("simnode json data not consistent:", len(li),
                                                    len(NODES_ITEM_FIELDS_NAMES)))
-                    return True
+                return True
             else:
                 self.batch.logger.wrn(("no tasks data in : ", json_file))
                 return False

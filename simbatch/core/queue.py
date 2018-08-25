@@ -393,7 +393,7 @@ class Queue:
                 if engines_counter == engine_index:
                     scr += evo_scr
                 engines_counter += 1
-            scr += act.generate_script_from_template(batch, hack_NL=False) + "; "
+            scr += act.generate_script_from_template(batch, with_new_line=False) + "; "
 
         return scr
 

@@ -41,7 +41,7 @@ class PredefinedVariables:
             key_plus = "<" + key + ">"
             if check_str.find(key_plus) >= 0:
                 function_to_eval = "self.{}({})".format(predefined_item["function"], param)
-                print "\n\n found var to val ", key_plus, function_to_eval , "___  in ___" , check_str
+                print "\n\n found var to val ", key_plus, function_to_eval, "___  in ___", check_str
                 try:
                     eval_ret = eval(function_to_eval)
                     # print "    ommand  ", check_str, predefined_item["function"],  predefined_item["type"] , eval_ret
@@ -54,28 +54,26 @@ class PredefinedVariables:
                     # return check_str
         return check_str
 
-
-    """ marker ATQ 242   convert var to val in command   """
+    """ marker ATQ 242   convert var to val in command """
     def convert_var_to_val_in_command(self, command, ei_str):
         for key, predefined_item in self.predefined.items():
             # print "______", key, predefined_item, "___ comm:", command
             key_plus = "<"+key+">"
             if command.find(key_plus) > 0:
                 function_to_eval = "self.{}({})".format(predefined_item["function"], ei_str)
-                print "\n\n found var to val ",  key_plus  ,  function_to_eval
+                print "\n\n found var to val ", key_plus, function_to_eval
                 try:
                     eval_ret = eval(function_to_eval)
                     # print "    eval_ret found var to val ", eval_ret
                     # return template.replace("<" + self.predefined[var]["type"] + ">", eval_ret)
 
-                    print "    ommand  ", command, predefined_item["function"],  predefined_item["type"] , eval_ret
+                    print "    ommand  ", command, predefined_item["function"],  predefined_item["type"], eval_ret
                     print "    rrreeee  ", command.replace("<" + predefined_item["type"] + ">", eval_ret)
                     return command.replace("<" + predefined_item["type"] + ">", eval_ret)
                 except ValueError:
                     # TODO ex
                     return command
             return command
-
 
     # convert predefined variable into final value command by command
     """ marker ATQ 240   convert var to val in script  """
@@ -297,8 +295,7 @@ class StorageInOut:
                 else:
                     files.append(fi)
         return files
-        
-    
+
     def check_any_data_to_load_exisit(self):
         if self.sts.store_data_mode == 1:
             return self.get_files_from_dir(self.sts.store_data_json_directory_abs, types="json")
@@ -395,7 +392,6 @@ class StorageInOut:
             shot_name = shot_name[:-1]
             return 1, shot_name
 
-
     def generate_shot_dir(self):
         if self.prj.current_project is None or \
                 self.batch.sch.current_schema is None or \
@@ -419,7 +415,7 @@ class StorageInOut:
         ret = self.generate_shot_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1]
-            evo_inject =""
+            evo_inject = ""
             if evo_index is not None:
                 evo_inject = "evo_"+str(evo_index)+"__"
             schema_name = self.batch.sch.current_schema.schema_name
@@ -468,7 +464,6 @@ class StorageInOut:
     def generate_scripts_dir(self):
         ret = self.generate_shot_dir()
         return ret[0], ret[1] + "scripts" + self.dir_separator
-
 
     #  get directory pattern for current project
     #  pattern is generated basis on directories structure on storage

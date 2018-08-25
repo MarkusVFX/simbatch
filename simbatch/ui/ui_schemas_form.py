@@ -240,7 +240,7 @@ class SchemaFormCreateOrEdit(QWidget):
         if multi_action.actions_count == 0:   # incorrectly defined action
             dummy_multiaction = self.batch.dfn.create_multiaction(-1, "empty action")
             action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", dummy_multiaction)
-            # first_action = self.batch.dfn.create_singleaction(multi_action.name, "err", "empty multiaction", "null")
+            # first_action = self.batch.dfn.create_single_action(multi_action.name, "err", "empty multiaction", "null")
         else:
             # first_action = multi_action.actions[0]
 

@@ -133,10 +133,10 @@ class SingleAction:
     """
 
     """ marker ATQ 235   generate script from temlpate   """
-    def generate_script_from_template(self, batch, hack_NL=False):
+    def generate_script_from_template(self, batch, with_new_line=False):
         # TODO optimize + mixed var     <dir>\custom_file.bin
         scr = "".join(self.template)
-        if hack_NL:
+        if with_new_line:
             scr += "\n"
         return scr
 

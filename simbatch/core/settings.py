@@ -167,8 +167,8 @@ class Settings:
             self.ini_file = os.path.abspath(ini_file)
 
         """ check and force DEV config """
-        if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file),"config_dev.ini"), info=False):
-            self.ini_file = os.path.join(os.path.dirname(self.ini_file),"config_dev.ini")
+        if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file), "config_dev.ini"), info=False):
+            self.ini_file = os.path.join(os.path.dirname(self.ini_file), "config_dev.ini")
             self.logger.inf(("force DEV config:", self.ini_file))
 
         self.sql = [None, None, None, None]
@@ -407,14 +407,18 @@ class Settings:
         if self.store_definitions_directory_abs is not None:
             palette_id = self.ui_color_mode
             if palette_id == 1:
-                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + self.COLORS_GRAY_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                             self.COLORS_GRAY_FILE_NAME
             elif palette_id == 2:
-                color_file = self.store_definitions_directory_abs + "colors"+ self.dir_separator + self.COLORS_PASTEL_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                             self.COLORS_PASTEL_FILE_NAME
             elif palette_id == 3:
-                color_file = self.store_definitions_directory_abs + "colors"+ self.dir_separator + self.COLORS_DARK_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                             self.COLORS_DARK_FILE_NAME
             else:
                 #  palette_id == 4:
-                color_file = self.store_definitions_directory_abs + "colors"+ self.dir_separator + self.COLORS_CUSTOM_FILE_NAME
+                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                             self.COLORS_CUSTOM_FILE_NAME
 
             if self.comfun.file_exists(color_file, info="colors file"):
                 self.clear_state_colors()

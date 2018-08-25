@@ -159,9 +159,9 @@ class Projects:
         print "\n\n"
 
     #  get index from list 'projects_data'  by id of project
-    def get_index_from_id(self, id):
+    def get_index_from_id(self, proj_id):
         for i, p in enumerate(self.projects_data):
-            if p.id == id:
+            if p.id == proj_id:
                 return i
         return None
 
@@ -227,12 +227,14 @@ class Projects:
                 self.batch.logger.inf("PRO version with SQL")
                 return False
 
-    def create_project(self, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
-                 cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
-                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
-        return SingleProject(project_id, project_name, is_default, state_id, state, project_directory, working_directory,
-                 cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
-                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=zeros_in_version)
+    @staticmethod
+    def create_project(project_id, project_name, is_default, state_id, state, project_directory, working_directory,
+                       cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
+                       custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
+        return SingleProject(project_id, project_name, is_default, state_id, state, project_directory,
+                             working_directory, cameras_directory, cache_directory, env_directory, props_directory,
+                             scripts_directory, custom_directory, seq_shot_take_pattern, description,
+                             zeros_in_version=zeros_in_version)
 
     #  add project to 'projects_data' list  on load  and on add by user
     def add_project(self, project_to_add, do_save=False, generate_directory_patterns=False):
@@ -295,16 +297,16 @@ class Projects:
         return None
 
     #  set def project init after loading
-    def set_proj_as_default(self, id=-1, index=-1):
+    def set_proj_as_default(self, proj_id=-1, index=-1):
         if index >= 0:
             for p in self.projects_data:
                 if p.is_default == 1:
                     p.is_default = 0
             self.projects_data[index].is_default = 1
             return True
-        elif id >= 0:
+        elif proj_id >= 0:
             for p in self.projects_data:
-                if p.id == id:
+                if p.id == proj_id:
                     p.is_default = 1
                 else:
                     if p.is_default == 1:
@@ -423,12 +425,12 @@ class Projects:
         return None
 
     #  remove single project
-    def remove_single_project(self, index=None, id=None, do_save=False):
-        if index is None and id is None:
+    def remove_single_project(self, index=None, proj_id=None, do_save=False):
+        if index is None and proj_id is None:
             return False
-        if id > 0:
+        if proj_id > 0:
             for i, q in enumerate(self.projects_data):
-                if q.id == id:
+                if q.id == proj_id:
                     del self.projects_data[i]
                     self.total_projects -= 1
                     break

@@ -181,13 +181,16 @@ class Definitions:
                 return d
         return None
 
-    def is_singleaction(self, obj):
+    @staticmethod
+    def is_single_action(obj):
         return isinstance(obj, SingleAction)
 
-    def create_singleaction(self, name, description, default_value, template, actual_value=None, mode=None, ui=None):
+    @staticmethod
+    def create_single_action(name, description, default_value, template, actual_value=None, mode=None, ui=None):
         return SingleAction(name, description, default_value, template, actual_value=actual_value, mode=mode, ui=ui)
 
-    def create_multiaction(self, mac_id, name):
+    @staticmethod
+    def create_multiaction(mac_id, name):
         return MultiAction(mac_id, name)
 
     def create_example_definition(self, do_save=False):
@@ -257,6 +260,7 @@ class Definitions:
             ret = self.save_definitions_to_mysql()
         else:
             ret = False
+        return ret
 
     def save_definition_to_json(self, json_file, content):
         if json_file is None or len(json_file) == 0:
@@ -265,7 +269,8 @@ class Definitions:
             json_file = self.sts.store_definitions_directory_abs + "interaction_" + json_file + ".json"
         return self.comfun.save_json_file(json_file, content)
 
-    def save_definitions_to_mysql(self):
+    @staticmethod
+    def save_definitions_to_mysql():
         # PRO version
         return False
 
@@ -340,7 +345,6 @@ class Definitions:
                                 new_definition.version = json_definition['definition']['meta']['version']
                             self.definitions_names.append(json_definition['definition']['meta']["name"])
                             self.add_definition(new_definition)
-                            
 
                             if "interactionScript" in json_definition['definition']['meta']:
                                 inters_f = definitions_dir + json_definition['definition']['meta']["interactionScript"]
@@ -348,7 +352,6 @@ class Definitions:
                                 if new_definition.interactions is None:
                                     loading_errors += 1
                                     self.batch.logger.err(("interaction file not loaded: ", inters_f))
-                                    
 
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():

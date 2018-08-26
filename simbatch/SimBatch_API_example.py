@@ -13,6 +13,10 @@ import core.core as core
 simbatch = core.SimBatch("no-gui", ini_file="config.ini")
 simbatch.load_data()
 
+if show_info is True:
+    print "data dir: ", simbatch.sts.store_data_json_directory_abs
+    print "settings data: ", simbatch.sts.json_settings_data
+
 if simbatch.prj.total_projects == 0:
     simbatch.create_example_data()
 
@@ -60,14 +64,20 @@ if add_param is True:
     schema_options.set_action_value("Import", "<shot_cache_dir>/orc_*.xml")
     schema_options.set_action_value("Import", "<project_cache_dir>/captain_sword.xml")
     schema_options.set_action_value("Save", "custom_file_name_v<ver>.mb", occurrence=1)
-    schema_options.set_action_value("Save", "<shot_dir>/backup/<schema_name>_<shot_name>__v<ver>.mb", occurrence=2)
-    schema_options.set_action_value("Save", "<working_dir>/last_sim/last_sim.mb", occurrence=3)
+    schema_options.set_action_value("Save", "<shot_dir>/backup/<schema_name>_<shot_name>__v<ver>.mb", occurrence=1)
+    schema_options.set_action_value("Save", "<working_dir>/last_sim/last_sim.mb", occurrence=1)
+
+    print "CT: ", simbatch.tsk.current_task.user_id
 
     task_options = simbatch.tsk.create_task_options_object()
+
+    print "TO: ", task_options.proxy_task
+    print "TO: ", task_options.proxy_task.user_id
     task_options.set_task_value("sim_from", 10)
     task_options.set_task_value("sim_to", 40)
     task_options.set_task_value("prior", 22)
     task_options.set_task_value("user options", 22)
+    task_options.set_task_value("user_id", 1)
 
     """
     new_queue_items = simbatch.tsk.generate_queue_items_from_task(simbatch.tsk.max_id, evolutions=[evos_str],

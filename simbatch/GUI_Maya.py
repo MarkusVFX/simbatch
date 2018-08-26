@@ -4,17 +4,17 @@
 #
 ##
 ###
-simbatch_installation_dir = "S:/simbatch/"
+simbatch_installation_root = "S:/"   # for  "S:/simbatch/"
 simbatch_config_ini = "S:/simbatch/config.ini"
 ###
 ##
 #
 import sys
-sys.path.append(simbatch_installation_dir)
+sys.path.append(simbatch_installation_root)
 
-import core.core
-import server.server
-import ui.mainw as simbatch_ui
+import simbatch.core.core as simbatch_core
+import simbatch.server.server as simbatch_server
+import simbatch.ui.mainw as simbatch_ui
 
 import maya.OpenMayaUI as mui
 
@@ -44,13 +44,12 @@ def get_maya_window():
 maya_window = get_maya_window()
 
 
-simbatch = core.core.SimBatch("Maya", ini_file=simbatch_config_ini)
+simbatch = simbatch_core.SimBatch("Maya", ini_file=simbatch_config_ini)
 loading_data_state = simbatch.load_data()
-simbatch_server = server.server.SimBatchServer(simbatch, force_local=True)
-
+simbatch_server = simbatch_server.SimBatchServer(simbatch, force_local=True)
 
 
 if simbatch.sts.WITH_GUI == 1:
-    main_window = simbatch_ui.MainWindow(simbatch, simbatch_server, parent=maya_window)
+    main_window = simbatch_ui.MainWindow(simbatch_server, parent=maya_window)
     main_window.show()
     main_window.post_run(loading_data_state)

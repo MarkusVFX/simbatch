@@ -4,21 +4,22 @@
 #
 ##
 ###
-simbatch_installation_dir = "S:\\simbatch\\"
-simbatch_config_ini = "S:\\simbatch\\config.ini"
+simbatch_installation_root = "S:/"   # for  "S:/simbatch/"
+simbatch_config_ini = "S:/simbatch/config.ini"
 ###
 ##
 #
 import sys
-sys.path.append(simbatch_installation_dir)
+sys.path.append(simbatch_installation_root)
 
-import core.core
-import server.server
-import ui.mainw as simbatch_ui
+import simbatch.core.core as simbatch_core
+import simbatch.server.server as simbatch_server
+import simbatch.ui.mainw as simbatch_ui
+
 
 """   force reload roots """
-reload(core.core)
-reload(server.server)
+reload(simbatch_core)
+reload(simbatch_server)
 reload(simbatch_ui)
 """   force reload roots END  """
 
@@ -50,77 +51,79 @@ def get_maya_window():
 maya_window = get_maya_window()
 
 
-simbatch = core.core.SimBatch("Maya", ini_file=simbatch_config_ini)
-loading_data_state = simbatch.load_data()
-simbatch_server = server.server.SimBatchServer(simbatch, force_local=True)
+simbatch = simbatch_core.SimBatch("Maya", ini_file=simbatch_config_ini)
+simbatch_server = simbatch_server.SimBatchServer(simbatch, force_local=True)
 
 
 """   force reload core   """
-import core.settings as simbatch_settings
+import simbatch.core.settings as simbatch_settings
 reload(simbatch_settings)
 simbatch.sts = simbatch_settings.Settings(simbatch.logger, "Maya", ini_file=simbatch_config_ini)
 
-import core.lib.common as simbatch_comfun
+import simbatch.core.lib.common as simbatch_comfun
 reload(simbatch_comfun)
 simbatch.comfun = simbatch_comfun.CommonFunctions()
 
-import core.lib.logger as simbatch_logger
+import simbatch.core.lib.logger as simbatch_logger
 reload(simbatch_logger)
 simbatch.logger = simbatch_logger.Logger()
 
-import core.projects as simbatch_projects
+import simbatch.core.projects as simbatch_projects
 reload(simbatch_projects)
 simbatch.prj = simbatch_projects.Projects(simbatch)
 
-import core.schemas as simbatch_schemas
+import simbatch.core.schemas as simbatch_schemas
 reload(simbatch_schemas)
 simbatch.sch = simbatch_schemas.Schemas(simbatch)
 
-import core.tasks as simbatch_tasks
+import simbatch.core.tasks as simbatch_tasks
 reload(simbatch_tasks)
 simbatch.tsk = simbatch_tasks.Tasks(simbatch)
 
-import core.queue as simbatch_queue
+import simbatch.core.queue as simbatch_queue
 reload(simbatch_queue)
 simbatch.que = simbatch_queue.Queue(simbatch)
 
-import core.nodes as simbatch_nodes
+import simbatch.core.nodes as simbatch_nodes
 reload(simbatch_nodes)
 simbatch.nod = simbatch_nodes.SimNodes(simbatch)
 
-import core.definitions as simbatch_definitions
+import simbatch.core.definitions as simbatch_definitions
 reload(simbatch_definitions)
 simbatch.dfn = simbatch_definitions.Definitions(simbatch)
 
-import core.io as simbatch_ios
+import simbatch.core.io as simbatch_ios
 reload(simbatch_ios)
 simbatch.sio = simbatch_ios.StorageInOut(simbatch)
 """   force reload core  END   """
 
+loading_data_state = simbatch.load_data()
+
 if simbatch.sts.WITH_GUI == 1:
     """   force reload UI """
-    import ui.ui_settings as simbatch_ui_settings
+    import simbatch.ui.ui_settings as simbatch_ui_settings
     reload(simbatch_ui_settings)
-    import ui.ui_projects as simbatch_ui_projects
+    import simbatch.ui.ui_projects as simbatch_ui_projects
     reload(simbatch_ui_projects)
-    import ui.ui_schemas as simbatch_ui_schemas
+    import simbatch.ui.ui_schemas as simbatch_ui_schemas
     reload(simbatch_ui_schemas)
-    import ui.ui_schemas_form as simbatch_ui_schemas_form
+    import simbatch.ui.ui_schemas_form as simbatch_ui_schemas_form
     reload(simbatch_ui_schemas_form)
-    import ui.ui_tasks as simbatch_ui_tasks
+    import simbatch.ui.ui_tasks as simbatch_ui_tasks
     reload(simbatch_ui_tasks)
-    import ui.ui_tasks_forms as simbatch_ui_tasks_forms
+    import simbatch.ui.ui_tasks_forms as simbatch_ui_tasks_forms
     reload(simbatch_ui_tasks_forms)
-    import ui.ui_tasks as simbatch_ui_tasks
+    import simbatch.ui.ui_tasks as simbatch_ui_tasks
     reload(simbatch_ui_tasks)
-    import ui.ui_queue as simbatch_ui_queue
+    import simbatch.ui.ui_queue as simbatch_ui_queue
     reload(simbatch_ui_queue)
-    import ui.ui_definitions as simbatch_ui_definitions
+    import simbatch.ui.ui_definitions as simbatch_ui_definitions
     reload(simbatch_ui_definitions)
-    import ui.ui_nodes as simbatch_nodes
+    import simbatch.ui.ui_nodes as simbatch_nodes
     reload(simbatch_nodes)
     reload(simbatch_ui)
     """   force reload UI  END   """
-    main_window = simbatch_ui.MainWindow(simbatch, simbatch_server, parent=maya_window)
+
+    main_window = simbatch_ui.MainWindow(simbatch_server, parent=maya_window)
     main_window.show()
     main_window.post_run(loading_data_state)

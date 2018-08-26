@@ -528,7 +528,7 @@ class TasksUI:
     """
 
     """ marker ATQ 100   gathering options   """
-    def gathering_options_from_action_widgets(self):
+    def generate_options_from_action_widgets(self):
         del self.qt_form_add.options[:]
         for i, wa in enumerate(self.qt_form_add.actions_widgets_array):
             if wa.qt_combo_param is not None:
@@ -553,7 +553,7 @@ class TasksUI:
 
                 self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver
 
-                self.gathering_options_from_action_widgets()
+                self.generate_options_from_action_widgets()
 
                 """ marker TO     TODO"""
                 schema_options = None
@@ -563,11 +563,11 @@ class TasksUI:
                                                                        schema_options=schema_options,
                                                                        task_options=task_options)
                 if form_queue_items is not None:
-                    self.batch.logger.db((" generated !", form_queue_items, form_queue_items[0].description))
+                    self.batch.logger.db(("q items generated !", form_queue_items, form_queue_items[0].description))
                     self.batch.que.add_to_queue(form_queue_items, do_save=True)
                     self.mainw.que_ui.update_all_queue()
                 else:
-                    self.batch.logger.wrn((" queue items NOT generated !", self.batch.tsk.current_task.id))
+                    self.batch.logger.wrn(("queue items NOT generated !", self.batch.tsk.current_task.id))
                     self.batch.tsk.current_task.state_id = self.sts.INDEX_STATE_ERROR
                     self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_ERROR]
                     self.batch.tsk.save_tasks()
@@ -586,8 +586,8 @@ class TasksUI:
                 else:
                     self.top_ui.set_top_info("Items not added to queue !", 9)
             else:
-                self.batch.logger.err("Add to queue: cant create directory !")
-                self.top_ui.set_top_info(" ERR: cant create directory ", 9)
+                self.batch.logger.err("Add to queue: can't create output directory !")
+                self.top_ui.set_top_info(" ERR: can't create output directory ", 9)
         else:
             self.batch.logger.wrn("Current task undefined! Please select task again.")
             self.top_ui.set_top_info("Please select task ", 7)

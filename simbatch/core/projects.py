@@ -257,7 +257,7 @@ class Projects:
         self.projects_data.append(project_to_add)
         self.total_projects += 1
         if project_to_add.is_default == 1:
-            self.set_proj_as_default(id=project_to_add.id)
+            self.set_proj_as_default(proj_id=project_to_add.id)
         if do_save:
             self.save_projects()
         return project_to_add.id

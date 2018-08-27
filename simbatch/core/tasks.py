@@ -210,7 +210,6 @@ class Tasks:
         collect_ids += self.add_task(sample_task_5, do_save=do_save)
         self.sample_data_checksum = 15
         self.sample_data_total = 5
-        self.save_tasks()
         return collect_ids
 
     def check_is_task_exist(self, task_item):

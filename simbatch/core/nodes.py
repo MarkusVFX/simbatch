@@ -102,10 +102,10 @@ class SimNodes:
                                                    len(NODES_ITEM_FIELDS_NAMES)))
                 return True
             else:
-                self.batch.logger.wrn(("no tasks data in : ", json_file))
+                self.batch.logger.wrn(("no nodes data in : ", json_file))
                 return False
         else:
-            self.batch.logger.wrn(("no schema file: ", json_file))
+            self.batch.logger.wrn(("no simnodes file: ", json_file))
             return False
 
     def load_nodes_from_mysql(self):

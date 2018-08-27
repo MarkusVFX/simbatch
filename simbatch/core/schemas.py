@@ -31,9 +31,12 @@ class SchemaOptions:
         # TODO  try , check attrib exist....
         action_index = self.proxy_schema.get_action_index_by_name(action_name, occurrence=occurrence)
         # action_value = self.proxy_schema.actions_array[action_index].actual_value
-        self.proxy_schema.actions_array[action_index].actual_value = val
-        # setattr(action_value, param, val)
-        return True  # TODO
+        if action_index is None:
+            return False
+        else:
+            self.proxy_schema.actions_array[action_index].actual_value = val
+            # setattr(action_value, param, val)
+            return True  # TODO
 
 
 class SchemaItem:
@@ -120,7 +123,7 @@ class SchemaItem:
     #     self.actions_array = arr_out
 
     """ marker ATQ 212   get evo scripts   """
-    def get_evo_scripts_array(self, batch, evos_str, engine_index):
+    def get_evo_scripts_array(self, batch, evos_str, action_with_evo_index):
         count_actions_with_evos = 0
         for act in self.actions_array:
             parameters = None
@@ -135,7 +138,7 @@ class SchemaItem:
                             parameters = mac.actions[action_index].parameters
 
             if parameters is not None:
-                if count_actions_with_evos == engine_index:
+                if count_actions_with_evos == action_with_evo_index:
                     ret = batch.pat.get_evolutions_from_string(evos_str)
                     tmp2_arr = []
                     tmp2i_arr = []

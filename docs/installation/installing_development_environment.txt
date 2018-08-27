@@ -1,25 +1,33 @@
 #  installing_development_environment.txt
 
-0 installing IDE
-  install https://notepad-plus-plus.org/download/    (lightweight option)
+1 installing PyTest
+  c:\Python27\Scripts\pip install -U pytest
+
+
+2 installing IDE
+  install https://notepad-plus-plus.org/download/    (lightweight option)  
   or https://www.jetbrains.com/pycharm/              (advanced option)
   or yoru favorite IDE                               (the best option)
+  
+  if you choose notepad++, please change tab to spaces in  Settings -> Preferences -> Language   by selecting   Python   and checking   "Replace by space"
 
 
-1 installing git 
+3 installing git 
   go to http://git-scm.com/download/win
   download 64-bit Git for Windows Setup
   run Git-2.18.0-64-bit.exe  (you can choose "Use Notepad++ as Git's default editor"  instead VIM)
 
-2 config git
+
+4 config git
   launch git bash
   $ git config --global user.name "yourname"
   $ git config --global user.email your@mail.com
   
   $ git clone https://github.com/MarkusVFX/simbatch.git  c:/my_local_git_directory
+  (you can also fork this repo, and develop your branch)
   
   
-3 afret edit source code
+5 after editing source code
 
     launch git bash
 	cd c:/my_local_git_directory    (if you not used "Git Bash Here" on your dir)

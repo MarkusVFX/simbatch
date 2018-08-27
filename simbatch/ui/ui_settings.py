@@ -539,6 +539,7 @@ class SettingsUI:
         batch.prj.clear_all_projects_data(clear_stored_data=True)
         batch.sch.clear_all_schemas_data(clear_stored_data=True)
         batch.tsk.clear_all_tasks_data(clear_stored_data=True)
+        batch.que.clear_all_queue_items(clear_stored_data=True)
         # batch.que.clearSampleData(taskID, projID)  # TODO
         # batch.nod.clearSampleData()  # TODO
         self.batch.logger.inf("Cleared sample data")

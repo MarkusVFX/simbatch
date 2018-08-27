@@ -7,7 +7,7 @@ import pytest
 
 
 # TODO check dir on prepare tests
-TESTING_AREA_DIR = "S:/simbatch/data/tests_data/"
+TESTING_AREA_DIR = "S:/simbatch/data/"
 TEST_DIR = "test_dir/"
 random_file = None
 

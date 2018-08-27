@@ -100,10 +100,10 @@ def test_is_index2_def_projert(sib):
 
 
 def test_by_id_set_proj_as_default(sib):
-    assert sib.prj.set_proj_as_default(id=1) is True
+    assert sib.prj.set_proj_as_default(proj_id=1) is True
     index = sib.prj.get_index_from_id(1)
     assert sib.prj.check_is_default(index=index) is True
-    assert sib.prj.set_proj_as_default(id=2) is True
+    assert sib.prj.set_proj_as_default(proj_id=2) is True
     index = sib.prj.get_index_from_id(2)
     assert sib.prj.check_is_default(index=index) is True
 
@@ -163,7 +163,7 @@ def test_current_project_details(sib):
 
 
 def test_remove_single_project(sib):
-    assert sib.prj.remove_single_project(id=1) is True
+    assert sib.prj.remove_single_project(proj_id=1) is True
     assert sib.prj.total_projects == 2
     assert len(sib.prj.projects_data) == 2
     assert sib.prj.remove_single_project(index=1) is True

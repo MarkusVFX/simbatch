@@ -10,6 +10,7 @@ def sib():
     sib = batch.SimBatch(5, ini_file=settings_file)
     return sib
 
+
 def test_prepare_data_directory_by_delete_all_files(sib):
     assert sib.sts.store_data_mode is not None
     if sib.sts.store_data_mode == 1:
@@ -18,11 +19,14 @@ def test_prepare_data_directory_by_delete_all_files(sib):
         # PRO version with sql
         pass
     sib.que.clear_all_queue_items(clear_stored_data=True)
+    sib.que.delete_json_queue_file()
+
 
 def test_no_queue_data(sib):
     assert len(sib.sts.store_data_json_directory_abs) > 0
     assert len(sib.sts.JSON_SCHEMAS_FILE_NAME) > 0
     assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_QUEUE_FILE_NAME) is False
+
 
 def test_create_example_queue_data(sib):
     assert sib.que.create_example_queue_data(do_save=True) == sib.que.sample_data_checksum

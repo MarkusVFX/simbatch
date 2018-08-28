@@ -1,0 +1,73 @@
+
+
+
+#ui_tasks
+    """ marker ATQ 010a   on click add   """
+    def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
+        ...
+        # marker ATQ 100
+        self.generate_options_from_action_widgets()
+        ...
+        # marker ATQ 200
+        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, action_options=form_atq.options, schema_options=schema_options, task_options=task_options) 
+        ...
+        self.batch.que.add_to_queue(form_queue_items, do_save=True)
+
+
+
+#ui_tasks
+    """ marker ATQ 100   generate options   """
+    def generate_options_from_action_widgets(self):
+
+
+    #	class AddToQueueForm(QWidget):
+    #		options = []                    # all user's inputs options with parameters
+
+
+
+
+#queue
+    """ marker ATQ 200   generate queue items   """
+    def generate_queue_items(self, task_id, evolutions=None, schema_options=None, task_options=None):
+        ...
+        # marker ATQ 210
+        template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
+
+#queue
+    """ marker ATQ 210   generate template   """
+    def generate_template_queue_item(self, task, schema):
+        """  generate template for multi use on add to queue process   """
+
+#schemas
+    """ marker ATQ 212   get evo scripts   """
+    def get_evo_scripts_array(self, batch, evos_str, action_with_evo_index):
+
+
+#queue
+    """ marker ATQ 220   generate name   """
+    def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
+
+
+#queue
+    """ marker ATQ 230   generate script from actions  """
+    def generate_script_from_actions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
+	""" marker ATQ 235   generate script from temlpate   """
+	scr += act.generate_script_from_action_template(batch, with_new_line=False) + "; "
+
+#actions
+    """ marker ATQ 235   generate script from temlpate   """
+    def generate_script_from_action_template(self, batch, with_new_line=False):
+
+
+#io
+    """ marker ATQ 240   convert var to val in script  """
+    def convert_var_to_val_in_script(self, script, evo_index=None):
+
+#io
+    """ marker ATQ 242   convert var to val in command """
+    def convert_var_to_val_in_command(self, command, ei_str):
+    
+#io
+    """ marker ATQ 250   convert undefined to default   """
+    def convert_undefined_to_default(self, template, evo_index=None):
+

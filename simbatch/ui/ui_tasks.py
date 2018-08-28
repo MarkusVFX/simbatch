@@ -527,18 +527,10 @@ class TasksUI:
                 self.batch.logger.deepdb(("not is_evo:", ak.is_evo, "   scr:", ak.script_type, ak.script))
     """
 
-    """ marker ATQ 100   gathering options   """
-    def generate_options_from_action_widgets(self):
-        del self.qt_form_add.options[:]
-        for i, wa in enumerate(self.qt_form_add.actions_widgets_array):
-            if wa.qt_combo_param is not None:
-                opt = wa.qt_edit_line_widget.qt_edit_line.text()
-                if len(opt) >= 5:   # "BND 4"...  # TODO  protection empty BND; SHR;
-                    self.qt_form_add.options.append(opt)
-
     """ marker ATQ 010a   on click add   """
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
+        form_atq.collect_options_from_action_widgets()
         # current_task_id = self.batch.tsk.current_task_id
         current_task = self.batch.tsk.current_task
         if current_task is not None:
@@ -553,13 +545,13 @@ class TasksUI:
 
                 self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver
 
-                self.generate_options_from_action_widgets()
+
 
                 """ marker TO     TODO"""
                 schema_options = None
                 task_options = None
                 form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id,
-                                                                       evolutions=form_atq.options,
+                                                                       action_options=form_atq.options,
                                                                        schema_options=schema_options,
                                                                        task_options=task_options)
                 if form_queue_items is not None:

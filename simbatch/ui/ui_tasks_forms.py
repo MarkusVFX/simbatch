@@ -408,10 +408,10 @@ class AddToQueueForm(QWidget):
                 #     for a in mac.actions:
                 #         evolution.append(a.parameters.name)
 
-                check_str = str(act.default_value)
+                # check_str = str(act.default_value)
                 check_str = str(act.actual_value)
                 val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str)
-                print " ret ret ret" , val_str
+                print " ret ret ret", val_str
                 if val_str is None:
                     val_str = "None"
                 # act.actual_value = ret
@@ -471,4 +471,14 @@ class AddToQueueForm(QWidget):
         if self.batch.tsk.proxy_task is not None:
             self.batch.tsk.proxy_task.description = txt
 
-
+    """ marker ATQ 100   collect options   """
+    def collect_options_from_action_widgets(self):
+        del self.options[:]
+        for i, wa in enumerate(self.actions_widgets_array):
+            if wa.qt_combo_param is not None:
+                opt = wa.qt_edit_line_widget.qt_edit_line.text()
+                if len(opt) >= 5:  # "BND 4"...  # TODO  protection empty BND; SHR;
+                    self.options.append(opt)
+            else:
+                opt = wa.qt_edit_line_widget.qt_edit_line.text()
+                self.options.append(opt)

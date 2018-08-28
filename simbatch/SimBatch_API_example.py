@@ -61,7 +61,7 @@ if add_param is True:
 
     schema_options = simbatch.sch.create_schema_options_object()
     schema_options.set_action_value("Open", "open_file.mb")
-    schema_options.set_action_value("Import", "<shot_cache_dir>/orc_*.xml")
+    schema_options.set_action_value("Import", "<shot_ani_cache_dir>/orc_*.xml")
     schema_options.set_action_value("Import", "<project_cache_dir>/captain_sword.xml")
     schema_options.set_action_value("Save", "custom_file_name_v<ver>.mb", occurrence=1)
     schema_options.set_action_value("Save", "<shot_dir>/backup/<schema_name>_<shot_name>__v<ver>.mb", occurrence=1)

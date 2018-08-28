@@ -57,6 +57,12 @@ class QueueItem:
         self.proj_id = proj_id   # TODO  change to project_id
         self.soft_id = soft_id
 
+    def print_this(self):
+        print "\n QUEUE ITEM: "
+        print "   id: {}   seq|sh|tk: {}|{}|{} \n".format(self.id, self.sequence, self.shot, self.take)
+        print "   ver:{}  evo_nr: {}   evo: {}    \n".format(self.version, self.evolution_nr, self.evolution)
+        print "   evolution_script:{}\n".format(self.evolution_script)
+
     """ marker ATQ 220   generate name   """
     def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
         name = task.task_name + " "
@@ -205,6 +211,14 @@ class Queue:
         else:
             return True
 
+    def clear_json_queue_file(self, json_file=None):
+        if json_file is None:
+            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_QUEUE_FILE_NAME
+        if self.comfun.file_exists(json_file):
+            return self.comfun.save_to_file(json_file, "")
+        else:
+            return True
+
     @staticmethod
     def clear_queue_items_in_mysql():
         # PRO VERSION with sql
@@ -219,7 +233,7 @@ class Queue:
         # TODO check clear UI val (last current...)
         if clear_stored_data:
             if self.sts.store_data_mode == 1:
-                if self.delete_json_queue_file():
+                if self.clear_json_queue_file():
                     return True
                 else:
                     return False
@@ -348,7 +362,7 @@ class Queue:
                                                    len(li), len(QUEUE_ITEM_FIELDS_NAMES)))
                     return True
             else:
-                self.batch.logger.wrn(("no tasks data in : ", json_file))
+                self.batch.logger.wrn(("no queue data in : ", json_file))
                 return False
         else:
             self.batch.logger.wrn(("queue file doesn't exist: ", json_file))
@@ -393,7 +407,7 @@ class Queue:
                 if engines_counter == engine_index:
                     scr += evo_scr
                 engines_counter += 1
-            scr += act.generate_script_from_template(batch, with_new_line=False) + "; "
+            scr += act.generate_script_from_action_template(batch, with_new_line=False) + "; "
 
         return scr
 
@@ -419,27 +433,29 @@ class Queue:
             return None
 
     """ marker ATQ 200   generate queue items   """
-    def generate_queue_items(self, task_id, evolutions=None, schema_options=None, task_options=None):
+    def generate_queue_items(self, task_id, action_options=None, schema_options=None, task_options=None):
         tsk = self.batch.tsk
         sch = self.batch.sch
         queue_items = []
         if task_options is None:
             based_on_task = copy.deepcopy(tsk.get_task_by_id(task_id))
         else:
-            based_on_task = task_options
+            based_on_task = task_options.proxy_task
 
         if schema_options is None:
             schema_index = sch.get_index_by_id(based_on_task.schema_id)
             based_on_schema = sch.schemas_data[schema_index]
         else:
-            based_on_schema = schema_options
+            based_on_schema = schema_options.proxy_schema
 
-        """ marker SO (SchemaOptions)   send to compile   """
+        # all_evos = get_evos_from_options(action_options)
+
+        """ marker SO (SchemaOptions) send to compile   """
         """ marker TO (TaskOptions)   send to compile   """
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
-        print "evolutions:", evolutions  ### ['Bnd 111 222']
+        print "action_options:", action_options  ### ['Bnd 111 222']
         if template_queue_item is not None:
-            if evolutions is None or len(evolutions) == 0:
+            if action_options is None or len(action_options) == 0:
                 template_queue_item.generate_queue_item_name(based_on_task, with_update=True)
                 template_queue_item.evolution = ""
 
@@ -451,11 +467,13 @@ class Queue:
                 #
 
                 queue_items.append(template_queue_item)
+
             else:
                 # evolutions = [  "BND 4 5; DMP 7"  ,      "BRN: 1 2 3"  ]    # example for 2 engines !!!
                 for engine_idx, evos in enumerate(evolutions):
                     print "eeevvvooooo" , evos  ### Bnd 111 222
-                    inject_evo_scr_arr = based_on_schema.get_evo_scripts_array(self.batch, evos, engine_index)
+                    evo_action_index = 1
+                    inject_evo_scr_arr = based_on_schema.get_evo_scripts_array(self.batch, evos, evo_action_index)
                     for j, evo_scr in enumerate(inject_evo_scr_arr[1]):
                         j1 = j+1
                         print "eeevvvo_scr ", evo_scr   ### interactions.set_evo_param(<o>.bendResistance = 111.0);
@@ -479,5 +497,5 @@ class Queue:
                         queue_items.append(queue_item)
 
         else:
-            self.batch.logger.wrn("template_queue_item is None")
+            self.batch.logger.err("template_queue_item is None")
         return queue_items

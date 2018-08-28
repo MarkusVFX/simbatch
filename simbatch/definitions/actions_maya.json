@@ -156,7 +156,7 @@
 				"name": "Save",
 				"desc": "Save Maya Scene",
 				"ui" : [["Get dir","[get_directory]"]],
-				"default": "<copmuted_scenes_dir>",
+				"default": "<copmuted_scene>",
 				"template": ["interactions.maya_save_scene(\"", "<f>", "\")"]
 			},
 			"7":{

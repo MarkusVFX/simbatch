@@ -118,7 +118,7 @@
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Current Scene",
-				"default": "<copmuted_scenes_dir>",
+				"default": "<copmuted_scene>",
 				"template": ["interaction.max_save_scene(\"", "<f>", "\")"]
 			},
 			"7":{

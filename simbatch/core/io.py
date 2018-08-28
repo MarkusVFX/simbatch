@@ -14,12 +14,12 @@ class PredefinedVariables:
         "project_props_dir": {"type": "d", "function": "get_project_props_dir"},
         "shot_camera_file": {"type": "f", "function": "get_shot_camera_file"},
         "shot_prev_file": {"type": "f", "function": "get_shot_prev_file"},
-        "shot_simed_setup": {"type": "f", "function": "get_shot_simed_setup"},
+        "copmuted_scene": {"type": "f", "function": "get_shot_computed_setup"},
         "scripts_dir": {"type": "d", "function": "get_scripts_dir"},
-        "shot_dir": {"type": "x", "function": "get_shot_dir"},
-        "working_dir": {"type": "x", "function": "get_working_dir"},
-        "schema_name": {"type": "x", "function": "get_schema_name"},
-        "shot_name": {"type": "x", "function": "get_shot_name"}
+        "shot_dir": {"type": "d", "function": "get_shot_dir"},
+        "working_dir": {"type": "d", "function": "get_working_dir"},
+        "schema_name": {"type": "s", "function": "get_schema_name"},
+        "shot_name": {"type": "s", "function": "get_shot_name"}
     }
     defaults = {
         "sim_ts": "get_sim_time_start",
@@ -180,8 +180,8 @@ class PredefinedVariables:
         else:
             return ""
 
-    def get_shot_simed_setup(self, evo_index=None):
-        ret = self.batch.sio.generate_shot_simed_setup(evo_index=evo_index)
+    def get_shot_computed_setup(self, evo_index=None):
+        ret = self.batch.sio.generate_shot_computed_setup(evo_index=evo_index)
         if ret[0] > 0:
             return ret[1]
         else:
@@ -411,7 +411,7 @@ class StorageInOut:
 
             return 1, shot_dir
 
-    def generate_shot_simed_setup(self, ver=0, evo_index=None):
+    def generate_shot_computed_setup(self, ver=0, evo_index=None):
         ret = self.generate_shot_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1]

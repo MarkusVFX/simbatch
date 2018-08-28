@@ -8,7 +8,8 @@ class PredefinedVariables:
 
     predefined = {
         "schema_base_setup": {"type": "f", "function": "get_schema_base_setup"},
-        "shot_cache_dir": {"type": "d", "function": "get_shot_cache_dir"},
+        "shot_ani_cache_dir": {"type": "d", "function": "get_shot_ani_cache_dir"},
+        "shot_cache_out_dir": {"type": "d", "function": "get_shot_cache_out_dir"},
         "project_cache_dir": {"type": "d", "function": "get_project_cache_dir"},
         "shot_cam_dir": {"type": "d", "function": "get_shot_cam_dir"},
         "project_props_dir": {"type": "d", "function": "get_project_props_dir"},
@@ -19,7 +20,9 @@ class PredefinedVariables:
         "shot_dir": {"type": "d", "function": "get_shot_dir"},
         "working_dir": {"type": "d", "function": "get_working_dir"},
         "schema_name": {"type": "s", "function": "get_schema_name"},
-        "shot_name": {"type": "s", "function": "get_shot_name"}
+        "shot_name": {"type": "s", "function": "get_shot_name"},
+        "default_camera": {"type": "s", "function": "get_default_camera_name"},
+        "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"}
     }
     defaults = {
         "sim_ts": "get_sim_time_start",
@@ -52,6 +55,8 @@ class PredefinedVariables:
                     pass
                     # TODO ex
                     # return check_str
+            else:
+                self.batch.logger.wrn(("Missing predefined key:", key_plus, " in ", predefined_item))
         return check_str
 
     """ marker ATQ 242   convert var to val in command """
@@ -131,8 +136,29 @@ class PredefinedVariables:
                         pass
         return template
 
+    def get_default_camera_name(self):
+        ret = self.batch.sio.generate_default_camera_name()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    def get_shot_prev_seq(self):
+        ret = self.batch.sio.generate_shot_prev_seq()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
     def get_schema_base_setup(self, evo_index=None):
         ret = self.batch.sio.generate_base_setup_file_name()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    def get_shot_ani_cache_dir(self):
+        ret = self.batch.sio.generate_shot_ani_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
@@ -145,8 +171,15 @@ class PredefinedVariables:
         else:
             return ""
 
-    def get_shot_cache_dir(self, evo_index=None):
-        ret = self.batch.sio.generate_shot_cache_path()
+    def get_project_props_dir(self, evo_index=None):
+        ret = self.batch.sio.generate_project_props_path()
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    def get_shot_cache_out_dir(self, evo_index=None):
+        ret = self.batch.sio.generate_shot_cache_out_path()
         if ret[0] > 0:
             return ret[1]
         else:
@@ -195,7 +228,7 @@ class PredefinedVariables:
             return ""
 
     def get_shot_dir(self, evo_index=None):
-        ret = self.batch.sio.generate_shot_dir()
+        ret = self.batch.sio.generate_shot_working_dir()
         if ret[0] > 0:
             return ret[1]
         else:
@@ -392,7 +425,37 @@ class StorageInOut:
             shot_name = shot_name[:-1]
             return 1, shot_name
 
-    def generate_shot_dir(self):
+    def generate_shot_ani_cache_dir(self):
+        if self.prj.current_project is None or self.batch.tsk.current_task is None:
+            return -1, ""
+        else:
+            shot_dir = self.prj.current_project.cache_directory_absolute
+            cur_tsk = self.batch.tsk.current_task
+            if len(cur_tsk.sequence) > 0:
+                shot_dir += cur_tsk.sequence + self.dir_separator
+            if len(cur_tsk.shot) > 0:
+                shot_dir += cur_tsk.shot + self.dir_separator
+            if len(cur_tsk.take) > 0:
+                shot_dir += cur_tsk.take + self.dir_separator
+
+            return 1, shot_dir
+
+    def generate_shot_cam_dir(self):
+        if self.prj.current_project is None or self.batch.tsk.current_task is None:
+            return -1, ""
+        else:
+            shot_dir = self.prj.current_project.cameras_directory_absolute
+            cur_tsk = self.batch.tsk.current_task
+            if len(cur_tsk.sequence) > 0:
+                shot_dir += cur_tsk.sequence + self.dir_separator
+            if len(cur_tsk.shot) > 0:
+                shot_dir += cur_tsk.shot + self.dir_separator
+            if len(cur_tsk.take) > 0:
+                shot_dir += cur_tsk.take + self.dir_separator
+
+            return 1, shot_dir
+
+    def generate_shot_working_dir(self):
         if self.prj.current_project is None or \
                 self.batch.sch.current_schema is None or \
                 self.batch.tsk.current_task is None:
@@ -412,7 +475,7 @@ class StorageInOut:
             return 1, shot_dir
 
     def generate_shot_computed_setup(self, ver=0, evo_index=None):
-        ret = self.generate_shot_dir()
+        ret = self.generate_shot_working_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1]
             evo_inject = ""
@@ -436,20 +499,25 @@ class StorageInOut:
         ret = self.get_project_data_dir()
         return ret[0], ret[1] + "cache" + self.dir_separator
 
-    def generate_shot_cache_path(self):
-        ret = self.generate_shot_dir()
+    def generate_shot_ani_cache_path(self):
+        ret = self.generate_shot_ani_cache_dir()
+        return ret
+
+    def generate_shot_cache_out_path(self):
+        ret = self.generate_shot_working_dir()
         return ret[0], ret[1] + "cache" + self.dir_separator
 
     def generate_shot_cam_path(self):
-        ret = self.generate_shot_dir()
-        return ret[0], ret[1] + "cam" + self.dir_separator
+        ret = self.generate_shot_cam_dir()
+        # TODO find higher version file cam
+        return ret
 
     def generate_project_props_path(self):
-        ret = self.generate_shot_dir()
+        ret = self.generate_shot_working_dir()
         return ret[0], ret[1] + "props" + self.dir_separator
 
     def generate_shot_prev_file(self):
-        ret = self.generate_shot_dir()
+        ret = self.generate_shot_working_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1] + "prev" + self.dir_separator
             schema_name = self.batch.sch.current_schema.schema_name
@@ -462,7 +530,7 @@ class StorageInOut:
         return ret
 
     def generate_scripts_dir(self):
-        ret = self.generate_shot_dir()
+        ret = self.generate_shot_working_dir()
         return ret[0], ret[1] + "scripts" + self.dir_separator
 
     #  get directory pattern for current project
@@ -472,5 +540,15 @@ class StorageInOut:
         self.batch.logger.db(("(get_dir_patterns) deep debug start dir:", directory))
         full_dir_pattern = None
         return full_dir_pattern
+
+    def generate_default_camera_name(self):
+        # TODO "<default_camera>"
+        return 1, ""
+
+    def generate_shot_prev_seq(self):
+        ret = self.generate_shot_working_dir()
+        q_ver_str = "001"
+        return ret[0], ret[1] + "prev" + self.dir_separator + q_ver_str + self.dir_separator + "prev_v"+q_ver_str+"__####.jpg"
+
 
 

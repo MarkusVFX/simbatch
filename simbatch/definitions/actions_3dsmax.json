@@ -28,7 +28,7 @@
 						"id": 1,
 						"mode": "ANI",
 						"desc": "Animation cache",
-						"default": "<project_cache_dir>",
+						"default": "<shot_ani_cache_dir>",
 						"additionalButton" : "Objs",
 						"additionalButtonFunction" : "interaction.max_get_scene_objects()",
 						"template": ["interaction.max_import_ani(", "<o>", ", \"", "<d>", "\" )"]
@@ -37,7 +37,7 @@
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
-						"default": "<project_cam_dir>",
+						"default": "<shot_cam_dir>",
 						"template": ["interaction.max_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {

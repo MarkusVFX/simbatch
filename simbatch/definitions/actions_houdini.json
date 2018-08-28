@@ -28,14 +28,14 @@
 						"id": 1,
 						"mode": "ANI",
 						"desc": "Animation cache",
-						"default": "<project_cache_dir>",
+						"default": "<shot_ani_cache_dir>",
 						"template": ["interaction.hou_import_ani(", "<o>", ", \"", "<d>", "\" )"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
-						"default": "<project_cam_dir>",
+						"default": "<shot_cam_dir>",
 						"template": ["interaction.hou_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
 					"3": {

@@ -29,7 +29,7 @@
 						"id": 1,
 						"mode": "ANI",
 						"desc": "Animation cache",
-						"default": "<project_cache_dir>",
+						"default": "<shot_ani_cache_dir>",
 						"ui" : [["Get dir","[get_directory]"],["Get selection","interactions.maya_get_selection"]],
 						"template": ["interactions.maya_import_ani(", "<o>", ", \"", "<d>", "\" )"]						
 					},
@@ -37,7 +37,7 @@
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
-						"default": "<project_cam_dir>",
+						"default": "<shot_cam_dir>",
 						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
 						"template": ["interactions.maya_import_cam(", "<o>", ", \"", "<f>", "\" )"]
 					},
@@ -137,7 +137,7 @@
 						"mode": "BLAST",
 						"desc": "grab viewport",
 						"ui" : [["Get camera","interactions.maya_get_camera"]],
-						"default": "<default_camera><shot_prev_dir>",
+						"default": "<default_camera><shot_prev_seq>",
 						"template": ["interactions.maya_render_blast(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					},
 					"2": {
@@ -145,7 +145,7 @@
 						"mode": "RENDER",
 						"desc": "render scene",
 						"ui" : [["Get camera","interactions.maya_get_camera"]],
-						"default": "<default_camera><shot_prev_dir>",
+						"default": "<default_camera><shot_prev_seq>",
 						"template": ["interactions.maya_render_software(", "<ts>", " , ", "<te>", " , \"", "<f>", "\"  )"]
 					}
 				}

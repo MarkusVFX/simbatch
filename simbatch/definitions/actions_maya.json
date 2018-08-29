@@ -16,10 +16,8 @@
 				"type": "single",
 				"name": "Open",
 				"desc": "Open Maya scene",
-				"ui" : [["Get file","[get_file]"]],
-				"default": "<schema_base_setup>",
-				"template": ["interactions.maya_open_scene(", "<f>", ")"],
-				"template_tags": [["<f>","ui"]]
+				"ui" : ["<schema_base_setup>", ["Get file","[get_file]"]],
+				"template": ["interactions.maya_open_scene(", "<ui>", ")"]
 			},
 			"2":{
 				"id": 2,
@@ -30,28 +28,22 @@
 						"id": 1,
 						"mode": "ANI",
 						"desc": "Animation cache",
-						"default": "<shot_ani_cache_dir>",
-						"ui" : [["Get dir","[get_directory]"],["Get selection","interactions.maya_get_selection"]],
-						"template": ["interactions.maya_import_ani(", "<d>", ")"],
-				        "template_tags": [["<d>","ui"]]
+						"ui" : ["<shot_ani_cache_dir>", ["Get dir","[get_directory]"],["Get selection","interactions.maya_get_selection"]],
+						"template": ["interactions.maya_import_ani(", "<ui>", ")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "CAM",
 						"desc": "Camera file",
-						"default": "<shot_cam_dir>",
-						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
-						"template": ["interactions.maya_import_cam(", "<f>", ")"],
-				        "template_tags": [["<f>","ui"]]
+						"ui" : ["<shot_cam_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.maya_import_cam(", "<ui>", ")"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "OBJ",
 						"desc": "Geometry file",
-						"default": "<project_props_dir>",
-						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
-						"template": ["interactions.maya_import_obj(", "<f>", ")"],
-				        "template_tags": [["<f>","ui"]]
+						"ui" : ["<project_props_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.maya_import_obj(", "<ui>", ")"]
 					}
 				}
 			},
@@ -60,10 +52,8 @@
 				"type": "single",
 				"name": "Set Value",
 				"desc": "Set value for object property",
- 				"ui" : [["Get selection","interactions.maya_get_selection"],["Info","[show_info|format: object.param=value]"]],
- 				"default": "<object>.<param>=<value>",
-                "template": ["interactions.maya_set_param(", "<s>", ")"],
-                "template_tags": [["<s>","ui"],["<d>","shot_cache_out_dir"]]
+ 				"ui" : ["<object>.<param>=<value>", ["Get selection","interactions.maya_get_selection"],["Info","[show_info|format: object.param=value]"]],
+                "template": ["interactions.maya_set_param(", "<ui>", ")"]
 			},
 			"4":{
 				"id": 4,
@@ -74,10 +64,8 @@
 						"id": 1,
 						"mode": "nCloth",
 						"desc": "nCloth sim",
-						"ui" : [["Get selection","interactions.maya_get_selection"]],
-						"default": "<cloth_objects>",
-						"template": ["interactions.maya_simulate_ncloth(", "<sts>", ", ", "<ste>", ", ", "<o>", ", ", "<d>", ")"],
-                        "template_tags": [["<sts>","predefined_default"],["<ste>","predefined_default"],["<o>","ui"],["<d>","shot_cache_out_dir"]]
+						"ui" : ["<cloth_objects>", ["Get selection","interactions.maya_get_selection"]],
+						"template": ["interactions.maya_simulate_ncloth(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"],
                         "params":{
                             "paramsTemplate": ["interactions.maya_set_param(", "<s>", ")"],
                             "paramsList":{
@@ -103,34 +91,29 @@
 						"id": 2,
 						"mode": "nHair",
 						"desc": "nHair sim",
-						"ui" : [["Get selection","interactions.maya_get_selection"]],
-						"default": "<hair_objects>",
+						"ui" : ["<hair_objects>", ["Get selection","interactions.maya_get_selection"]],
 						"template": ["interactions.maya_simulate_nhair(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
 					},
 					"3": {
 						"id": 3,
 						"mode": "nParticle",
 						"desc": "nParticle sim",
-						"ui" : [["Get selection","interactions.maya_get_selection"]],
-						"default": "<particle_objects>",
+						"ui" : ["<particle_objects>", ["Get selection","interactions.maya_get_selection"]],
 						"template": ["interactions.maya_simulate_nparticle(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
 					},
 					"4": {
 						"id": 4,
 						"mode": "FumeFX",
 						"desc": "FumeFX sim",
-						"ui" : [["Get selection","interactions.maya_get_selection"]],
-						"default": "<fume_container>",
+						"ui" : ["<fume_container>", ["Get selection","interactions.maya_get_selection"]],
 						"template": ["interactions.maya_simulate_fume(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
 					},
 					"5": {
 						"id": 5,
 						"mode": "FumeFX WT",
 						"desc": "FumeFX Wavelet",
-						"ui" : [["Get selection","interactions.maya_get_selection"]],
-						"default": "<fume_container>",
-						"template": ["interactions.maya_simulate_fumewt(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"],
-						"template_tags": [["<o>","ui"],["<d>","shot_cache_out_dir"]]
+						"ui" : ["<fume_container>", ["Get selection","interactions.maya_get_selection"]],
+						"template": ["interactions.maya_simulate_fumewt(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
 					}
 				}
 			},
@@ -143,17 +126,15 @@
 						"id": 1,
 						"mode": "BLAST",
 						"desc": "grab viewport",
-						"ui" : [["Get dir","[get_directory]"]],
-						"default": "<shot_prev_seq>",
+						"ui" : ["<shot_prev_seq>",["Get dir","[get_directory]"]],
 						"template": ["interactions.maya_render_blast(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "RENDER",
 						"desc": "render scene",
-						"ui" : [["Get dir","[get_directory]"]],
-						"default": "<shot_prev_seq>",
-						"template": ["interactions.maya_render_software(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"],
+						"ui" : ["<shot_prev_seq>", ["Get dir","[get_directory]"]],
+						"template": ["interactions.maya_render_software(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
 					}
 				}
 			},
@@ -162,10 +143,8 @@
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Maya Scene",
-				"ui" : [["Get dir","[get_directory]"]],
-				"default": "<copmuted_scene>",
-				"template": ["interactions.maya_save_scene(", "<f>", ")"],
-				"template_tags": [["<f>","ui"]]
+				"ui" : ["<copmuted_scene>", ["Get dir","[get_directory]"]],
+				"template": ["interactions.maya_save_scene(", "<ui>", ")"]
 			},
 			"7":{
 				"id": 7,
@@ -176,20 +155,15 @@
 						"id": 1,
 						"mode": "PY",
 						"desc": "run Python file",
-						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
-						"ui_tag" : "<f>",
-						"default": "<scripts_dir>*.py",
-						"template": ["interactions.maya_script_py(", "<f>", ")"],
-						"template_tags": [["<f>","ui"]]
+						"ui" : ["<scripts_dir>*.py", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.maya_script_py(", "<ui>", ")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "MEL",
 						"desc": "run MEL file",
-						"ui" : [["Get dir","[get_directory]"],["Get file","[get_file]"]],
-						"default": "<scripts_dir>*.mel",
-						"template": ["interactions.maya_script_mel(", "<f>", ")"],
-						"template_tags": [["<f>","ui"]]
+						"ui" : ["<scripts_dir>*.mel", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.maya_script_mel(", "<ui>", ")"]
 					}
 				}
 			}

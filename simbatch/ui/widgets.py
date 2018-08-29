@@ -315,8 +315,11 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
             function_to_eval = "self."+button_fun_str+"()"
 
         if function_to_eval is not None:
-            eval_ret = eval(function_to_eval)
-            edit.setText(eval_ret)
+            try:
+                eval_ret = eval(function_to_eval)
+                edit.setText(eval_ret)
+            except ValueError:
+                pass
         else:
             self.batch.logger.wrn("Dynamic button clicked connect is EMPTY")
 
@@ -332,7 +335,7 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
     def defined_button_get_directory(self):           # QFileDialog - protect common function to be independent library
         ret_dir = self.batch.comfun.get_dialog_directory(self.qt_edit, QFileDialog,
                                                          force_start_dir=self.batch.prj.current_project.project_directory,
-                                                         dir_separator=self.sts.dir_separator)
+                                                         dir_separator=self.batch.sts.dir_separator)
         return ret_dir
 
     def defined_button_show_info(self, info):

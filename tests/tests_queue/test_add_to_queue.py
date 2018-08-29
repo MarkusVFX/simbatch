@@ -12,8 +12,12 @@ def sib():
 
 
 def test_init_simbatch(sib):
-    assert sib.sts.runtime_env == "Stand-alone"
+    #
+    sib.sts.debug_level = 0
+    sib.logger.console_level = 0
+    #
 
+    assert sib.sts.runtime_env == "Stand-alone"
     lo = sib.load_data()
     assert lo[0] is True
 
@@ -21,6 +25,24 @@ def test_init_simbatch(sib):
     assert sib.sch.total_schemas > 0
     assert sib.tsk.total_tasks > 0
     assert sib.que.total_queue_items > 0
+
+
+def test_get_evolutions_from_string(sib):
+    evos = sib.pat.get_evolutions_from_string("BND 1 2 3")
+    assert evos[0] == 3
+    assert evos[1] == [['BND', '1.0', '2.0', '3.0']]
+
+    evos = sib.pat.get_evolutions_from_string("BND 1 2 3; STR 4 5")
+    assert evos[0] == 6
+    assert evos[1][1] == ['STR', '4.0', '5.0']
+
+
+def test_get_scripts_from_evolutions(sib):
+    evos = sib.pat.get_evolutions_from_string("BND 1 2 3; STR 4 5")
+
+    # sib.get_scripts_from_evolutions(evos)
+    # sib.sch.current_schema
+    #
 
 
 def test_set_prj_sch_tsk(sib):
@@ -38,13 +60,33 @@ def test_set_prj_sch_tsk(sib):
 
     sib.que.remove_all_queue_items(only_done=True)
 
-    sib.que.print_all()
+    # sib.que.print_all()
     assert sib.que.total_queue_items > 0
-    sib.que.print_queue_item(sib.que.queue_data[sib.que.total_queue_items-1])
+    # sib.que.print_queue_item(sib.que.queue_data[sib.que.total_queue_items-1])
 
 
-def test_generate_queue_items_from_task(sib):
+def test_generate_template_queue_item(sib):
+    print "\n\n___ template_queue_item ___"
+    template_queue_item = sib.que.generate_template_queue_item(sib.tsk.current_task, sib.sch.current_schema)
+
+    script = sib.que.generate_script_from_actions(sib, sib.sch.current_schema)
+    print " template_queue_item: ", template_queue_item
+    print " script: ", script
+    template_queue_item.evolution_script = script
+    #template_queue_item.print_this()
+
+
+def test_generate_queue_items(sib):
+    print "\n\n___ queue_items ___"
     qi1 = sib.que.generate_queue_items(sib.tsk.current_task_id)
+    for qi in qi1:
+        print "___"
+        qi.print_this()
+
+def test_generate_queue_items(sib):
+    print "\n\n___ queue_items ___"
+    custom_action_options = ["ooppoo",[10, 99,"cape", "out","DMP 1 2 3"],"simed_file"]
+    qi1 = sib.que.generate_queue_items(sib.tsk.current_task_id, action_options=custom_action_options)
     for qi in qi1:
         print "___"
         qi.print_this()

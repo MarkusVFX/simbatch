@@ -65,7 +65,8 @@ class SchemaFormCreateOrEdit(QWidget):
                                                                                            aw.edit_val, aw.ui_info))
         self.batch.logger.raw("\nforms action_array count:  {}".format(len(self.local_schema_item.actions_array)))
         for a in self.local_schema_item.actions_array:
-            self.batch.logger.raw("action: {}  def_val:{}  act_val:{}  mode:{}".format(a.name, a.default_value,
+            self.batch.logger.raw("action: {}  def_val:{}  act_val:{}  mode:{}".format(a.name, a.ui[0],
+                                                                                       # a.default_value
                                                                                        a.actual_value, a.mode))
 
     def init_ui_elements(self):
@@ -228,12 +229,12 @@ class SchemaFormCreateOrEdit(QWidget):
         button_2_function_str = None
         if len(multi_action.actions) > 0:
             if multi_action.actions[0].ui is not None:
-                if len(multi_action.actions[0].ui) > 0:
-                    button_1_caption = multi_action.actions[0].ui[0][0]
-                    button_1_function_str = multi_action.actions[0].ui[0][1]
                 if len(multi_action.actions[0].ui) > 1:
-                    button_2_caption = multi_action.actions[0].ui[1][0]
-                    button_2_function_str = multi_action.actions[0].ui[1][1]
+                    button_1_caption = multi_action.actions[0].ui[1][0]
+                    button_1_function_str = multi_action.actions[0].ui[1][1]
+                if len(multi_action.actions[0].ui) > 2:
+                    button_2_caption = multi_action.actions[0].ui[2][0]
+                    button_2_function_str = multi_action.actions[0].ui[2][1]
 
         batch = self.batch   # share logger and interaction from definition
         top = self.top_ui
@@ -247,7 +248,8 @@ class SchemaFormCreateOrEdit(QWidget):
             if multi_action.actions_count == 1:   # single action, no combo
                 # print "ui ui ui ", multi_action.actions[0].actual_value , "___" , multi_action.actions[0]
                 if len(multi_action.actions[0].actual_value) == 0:
-                    multi_action.actions[0].actual_value = multi_action.actions[0].default_value   # TODO actual vs user val
+                    # multi_action.actions[0].actual_value = multi_action.actions[0].default_value
+                    multi_action.actions[0].actual_value = multi_action.actions[0].ui[0]
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.actions[0].name,
                                              copy.deepcopy(multi_action),
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
@@ -257,7 +259,8 @@ class SchemaFormCreateOrEdit(QWidget):
                 for i, a in enumerate(multi_action.actions):
                     combo_items.append(a.mode)
 
-                    a.actual_value = a.default_value    # TODO actual vs user val
+                    # a.actual_value = a.default_value    # TODO actual vs user val
+                    a.actual_value = a.ui[0]
                 action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.name,
                                              copy.deepcopy(multi_action),
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,

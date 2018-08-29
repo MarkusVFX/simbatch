@@ -256,7 +256,8 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
                 if len(multi_action.actions[0].actual_value) > 0:
                     edit_txt = multi_action.actions[0].actual_value
                 else:
-                    edit_txt = multi_action.actions[0].default_value
+                    # edit_txt = multi_action.actions[0].default_value
+                    edit_txt = multi_action.actions[0].ui[0]
 
         if edit_txt is not False:
             if edit_txt == " ":
@@ -355,18 +356,19 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
         if len(sub_a.actual_value) > 0:
             self.qt_edit.setText(sub_a.actual_value)
         else:
-            self.qt_edit.setText(sub_a.default_value)
+            # self.qt_edit.setText(sub_a.default_value)
+            self.qt_edit.setText(sub_a.ui[0])
         if sub_a.ui is not None:
-            if len(sub_a.ui) > 0:
-                button_1_caption = sub_a.ui[0][0]   # TODO  sub_a as object
-                button_1_fun_str = sub_a.ui[0][1]   # TODO  sub_a as object
+            if len(sub_a.ui) > 1:
+                button_1_caption = sub_a.ui[1][0]   # TODO  sub_a as object
+                button_1_fun_str = sub_a.ui[1][1]   # TODO  sub_a as object
                 self.qt_button_1.setText(button_1_caption)
                 self.qt_button_1.clicked.disconnect()
                 self.qt_button_1.clicked.connect(lambda: self.eval_button_fun(self.qt_edit, button_1_fun_str))
 
-            if len(sub_a.ui) > 1:
-                button_2_caption = sub_a.ui[1][0]   # TODO  sub_a as object
-                button_2_fun_str = sub_a.ui[1][1]   # TODO  sub_a as object
+            if len(sub_a.ui) > 2:
+                button_2_caption = sub_a.ui[2][0]   # TODO  sub_a as object
+                button_2_fun_str = sub_a.ui[2][1]   # TODO  sub_a as object
                 self.qt_button_2.setText(button_2_caption)
                 self.qt_button_2.clicked.disconnect()
                 self.qt_button_2.clicked.connect(lambda: self.eval_button_fun(self.qt_edit, button_2_fun_str))
@@ -428,7 +430,6 @@ class ActionWidgetATQ(QWidget):  # QWidget
         self.check_evos()
 
     def check_evos(self):
-
         ret = self.batch.pat.get_evolutions_from_string(self.qt_edit_line_widget.qt_edit_line.text())
 
         self.evos_array = ret[1]
@@ -446,7 +447,7 @@ class ActionWidgetATQ(QWidget):  # QWidget
         ee = []
         for e in self.evos_array:
             ee.append("  ".join(e))
-        self.qt_edit_line_widget.qt_edit_line.setText("  ; ".join(ee))
+        self.qt_edit_line_widget.qt_edit_line.setText(" ;  ".join(ee))
 
 
 class WidgetGroup:

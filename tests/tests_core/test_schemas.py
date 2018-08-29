@@ -137,7 +137,7 @@ def test_actions_in_single_schema(sib):
 def test_add_schema(sib):
     assert len(sib.sch.current_schema.actions_array) == 1
     # sia = SingleAction(-1, "virtual action", "virt descr", "<val>", "template <f>", type="single", ui=(("ui", "2+2")))
-    sia = SingleAction("virtual action", "virt descr", "<val>", "template <f>", mode="single", ui=(("ui", "2+2")))
+    sia = SingleAction("virtual action", "virt descr", "template <f>", mode="single", ui=(("ui", "2+2")))
     sib.sch.current_schema.add_action_to_schema(sia)
     assert len(sib.sch.current_schema.actions_array) == 2
 

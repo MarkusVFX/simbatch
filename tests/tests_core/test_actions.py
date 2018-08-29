@@ -21,16 +21,15 @@ def simbatch():
 
 
 def test_single_action():
-    sa = SingleAction("acti name", "descr", "abc", "template <f>")
+    sa = SingleAction("acti name", "descr", "template <f>")
     assert sa.name == "acti name"
     assert sa.description == "descr"
-    assert sa.default_value == "abc"
     assert sa.template == "template <f>"
 
 
 def test_multi_action():
-    singl_a1 = SingleAction("acti name1", "descr1", "abc", "template1 <f>")
-    singl_a2 = SingleAction("acti name2", "descr2", "abc", "template2 <f>")
+    singl_a1 = SingleAction("acti name1", "descr1", "template1 <f>")
+    singl_a2 = SingleAction("acti name2", "descr2", "template2 <f>")
     multi_a = MultiAction(1, "tst")
     assert multi_a.actions_count == 0
     multi_a.add_single_action(singl_a1)

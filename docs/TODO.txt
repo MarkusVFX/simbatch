@@ -1,0 +1,25 @@
+
+
+1 HARD
+  MULTI UI INPUTS for Definitions -> actions
+    example:
+        "3":{
+            "id": 3,
+            "type": "single",
+            "name": "Set Value",
+            "desc": "Set value for object property",
+            "ui" : [
+                    ["obj","<object>","Get selection","interactions.maya_get_selection"],
+                    ["prop","<property>","Info","[show_info|format: property]"],
+                    ["val","<value>","Info","[show_info|format: value]"]
+                    ],
+            "template": ["interactions.maya_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"],
+            "template_tags": [["<o>",["ui","obj"]],["<p>",["ui","prop"]],["<v>",["ui","val"]]]
+
+
+2 MED
+  Cleanup SingleAction 
+    self.default_value = default_value
+    self.actual_value = actual_value
+
+

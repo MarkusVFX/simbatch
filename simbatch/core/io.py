@@ -22,13 +22,14 @@ class PredefinedVariables:
         "schema_name": {"type": "s", "function": "get_schema_name"},
         "shot_name": {"type": "s", "function": "get_shot_name"},
         "default_camera": {"type": "s", "function": "get_default_camera_name"},
-        "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"}
+        "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"},
+        "sim_time_start": {"type": "t", "function": "get_sim_time_start"},
+        "sim_time_end": {"type": "t", "function": "get_sim_time_end"},
+        "prev_time_start": {"type": "t", "function": "get_prev_time_start"},
+        "prev_time_end": {"type": "t", "function": "get_prev_time_end"},
+
     }
     defaults = {
-        "sim_ts": "get_sim_time_start",
-        "sim_te": "get_sim_time_end",
-        "prev_ts": "get_prev_time_start",
-        "prev_te": "get_prev_time_end",
         "d": "get_working_directory",
         "f": "get_default_file",
         "o": "get_default_object",
@@ -547,8 +548,13 @@ class StorageInOut:
 
     def generate_shot_prev_seq(self):
         ret = self.generate_shot_working_dir()
-        q_ver_str = "001"
-        return ret[0], ret[1] + "prev" + self.dir_separator + q_ver_str + self.dir_separator + "prev_v"+q_ver_str+"__####.jpg"
+        qv = self.batch.tsk.current_task.queue_ver
+        q_ver_str = self.batch.comfun.str_with_zeros(qv)
+
+        path = ret[1] + "prev" + self.dir_separator + q_ver_str + self.dir_separator
+        filename = "prev_v" + q_ver_str  +"__####.jpg"
+        return ret[0], path + filename
+
 
 
 

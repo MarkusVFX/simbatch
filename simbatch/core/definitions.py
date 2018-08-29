@@ -94,8 +94,7 @@ class SingleDefinition:
                 logger_raw("   group_name: {} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
                                                                                 len(ga.actions)))
             for j, sa in enumerate(ga.actions):
-                logger_raw("       action {}  name: {}  default_value: {}  ui: {}".format(j, sa.name,
-                                                                                          sa.default_value, sa.ui))
+                logger_raw("       action {}  name: {}  default_value: {}  ui: {}".format(j, sa.name, sa.ui[0], sa.ui))
         self.logger.buffering_off()
         return self.logger.get_buffer()
 
@@ -186,8 +185,8 @@ class Definitions:
         return isinstance(obj, SingleAction)
 
     @staticmethod
-    def create_single_action(name, description, default_value, template, actual_value=None, mode=None, ui=None):
-        return SingleAction(name, description, default_value, template, actual_value=actual_value, mode=mode, ui=ui)
+    def create_single_action(name, description, template, actual_value=None, mode=None, ui=None):
+        return SingleAction(name, description, template, actual_value=actual_value, mode=mode, ui=ui)
 
     @staticmethod
     def create_multiaction(mac_id, name):
@@ -284,7 +283,7 @@ class Definitions:
     def get_example_definition(self):
         example_defi = SingleDefinition("example_defi", self.batch.logger)
         example_group_actions = MultiAction(1, "example a gr")
-        example_action = SingleAction("ex_a", "desc", "<def>", "templ <o>", mode="single",
+        example_action = SingleAction("ex_a", "desc", "templ <o>", mode="single",
                                       ui=(("Tst", "print('ex')"), ("Tst", "print('ex')")))
         example_group_actions.add_single_action(example_action)
         example_defi.add_group_action(example_group_actions)
@@ -359,8 +358,7 @@ class Definitions:
 
                                     if li['type'] == "single":   # id:1  for all single SingleAction in group
                                         li_ui = self.get_ui_values(li)
-                                        new_action = SingleAction(li['name'], li['desc'], li['default'],
-                                                                  li['template'], ui=li_ui)
+                                        new_action = SingleAction(li['name'], li['desc'], li['template'], ui=li_ui)
                                         if "params" in li:
                                             new_action.parameters = li["params"]
                                         new_group_action.add_single_action(new_action)
@@ -368,8 +366,8 @@ class Definitions:
                                     elif li['type'] == "multi":
                                         for ag in li["subActions"].values():
                                             ag_ui = self.get_ui_values(ag)
-                                            new_action = SingleAction(li['name'], ag['desc'], ag['default'],
-                                                                      ag['template'], mode=ag['mode'], ui=ag_ui)
+                                            new_action = SingleAction(li['name'], ag['desc'], ag['template'],
+                                                                      mode=ag['mode'], ui=ag_ui)
                                             if "params" in ag:
                                                 template = ag["params"]["paramsTemplate"]
                                                 new_action.parameters = ActionParameters(ag['mode'], template)

@@ -88,7 +88,7 @@ class SchemaItem:
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
-        self.add_action_to_schema(SingleAction("virtual action", "virt descr", "<def_val>", "template <f>",
+        self.add_action_to_schema(SingleAction("virtual action", "virt descr", "template <f>",
                                                ui=("ui", "interaction.ui_fun()")))
         return True
 
@@ -235,7 +235,7 @@ class Schemas:
         print "       definition id:{}   project id:{}".format(schema.based_on_definition, schema.project_id)
         for a in schema.actions_array:
             print "       __a: name:{}  def_val:{}  actual_val:{}  descr:{}  mode:{}".format(a.name,
-                                                                                             a.default_value,
+                                                                                             a.ui[0],
                                                                                              a.actual_value,
                                                                                              a.description,
                                                                                              a.mode)
@@ -252,7 +252,7 @@ class Schemas:
             print "   proj id:{},  definition:{} ".format(sch.project_id, sch.based_on_definition)
             print "   actions count: ", len(sch.actions_array)
             for a in sch.actions_array:
-                print "   __action: {}__{}__{}__{}".format(a.name, a.default_value, a.actual_value, a.template)
+                print "   __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template)
         print "\n\n"
 
     def get_schema_names(self, as_string=False, fit=()):
@@ -494,7 +494,7 @@ class Schemas:
                                 for lia in li['actions'].values():
                                     self.batch.logger.deepdb(("(lsfj) actions: ", lia))
                                     av = lia["actual"]
-                                    new_action = SingleAction(lia["name"], lia["desc"], lia["default"], lia["template"],
+                                    new_action = SingleAction(lia["name"], lia["desc"], lia["template"],
                                                               actual_value=av, mode=lia["mode"],
                                                               evos_possible=lia["evos"])
                                     new_schema_actions.append(new_action)
@@ -572,7 +572,7 @@ class Schemas:
         for sch in self.schemas_data:
             if sch.soft_id == soft_id:
                 for a in sch.actions_array:
-                    if a.user_value == a.default_value:
+                    if a.user_value == a.ui[0]:
                         # print "       action   : ", a.soft_id, a.action_type, a.action_param
                         pass
                         # TODO  get_all_object_from_all_schemas

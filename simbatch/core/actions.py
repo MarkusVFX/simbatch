@@ -7,7 +7,7 @@ ACTION_DATA_FIELDS_NAMES = (
     ('evos', 'evos_possible'),            # "single" or "group",
     ('mode', 'mode'),        # "ANI", "CAM", "OBJ" for 'Import' action
     # ('ui', 'ui'),        # array [["1","2"],["3","4"]]  1 primary button caption 2 function 3 secondary butt 4 sec fun
-    ('default', 'default_value'),
+    # ('default', 'default_value'),
     ('actual', 'actual_value'),
     ('template', 'template'),
     ('desc', 'description')
@@ -58,7 +58,7 @@ class SingleAction:
     name = ""
     evos_possible = False  # True for sim engines with evolutions possible BND, DMP, ...
     mode = None         # one of nCloth, nHair, Fume ...   for Maya simulate    BLAST, RENDER for prev
-    default_value = ""  # pattern changed when add to queue
+    # default_value = ""  # pattern changed when add to queue
     actual_value = ""   # var set by user or default_value, finally used for generate action_script from template
     template = ""       # use template for create absolute ...
     parameters = None   # for nucleus engine it's  BND STR MAS
@@ -69,14 +69,16 @@ class SingleAction:
     user_value = ""
     logger = None  # TODO  @classmethod
 
-    def __init__(self, name, description, default_value, template, actual_value=None, mode=None, ui=None,
-                 evos_possible=False):
+    def __init__(self, name, description, template, actual_value=None, mode=None, ui=None, evos_possible=False):
         self.name = name
         self.evos_possible = evos_possible
         self.mode = mode  # subaction mode : nCloth, nHair, Fume
-        self.ui = ui
+        if ui is None:
+            self.ui = ["None"]
+        else:
+            self.ui = ui
         self.description = description
-        self.default_value = default_value
+        # old self.default_value = default_value
         if actual_value is not None:
             self.actual_value = actual_value
         self.template = template
@@ -84,13 +86,12 @@ class SingleAction:
         self.logger = Logger()
 
     def __repr__(self):
-        return 'SingleAction("{}", "{}", "{}", "{}", actual_value="{}", ui="{}")'.format(self.name, self.description,
-                                                                                         self.default_value,
-                                                                                         self.template,
-                                                                                         self.actual_value, self.ui)
+        return 'SingleAction("{}", "{}", "{}", actual_value="{}", ui="{}")'.format(self.name, self.description,
+                                                                                   self.template, self.actual_value,
+                                                                                   self.ui)
 
     def __str__(self):
-        return "SingleAction  " + self.name
+        return "SingleAction  " + self.name + self.description + self.template
 
     def print_minimum(self):
         print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
@@ -107,7 +108,7 @@ class SingleAction:
 
     def print_action(self):
         print "   action: {}   def_val: {}   actual_val: {}   templ: {}   mode: {}".format(self.name,
-                                                                                           self.default_value,
+                                                                                           self.ui[0],
                                                                                            self.actual_value,
                                                                                            self.template,
                                                                                            self.mode)
@@ -116,7 +117,7 @@ class SingleAction:
         self.logger.buffering_on()
         logger_raw = self.logger.raw
         logger_raw("   action:          {}\n      default_value: {}\n      actual_value: {}\
-                   \n      template:       {}".format(self.name, self.default_value, self.actual_value,
+                   \n      template:       {}".format(self.name, self.ui[0], self.actual_value,
                                                       self.unicode_arr_to_asci_str(self.template)))
 
         self.logger.buffering_off()

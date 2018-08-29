@@ -13,8 +13,8 @@
 				"type": "single",
 				"name": "Run Script",
 				"desc": "execute python script",
-				"default": "<script_directory>",
-				"template": ["os.system(\"", "<f>", "\")"]
+				"ui": ["<script_directory>", ["Get dir","[get_directory]"], ["Get file","[get_file]"]],
+				"template": ["os.system(", "<ui>", ")"]
 			},
 			"2":{
 				"id": 2,
@@ -25,15 +25,15 @@
 						"id": 1,
 						"mode": "EXE",
 						"desc": "run executable file",
-						"default": "<script_directory>",
-						"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
+						"ui": ["<script_directory>", ["Get file","[get_file]"]],
+						"template": ["subprocess.Popen(", "<ui>", ", shell=True)"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "BAT",
 						"desc": "run shell program",
-						"default": "<script_directory>",
-						"template": ["subprocess.Popen(\"", "<f>", "\", shell=True)"]
+						"ui": ["<script_directory>", ["Get file","[get_file]"]],
+						"template": ["subprocess.Popen(", "<ui>", ", shell=True)"]
 					}
 				}
 			}

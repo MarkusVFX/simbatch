@@ -381,6 +381,7 @@ class ActionWidgetATQ(QWidget):  # QWidget
     qt_widget_layout = None
     qt_combo_param = None   # ComboLabel
     qt_edit_line_widget = None  # EditLineWithButtons
+    qt_evo_edit_line_widget = None  # EditLineWithButtons
 
     batch = None
 
@@ -392,33 +393,29 @@ class ActionWidgetATQ(QWidget):  # QWidget
         # QWidget.__init__(self)
         self.batch = batch
         self.qt_widget_layout = QVBoxLayout()
-        correct_button_caption = ""
-        if combo_label is not None:
-            self.qt_combo_param = ComboLabel(combo_label+" "+text_edit, combo_items, text_on_button_1="Add evo",
-                                             button_size=70)
-            self.qt_widget_layout.addLayout(self.qt_combo_param.qt_widget_layout)
-            correct_button_caption = "Correct"
 
-            self.qt_edit_line_widget = EditLineWithButtons(text_label, "", text_on_button_1=correct_button_caption,
-                                                           button_width=70)
-            if self.qt_combo_param is not None:
-                self.qt_combo_param.button_1.clicked.connect(lambda: self.add_evo_to_line())
-
-            if self.qt_edit_line_widget.button_1 is not None:
-                self.qt_edit_line_widget.button_1.clicked.connect(lambda: self.correct_params())
-                self.qt_edit_line_widget.qt_edit_line.textChanged.connect(lambda: self.check_evos())
-
-        else:
-            self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit,
-                                                           text_on_button_1=correct_button_caption, button_width=70)
+        self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit, text_on_button_1="",
+                                                       button_width=70)
         self.qt_widget_layout.addLayout(self.qt_edit_line_widget.qt_widget_layout)
+
+        if combo_label is not None:
+            self.qt_combo_param = ComboLabel(combo_label, combo_items, text_on_button_1="Add evo", button_size=70)
+            self.qt_combo_param.button_1.clicked.connect(lambda: self.add_evo_to_line())
+
+            self.qt_evo_edit_line_widget = EditLineWithButtons("    1 evolution :", "", text_on_button_1="Correct",
+                                                               button_width=70)
+            self.qt_evo_edit_line_widget.button_1.clicked.connect(lambda: self.correct_params())
+            self.qt_evo_edit_line_widget.qt_edit_line.textChanged.connect(lambda: self.check_evos())
+
+            self.qt_widget_layout.addLayout(self.qt_combo_param.qt_widget_layout)
+            self.qt_widget_layout.addLayout(self.qt_evo_edit_line_widget.qt_widget_layout)
 
     def __str__(self):
         return "ActionWidgetATQ   evos_count:" + str(self.evos_count)
 
     def add_evo_to_line(self):
         evo_abbreviation = self.qt_combo_param.combo.currentText()[:3]
-        el = self.qt_edit_line_widget.qt_edit_line
+        el = self.qt_evo_edit_line_widget.qt_edit_line
 
         # print "[DB] add_evo_to_line: ", evo_abbreviation
 
@@ -433,7 +430,7 @@ class ActionWidgetATQ(QWidget):  # QWidget
         self.check_evos()
 
     def check_evos(self):
-        ret = self.batch.pat.get_evolutions_from_string(self.qt_edit_line_widget.qt_edit_line.text())
+        ret = self.batch.pat.get_evolutions_from_string(self.qt_evo_edit_line_widget.qt_edit_line.text())
 
         self.evos_array = ret[1]
         self.show_number_evolutions(ret[0])
@@ -441,16 +438,16 @@ class ActionWidgetATQ(QWidget):  # QWidget
 
     def show_number_evolutions(self, nr):
         if nr <= 1:
-            self.qt_edit_line_widget.label.setText("    {} evolution: ".format(nr))
+            self.qt_evo_edit_line_widget.label.setText("    {} evolution: ".format(nr))
         else:
-            self.qt_edit_line_widget.label.setText("    {} evolutions:".format(nr))
+            self.qt_evo_edit_line_widget.label.setText("    {} evolutions:".format(nr))
 
     def correct_params(self):
         self.check_evos()
         ee = []
         for e in self.evos_array:
             ee.append("  ".join(e))
-        self.qt_edit_line_widget.qt_edit_line.setText(" ;  ".join(ee))
+        self.qt_evo_edit_line_widget.qt_edit_line.setText(" ;  ".join(ee))
 
 
 class WidgetGroup:

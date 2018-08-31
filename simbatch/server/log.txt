@@ -1,6 +1,5 @@
 2018-06-13_01:05:47 set WORKING [1]   queue item 2   by server: SiNode_01; 
 2018-06-13_01:05:53 set WORKING [2]   queue item 2   by server: SiNode_01; 
-2018-06-13_01:10:22 set WORKING [3]   queue item 2   by server: SiNode_01; 
-2018-06-13_01:54:06 state:WORKING   id:4    qin:queue item 2   by server:SimNode_01; 
-2018-06-13_01:56:01 state:WORKING   id:4    qin:queue item 2   by server:SimNode_01; 
-2018-06-13_01:56:16 state:WORKING   id:4    qin:queue item 2   by server:SimNode_01; 
+2018-06-13_01:10:22 set WORKING [3]   queue item 2   by server: SiNode_01;
+2018-08-31 15:33:50 set state:WORKING   id:49    qin:ALL 2_3  v:8 [e:03]   by server:Maya (local); 
+2018-08-31 15:33:50 set state:DONE      id:49    qin:ALL 2_3  v:8 [e:03]   by server:Maya (local); 

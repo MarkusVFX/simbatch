@@ -80,7 +80,7 @@ class SimBatchServer:
         if log_file is None:
             log_file = self.server_dir + self.log_file_name
         f = open(log_file, 'a')
-        f.write(date + info + '; \n')
+        f.write(date + " " + info + '; \n')
         f.close()
         self.batch.logger.log(info)
 
@@ -99,13 +99,14 @@ class SimBatchServer:
         if ret is not False:
             ret = self.batch.que.update_state_and_node(queue_id, state, state_id, server_name=server_name, server_id=1,
                                                        set_time=set_time, add_current_time=add_current_time)
+            state_length_10 = self.batch.comfun.str_with_spaces(state, length=10)
             if ret:
                 qin = self.batch.que.current_queue.queue_item_name
-                self.add_to_log("set state:{}   id:{}    qin:{}   by server:{}".format(state,
+                self.add_to_log("set state:{}   id:{}    qin:{}   by server:{}".format(state_length_10,
                                                                                        self.batch.que.current_queue_id,
                                                                                        qin, self.server_name))
             else:
-                self.add_to_log("[ERR] state NOT set:{}    id:{}  by server:{}".format(state,
+                self.add_to_log("[ERR] state NOT set:{}    id:{}  by server:{}".format(state_length_10,
                                                                                        self.batch.que.current_queue_id,
                                                                                        self.server_name))
                 return False

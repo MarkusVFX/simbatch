@@ -83,6 +83,15 @@ def test_str_with_zeros(comfun):
     assert comfun.str_with_zeros(4000, zeros=5) == "04000"
 
 
+def test_str_with_spaces(comfun):
+    assert comfun.str_with_spaces("ok") == "ok "
+    assert comfun.str_with_spaces("ok", length=5) == "ok   "
+    assert comfun.str_with_spaces("oki", length=5, as_prefix=True) == "  oki"
+    assert comfun.str_with_spaces("___oki", length=5, as_prefix=True) == "___oki"
+    assert comfun.str_with_spaces("___oki") == "___oki"
+    assert comfun.str_with_spaces("___oki___") == "___oki___"
+
+
 def test_std_find_string_in_list(comfun):
     assert comfun.find_string_in_list(["aaa", "bbb", "abc", "abcde", "cde"], "ab") is None
 

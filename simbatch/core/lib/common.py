@@ -90,6 +90,18 @@ class CommonFunctions:
             stri = "0" + stri
         return stri
 
+    def str_with_spaces(self, text, length=3, as_prefix=False):
+        if self.is_int(length):
+            while len(text) < length:
+                if as_prefix:
+                    text = " " + text
+                else:
+                    text += " "
+        else:
+            self.logger.err(("(str_with_spaces) length is not int:", length))
+
+        return text
+
     @staticmethod
     def list_as_string(get_list, only_first=False, start_from_item=0, separator=";"):
         ret_str = ""

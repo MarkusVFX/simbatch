@@ -57,6 +57,12 @@ class QueueItem:
         self.proj_id = proj_id   # TODO  change to project_id
         self.soft_id = soft_id
 
+    def __str__(self):
+        return "QueueItem: {},{},{},... ,{},{},{},... ,{},{},{},{} ".format(self.id, self.queue_item_name, self.task_id,
+                                                                            self.sequence, self.shot, self.take,
+                                                                            self.version, self.evolution,
+                                                                            self.evolution_nr, self.evolution_script)
+
     def print_this(self):
         print "\n QUEUE ITEM: "
         print "   id: {}   seq|sh|tk: {}|{}|{} \n".format(self.id, self.sequence, self.shot, self.take)
@@ -398,8 +404,8 @@ class Queue:
     ##
     #
 
-    """ marker ATQ 230   generate script from actions  """
-    def generate_script_from_actions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
+    """ marker X ATQ X 230   generate script from actions  """
+    def generate_script_from_Xactions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
         scr = ""
         engines_counter = 0
         for act in based_on_schema.actions_array:
@@ -407,7 +413,8 @@ class Queue:
                 if engines_counter == engine_index:
                     scr += evo_scr
                 engines_counter += 1
-            scr += act.generate_script_from_action_template(batch, with_new_line=False) + "; "
+            scr += act.generate_script_from_action_template(batch, "", with_new_line=False) + "; "
+            #                               TODO check    option   ""   !!!
 
         return scr
 
@@ -432,8 +439,43 @@ class Queue:
         else:
             return None
 
+    def generate_template_evo_script(self, action_inputs):
+        scr = ""
+        for i, act in enumerate(self.batch.sch.current_schema.actions_array):
+            if len(action_inputs[i]) > 1:
+                scr += "[evo_scr]  ; "
+                print "\n\n DAWWDJAWDJAWJ \n\n"
+            scr += act.generate_script_from_action_template(self.batch, action_inputs[i][0], evo="[evo]") + "; "
+        return scr
+
+
+
+    def fill_evos_in_template(self, templ, evo=None, evo_scr=""):
+        if evo is None:
+            evo = "zzz_evo_www"
+        templ = templ.replace("[evo]", evo)
+
+
+        templ = templ.replace("[evo_scr]", evo_scr)
+
+        return templ
+
+
+    """ marker ATQ 202   generate all evos arr with scripts   """
+    def get_evos_from_action_inputs(self, action_inputs):
+        all_evos = []
+        found_evos = 3
+        for i, ai in enumerate(action_inputs):
+            if len(ai) > 1:
+                print "evo in action input: ", i, ai
+                found_evos = 4
+
+        for f in range(0, found_evos):
+            all_evos.append(["BND "+str(f),"scrsrcrs.param = "+str(f)])
+        return all_evos
+
     """ marker ATQ 200   generate queue items   """
-    def generate_queue_items(self, task_id, action_options=None, schema_options=None, task_options=None):
+    def generate_queue_items(self, task_id, action_inputs=None, schema_options=None, task_options=None):
         tsk = self.batch.tsk
         sch = self.batch.sch
         queue_items = []
@@ -448,54 +490,42 @@ class Queue:
         else:
             based_on_schema = schema_options.proxy_schema
 
-        # all_evos = get_evos_from_options(action_options)
+        all_evos = self.get_evos_from_action_inputs(action_inputs)
 
         """ marker SO (SchemaOptions) send to compile   """
         """ marker TO (TaskOptions)   send to compile   """
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
-        print "action_options:", action_options  ### ['Bnd 111 222']
+        template_queue_item.evolution_script = self.generate_template_evo_script(action_inputs)
         if template_queue_item is not None:
-            if action_options is None or len(action_options) == 0:
+            if len(all_evos) == 0:
                 template_queue_item.generate_queue_item_name(based_on_task, with_update=True)
                 template_queue_item.evolution = ""
 
                 #
-                #
-                script = self.generate_script_from_actions(self.batch, based_on_schema)
+                # script = self.generate_script_from_Xactions(self.batch, based_on_schema)
+                script = self.fill_evos_in_template(template_queue_item.evolution_script, evo=None)
                 template_queue_item.evolution_script = script
-                #
                 #
 
                 queue_items.append(template_queue_item)
 
             else:
-                # evolutions = [  "BND 4 5; DMP 7"  ,      "BRN: 1 2 3"  ]    # example for 2 engines !!!
-                for engine_idx, evos in enumerate(evolutions):
-                    print "eeevvvooooo" , evos  ### Bnd 111 222
-                    evo_action_index = 1
-                    inject_evo_scr_arr = based_on_schema.get_evo_scripts_array(self.batch, evos, evo_action_index)
-                    for j, evo_scr in enumerate(inject_evo_scr_arr[1]):
-                        j1 = j+1
-                        print "eeevvvo_scr ", evo_scr   ### interactions.set_evo_param(<o>.bendResistance = 111.0);
-                        queue_item = copy.deepcopy(template_queue_item)
+                for i, single_evo in enumerate(all_evos):
+                    evo_i_s = self.comfun.str_with_zeros(i + 1, zeros=2)
+                    queue_item = copy.deepcopy(template_queue_item)
+                    queue_item.generate_queue_item_name(based_on_task, with_update=True, with_sufix=" [e:"+evo_i_s+"]")
+                    queue_item.evolution = single_evo[0]
+                    queue_item.evolution_nr = i + 1
 
-                        queue_item.generate_queue_item_name(based_on_task, with_update=True,
-                                                            with_sufix=" [e:"+str(j1)+"]")
-                        queue_item.evolution = inject_evo_scr_arr[0][j]
-                        queue_item.evolution_nr = engine_index
+                    #
+                    script = self.fill_evos_in_template(template_queue_item.evolution_script, evo="_evo"+evo_i_s,
+                                                        evo_scr=single_evo[1])
+                    queue_item.evolution_script = script
+                    #
 
-                        #
-                        #
-                        script = self.generate_script_from_actions(self.batch, based_on_schema, evo_scr=evo_scr,
-                                                                   engine_index=engine_idx)
-                        # script = self.batch.sio.predefined.convert_var_to_val_in_script(script, evo_index=j1)
-                        # script = self.batch.sio.predefined.convert_undefined_to_default(script, evo_index=j1)
-                        queue_item.evolution_script = script
-                        #
-                        #
-
-                        queue_items.append(queue_item)
+                    queue_items.append(queue_item)
 
         else:
             self.batch.logger.err("template_queue_item is None")
         return queue_items
+

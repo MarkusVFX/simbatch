@@ -69,10 +69,10 @@ def test_generate_template_queue_item(sib):
     print "\n\n___ template_queue_item ___"
     template_queue_item = sib.que.generate_template_queue_item(sib.tsk.current_task, sib.sch.current_schema)
 
-    script = sib.que.generate_script_from_actions(sib, sib.sch.current_schema)
+    # script = sib.que.generate_script_from_Xactions(sib, sib.sch.current_schema)
     print " template_queue_item: ", template_queue_item
-    print " script: ", script
-    template_queue_item.evolution_script = script
+    # print " script: ", script
+    # template_queue_item.evolution_script = script
     #template_queue_item.print_this()
 
 
@@ -85,8 +85,8 @@ def test_generate_queue_items(sib):
 
 def test_generate_queue_items(sib):
     print "\n\n___ queue_items ___"
-    custom_action_options = ["ooppoo",[10, 99,"cape", "out","DMP 1 2 3"],"simed_file"]
-    qi1 = sib.que.generate_queue_items(sib.tsk.current_task_id, action_options=custom_action_options)
+    custom_action_inputs = ["ooppoo",[10, 99,"cape", "out","DMP 1 2 3"],"simed_file"]
+    qi1 = sib.que.generate_queue_items(sib.tsk.current_task_id, action_inputs=custom_action_inputs)
     for qi in qi1:
         print "___"
         qi.print_this()

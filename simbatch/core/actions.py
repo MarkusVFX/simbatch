@@ -1,3 +1,5 @@
+import copy
+
 from lib.common import Logger
 
 
@@ -134,9 +136,21 @@ class SingleAction:
     """
 
     """ marker ATQ 235   generate script from temlpate   """
-    def generate_script_from_action_template(self, batch, with_new_line=False):
+    def generate_script_from_action_template(self, batch, option, with_new_line=False, evo=""):
         # TODO optimize + mixed var     <dir>\custom_file.bin
-        scr = "".join(self.template)
+
+        template_with_vaules = copy.deepcopy(self.template)
+        for i, twv in enumerate(template_with_vaules):
+            if twv[0] == "<":
+                if twv == "<ui>":
+                    if len(option) > 0:
+                        template_with_vaules[i] = option
+                    else:
+                        template_with_vaules[i] = "empty_option"
+                else:
+                    template_with_vaules[i] = batch.sio.predefined.convert_predefined_variables_to_values(twv, param=evo)
+                template_with_vaules[i] = "\"" + template_with_vaules[i] + "\""
+        scr = "".join(template_with_vaules)
         if with_new_line:
             scr += "\n"
         return scr

@@ -476,10 +476,10 @@ class Tasks:
                     template_queue_item.generate_queue_item_name(task_to_add, with_update=True)
                     template_queue_item.evolution = ""
 
-                    #script = schema_to_queued.generate_script_from_actions(self.batch)
+                    #script = schema_to_queued.generate_script_from_Xactions(self.batch)
                     #script = self.batch.sio.predefined.convert_var_to_val_in_script(script)
                     #script = self.batch.sio.predefined.convert_undefined_to_default(script)
-                    script = schema_to_queued.generate_script_from_actions(self.batch)
+                    script = schema_to_queued.generate_script_from_Xactions(self.batch)
                     template_queue_item.evolution_script = script
 
                     template_queue_item.description = self.proxy_task.description
@@ -504,7 +504,7 @@ class Tasks:
                             queue_item.evolution = inject_evo_scr_arr[0][j]
                             queue_item.evolution_nr = engine_index
 
-                            script = schema_to_queued.generate_script_from_actions(self.batch, evo_scr=evo_scr,
+                            script = schema_to_queued.generate_script_from_Xactions(self.batch, evo_scr=evo_scr,
                                                                                    engine_index=engine_index)
 
                             print "\n\n zzzz SCR : \n", script

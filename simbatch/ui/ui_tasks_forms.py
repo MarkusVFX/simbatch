@@ -305,12 +305,12 @@ class AddToQueueForm(QWidget):
         if self.batch.sts.debug_level > 3:  # debug proxy SchemaItem object (used when adding or editing schema)
             db_buttons_group = QGroupBox()
             db_b1 = ButtonOnLayout("basic print", width=140)
-            # db_b2 = ButtonOnLayout("detailed print", width=170)
-            qt_debug_buttons = WidgetGroup([SimpleLabel("debug buttons"), db_b1])   # , db_b2
+            db_b2 = ButtonOnLayout("detailed print", width=170)
+            qt_debug_buttons = WidgetGroup([SimpleLabel("debug buttons"), db_b1, db_b2])   # , db_b2
             db_buttons_group.setLayout(qt_debug_buttons.qt_widget_layout)
             qt_form_add_layout.addWidget(db_buttons_group)
             db_b1.button.clicked.connect(self.form_basic_db_print)
-            # db_b2.button.clicked.connect(self.form_detailed_db_print)
+            db_b2.button.clicked.connect(self.form_detailed_db_print)
 
         # qt_action_empty = ActionWidget(None, label_txt="    Select Task")
         qt_lay_actions = QVBoxLayout()
@@ -367,6 +367,34 @@ class AddToQueueForm(QWidget):
         print "\n"
         self.batch.tsk.print_task(self.batch.tsk.proxy_task)
 
+    def form_detailed_db_print(self):
+        print_all = False
+        print "\n COLLECT OPTIONS (default or user values)"
+        self.collect_options_from_action_widgets()
+        if print_all:
+            for i, op in enumerate(self.options):
+                print i, op
+
+        # generate_script_from_actions
+        if print_all:
+            for i, act in enumerate(self.batch.sch.current_schema.actions_array):
+                print act.generate_script_from_action_template(self.batch, self.options[i][0], with_new_line=False, evo="1")
+
+        print "\n GENERATE QUEUE ITEMS"
+        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, action_inputs=self.options)
+
+        for i, q in enumerate(qi):
+            print "gen qi: ", i, q
+
+        print "\n END"
+
+        """
+        evos = "TIM 1 2 3"
+        evo_action_index = 1
+        print self.batch.sch.current_schema.get_evo_scripts_array(self.batch, evos, evo_action_index)
+        # self.generate_script_from_Xactions
+        """
+
     def update_form(self):
         current_task = self.batch.tsk.current_task
         self.qt_edit_button_sim_from.qt_edit_line.setText(str(current_task.sim_frame_start))
@@ -403,20 +431,14 @@ class AddToQueueForm(QWidget):
                 else:
                     act_name_sufix = ""
 
-                # if mac is not None:
-                #     evolution = []
-                #     for a in mac.actions:
-                #         evolution.append(a.parameters.name)
-
-                # check_str = str(act.default_value)
                 check_str = str(act.actual_value)
-                val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str)
-                print " ret ret ret", val_str
+                val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str, param="[evo]")
+
+                # print " ret ret ret", val_str
                 if val_str is None:
                     val_str = "None"
-                # act.actual_value = ret
 
-                self.add_action_widget_to_form(act.name+act_name_sufix, val_str, evo=evolution)
+                self.add_action_widget_to_form(act.name+act_name_sufix, edit_txt=val_str, evo=evolution)
 
     def add_action_widget_to_form(self, info, edit_txt=None, evo=None):
         if edit_txt is None and evo is None:
@@ -426,8 +448,7 @@ class AddToQueueForm(QWidget):
                 if len(evo) <= 1:
                     wi = ActionWidgetATQ(self.batch, info, edit_txt)
                 else:
-                    wi = ActionWidgetATQ(self.batch, "    1 evolution :", edit_txt,  combo_label=info, combo_items=evo)
-                # wi = EditLineWithButtons("evo_" + info, edit_txt)  # TODO
+                    wi = ActionWidgetATQ(self.batch, info, edit_txt,  combo_label="    with evolutions:", combo_items=evo)
             else:
                 wi = ActionWidgetATQ(self.batch, info, edit_txt)
 
@@ -435,7 +456,6 @@ class AddToQueueForm(QWidget):
         qt_widget.setLayout(wi.qt_widget_layout)
         self.qt_lay_actions.addWidget(qt_widget)
         self.actions_widgets_array.append(wi)
-        # self.qt_lay_actions.addLayout(wi.qt_widget_layout)
 
     def remove_all_action_widgets(self):
         del self.actions_widgets_array[:]
@@ -475,10 +495,12 @@ class AddToQueueForm(QWidget):
     def collect_options_from_action_widgets(self):
         del self.options[:]
         for i, wa in enumerate(self.actions_widgets_array):
+            opt = wa.qt_edit_line_widget.qt_edit_line.text()
+            evo = ""
             if wa.qt_combo_param is not None:
-                opt = wa.qt_edit_line_widget.qt_edit_line.text()
-                if len(opt) >= 5:  # "BND 4"...  # TODO  protection empty BND; SHR;
-                    self.options.append(opt)
+                evo = wa.qt_evo_edit_line_widget.qt_edit_line.text()
+
+            if len(evo) > 4:   # TODO check is evo or  random string !
+                self.options.append([opt, evo])
             else:
-                opt = wa.qt_edit_line_widget.qt_edit_line.text()
-                self.options.append(opt)
+                self.options.append([opt])

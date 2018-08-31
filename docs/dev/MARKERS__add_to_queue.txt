@@ -1,24 +1,47 @@
 
 
 
+#ui_tasks_forms 
+    def update_form(self):
+        ...
+        check_str = str(act.actual_value)
+        val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str)
+        ...
+        self.add_action_widget_to_form(act.name+act_name_sufix, edit_txt=val_str, evo=evolution)
+        
+        
+#io    
+    """ marker ATQ 001   on show form, on update form and on generate_script_from_action_template   """
+    def convert_predefined_variables_to_values(self, check_str, param=""):
+        for key, predefined_item in self.predefined.items():
+            key_plus = "<" + key + ">"
+            if check_str.find(key_plus) >= 0:
+                function_to_eval = "self.{}(\"{}\")".format(predefined_item["function"], param)
+                ...
+                
+                
+
 #ui_tasks
     """ marker ATQ 010a   on click add   """
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         ...
         # marker ATQ 100
-        self.generate_options_from_action_widgets()
+        self.collect_options_from_action_widgets() 
         ...
         # marker ATQ 200
-        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, action_options=form_atq.options, schema_options=schema_options, task_options=task_options) 
+        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, action_inputs=form_atq.options, schema_options=schema_options, task_options=task_options)
         ...
         self.batch.que.add_to_queue(form_queue_items, do_save=True)
 
 
 
-#ui_tasks
+#ui_tasks_forms
     """ marker ATQ 100   generate options   """
-    def generate_options_from_action_widgets(self):
-
+    def collect_options_from_action_widgets(self):
+        ...
+            self.options.append([opt, evo])
+            or
+            self.options.append([opt])
 
     #	class AddToQueueForm(QWidget):
     #		options = []                    # all user's inputs options with parameters
@@ -28,10 +51,19 @@
 
 #queue
     """ marker ATQ 200   generate queue items   """
-    def generate_queue_items(self, task_id, evolutions=None, schema_options=None, task_options=None):
+    def generate_queue_items(self, task_id, action_inputs=None, schema_options=None, task_options=None):
+        ...
+        # marker ATQ 202
+        all_evos = self.get_evos_from_action_inputs(action_inputs)
         ...
         # marker ATQ 210
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
+       
+       
+#queue     
+    """ marker ATQ 202   generate all evos arr with scripts   """
+    def get_evos_from_action_inputs(self, action_inputs):
+        
 
 #queue
     """ marker ATQ 210   generate template   """
@@ -49,8 +81,8 @@
 
 
 #queue
-    """ marker ATQ 230   generate script from actions  """
-    def generate_script_from_actions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
+    """ marker X ATQ X 230   generate script from actions  """
+    def generate_script_from_Xactions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
 	""" marker ATQ 235   generate script from temlpate   """
 	scr += act.generate_script_from_action_template(batch, with_new_line=False) + "; "
 

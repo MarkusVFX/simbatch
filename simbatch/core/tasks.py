@@ -256,6 +256,12 @@ class Tasks:
                 break
             index += 1
 
+    def increase_queue_ver(self):
+        self.current_task.queue_ver += 1
+        self.current_task.state_id = self.sts.INDEX_STATE_QUEUED
+        self.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_QUEUED]
+        self.save_tasks()
+
     def remove_single_task(self, index=None, task_id=None, do_save=False):
         if index is None and task_id is None:
             return False

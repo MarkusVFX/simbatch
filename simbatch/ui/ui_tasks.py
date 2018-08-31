@@ -538,14 +538,9 @@ class TasksUI:
             if ret:
                 # self.batch.tsk.update_proxy_task_form_current()
 
-                self.batch.tsk.current_task.queue_ver += 1
-                self.batch.tsk.current_task.state_id = self.sts.INDEX_STATE_QUEUED
-                self.batch.tsk.current_task.state = self.sts.states_visible_names[self.sts.INDEX_STATE_QUEUED]
-                self.batch.tsk.save_tasks()
+                self.batch.tsk.increase_queue_ver()
 
-                self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver
-
-
+                self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver\
 
                 """ marker TO     TODO"""
                 schema_options = None

@@ -15,6 +15,7 @@ class PredefinedVariables:
         "project_props_dir": {"type": "d", "function": "get_project_props_dir"},
         "shot_camera_file": {"type": "f", "function": "get_shot_camera_file"},
         "shot_prev_file": {"type": "f", "function": "get_shot_prev_file"},
+        "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"},
         "copmuted_scene": {"type": "f", "function": "get_shot_computed_setup"},
         "scripts_dir": {"type": "d", "function": "get_scripts_dir"},
         "shot_dir": {"type": "d", "function": "get_shot_dir"},
@@ -22,7 +23,6 @@ class PredefinedVariables:
         "schema_name": {"type": "s", "function": "get_schema_name"},
         "shot_name": {"type": "s", "function": "get_shot_name"},
         "default_camera": {"type": "s", "function": "get_default_camera_name"},
-        "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"},
         "sim_time_start": {"type": "t", "function": "get_sim_time_start"},
         "sim_time_end": {"type": "t", "function": "get_sim_time_end"},
         "prev_time_start": {"type": "t", "function": "get_prev_time_start"},
@@ -40,14 +40,15 @@ class PredefinedVariables:
     def __init__(self, batch):
         self.batch = batch
 
+    """ marker ATQ 001   on show form, on update form and on generate_script_from_action_template   """
     def convert_predefined_variables_to_values(self, check_str, param=""):
         for key, predefined_item in self.predefined.items():
             key_plus = "<" + key + ">"
             if check_str.find(key_plus) >= 0:
-                function_to_eval = "self.{}({})".format(predefined_item["function"], param)
-                print "\n\n found var to val ", key_plus, function_to_eval, "___  in ___", check_str
+                function_to_eval = "self.{}(\"{}\")".format(predefined_item["function"], param)
+                print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
                 try:
-                    eval_ret = eval(function_to_eval)
+                    eval_ret = str(eval(function_to_eval))
                     # print "    ommand  ", check_str, predefined_item["function"],  predefined_item["type"] , eval_ret
                     # print "    orrreeee  ", check_str.replace("<" + predefined_item["type"] + ">", eval_ret)
                     check_str = check_str.replace(key_plus, eval_ret)
@@ -55,72 +56,16 @@ class PredefinedVariables:
                 except ValueError:
                     pass
                     # TODO ex
-                    # return check_str
-            else:
-                self.batch.logger.wrn(("Missing predefined key:", key_plus, " in ", predefined_item))
         return check_str
 
-    """ marker ATQ 242   convert var to val in command """
-    def convert_var_to_val_in_command(self, command, ei_str):
-        for key, predefined_item in self.predefined.items():
-            # print "______", key, predefined_item, "___ comm:", command
-            key_plus = "<"+key+">"
-            if command.find(key_plus) > 0:
-                function_to_eval = "self.{}({})".format(predefined_item["function"], ei_str)
-                print "\n\n found var to val ", key_plus, function_to_eval
-                try:
-                    eval_ret = eval(function_to_eval)
-                    # print "    eval_ret found var to val ", eval_ret
-                    # return template.replace("<" + self.predefined[var]["type"] + ">", eval_ret)
-
-                    print "    ommand  ", command, predefined_item["function"],  predefined_item["type"], eval_ret
-                    print "    rrreeee  ", command.replace("<" + predefined_item["type"] + ">", eval_ret)
-                    return command.replace("<" + predefined_item["type"] + ">", eval_ret)
-                except ValueError:
-                    # TODO ex
-                    return command
-            return command
-
-    # convert predefined variable into final value command by command
-    """ marker ATQ 240   convert var to val in script  """
-    def convert_var_to_val_in_script(self, script, evo_index=None):
-        script_out = ""
-        if evo_index is None:
-            ei_str = ""
-        else:
-            ei_str = "evo_index=" + str(evo_index)
-
-        script_splited_arr = script.split(";")
-        for scr_command in script_splited_arr:   # protect replace key according to type
-            if len(scr_command) > 2:
-                script_out += self.convert_var_to_val_in_command(scr_command, ei_str) + ";"
-                zzz = self.convert_var_to_val_in_command(scr_command, ei_str)
-                # print " ccc c ccccccc c c c c c c c c c cc ",len(scr_command) , "___" , zzz , "mmm\n"
-        return script_out
-
-
-
-        #def convert_var_to_val(self, var, template, evo_index=None):
-
-        """
-        st = self.default_value.find("<")
-        if st >= 0:
-            en = self.default_value.find(">")
-            val = self.default_value[st + 1:en]
-            # TODO detect multi <option>
-            ret = batch.sio.predefined.convert_var_to_val(val, scr)
-            if ret is not None:
-                scr = ret
-        """
-
     """ marker ATQ 250   convert undefined to default   """
-    def convert_undefined_to_default(self, template, evo_index=None):
+    def convert_undefined_to_default(self, template, evo_inject=None):
         # TODO optimize !
         # for de in self.defaults:
-        if evo_index is None:
+        if len(evo_inject) == 0:
             ei_str = ""
         else:
-            ei_str = "evo_index=" + str(evo_index)
+            ei_str = "evo_inject=" + str(evo_inject)
 
         if template is not None:
             for key, get_default in self.defaults.items():
@@ -137,115 +82,115 @@ class PredefinedVariables:
                         pass
         return template
 
-    def get_default_camera_name(self):
+    def get_default_camera_name(self, evo):
         ret = self.batch.sio.generate_default_camera_name()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_prev_seq(self):
-        ret = self.batch.sio.generate_shot_prev_seq()
-        if ret[0] > 0:
-            return ret[1]
-        else:
-            return ""
-
-    def get_schema_base_setup(self, evo_index=None):
+    def get_schema_base_setup(self, evo):
         ret = self.batch.sio.generate_base_setup_file_name()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_ani_cache_dir(self):
+    def get_shot_ani_cache_dir(self, evo):
         ret = self.batch.sio.generate_shot_ani_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_cache_dir(self, evo_index=None):
+    def get_project_cache_dir(self, evo):
         ret = self.batch.sio.generate_project_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_props_dir(self, evo_index=None):
+    def get_project_props_dir(self, evo):
         ret = self.batch.sio.generate_project_props_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_cache_out_dir(self, evo_index=None):
-        ret = self.batch.sio.generate_shot_cache_out_path()
+    def get_shot_cache_out_dir(self, evo):
+        ret = self.batch.sio.generate_shot_cache_out_path(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_cam_dir(self, evo_index=None):
+    def get_shot_cam_dir(self, evo):
         ret = self.batch.sio.generate_shot_cam_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_camera_file(self, evo_index=None):
+    def get_shot_camera_file(self, evo):
         ret = self.batch.sio.generate_shot_camera_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_prev_file(self, evo_index=None):
-        ret = self.batch.sio.generate_shot_prev_file()
+    def get_shot_prev_file(self, evo):
+        ret = self.batch.sio.generate_shot_prev_file(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_props_path(self, evo_index=None):
+    def get_shot_prev_seq(self, evo):
+        ret = self.batch.sio.generate_shot_prev_seq(evo_inject=evo)
+        if ret[0] > 0:
+            return ret[1]
+        else:
+            return ""
+
+    def get_project_props_path(self, evo):
         ret = self.batch.sio.generate_project_props_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_computed_setup(self, evo_index=None):
-        ret = self.batch.sio.generate_shot_computed_setup(evo_index=evo_index)
+    def get_shot_computed_setup(self, evo):
+        ret = self.batch.sio.generate_shot_computed_setup(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_scripts_dir(self, evo_index=None):
+    def get_scripts_dir(self, evo):
         ret = self.batch.sio.generate_scripts_dir()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_dir(self, evo_index=None):
+    def get_shot_dir(self, evo):
         ret = self.batch.sio.generate_shot_working_dir()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_working_dir(self, evo_index=None):
+    def get_working_dir(self, evo):
         if self.batch.prj.current_project is not None:
             return self.batch.prj.current_project.working_directory_absolute
         else:
             return ""
 
-    def get_schema_name(self, evo_index=None):
+    def get_schema_name(self, evo):
         schema_name = self.batch.sch.current_schema.schema_name
         return self.batch.sio.get_flat_name(schema_name)
 
-    def get_shot_name(self, evo_index=None):
+    def get_shot_name(self, evo):
         ret = self.batch.sio.generate_shot_name()
         if ret[0] > 0:
             return ret[1]
@@ -261,35 +206,35 @@ class PredefinedVariables:
     #
     #
 
-    def get_sim_time_start(self, evo_index=None):
+    def get_sim_time_start(self, evo):
         return self.batch.tsk.current_task.sim_frame_start
 
-    def get_sim_time_end(self, evo_index=None):
+    def get_sim_time_end(self, evo):
         return self.batch.tsk.current_task.sim_frame_end
 
-    def get_prev_time_start(self, evo_index=None):
+    def get_prev_time_start(self, evo):
         return self.batch.tsk.current_task.prev_frame_start
 
-    def get_prev_time_end(self, evo_index=None):
+    def get_prev_time_end(self, evo):
         return self.batch.tsk.current_task.prev_frame_end
 
-    def get_working_directory(self, evo_index=None):
+    def get_working_directory(self, evo):
         ret = self.batch.prj.current_project.working_directory_absolute
         if ret is not None:
             return ret
         else:
             return ""
 
-    def get_default_file(self, evo_index=None):
+    def get_default_file(self, evo):
         return "[default_file]"
 
-    def get_default_object(self, evo_index=None):
+    def get_default_object(self, evo):
         return "[default_object]"
 
-    def get_default_param(self, evo_index=None):
+    def get_default_param(self, evo):
         return "[default_param]"
 
-    def get_default_value(self, evo_index=None):
+    def get_default_value(self, evo):
         return "[default_value]"
 
 
@@ -475,21 +420,18 @@ class StorageInOut:
 
             return 1, shot_dir
 
-    def generate_shot_computed_setup(self, ver=0, evo_index=None):
+    def generate_shot_computed_setup(self, ver=0, evo_inject=""):
         ret = self.generate_shot_working_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1]
-            evo_inject = ""
-            if evo_index is not None:
-                evo_inject = "evo_"+str(evo_index)+"__"
             schema_name = self.batch.sch.current_schema.schema_name
             schema_flat_name = self.get_flat_name(schema_name)
             ret_file_and_path += "simed_setup" + self.dir_separator
             if ver == 0:
-                ver = self.batch.tsk.current_task.queue_ver
+                ver = self.batch.tsk.current_task.queue_ver + 1
             file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_setup_ext()
-            ret_file_and_path += schema_flat_name + "__simed__" + evo_inject + "v" + file_version + "." + file_ext
+            ret_file_and_path += schema_flat_name + "__simed__v" + file_version + evo_inject + "." + file_ext
             return ret[0], ret_file_and_path
         return ret
 
@@ -504,9 +446,13 @@ class StorageInOut:
         ret = self.generate_shot_ani_cache_dir()
         return ret
 
-    def generate_shot_cache_out_path(self):
+    def generate_shot_cache_out_path(self, evo_inject=""):
         ret = self.generate_shot_working_dir()
-        return ret[0], ret[1] + "cache" + self.dir_separator
+        if ret[0] == 1:
+            ver = self.batch.tsk.current_task.queue_ver + 1
+            version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
+
+        return ret[0], ret[1] + "cache" + self.dir_separator + "cache_v" + version + evo_inject
 
     def generate_shot_cam_path(self):
         ret = self.generate_shot_cam_dir()
@@ -517,18 +463,22 @@ class StorageInOut:
         ret = self.generate_shot_working_dir()
         return ret[0], ret[1] + "props" + self.dir_separator
 
-    def generate_shot_prev_file(self):
+    def generate_shot_prev_file(self, evo_inject="", seq=""):
         ret = self.generate_shot_working_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1] + "prev" + self.dir_separator
             schema_name = self.batch.sch.current_schema.schema_name
             schema_flat_name = self.get_flat_name(schema_name)
-            ver = self.batch.tsk.current_task.queue_ver
+            ver = self.batch.tsk.current_task.queue_ver + 1
             file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_prev_ext()
-            ret_file_and_path += schema_flat_name + "__prev__v" + file_version + "__####." + file_ext
+            dir_and_head_name = schema_flat_name + "__prev__v" + file_version + evo_inject
+            ret_file_and_path += dir_and_head_name + self.dir_separator + dir_and_head_name + seq + "." + file_ext
             return ret[0], ret_file_and_path
         return ret
+
+    def generate_shot_prev_seq(self, evo_inject=""):
+        return self.generate_shot_prev_file(evo_inject=evo_inject, seq="__####")
 
     def generate_scripts_dir(self):
         ret = self.generate_shot_working_dir()
@@ -545,15 +495,6 @@ class StorageInOut:
     def generate_default_camera_name(self):
         # TODO "<default_camera>"
         return 1, ""
-
-    def generate_shot_prev_seq(self):
-        ret = self.generate_shot_working_dir()
-        qv = self.batch.tsk.current_task.queue_ver
-        q_ver_str = self.batch.comfun.str_with_zeros(qv)
-
-        path = ret[1] + "prev" + self.dir_separator + q_ver_str + self.dir_separator
-        filename = "prev_v" + q_ver_str  +"__####.jpg"
-        return ret[0], path + filename
 
 
 

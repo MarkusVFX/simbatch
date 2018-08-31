@@ -155,14 +155,14 @@
 						"id": 1,
 						"mode": "PY",
 						"desc": "run Python file",
-						"ui" : ["<scripts_dir>*.py", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"ui" : ["<scripts_dir>*.py", ["Get dir","[get_directory]"], ["Get file","[get_file]"]],
 						"template": ["interactions.maya_script_py(", "<ui>", ")"]
 					},
 					"2": {
 						"id": 2,
 						"mode": "MEL",
 						"desc": "run MEL file",
-						"ui" : ["<scripts_dir>*.mel", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"ui" : ["<scripts_dir>*.mel", ["Get dir","[get_directory]"], ["Get file","[get_file]"]],
 						"template": ["interactions.maya_script_mel(", "<ui>", ")"]
 					}
 				}

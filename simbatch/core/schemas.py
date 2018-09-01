@@ -88,7 +88,7 @@ class SchemaItem:
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
-        self.add_action_to_schema(SingleAction("virtual action", "virt descr", "template <f>",
+        self.add_action_to_schema(SingleAction("virtual action", "virt descr", ["template ", "<f>"],
                                                ui=("ui", "interaction.ui_fun()")))
         return True
 

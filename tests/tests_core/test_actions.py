@@ -21,10 +21,11 @@ def simbatch():
 
 
 def test_single_action():
-    sa = SingleAction("acti name", "descr", "template <f>")
+    sa = SingleAction("acti name", "descr", ["template ", "<f>"])
     assert sa.name == "acti name"
     assert sa.description == "descr"
-    assert sa.template == "template <f>"
+    assert sa.template[0] == "template "
+    assert sa.template[1] == "<f>"
 
 
 def test_multi_action():

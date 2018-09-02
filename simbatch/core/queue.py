@@ -444,11 +444,8 @@ class Queue:
         for i, act in enumerate(self.batch.sch.current_schema.actions_array):
             if len(action_inputs[i]) > 1:
                 scr += "[evo_scr]  ; "
-                print "\n\n DAWWDJAWDJAWJ \n\n"
             scr += act.generate_script_from_action_template(self.batch, action_inputs[i][0], evo="[evo]") + "; "
         return scr
-
-
 
     def fill_evos_in_template(self, templ, evo=None, evo_scr=""):
         if evo is None:
@@ -460,18 +457,22 @@ class Queue:
 
         return templ
 
-
     """ marker ATQ 202   generate all evos arr with scripts   """
     def get_evos_from_action_inputs(self, action_inputs):
         all_evos = []
-        found_evos = 3
+        found_evos = 0
         for i, ai in enumerate(action_inputs):
             if len(ai) > 1:
-                print "evo in action input: ", i, ai
-                found_evos = 4
+                print "evo in action input: ", i, ai[1]
+                ret = self.batch.pat.get_evolutions_from_string(ai[1])
+                if ret[0] > 0:
+                    found_evos += ret[0]
 
-        for f in range(0, found_evos):
-            all_evos.append(["BND "+str(f),"scrsrcrs.param = "+str(f)])
+                    for ie in ret[1]:    # TODO optimize !!!
+                        for c, subie in enumerate(ie):
+                            if c > 0:
+                                all_evos.append([ie[0]+":"+subie, "interactions.set_param(\""+ie[0]+"\","+subie+")"])
+
         return all_evos
 
     """ marker ATQ 200   generate queue items   """

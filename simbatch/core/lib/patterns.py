@@ -13,12 +13,10 @@ class Patterns:    # TODO  TESTS !!!!
         self.logger = Logger(log_level=0, console_level=3)
         self.comfun = CommonFunctions(self.logger)
 
+    """ convert string    'BNd  2      44; sTr 1 2  '   to  'BND  2.0  44.0 ;  STR  1.0  2.0'   """
     def get_evolutions_from_string(self, evo_str):
-        total_evos_count = 0
         out_evos_array = []
-
         evos_arr = evo_str.split(";")
-
         evo_count_all = 1
         for e in evos_arr:  # TODO   optimize !!!
             e = e.replace("_", "")

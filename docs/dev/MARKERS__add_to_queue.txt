@@ -63,6 +63,8 @@
 #queue     
     """ marker ATQ 202   generate all evos arr with scripts   """
     def get_evos_from_action_inputs(self, action_inputs):
+        ...
+        return all_evos
         
 
 #queue
@@ -102,4 +104,21 @@
 #io
     """ marker ATQ 250   convert undefined to default   """
     def convert_undefined_to_default(self, template, evo_index=None):
+    
+    
+    
+    
+    
+# EVO CHECK
+#patterns
+    """ convert string    'BNd  2      44; sTr 1 2  '   to  'BND  2.0  44.0 ;  STR  1.0  2.0'   """
+    def get_evolutions_from_string(self, evo_str):
+        ...
+        return evo_count_all, out_evos_array
+        
+        
+        # use :
+        # batch.pat.get_evolutions_from_string("bnd 1 2")
+    
+    
 

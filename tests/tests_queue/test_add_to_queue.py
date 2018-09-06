@@ -90,7 +90,7 @@ def test_generate_queue_items(sib):
     sib.tsk.update_current_from_id(sib.tsk.max_id)
     sib.print_important_values()
 
-    custom_action_inputs = [["ooppoo"],[["sim_clt"],["DMP 1 2 3"]],["simed_file"]]
+    custom_action_inputs = [["ooppoo"], [["sim_clt"], "DMP 1 2 3"], ["simed_file"]]
     qi1 = sib.que.generate_queue_items(sib.tsk.current_task_id, action_inputs=custom_action_inputs)
     for qi in qi1:
         print "___"

@@ -1,5 +1,6 @@
 
-import core.core as core
+import core
+
 
 class SimBatchAPI:
     simbatch_core = None
@@ -94,6 +95,12 @@ class SimBatchAPI:
         sib.que.add_to_queue(new_queue_items)
         sib.que.save_queue()
 
+    def print_queue_header(self):
+        self.simbatch_core.que.print_header()
+
+    def print_last_queue_item(self):
+        if self.simbatch_core.que.total_queue_items > 0:
+            self.simbatch_core.que.print_queue_item(self.simbatch_core.que.queue_data[-1])
     #
     ##
     ###
@@ -105,7 +112,7 @@ class SimBatchAPI:
 
     def add_user_input(self, txt):  # TODO user_inputs_object.add
         vals = self.simbatch_core.sio.predefined.convert_predefined_variables_to_values(txt)
-        inputs.append([vals])
+        self.user_inputs_add_to_queue.append([vals])
 
 
 

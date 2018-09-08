@@ -3,13 +3,13 @@ import core.core as core
 
 class SimBatchAPI:
     simbatch_core = None
+    user_inputs_add_to_queue = None
 
     def __init__(self, ini_file="config.ini"):
         self.init_simbatch(ini_file=ini_file)
 
     def init_simbatch(self, ini_file="config.ini"):
         self.simbatch_core = core.SimBatch("no-gui", ini_file=ini_file)
-
 
     def load_data(self):
         self.simbatch_core.load_data()
@@ -24,7 +24,92 @@ class SimBatchAPI:
         if self.simbatch_core.prj.total_projects == 0:
             self.simbatch_core.create_example_data()
 
-    """   DEFINITIONS """
+    def print_basic_data_info(self):
+        self.simbatch_core.print_important_values()
 
-    
+    #
+    ##
+    ###
+    """   DEFINITIONS """
+    def set_current_definition(self, definition_name):
+        self.simbatch_core.dfn.update_current_definition_by_name(definition_name)
+        # TODO return !
+
+    #
+    ##
+    ###
+    """   PROJECTS    """
+    def set_current_project(self, last=True, project_id=None):
+        if last:
+            self.simbatch_core.prj.update_current_from_id(self.simbatch_core.prj.max_id)
+        if project_id is not None:
+            # TODO is number ?
+            self.simbatch_core.prj.update_current_from_id(project_id)
+
+    #
+    ##
+    ###
+    """   SCHEMAS    """
+    def set_current_schema(self, last=True, schema_id=None):
+        if last is True:
+            self.simbatch_core.sch.update_current_from_id(self.simbatch_core.tsk.tasks_data[-1].schema_id)
+        if schema_id is not None:
+            # TODO is number ?
+            self.simbatch_core.sch.update_current_from_id(schema_id)
+
+    def get_schema_options_object(self):
+        return self.simbatch_core.sch.create_schema_options_object()
+    #
+    ##
+    ###
+    """   TASKS      """
+    def set_current_task(self, last=True, task_id=None):
+        if last is True:
+            self.simbatch_core.tsk.update_current_from_id(self.simbatch_core.tsk.max_id)
+        if task_id is not None:
+            # TODO is number ?
+            self.simbatch_core.tsk.update_current_from_id(task_id)
+
+    def create_task_options_object(self):
+        return self.simbatch_core.tsk.create_task_options_object()
+
+    #
+    ##
+    ###
+    """    QUEUE     """
+
+    def clear_green_items_from_queue(self):
+        self.simbatch_core.que.remove_all_queue_items(only_done=True)
+        self.simbatch_core.que.save_queue()
+
+    def add_current_task_to_queue(self, evo=None, action_inputs=None, schema_options=None, task_options=None):
+        sib = self.simbatch_core
+        if evo is not None:
+            evolutions = sib.pat.get_evolutions_from_string(evo)
+            # TODO EVO !!!
+
+        sib.tsk.increase_queue_ver()
+        new_queue_items = sib.que.generate_queue_items(sib.tsk.max_id, action_inputs=action_inputs,
+                                                       schema_options=schema_options, task_options=task_options)
+        sib.que.add_to_queue(new_queue_items)
+        sib.que.save_queue()
+
+    #
+    ##
+    ###
+    # TODO OOP
+    """     user    interaction   """
+    def create_inputs_object(self):
+        self.user_inputs_add_to_queue = []
+        return self.user_inputs_add_to_queue
+
+    def add_user_input(self, txt):  # TODO user_inputs_object.add
+        vals = self.simbatch_core.sio.predefined.convert_predefined_variables_to_values(txt)
+        inputs.append([vals])
+
+
+
+
+
+
 

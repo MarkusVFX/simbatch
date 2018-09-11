@@ -250,19 +250,6 @@ class StorageInOut:
         self.predefined = PredefinedVariables(batch)
         self.dir_separator = batch.sts.dir_separator
 
-    @staticmethod
-    def get_flat_name(name):
-        return re.sub('\s', '_', name)
-
-    def create_project_working_directory(self, directory):
-        self.comfun.create_directory(directory)
-
-    def create_schema_directory(self, directory):
-        self.comfun.create_directory(directory + "base_setup" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "computed_setups" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "prevs" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
-
     def get_files_from_dir(self, directory, types=""):
         files = []
         dir_path = self.comfun.get_path_from_full(directory)
@@ -274,6 +261,33 @@ class StorageInOut:
                 else:
                     files.append(fi)
         return files
+        
+    @staticmethod
+    def get_flat_name(name):
+        return re.sub('\s', '_', name)
+
+    def create_data_directory_if_not_exist(self):
+        dir_path = self.batch.sts.store_data_json_directory_abs
+        if self.comfun.path_exists(dir_path) is False:
+            self.comfun.create_directory(dir_path)
+        
+    def create_project_working_directory(self, dir_path):
+        self.comfun.create_directory(dir_path)
+
+    def create_schema_directory(self, directory):
+        self.comfun.create_directory(directory + "base_setup" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "computed_setups" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "prevs" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
+            
+    def create_example_data(self):
+        self.prj.create_example_project_data(do_save=True)
+        self.batch.sch.create_example_schemas_data(do_save=True)
+        self.batch.tsk.create_example_tasks_data(do_save=True)
+        self.batch.que.create_example_queue_data(do_save=True)
+        # self.batch.nod.createSampleData()  # TODO
+        self.batch.nod.save_nodes()
+        self.batch.logger.inf("Created sample data")
 
     def check_any_data_to_load_exisit(self):
         if self.sts.store_data_mode == 1:

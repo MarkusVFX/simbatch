@@ -1,4 +1,3 @@
-
 import core
 
 
@@ -22,8 +21,9 @@ class SimBatchAPI:
         return self.simbatch_core.sts.json_settings_data
 
     def create_example_data_if_not_exists(self):
+        self.simbatch_core.sio.create_data_directory_if_not_exist()
         if self.simbatch_core.prj.total_projects == 0:
-            self.simbatch_core.create_example_data()
+            self.simbatch_core.sio.create_example_data()
 
     def print_basic_data_info(self):
         self.simbatch_core.print_important_values()
@@ -113,10 +113,3 @@ class SimBatchAPI:
     def add_user_input(self, txt):  # TODO user_inputs_object.add
         vals = self.simbatch_core.sio.predefined.convert_predefined_variables_to_values(txt)
         self.user_inputs_add_to_queue.append([vals])
-
-
-
-
-
-
-

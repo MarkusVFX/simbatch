@@ -74,7 +74,7 @@ if add_param is True:
     # TODO user_inputs_object.add
     api.add_user_input("<schema_base_setup>")
     api.add_user_input("<shot_ani_cache_dir>")
-    api.add_user_input("<object>.<param>=<value>")
+    # api.add_user_input("<object>.<param>=<value>")
     api.add_user_input("<cloth_objects>")
     api.add_user_input("<shot_prev_seq>")
     api.add_user_input("<copmuted_scene>")
@@ -93,4 +93,4 @@ if add_param is True:
 """ print queue info """
 if show_info is True:
     api.print_queue_header()
-    api.print_last_queue_item()
+api.print_last_queue_item()

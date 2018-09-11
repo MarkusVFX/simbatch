@@ -96,7 +96,7 @@ class SettingsUI:
             qt_radio_mode2.setChecked(True)
         qt_button_group_data.addButton(qt_radio_mode2)
         qt_lay_settings_mode.addWidget(qt_radio_mode2)
-        qt_radio_mode3 = QRadioButton("MySql")
+        qt_radio_mode3 = QRadioButton("MySQL")
         if settings.store_data_mode == 2:
             qt_radio_mode3.setChecked(True)
         qt_button_group_data.addButton(qt_radio_mode3)
@@ -424,8 +424,11 @@ class SettingsUI:
 
         if index > 1:
             # PRO version
-            self.top_ui.set_top_info("MySQL will be supported with the PRO version", 4)
+            self.top_ui.set_top_info("MySQL will be supported with the PRO version", 7)
             self.batch.logger.inf("MySQL will be supported with the PRO version")
+        else:
+            self.top_ui.set_top_info("JSON data mode is active :)", 4)
+            self.batch.logger.inf("JSON data mode is active")
 
     def on_change_data_dir(self, txt):
         self.batch.logger.deepdb(("on_change_data_dir: ", txt))
@@ -500,18 +503,9 @@ class SettingsUI:
             self.batch.logger.wrn("Sample not created, directory not defined!")
             self.top_ui.set_top_info("Sample not created, directory not defined!", 7)
         else:
-            if self.comfun.path_exists(self.batch.sts.store_data_json_directory_abs) is False:
-                self.comfun.create_directory(self.batch.sts.store_data_json_directory_abs)
-
+            batch.sio.create_data_directory_if_not_exist()
             if self.comfun.path_exists(self.batch.sts.store_data_json_directory_abs) is True:
-                batch.prj.create_example_project_data(do_save=True)
-                batch.sch.create_example_schemas_data(do_save=True)
-                batch.tsk.create_example_tasks_data(do_save=True)
-                # batch.que.createSampleData(taskID, projID)  # TODO
-                # batch.nod.createSampleData()  # TODO
-                batch.que.create_example_queue_data(do_save=True)
-                batch.nod.save_nodes()
-                self.batch.logger.inf("Created sample data")
+                batch.sio.create_example_data()
                 self.mainw.refresh_ui_with_reload_data()
             else:
                 msg = "Sample not created, directory {} not exists".format(self.batch.sts.store_data_json_directory)

@@ -88,7 +88,7 @@ class SimNodes:
         if len(json_file) == 0:
             json_file = self.batch.sts.store_data_json_directory_abs + self.batch.sts.JSON_SIMNODES_FILE_NAME
         if self.comfun.file_exists(json_file, info="simnodes file"):
-            self.batch.logger.inf(("loading simnode items: ", json_file))
+            self.batch.logger.inf(("loading simnodes: ", json_file))
             json_nodes = self.comfun.load_json_file(json_file)
             if json_nodes is not None and "simnodes" in json_nodes.keys():
                 if json_nodes['simnodes']['meta']['total'] > 0:

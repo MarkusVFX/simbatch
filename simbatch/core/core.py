@@ -174,9 +174,5 @@ class SimBatch:
         else:
             return False, "config.ini not loaded"
 
-    def create_example_data(self):
-        self.prj.create_example_project_data()
-
-
 if __name__ == "__main__":
     sib = SimBatch(5)

@@ -24,6 +24,26 @@ class SimBatchAPI:
         self.simbatch_core.sio.create_data_directory_if_not_exist()
         if self.simbatch_core.prj.total_projects == 0:
             self.simbatch_core.sio.create_example_data()
+            
+    def create_api_example_if_not_exists(self):
+        api_project_id = 0
+        if self.simbatch_core.prj.is_project_exists("API example") is False:
+            print " cereste API exmppl "
+            api_project = self.simbatch_core.prj.get_example_single_project()
+            api_project.project_name = "API example"
+            api_project.description = "proj created by API example script"
+            api_project_id = self.simbatch_core.prj.add_project(api_project, do_save=True)
+        else:
+            api_project_id = self.simbatch_core.prj.get_id_from_name("API example")
+        
+        if self.simbatch_core.sch.is_schema_exists("Simple Schema") is False:
+            api_simple_schema = self.simbatch_core.sch.get_example_single_schema()
+            api_simple_schema.schema_name = "Simple Schema"
+            api_simple_schema.actions_array = []
+            api_simple_schema.project_id = api_project_id
+            
+            self.simbatch_core.sch.add_schema(api_simple_schema, do_save=True)
+            
 
     def print_basic_data_info(self):
         self.simbatch_core.print_important_values()

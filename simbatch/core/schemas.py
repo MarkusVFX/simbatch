@@ -66,7 +66,7 @@ class SchemaItem:
         # self.actions_string = ""
         self.description = description
         # self.actions_to_string()
-        soft_name = "Maya_TODO"  # TODO
+        # soft_name = "Maya_TODO"  # TODO
 
     def __str__(self):
         return "SchemaItem   id:{}  name:{}".format(self.id, self.schema_name)
@@ -298,6 +298,13 @@ class Schemas:
         self.batch.logger.wrn(("no schema with ID: ", get_id))
         return None
 
+    def is_schema_exists(self, name):
+        if self.get_index_by_name(name) == None:
+            return False
+        else:
+            return True
+        
+        
     def update_current_schema(self, schema_id=-1, index=-1, last=-1):
         if last == 1:
             last_sch = self.schemas_data[self.total_schemas - 1]
@@ -456,6 +463,9 @@ class Schemas:
         for sch in self.schemas_data:
             sch.add_example_actions_to_schema()
 
+    def get_example_single_schema(self):
+        return SchemaItem(0, "schema example", 22, "ACTIVE", 1, "example_definition", [], 1, "schema example")
+        
     def create_example_schemas_data(self, do_save=True):
         collect_ids = 0
         sample_schema_item_1 = SchemaItem(0, "schema 1", 22, "ACTIVE", 1, "sample_definition_1", [], 1, "first schema")

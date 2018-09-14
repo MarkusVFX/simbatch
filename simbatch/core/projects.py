@@ -176,6 +176,17 @@ class Projects:
                     return p.id
         return None
 
+    def is_project_exists(self, name):
+        if self.get_id_from_name(name) == None:
+            return False
+        else:
+            return True
+            
+    def get_example_single_project(self):
+        return SingleProject(0, "Blank Proj", 1, 0, "defState", "proj_dir", "woking_dir",
+                                     "cam", "cache", "env", "props", "scripts", "custom",
+                                     "s_<sh##>", "description")
+    
     #  update id, index and current for fast use by all modules
     def update_current_from_id(self, proj_id):
         if proj_id is None:

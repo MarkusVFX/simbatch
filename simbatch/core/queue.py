@@ -441,6 +441,9 @@ class Queue:
 
     def generate_template_evo_script(self, action_inputs):
         scr = ""
+        if action_inputs is None:
+            return ""
+
         for i, act in enumerate(self.batch.sch.current_schema.actions_array):
             if len(action_inputs[i]) > 1:
                 scr += "[evo_scr]  ; "
@@ -461,6 +464,9 @@ class Queue:
     def get_evos_from_action_inputs(self, action_inputs):
         all_evos = []
         found_evos = 0
+        if action_inputs is None:
+            return all_evos
+
         for i, ai in enumerate(action_inputs):
             if len(ai) > 1:
                 print "evo in action input: ", i, ai[1]

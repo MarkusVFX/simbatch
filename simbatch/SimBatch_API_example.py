@@ -31,7 +31,7 @@ if show_info is True:
 """ load data or create example data """
 api.load_data()
 api.create_example_data_if_not_exists()
-
+api.create_api_example_if_not_exists()
 
 """ set working data """
 api.set_current_definition("Maya")

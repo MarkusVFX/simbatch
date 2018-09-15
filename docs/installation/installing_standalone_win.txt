@@ -33,7 +33,7 @@
 	
 5c installation for developement
 	for information about installing PyTest, Git please read:
-	https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/installing_development_environment.txt
+	https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/installing_development_environment_win.txt
 
 	
 	

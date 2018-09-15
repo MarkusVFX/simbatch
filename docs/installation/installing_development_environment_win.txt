@@ -1,4 +1,4 @@
-#  installing_development_environment.txt
+0 install python with PySide, for information please go to installing_standalone_win.txt
 
 1 installing PyTest
   c:\Python27\Scripts\pip install -U pytest

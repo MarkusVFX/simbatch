@@ -64,16 +64,17 @@ class SimBatchAPI:
             ret = self.simbatch_core.tsk.add_task(api_task_1, do_save=True) 
             if ret is not False:
                 api_task_id = ret
+                self.set_current_definition("Maya")
+                self.set_current_project(last=True)
+                self.set_current_schema(last=True)
+                self.set_current_task(last=True) 
+                task_options = self.create_task_options_object(task=api_task_1)
+                task_options.set_task_value("description", "example api")
+                self.add_current_task_to_queue(task_options=task_options)
             else:
                 api_task_id = 0
         else:
             api_task_id = self.simbatch_core.tsk.get_id_by_name("API tsk 1")
-            
-        self.set_current_definition("Maya")
-        self.set_current_project(last=True)
-        self.set_current_schema(last=True)
-        self.set_current_task(last=True) 
-        self.add_current_task_to_queue()
             
 
     def print_basic_data_info(self):
@@ -122,8 +123,8 @@ class SimBatchAPI:
             # TODO is number ?
             self.simbatch_core.tsk.update_current_from_id(task_id)
 
-    def create_task_options_object(self):
-        return self.simbatch_core.tsk.create_task_options_object()
+    def create_task_options_object(self, task=None):
+        return self.simbatch_core.tsk.create_task_options_object(task=task)
 
     #
     ##

@@ -288,6 +288,13 @@ class Schemas:
             counter += 1
         self.batch.logger.wrn(("no schema with name: ", schema_name))
         return None
+        
+    def get_id_by_name(self, schema_name):
+        for sch in self.schemas_data:
+            if sch.schema_name == schema_name:
+                return sch.id
+        self.batch.logger.wrn(("no schema with name: ", schema_name))
+        return None
 
     def get_index_by_id(self, get_id):
         counter = 0

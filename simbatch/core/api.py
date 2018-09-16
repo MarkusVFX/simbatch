@@ -69,6 +69,11 @@ class SimBatchAPI:
         else:
             api_task_id = self.simbatch_core.tsk.get_id_by_name("API tsk 1")
             
+        self.set_current_definition("Maya")
+        self.set_current_project(last=True)
+        self.set_current_schema(last=True)
+        self.set_current_task(last=True) 
+        self.add_current_task_to_queue()
             
 
     def print_basic_data_info(self):

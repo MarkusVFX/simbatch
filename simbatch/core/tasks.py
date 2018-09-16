@@ -134,6 +134,19 @@ class Tasks:
                 return i
         self.batch.logger.wrn(("no task with ID: ", get_id))
         return None
+        
+    def get_id_by_name(self, name):
+        for tsk in self.tasks_data:
+            if tsk.name == name:
+                return tsk.id
+        self.batch.logger.wrn(("no task with name: ", name))
+        return None
+        
+    def is_task_exists(self, name):
+        if self.get_id_by_name(name) == None:
+            return False
+        else:
+            return True
 
     def get_task_by_id(self, task_id):
         index = self.get_index_by_id(task_id)

@@ -1,7 +1,12 @@
+:)
+
 0 install python with PySide, for information please go to installing_standalone_win.txt
 
+
 1 installing PyTest
+  execute command:
   c:\Python27\Scripts\pip install -U pytest
+
 
 
 2 installing IDE
@@ -9,32 +14,41 @@
   or https://www.jetbrains.com/pycharm/              (advanced option)
   or yoru favorite IDE                               (the best option)
   
-  if you choose notepad++, please change tab to spaces in  Settings -> Preferences -> Language   by selecting   Python   and checking   "Replace by space"
+  if you choose notepad++, please change tab to spaces in  Settings -> Preferences -> Language   
+  by selecting   Python   and checking   "Replace by space"
 
 
-3 installing git 
+
+3 installing git
+  ( .NET Framework 4.5.1 recomended for "Git Credential Manager" )
   go to http://git-scm.com/download/win
   download 64-bit Git for Windows Setup
   run Git-2.18.0-64-bit.exe  (you can choose "Use Notepad++ as Git's default editor"  instead VIM)
 
 
-4 config git
+
+4a get SimBatch source code
   launch git bash
+  $ git clone https://github.com/MarkusVFX/simbatch.git  c:/my_local_git_directory
+  (you can also fork this repository and develop your own branch)
+  
+  
+4b if you would like to commit your changes, set up git:
+	
   $ git config --global user.name "yourname"
   $ git config --global user.email your@mail.com
   
-  $ git clone https://github.com/MarkusVFX/simbatch.git  c:/my_local_git_directory
-  (you can also fork this repo, and develop your branch)
+  
   
   
 5 after editing source code
 
     launch git bash
-	cd c:/my_local_git_directory    (if you not used "Git Bash Here" on your dir)
-	git status
-	git add .
-	git commit -m "info about edit"
-	git push
+	$ cd c:/my_local_git_directory    (if you not used "Git Bash Here" on your dir)
+	$ git status
+	$ git add filename_and_path
+	$ git commit -m "info about changes"
+	$ git push
 	
 
 

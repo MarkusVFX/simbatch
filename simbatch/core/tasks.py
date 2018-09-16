@@ -137,7 +137,7 @@ class Tasks:
         
     def get_id_by_name(self, name):
         for tsk in self.tasks_data:
-            if tsk.name == name:
+            if tsk.task_name == name:
                 return tsk.id
         self.batch.logger.wrn(("no task with name: ", name))
         return None

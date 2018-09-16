@@ -53,7 +53,6 @@ class SimBatchAPI:
         
         api_task_id = 0
         if self.simbatch_core.tsk.is_task_exists("API tsk 1") is False:
-            get_id_by_name
             api_task_1 = self.simbatch_core.tsk.get_blank_task()
             api_task_1.task_name = "API tsk 1"
             api_task_1.state_id = self.simbatch_core.sts.INDEX_STATE_WAITING

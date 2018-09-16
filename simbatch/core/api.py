@@ -36,14 +36,21 @@ class SimBatchAPI:
         else:
             api_project_id = self.simbatch_core.prj.get_id_from_name("API example")
         
+        api_schema_id = 0
         if self.simbatch_core.sch.is_schema_exists("Simple Schema") is False:
             api_simple_schema = self.simbatch_core.sch.get_example_single_schema()
             api_simple_schema.schema_name = "Simple Schema"
             api_simple_schema.actions_array = []
             api_simple_schema.project_id = api_project_id
             
-            self.simbatch_core.sch.add_schema(api_simple_schema, do_save=True)
-            
+            ret = self.simbatch_core.sch.add_schema(api_simple_schema, do_save=True)
+            if ret is not False:
+                api_schema_id = ret
+            else:
+                api_schema_id = 0
+        else:
+            api_schema_id = self.simbatch_core.sch.get_id_by_name("Simple Schema")
+        
 
     def print_basic_data_info(self):
         self.simbatch_core.print_important_values()

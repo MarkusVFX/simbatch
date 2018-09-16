@@ -61,6 +61,11 @@ class SimBatchAPI:
             api_task_1.schema_id = api_schema_id
             api_task_1.shot = "api01"
             api_task_1.description = "API example task 01"
+            ret = self.simbatch_core.tsk.add_task(api_task_1, do_save=True) 
+            if ret is not False:
+                api_task_id = ret
+            else:
+                api_task_id = 0
         else:
             api_task_id = self.simbatch_core.tsk.get_id_by_name("API tsk 1")
             

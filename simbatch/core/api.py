@@ -51,6 +51,21 @@ class SimBatchAPI:
         else:
             api_schema_id = self.simbatch_core.sch.get_id_by_name("Simple Schema")
         
+        api_task_id = 0
+        if self.simbatch_core.tsk.is_task_exists("API tsk 1") is False:
+            get_id_by_name
+            api_task_1 = self.simbatch_core.tsk.get_blank_task()
+            api_task_1.task_name = "API tsk 1"
+            api_task_1.state_id = self.simbatch_core.sts.INDEX_STATE_WAITING
+            api_task_1.state = self.simbatch_core.sts.states_visible_names[api_task_1.state_id]
+            api_task_1.project_id = api_project_id
+            api_task_1.schema_id = api_schema_id
+            api_task_1.shot = "api01"
+            api_task_1.description = "API example task 01"
+        else:
+            api_task_id = self.simbatch_core.tsk.get_id_by_name("API tsk 1")
+            
+            
 
     def print_basic_data_info(self):
         self.simbatch_core.print_important_values()

@@ -65,6 +65,7 @@ class SimBatchServer:
             self.set_simnode_state(2)
 
         self.server_name = batch.sts.runtime_env + " (local)"
+        print "srv"
         self.batch.logger.inf(("init server :", self.server_name, self.server_dir))
 
     def test_server_dir(self):
@@ -174,7 +175,7 @@ class SimBatchServer:
             pass
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
-    def run(self, mode):
+    def run(self, mode="all"):
         if mode == "single":
             self.loops_limit = 1
         if mode == "all":

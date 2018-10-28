@@ -77,7 +77,7 @@ if add_param is True:
     # api.add_user_input("<object>.<param>=<value>")
     api.add_user_input("<cloth_objects>")
     api.add_user_input("<shot_prev_seq>")
-    api.add_user_input("<copmuted_scene>")
+    api.add_user_input("<computed_scene>")
     api.add_user_input("<scripts_dir>\example.py")
 
     task_options = api.create_task_options_object()

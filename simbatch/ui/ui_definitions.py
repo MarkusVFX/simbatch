@@ -176,22 +176,27 @@ class DefinitionsUI:
         if self.current_selected[0] is not None:
             indexes = self.current_selected
             self.print_info("Current definition :  {}".format(self.dfn.definitions_names[indexes[0]]))
-            if len(indexes) > 1:
-                self.print_info(" Current action :  {}".format(
-                    self.dfn.definitions_array[indexes[0]].action_names[indexes[1]]))
-            if len(indexes) > 2:
-                self.print_info("  Current subaction :  {}".format(
-                    self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]].name))
+            if len(indexes) == 2:
+                if indexes[0] is not None and indexes[1] is not None:
+                    self.print_info(" Current action :  {}".format(
+                        self.dfn.definitions_array[indexes[0]].action_names[indexes[1]]))
+            if len(indexes) == 3:
+                if indexes[0] is not None and indexes[1] is not None and indexes[2] is not None:
+                    self.print_info("  Current subaction :  {}".format(
+                        self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]].name))
 
             if len(indexes) == 1:
-                d = self.dfn.definitions_array[indexes[0]]
-                self.qt_definition_content.append(d.print_single())
+                if indexes[0] is not None:
+                    d = self.dfn.definitions_array[indexes[0]]
+                    self.qt_definition_content.append(d.print_single())
             elif len(indexes) == 2:
-                ma = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]]
-                self.qt_definition_content.append(ma.print_actions())
+                if indexes[0] is not None and indexes[1] is not None:
+                    ma = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]]
+                    self.qt_definition_content.append(ma.print_actions())
             else:
-                sa = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]]
-                self.qt_definition_content.append(sa.print_action())
+                if indexes[0] is not None and indexes[1] is not None and indexes[2] is not None:
+                    sa = self.dfn.definitions_array[indexes[0]].multi_actions_array[indexes[1]].actions[indexes[2]]
+                    self.qt_definition_content.append(sa.print_action())
             self.qt_definition_content.append("\n\n\n")
         else:
             self.top_ui.set_top_info("Select element from tree view", 7)

@@ -116,7 +116,7 @@
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Current Scene",
-				"ui" : ["<copmuted_scene>", ["Get dir","[get_directory]"]],
+				"ui" : ["<computed_scene>", ["Get dir","[get_directory]"]],
 				"template": ["interaction.max_save_scene(", "<ui>", ")"]
 			},
 			"7":{

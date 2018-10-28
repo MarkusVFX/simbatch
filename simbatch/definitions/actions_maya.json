@@ -143,7 +143,7 @@
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Maya Scene",
-				"ui" : ["<copmuted_scene>", ["Get dir","[get_directory]"]],
+				"ui" : ["<computed_scene>", ["Get dir","[get_directory]"]],
 				"template": ["interactions.maya_save_scene(", "<ui>", ")"]
 			},
 			"7":{

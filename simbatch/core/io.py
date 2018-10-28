@@ -16,7 +16,7 @@ class PredefinedVariables:
         "shot_camera_file": {"type": "f", "function": "get_shot_camera_file"},
         "shot_prev_file": {"type": "f", "function": "get_shot_prev_file"},
         "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"},
-        "copmuted_scene": {"type": "f", "function": "get_shot_computed_setup"},
+        "computed_scene": {"type": "f", "function": "get_shot_computed_setup"},
         "scripts_dir": {"type": "d", "function": "get_scripts_dir"},
         "shot_dir": {"type": "d", "function": "get_shot_dir"},
         "working_dir": {"type": "d", "function": "get_working_dir"},
@@ -46,7 +46,7 @@ class PredefinedVariables:
             key_plus = "<" + key + ">"
             if check_str.find(key_plus) >= 0:
                 function_to_eval = "self.{}(\"{}\")".format(predefined_item["function"], param)
-                print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
+                # print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
                 try:
                     eval_ret = str(eval(function_to_eval))
                     # print "    ommand  ", check_str, predefined_item["function"],  predefined_item["type"] , eval_ret

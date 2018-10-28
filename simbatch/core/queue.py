@@ -131,7 +131,7 @@ class Queue:
 
     @staticmethod
     def print_queue_item(qi):
-        print "      queue item:{}    {} {} {}     {} {} \n      script:{}".format(qi.queue_item_name,
+        print "      queue item: {}    {} {} {}     {} {} \n     script:{}".format(qi.queue_item_name,
                                                                                    qi.sequence, qi.shot, qi.take,
                                                                                    qi.frame_from, qi.frame_to,
                                                                                    qi.get_evolution_script_with_nl())

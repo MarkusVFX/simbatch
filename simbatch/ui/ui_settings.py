@@ -44,15 +44,17 @@ class SettingsUI:
         qt_lay_settings_main = QVBoxLayout()      # layout for group boxes
         qt_scroll_widget = QWidget()
         self.qt_scroll_widget = qt_scroll_widget
+
         if settings.window is not None:
             qt_scroll_widget.setMinimumWidth(settings.window[2]-self.scroll_margin)
         else:
             qt_scroll_widget.setMinimumWidth(400)
 
-        if self.settings.runtime_env == "Maya":      # if self.settings.current_os == 1:
-            qt_scroll_widget.setMinimumHeight(750)
+        if self.settings.runtime_env == "Maya":
+            qt_scroll_widget.setMinimumHeight(400)
         else:
             qt_scroll_widget.setMinimumHeight(400)
+
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
 
@@ -187,16 +189,16 @@ class SettingsUI:
         # sett_sql_test.clicked.connect(self.sql_test_connection)
 
         qt_lay_settings_sql.addRow(sett_sql_1a, sett_sql_1b)
-        qt_lay_settings_sql.addRow(sett_sql_2a, sett_sql_2b)
-        qt_lay_settings_sql.addRow(sett_sql_3a, sett_sql_3b)
-        qt_lay_settings_sql.addRow(sett_sql_4abc.qt_widget_layout)
+        qt_lay_settings_sql.addRow(sett_sql_2a, sett_sql_2b)  # PRO version
+        qt_lay_settings_sql.addRow(sett_sql_3a, sett_sql_3b)  # PRO version
+        qt_lay_settings_sql.addRow(sett_sql_4abc.qt_widget_layout)  # PRO version
 
-        qt_radio_group_sql.setLayout(qt_lay_settings_sql)
+        qt_radio_group_sql.setLayout(qt_lay_settings_sql)  # PRO version
 
         ''' Users '''
         qt_lay_settings_user = QFormLayout()
         qt_radio_group_user = QGroupBox()
-        qt_radio_group_user.setMaximumHeight(130)
+
         qt_radio_group_user.setTitle("User settings (available in the Pro version)")
         qt_radio_group_user.setEnabled(False)
 
@@ -209,12 +211,13 @@ class SettingsUI:
         qt_sett_ser_4a = QLabel("role : ")
         qt_sett_ser_4b = QLineEdit("admin")
 
-        qt_lay_settings_user.addRow(qt_sett_ser_1a, qt_sett_ser_1b)
-        qt_lay_settings_user.addRow(qt_sett_ser_2a, qt_sett_ser_2b)
-        qt_lay_settings_user.addRow(qt_sett_ser_3a, qt_sett_ser_3b)
-        qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)
+        qt_lay_settings_user.addRow(qt_sett_ser_1a, qt_sett_ser_1b)   # PRO version
+        qt_lay_settings_user.addRow(qt_sett_ser_2a, qt_sett_ser_2b)   # PRO version
+        qt_lay_settings_user.addRow(qt_sett_ser_3a, qt_sett_ser_3b)   # PRO version
+        qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)   # PRO version
+        qt_radio_group_user.setMaximumHeight(130)   # PRO version
 
-        qt_radio_group_user.setLayout(qt_lay_settings_user)
+        qt_radio_group_user.setLayout(qt_lay_settings_user)   # PRO version
 
         ''' Colors '''
         qt_button_group_colors = QButtonGroup()
@@ -328,6 +331,7 @@ class SettingsUI:
         qt_radio_group_info.setTitle("Support and updates")
         qt_label_info = QLabel("              www.simbatch.com ")
         qt_lay_settings_info.addWidget(qt_label_info)
+        qt_radio_group_info.setMaximumHeight(130)
         qt_radio_group_info.setLayout(qt_lay_settings_info)
 
         qt_lay_settings_buttons = QHBoxLayout()
@@ -349,14 +353,14 @@ class SettingsUI:
         # qt_lay_settings_main.addStretch()
         qt_lay_settings_main.addWidget(qt_radio_group_colors)
         qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
-        qt_lay_settings_main.addWidget(qt_radio_group_sql)
-        qt_lay_settings_main.addWidget(qt_radio_group_user)
+        # qt_lay_settings_main.addWidget(qt_radio_group_sql)   # PRO version
+        # qt_lay_settings_main.addWidget(qt_radio_group_user)   # PRO version
         qt_lay_settings_main.addWidget(qt_radio_group_info)
         qt_lay_settings_main.addItem(QSpacerItem(1, 22))
 
+
         qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
         # qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
-
 
     def test_data_config_ini(self):
         if self.test_exist_config_ini():

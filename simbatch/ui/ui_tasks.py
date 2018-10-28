@@ -530,7 +530,8 @@ class TasksUI:
     """ marker ATQ 010a   on click add   """
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
-        form_atq.collect_options_from_action_widgets()
+        # self.actions_options.append(self.form_task_item.description)
+        form_atq.collect_options_from_widgets()
         # current_task_id = self.batch.tsk.current_task_id
         current_task = self.batch.tsk.current_task
         if current_task is not None:
@@ -546,9 +547,9 @@ class TasksUI:
                 schema_options = None
                 task_options = None
                 form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id,
-                                                                       action_inputs=form_atq.options,
+                                                                       action_inputs=form_atq.actions_options,
                                                                        schema_options=schema_options,
-                                                                       task_options=task_options)
+                                                                       task_options=form_atq.task_options)
                 if form_queue_items is not None and len(form_queue_items) > 0:
                     self.batch.logger.db(("q items generated !", form_queue_items, form_queue_items[0].description))
                     self.batch.que.add_to_queue(form_queue_items, do_save=True)

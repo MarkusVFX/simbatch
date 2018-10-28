@@ -26,10 +26,10 @@
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         ...
         # marker ATQ 100
-        self.collect_options_from_action_widgets() 
+        self.collect_options_from_widgets()
         ...
         # marker ATQ 200
-        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, action_inputs=form_atq.options, schema_options=schema_options, task_options=task_options)
+        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, action_inputs=form_atq.actions_options, schema_options=schema_options, task_options=task_options)
         ...
         self.batch.que.add_to_queue(form_queue_items, do_save=True)
 
@@ -37,11 +37,11 @@
 
 #ui_tasks_forms
     """ marker ATQ 100   generate options   """
-    def collect_options_from_action_widgets(self):
+    def collect_options_from_widgets(self):
         ...
-            self.options.append([opt, evo])
+            self.actions_options.append([opt, evo])
             or
-            self.options.append([opt])
+            self.actions_options.append([opt])
 
     #	class AddToQueueForm(QWidget):
     #		options = []                    # all user's inputs options with parameters

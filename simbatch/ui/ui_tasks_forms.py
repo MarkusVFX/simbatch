@@ -272,13 +272,14 @@ class TasksFormCreateOrEdit(QWidget):
 class AddToQueueForm(QWidget):
     batch = None
     comfun = None
-    options = []                    # all user's inputs options with parameters
+    actions_options = []         # user inputs for all actions (options with parameters)
+    task_options = None          # user inputs (task_proxy)
 
     qt_edit_button_frame_from = None
     qt_edit_button_frame_to = None
     qt_edit_button_sim_from = None
     qt_edit_button_sim_to = None
-    qt_edit_button_version = None
+    # qt_edit_button_version = None   # removed
     qt_edit_button_prior = None
     qt_gb_add_to_queue_now = None
     qt_lay_actions = None
@@ -294,9 +295,10 @@ class AddToQueueForm(QWidget):
     def __init__(self, batch):
         QWidget.__init__(self)
         self.batch = batch
+        self.tsk = batch.tsk
         # self.form_atq_local_item = self.batch.que.get_blank_queue_item()
         # self.sts = self.batch.sts
-        # self.comfun = self.batch.comfun
+        self.comfun = self.batch.comfun
         self.init_ui_elements()
 
     def init_ui_elements(self):
@@ -309,13 +311,12 @@ class AddToQueueForm(QWidget):
             qt_debug_buttons = WidgetGroup([SimpleLabel("debug buttons"), db_b1, db_b2])   # , db_b2
             db_buttons_group.setLayout(qt_debug_buttons.qt_widget_layout)
             qt_form_add_layout.addWidget(db_buttons_group)
+            qt_form_add_layout.addItem(QSpacerItem(1, 13))
             db_b1.button.clicked.connect(self.form_basic_db_print)
             db_b2.button.clicked.connect(self.form_detailed_db_print)
 
-        # qt_action_empty = ActionWidget(None, label_txt="    Select Task")
         qt_lay_actions = QVBoxLayout()
         self.qt_lay_actions = qt_lay_actions
-        # qt_lay_actions.addWidget(qt_action_empty)
         qt_lay_actions.setSpacing(0)
         qt_lay_actions.setContentsMargins(0, 0, 0, 0)
         qt_gb_actions = QGroupBox()
@@ -323,37 +324,37 @@ class AddToQueueForm(QWidget):
         qt_gb_actions.setLayout(qt_lay_actions)
         qt_form_add_layout.addWidget(qt_gb_actions)
 
-        qt_edit_button_version = EditLineWithButtons("version")
-        qt_edit_button_prior = EditLineWithButtons("prior")
         qt_edit_button_sim_from = EditLineWithButtons("sim from")
         qt_edit_button_sim_to = EditLineWithButtons("sim to")
         qt_edit_button_frame_from = EditLineWithButtons("start")
         qt_edit_button_frame_to = EditLineWithButtons("end")
+        qt_edit_button_prior = EditLineWithButtons("prior")
 
         qt_edit_button_description = EditLineWithButtons("desc", label_minimum_size=60)
         qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_desc)
 
-        qt_button_cb_add_to_queue = ButtonWithCheckBoxes("Add To Queue Now!", pin_text="pin ")
-
-        qt_widget_group_frame_range = WidgetGroup(
-            [qt_edit_button_version, qt_edit_button_prior, qt_edit_button_sim_from, qt_edit_button_sim_to,
-             qt_edit_button_frame_from, qt_edit_button_frame_to])
-
-        qt_form_add_layout.addLayout(qt_widget_group_frame_range.qt_widget_layout)
-        qt_form_add_layout.addLayout(qt_edit_button_description.qt_widget_layout)
-        qt_form_add_layout.addLayout(qt_button_cb_add_to_queue.qt_widget_layout)
+        qt_widget_group_frame_range = WidgetGroup([qt_edit_button_sim_from, qt_edit_button_sim_to,
+                                                   qt_edit_button_frame_from, qt_edit_button_frame_to,
+                                                   qt_edit_button_prior])
+        qt_lay_task_options = QVBoxLayout()
+        qt_lay_task_options.addLayout(qt_widget_group_frame_range.qt_widget_layout)
+        qt_lay_task_options.addLayout(qt_edit_button_description.qt_widget_layout)
 
         qt_gb_atq = QGroupBox()
-        # qt_gb_atq.setLayout(qt_form_add_layout)
+        qt_gb_atq.setTitle("Options")
+        qt_gb_atq.setLayout(qt_lay_task_options)
         self.qt_gb_add_to_queue_now = qt_gb_atq
+        qt_form_add_layout.addItem(QSpacerItem(1, 13))
         qt_form_add_layout.addWidget(qt_gb_atq)
+
+        qt_button_cb_add_to_queue = ButtonWithCheckBoxes("Add To Queue Now!", pin_text="pin ")
+        qt_form_add_layout.addLayout(qt_button_cb_add_to_queue.qt_widget_layout)
 
         self.qt_edit_button_sim_from = qt_edit_button_sim_from
         self.qt_edit_button_sim_to = qt_edit_button_sim_to
         self.qt_edit_button_frame_from = qt_edit_button_frame_from
         self.qt_edit_button_frame_to = qt_edit_button_frame_to
         self.qt_edit_button_prior = qt_edit_button_prior
-        self.qt_edit_button_version = qt_edit_button_version
         self.qt_edit_button_description = qt_edit_button_description
         self.execute_button = qt_button_cb_add_to_queue.button
 
@@ -368,25 +369,28 @@ class AddToQueueForm(QWidget):
         self.batch.tsk.print_task(self.batch.tsk.proxy_task)
 
     def form_detailed_db_print(self):
-        print_all = False
-        print "\n COLLECT OPTIONS (default or user values)"
-        self.collect_options_from_action_widgets()
+        print_all = True
+        self.collect_options_from_widgets()
+
         if print_all:
-            for i, op in enumerate(self.options):
+            print "\n [INF] PRINT OPTIONS"
+            for i, op in enumerate(self.actions_options):
                 print i, op
 
         # generate_script_from_actions
         if print_all:
+            print "\n [INF] PRINT OPTIONS"
             for i, act in enumerate(self.batch.sch.current_schema.actions_array):
-                print act.generate_script_from_action_template(self.batch, self.options[i][0], with_new_line=False, evo="1")
+                print act.generate_script_from_action_template(self.batch, self.actions_options[i][0],
+                                                               with_new_line=False, evo="1")
 
-        print "\n GENERATE QUEUE ITEMS"
-        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, action_inputs=self.options)
+        print "\n [INF] GENERATE QUEUE ITEMS"
+        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, action_inputs=self.actions_options)
 
         for i, q in enumerate(qi):
             print "gen qi: ", i, q
 
-        print "\n END"
+        print "\n [INF] END"
 
         """
         evos = "TIM 1 2 3"
@@ -396,13 +400,12 @@ class AddToQueueForm(QWidget):
         """
 
     def update_form(self):
-        current_task = self.batch.tsk.current_task
+        current_task = self.tsk.current_task
         self.qt_edit_button_sim_from.qt_edit_line.setText(str(current_task.sim_frame_start))
         self.qt_edit_button_sim_to.qt_edit_line.setText(str(current_task.sim_frame_end))
         self.qt_edit_button_frame_from.qt_edit_line.setText(str(current_task.prev_frame_start))
         self.qt_edit_button_frame_to.qt_edit_line.setText(str(current_task.prev_frame_end))
         self.qt_edit_button_prior.qt_edit_line.setText(str(current_task.priority))
-        self.qt_edit_button_version.qt_edit_line.setText(str(current_task.task_ver))
         self.qt_edit_button_description.qt_edit_line.setText(current_task.description)
 
         self.remove_all_action_widgets()
@@ -492,8 +495,13 @@ class AddToQueueForm(QWidget):
             self.batch.tsk.proxy_task.description = txt
 
     """ marker ATQ 100   collect options   """
+    def collect_options_from_widgets(self):
+        self.batch.logger.db("colecting user options from widgets ...")
+        del self.actions_options[:]
+        self.collect_options_from_action_widgets()
+        self.task_options = self.collect_options_from_task_widgets()
+
     def collect_options_from_action_widgets(self):
-        del self.options[:]
         for i, wa in enumerate(self.actions_widgets_array):
             opt = wa.qt_edit_line_widget.qt_edit_line.text()
             evo = ""
@@ -501,6 +509,39 @@ class AddToQueueForm(QWidget):
                 evo = wa.qt_evo_edit_line_widget.qt_edit_line.text()
 
             if len(evo) > 4:   # TODO check is evo or  random string !
-                self.options.append([opt, evo])
+                self.actions_options.append([opt, evo])
             else:
-                self.options.append([opt])
+                self.actions_options.append([opt])
+
+    def collect_options_from_task_widgets(self):
+        task_options = self.tsk.create_task_options_object()
+
+        check_val = self.qt_edit_button_sim_from.qt_edit_line.text()
+        if self.comfun.is_int(check_val):
+            task_options.set_task_value("sim_frame_start", check_val)
+
+        check_val = self.qt_edit_button_sim_to.qt_edit_line.text()
+        if self.comfun.is_int(check_val):
+            task_options.set_task_value("sim_frame_end", check_val)
+
+        check_val = self.qt_edit_button_frame_from.qt_edit_line.text()
+        if self.comfun.is_int(check_val):
+            task_options.set_task_value("prev_frame_start", check_val)
+
+        check_val = self.qt_edit_button_frame_to.qt_edit_line.text()
+        if self.comfun.is_int(check_val):
+            task_options.set_task_value("prev_frame_end", check_val)
+
+        check_val = self.qt_edit_button_prior.qt_edit_line.text()
+        if self.comfun.is_int(check_val):
+            task_options.set_task_value("priority", check_val)
+
+        check_val = self.qt_edit_button_description.qt_edit_line.text()
+        if self.comfun.is_int(check_val):
+            task_options.set_task_value("description", check_val)
+
+        # task_options.set_task_value("user options", 22)   # PRO version
+        # task_options.set_task_value("user_id", 1)   # PRO version
+
+        return task_options
+

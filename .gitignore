@@ -10,8 +10,8 @@ simbatch/data_test
 simbatch/definitions_test
 simbatch/definitions/interaction_example.json
 
-simbatch/simbatch/server/break.txt
-simbatch/simbatch/server/break__.txt
+simbatch/server/break.txt
+simbatch/server/break__.txt
 
 env/
 build/

@@ -43,12 +43,12 @@ class SimBatchServer:
         self.batch = batch
         self.comfun = batch.comfun
         if force_local is False:
-            self.batch.que.load_queue()
+            self.batch.que.load_queue()            
+            if self.batch.que.total_queue_items == 0:
+                self.batch.logger.inf("queue data is empty, nothing loaded")
+                self.batch.que.print_header()
         # else:
-            # already loaded !
-        if self.batch.que.total_queue_items == 0:
-            self.batch.logger.err("queue data is empty, nothing loaded")
-            self.batch.que.print_header()
+            # queue is already loaded !
 
         self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
         self.test_server_dir()
@@ -65,7 +65,6 @@ class SimBatchServer:
             self.set_simnode_state(2)
 
         self.server_name = batch.sts.runtime_env + " (local)"
-        print "srv"
         self.batch.logger.inf(("init server :", self.server_name, self.server_dir))
 
     def test_server_dir(self):
@@ -175,12 +174,18 @@ class SimBatchServer:
             pass
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
+    """ marker SIM 010   running   """
     def run(self, mode="all"):
         if mode == "single":
             self.loops_limit = 1
+            self.batch.logger.inf("run sim one")
         if mode == "all":
+            self.loops_limit = 0
             self.batch.logger.db("\n\n")
-
+            self.batch.logger.inf("run sim all")
+        self.run_loop()
+            
+    def run_loop(self):
         self.loops_counter += 1
         if self.loops_counter <= self.loops_limit or self.loops_limit < 1:
             if self.loops_limit > 0:
@@ -220,7 +225,7 @@ class SimBatchServer:
                     if ret is False:
                         self.batch.logger.err(("current queue item set_working failed! id:", execute_queue_id))
 
-                    """     RUN SINGLE JOB     """
+                    """     RUN SINGLE JOB AS LOCAL     """
                     if self.force_local is True:  # run local
                         print "\n\nrun_script(generate_script_file)"
                         print "run_script(generate_script_file)"  # TODO
@@ -233,11 +238,10 @@ class SimBatchServer:
 
                         if is_something_more_to_compute[0] == 1:
                             print ("\n pre run wew" + str(self.loops_counter) + "\n")
-                            self.run(mode)
+                            self.run_loop()
                             print ("\n post run wew" + str(self.loops_counter) + "\n")
                     else:
-                        """ run as simnode """
-
+                        """     RUN SINGLE JOB AS SIMNODE     """
                         job_id = is_something_to_compute[2]
                         job_script = is_something_to_compute[3]
                         job_description = is_something_to_compute[5]
@@ -251,14 +255,14 @@ class SimBatchServer:
                         self.run_external_software(generated_script_file)
                     """     END SINGLE JOB     """
 
-                else:
+                else:  # nothing more to compute!
                     self.batch.logger.inf((self.comfun.get_current_time(), "   there is nothing to compute"))
                     if self.loops_counter == 1:
-                        self.last_info = "there is nothing to compute"
+                        self.last_info = "there is nothing to compute"   # else last_info ->  last job id
 
-                    """ MODE ALL END """
-                    if mode == "all":
-                        self.loops_limit = self.loops_counter - 1
+                    """  BREAK ! """
+                    self.loops_limit = self.loops_counter
+                    self.loops_counter += 1
             else:
                 if self.current_simnode_state == 9:
                     self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
@@ -275,6 +279,6 @@ class SimBatchServer:
                     os.remove(external_breaker_off)
                 os.rename(external_breaker, external_breaker_off)
             else:
-                threading.Timer(self.timer_delay_seconds, lambda: self.run(mode)).start()
+                threading.Timer(self.timer_delay_seconds, lambda: self.run_loop()).start()
         else:
             self.batch.logger.inf(("end main loop", self.last_info))

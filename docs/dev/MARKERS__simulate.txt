@@ -1,0 +1,66 @@
+simnode_states:
+0 local mode (execution inside the framework)
+9 file state err
+
+
+#ui_queue
+    def on_click_sim_one(self):
+        self.run_server_from_framework("single")
+    def on_click_sim_all(self):
+        self.run_server_from_framework("all")
+    """ marker SIM 001   run by UI   """
+    def run_server_from_framework(self, mode):
+        ...
+        server.run(mode)
+        ...
+        
+#server
+    """ marker SIM 010   running   """
+    def run(self, mode="all"):
+        ...
+        if self.current_simnode_state <= 1:   # server waiting or in local mode
+            ...
+            is_something_to_compute = self.is_something_to_do(force_software=self.forces_software)
+            
+                ...
+                que.update_current_from_id(execute_queue_id)
+                set_working(execute_queue_id, self.server_name)
+                
+                
+                    """     RUN SINGLE JOB     """
+                    if self.force_local is True:  # run local
+                        TODO
+                    else:
+                        """ run as simnode """
+                        self.generate_script_for_external_software(generated_script_file, job_script, job_description, job_id)
+                        self.run_external_software(generated_script_file)
+                    """     END SINGLE JOB     """
+            
+            else:
+                inf: "there is nothing to compute"
+                
+                """ MODE ALL COUNTER """
+                if mode == "all":
+                    self.loops_limit = self.loops_counter - 1
+                
+        else:
+            if self.current_simnode_state == 9:
+                self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
+            else:
+                self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, "is busy"))
+        """    MAIN EXECUTION  FIN    """
+        external_breaker = self.server_dir + "break.txt"
+        if check_breaker:
+            ...
+        else:
+            threading.Timer(self.timer_delay_seconds, lambda: self.run(mode)).start()
+    else:
+        self.batch.logger.inf(("end main loop", self.last_info))
+
+        
+        
+        
+        
+        
+        
+        

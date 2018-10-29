@@ -370,7 +370,7 @@ class Settings:
 
         if len(settings_file) == 0:
             settings_file = self.ini_file  # JSON format
-        comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True))
+        comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True), nl_at_end=True)
         print ' [INF] settings saved to: ', settings_file
 
         if self.store_data_mode == 1:

@@ -357,9 +357,11 @@ class CommonFunctions:
         return True   # TODO  Exception
 
     @staticmethod
-    def save_to_file(file_name, content):
+    def save_to_file(file_name, content, nl_at_end=False):
         with open(file_name, 'w') as f:
             f.write(content)
+            if nl_at_end:
+                f.write("\n")
 
     # widgets QT ...
     @staticmethod

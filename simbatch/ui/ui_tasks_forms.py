@@ -366,16 +366,23 @@ class AddToQueueForm(QWidget):
 
     def form_basic_db_print(self):
         print "\n"
-        self.batch.tsk.print_task(self.batch.tsk.proxy_task)
+        self.collect_options_from_widgets()
+        self.tsk.print_task(self.task_options.proxy_task)
 
     def form_detailed_db_print(self):
+        print "\n"
         print_all = True
         self.collect_options_from_widgets()
 
         if print_all:
-            print "\n [INF] PRINT OPTIONS"
+            print "\n [INF] PRINT ACTIONS OPTIONS"
             for i, op in enumerate(self.actions_options):
                 print i, op
+            if self.task_options is not None:
+                print "\n [INF] PRINT TASK OPTIONS"
+                self.tsk.print_task(self.task_options.proxy_task)
+            else:
+                print "\n [WRN] task_options undefined!"
 
         # generate_script_from_actions
         if print_all:
@@ -517,28 +524,26 @@ class AddToQueueForm(QWidget):
         task_options = self.tsk.create_task_options_object()
 
         check_val = self.qt_edit_button_sim_from.qt_edit_line.text()
-        if self.comfun.is_int(check_val):
-            task_options.set_task_value("sim_frame_start", check_val)
+        if self.comfun.can_get_int(check_val):
+            task_options.set_task_value("sim_frame_start", int(check_val))
 
         check_val = self.qt_edit_button_sim_to.qt_edit_line.text()
-        if self.comfun.is_int(check_val):
-            task_options.set_task_value("sim_frame_end", check_val)
+        if self.comfun.can_get_int(check_val):
+            task_options.set_task_value("sim_frame_end", int(check_val))
 
         check_val = self.qt_edit_button_frame_from.qt_edit_line.text()
-        if self.comfun.is_int(check_val):
-            task_options.set_task_value("prev_frame_start", check_val)
+        if self.comfun.can_get_int(check_val):
+            task_options.set_task_value("prev_frame_start", int(check_val))
 
         check_val = self.qt_edit_button_frame_to.qt_edit_line.text()
-        if self.comfun.is_int(check_val):
-            task_options.set_task_value("prev_frame_end", check_val)
+        if self.comfun.can_get_int(check_val):
+            task_options.set_task_value("prev_frame_end", int(check_val))
 
         check_val = self.qt_edit_button_prior.qt_edit_line.text()
-        if self.comfun.is_int(check_val):
-            task_options.set_task_value("priority", check_val)
+        if self.comfun.can_get_int(check_val):
+            task_options.set_task_value("priority", int(check_val))
 
-        check_val = self.qt_edit_button_description.qt_edit_line.text()
-        if self.comfun.is_int(check_val):
-            task_options.set_task_value("description", check_val)
+        task_options.set_task_value("description", self.qt_edit_button_description.qt_edit_line.text())
 
         # task_options.set_task_value("user options", 22)   # PRO version
         # task_options.set_task_value("user_id", 1)   # PRO version

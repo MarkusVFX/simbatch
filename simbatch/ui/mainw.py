@@ -253,6 +253,8 @@ class MainWindow(QMainWindow):
         if self.sts.loading_state < 4:
             top.set_top_info("Settings loaded not properly", 7)
             self.batch.logger.wrn(("Settings loaded not properly", self.sts.loading_state, self.sts.settings_err_info))
+        else:
+            self.batch.logger.inf("Settings and data loaded\n\n")
 
     def post_run(self, loading_data_state):  # show welcome message or error info
         if loading_data_state[0] is True:

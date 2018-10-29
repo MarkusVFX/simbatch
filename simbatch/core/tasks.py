@@ -115,6 +115,7 @@ class Tasks:
         print "       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end)
         print "       state:{}   state_id:{} ".format(task.state, task.state_id)
         print "       options ", task.options
+        print "       description ", task.description
 
     def print_current(self):
         self.print_task()
@@ -420,7 +421,10 @@ class Tasks:
     """ marker TO (TaskOptions)   create object   """
     def create_task_options_object(self, task=None):
         if task is None:
-            task = self.current_task
+            if self.current_task is None:
+                task = self.get_blank_task()
+            else:
+                task = self.current_task
         return TaskOptions(task)
 
     def clear_proxy_task(self):

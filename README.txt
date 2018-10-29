@@ -1,22 +1,8 @@
-Hi, this is basic info about
+Hi,
+this tool is under refactioring :)
 
-1 git repository
+I have a working prototype, so if you need urgently this tool please let me know :)
 
-2 installing SimBATCH
-  a) standalone
-  b) Houdini
-  c) Maya
-  d) 3dsMAX
-  e) RealFlow
-  
-3 installing a development environment
-
-
-
-1 
-  
-2
-
-3
+MarkusVFX
 
 

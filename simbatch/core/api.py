@@ -28,10 +28,9 @@ class SimBatchAPI:
     def create_api_example_if_not_exists(self):
         api_project_id = 0
         if self.simbatch_core.prj.is_project_exists("API example") is False:
-            print " cereste API exmppl "
             api_project = self.simbatch_core.prj.get_example_single_project()
             api_project.project_name = "API example"
-            api_project.description = "proj created by API example script"
+            api_project.description = "proj created by API as example"
             api_project_id = self.simbatch_core.prj.add_project(api_project, do_save=True)
         else:
             api_project_id = self.simbatch_core.prj.get_id_from_name("API example")

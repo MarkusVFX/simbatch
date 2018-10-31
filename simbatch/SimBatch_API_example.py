@@ -70,16 +70,6 @@ if add_param is True:
     # schema_options.set_action_value("Save", "<shot_dir>/backup/<schema_name>_<shot_name>__v<ver>.mb", occurrence=2)
     # schema_options.set_action_value("Save", "<working_dir>/last_sim/last_sim.mb", occurrence=3)
 
-    user_inputs_object = api.create_inputs_object()
-    # TODO user_inputs_object.add
-    api.add_user_input("<schema_base_setup>")
-    api.add_user_input("<shot_ani_cache_dir>")
-    # api.add_user_input("<object>.<param>=<value>")
-    api.add_user_input("<cloth_objects>")
-    api.add_user_input("<shot_prev_seq>")
-    api.add_user_input("<computed_scene>")
-    api.add_user_input("<scripts_dir>\example.py")
-
     task_options = api.create_task_options_object()
     task_options.set_task_value("sim_from", 10)
     task_options.set_task_value("sim_to", 40)
@@ -87,9 +77,8 @@ if add_param is True:
     task_options.set_task_value("user options", 22)
     task_options.set_task_value("user_id", 1)
 
-    api.add_current_task_to_queue(action_inputs=user_inputs_object, schema_options=schema_options,
-                                  task_options=task_options)
-
+    api.add_current_task_to_queue(schema_options=schema_options, task_options=task_options)
+           
 """ print queue info """
 if show_info is True:
     api.print_queue_header()

@@ -280,20 +280,22 @@ class Schemas:
         self.batch.logger.wrn(("no schema with ID: ", get_id))
         return None
 
-    def get_index_by_name(self, schema_name):
+    def get_index_by_name(self, schema_name, msg=True):
         counter = 0
         for sch in self.schemas_data:
             if sch.schema_name == schema_name:
                 return counter
             counter += 1
-        self.batch.logger.wrn(("no schema with name: ", schema_name))
+        if msg:    
+            self.batch.logger.wrn(("no schema with name: ", schema_name))
         return None
         
-    def get_id_by_name(self, schema_name):
+    def get_id_by_name(self, schema_name, msg=True):
         for sch in self.schemas_data:
             if sch.schema_name == schema_name:
                 return sch.id
-        self.batch.logger.wrn(("no schema with name: ", schema_name))
+        if msg:
+            self.batch.logger.wrn(("no schema with name: ", schema_name))
         return None
 
     def get_index_by_id(self, get_id):
@@ -305,8 +307,8 @@ class Schemas:
         self.batch.logger.wrn(("no schema with ID: ", get_id))
         return None
 
-    def is_schema_exists(self, name):
-        if self.get_index_by_name(name) == None:
+    def is_schema_exists(self, name, msg=True):
+        if self.get_index_by_name(name, msg=msg) == None:
             return False
         else:
             return True

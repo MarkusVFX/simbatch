@@ -27,23 +27,24 @@ class SimBatchAPI:
             
     def create_api_example_if_not_exists(self):
         api_project_id = 0
-        if self.simbatch_core.prj.is_project_exists("API example") is False:
-            print " cereste API exmppl "
+        if self.simbatch_core.prj.is_project_exists("API example", msg=False) is False:
             api_project = self.simbatch_core.prj.get_example_single_project()
             api_project.project_name = "API example"
             api_project.description = "proj created by API example script"
             api_project_id = self.simbatch_core.prj.add_project(api_project, do_save=True)
+            self.simbatch_core.logger.inf("Created API project example")
         else:
             api_project_id = self.simbatch_core.prj.get_id_from_name("API example")
         
         api_schema_id = 0
-        if self.simbatch_core.sch.is_schema_exists("Simple Schema") is False:
+        if self.simbatch_core.sch.is_schema_exists("Simple Schema", msg=False) is False:
             api_simple_schema = self.simbatch_core.sch.get_example_single_schema()
             api_simple_schema.schema_name = "Simple Schema"
             api_simple_schema.actions_array = []
             api_simple_schema.project_id = api_project_id
             
             ret = self.simbatch_core.sch.add_schema(api_simple_schema, do_save=True)
+            self.simbatch_core.logger.inf("Created API schema example")
             if ret is not False:
                 api_schema_id = ret
             else:
@@ -52,7 +53,7 @@ class SimBatchAPI:
             api_schema_id = self.simbatch_core.sch.get_id_by_name("Simple Schema")
         
         api_task_id = 0
-        if self.simbatch_core.tsk.is_task_exists("API tsk 1") is False:
+        if self.simbatch_core.tsk.is_task_exists("API tsk 1", msg=False) is False:
             api_task_1 = self.simbatch_core.tsk.get_blank_task()
             api_task_1.task_name = "API tsk 1"
             api_task_1.state_id = self.simbatch_core.sts.INDEX_STATE_WAITING
@@ -71,7 +72,9 @@ class SimBatchAPI:
                 task_options = self.create_task_options_object(task=api_task_1)
                 task_options.set_task_value("description", "example api")
                 self.add_current_task_to_queue(task_options=task_options)
+                self.simbatch_core.logger.inf("Created API task example")
             else:
+                self.simbatch_core.logger.err("Not created API task example")
                 api_task_id = 0
         else:
             api_task_id = self.simbatch_core.tsk.get_id_by_name("API tsk 1")
@@ -135,15 +138,14 @@ class SimBatchAPI:
         self.simbatch_core.que.remove_all_queue_items(only_done=True)
         self.simbatch_core.que.save_queue()
 
-    def add_current_task_to_queue(self, evo=None, action_inputs=None, schema_options=None, task_options=None):
+    def add_current_task_to_queue(self, evo=None, schema_options=None, task_options=None):
         sib = self.simbatch_core
         if evo is not None:
             evolutions = sib.pat.get_evolutions_from_string(evo)
             # TODO EVO !!!
 
         sib.tsk.increase_queue_ver()
-        new_queue_items = sib.que.generate_queue_items(sib.tsk.max_id, action_inputs=action_inputs,
-                                                       schema_options=schema_options, task_options=task_options)
+        new_queue_items = sib.que.generate_queue_items(sib.tsk.max_id, schema_options=schema_options, task_options=task_options)
         sib.que.add_to_queue(new_queue_items)
         sib.que.save_queue()
 
@@ -158,10 +160,6 @@ class SimBatchAPI:
     ###
     # TODO OOP
     """     user    interaction   """
-    def create_inputs_object(self):
-        self.user_inputs_add_to_queue = []
-        return self.user_inputs_add_to_queue
-
-    def add_user_input(self, txt):  # TODO user_inputs_object.add
-        vals = self.simbatch_core.sio.predefined.convert_predefined_variables_to_values(txt)
-        self.user_inputs_add_to_queue.append([vals])
+    
+    
+    

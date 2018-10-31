@@ -480,10 +480,13 @@ class Queue:
         return all_evos
 
     """ marker ATQ 200   generate queue items   """
-    def generate_queue_items(self, task_id, action_inputs=None, schema_options=None, task_options=None):
+    def generate_queue_items(self, task_id, schema_options=None, task_options=None):
         tsk = self.batch.tsk
         sch = self.batch.sch
         queue_items = []
+        
+        action_inputs=None    # TODO  generate from schema or schema optionss
+        
         if task_options is None:
             based_on_task = copy.deepcopy(tsk.get_task_by_id(task_id))
         else:

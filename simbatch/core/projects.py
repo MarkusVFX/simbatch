@@ -166,7 +166,7 @@ class Projects:
         return None
 
     #  get index from name for form copy schema
-    def get_id_from_name(self, name, check_similar=False):
+    def get_id_from_name(self, name, check_similar=False, msg=True):
         for p in self.projects_data:
             if name == p.project_name:
                 return p.id
@@ -174,10 +174,13 @@ class Projects:
             for p in self.projects_data:
                 if name.lower() in p.project_name.lower():
                     return p.id
+                    
+        if msg:
+            self.batch.logger.wrn(("no project with name: ", name))
         return None
 
-    def is_project_exists(self, name):
-        if self.get_id_from_name(name) == None:
+    def is_project_exists(self, name, msg=True):
+        if self.get_id_from_name(name, msg=msg) == None:
             return False
         else:
             return True

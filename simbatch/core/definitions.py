@@ -302,7 +302,7 @@ class Definitions:
     # TODO move to common !!!!
 
     def load_interaction_file(self, file_path):
-        self.batch.logger.db(("__load_interaction_file: ", file_path))
+        self.batch.logger.deepdb(("__load_interaction_file: ", file_path))
         if self.sts.current_os == 1:
             file_path = file_path.replace("/", "\\")
         if self.comfun.file_exists(file_path):

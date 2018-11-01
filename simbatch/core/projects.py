@@ -390,7 +390,7 @@ class Projects:
         if json_file is None:
             json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file, info="projects file"):
-            self.batch.logger.inf(("loading projects: ", json_file))
+            self.batch.logger.inf(("loading projects: ", json_file), nl=True)
             json_projects = self.comfun.load_json_file(json_file)
             if json_projects is not None and "projects" in json_projects.keys():
                 if json_projects['projects']['meta']['total'] > 0:

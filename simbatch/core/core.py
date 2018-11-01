@@ -48,7 +48,7 @@ class SimBatch:
         self.pat = Patterns()           # pat
         #  abbreviation  END
 
-        self.logger.inf("SimBatch started")
+        self.logger.inf("SimBatch started", nl=True, nl_after=True)
 
     def print_data(self):
         self.prj.print_all()

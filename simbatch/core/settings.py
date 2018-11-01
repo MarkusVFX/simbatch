@@ -169,7 +169,7 @@ class Settings:
         """ check and force DEV config """
         if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file), "config_dev.ini"), info=False):
             self.ini_file = os.path.join(os.path.dirname(self.ini_file), "config_dev.ini")
-            self.logger.inf(("force DEV config:", self.ini_file))
+            self.logger.inf(("force DEV config:", self.ini_file), nl=True)
 
         self.sql = [None, None, None, None]
         self.clear_state_colors()

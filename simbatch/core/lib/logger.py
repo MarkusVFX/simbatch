@@ -14,7 +14,7 @@ class Logger:
         self.console_level = console_level
         self.log_file_level = log_level
 
-    def dispatch(self, level, message, force_print=False, raw=False):
+    def dispatch(self, level, message, force_print=False, raw=False, nl=False, nla=False):
         if self.console_level >= level or force_print:
             console_print = True
         else:
@@ -50,11 +50,15 @@ class Logger:
         if raw:
             print message
         elif console_print:
+            if nl:
+                print "\n"
             if type(message) is tuple:
                 out = "  ".join([str(el) for el in message])
                 print "{}[{}]  {}".format(indent, prefix, out)
             else:
                 print "{}[{}]  {}".format(indent, prefix, message)
+            if nla:
+                print "\n"
 
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)
@@ -62,23 +66,23 @@ class Logger:
         if self.buffering is not False:
             self.buffer += "\n"+message
 
-    def inf(self, message, force_print=False):
-        self.dispatch(1, message, force_print=force_print)
+    def inf(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(1, message, force_print=force_print, nl=nl, nla=nl_after)
 
-    def wrn(self, message, force_print=True):
-        self.dispatch(2, message, force_print=force_print)
+    def wrn(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(2, message, force_print=force_print, nl=nl, nla=nl_after)
 
-    def err(self, message, force_print=False):
-        self.dispatch(3, message, force_print=force_print)
+    def err(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(3, message, force_print=force_print, nl=nl, nla=nl_after)
 
-    def db(self, message, force_print=False):
-        self.dispatch(4, message, force_print=force_print)
+    def db(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(4, message, force_print=force_print, nl=nl, nla=nl_after)
 
-    def deepdb(self, message, force_print=False):
-        self.dispatch(5, message, force_print=force_print)
+    def deepdb(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(5, message, force_print=force_print, nl=nl, nla=nl_after)
 
-    def log(self, message, force_print=False):
-        self.dispatch(6, message, force_print=force_print)
+    def log(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(6, message, force_print=force_print, nl=nl, nla=nl_after)
         self.add_to_log("TODO")  # TODO
 
     def raw(self, message):

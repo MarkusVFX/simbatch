@@ -35,9 +35,11 @@ class TaskOptions:
         self.proxy_task = copy.deepcopy(task)
 
     def set_task_value(self, param, val):
-        # TODO  try , check attrib exist....
-        setattr(self.proxy_task, param, val)
-        return True  # TODO
+        if hasattr(self.proxy_task, param):
+            setattr(self.proxy_task, param, val)
+            return True
+        else:
+            return False
 
 
 class TaskItem:

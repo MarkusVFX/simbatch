@@ -11,6 +11,9 @@ class SimBatchAPI:
     def init_simbatch(self, ini_file="config.ini"):
         self.simbatch_core = core.SimBatch("no-gui", ini_file=ini_file)
 
+    def hello_world(self):
+        print self.simbatch_core.sts.random_welcome_message()
+
     def load_data(self):
         self.simbatch_core.load_data()
 
@@ -101,6 +104,7 @@ class SimBatchAPI:
         if project_id is not None:
             # TODO is number ?
             self.simbatch_core.prj.update_current_from_id(project_id)
+        # TODO return id or false
 
     #
     ##
@@ -112,6 +116,7 @@ class SimBatchAPI:
         if schema_id is not None:
             # TODO is number ?
             self.simbatch_core.sch.update_current_from_id(schema_id)
+        # TODO return id or false
 
     def get_schema_options_object(self):
         return self.simbatch_core.sch.create_schema_options_object()
@@ -125,6 +130,7 @@ class SimBatchAPI:
         if task_id is not None:
             # TODO is number ?
             self.simbatch_core.tsk.update_current_from_id(task_id)
+        # TODO return id or false
 
     def create_task_options_object(self, task=None):
         return self.simbatch_core.tsk.create_task_options_object(task=task)
@@ -147,10 +153,11 @@ class SimBatchAPI:
         sib.tsk.increase_queue_ver()
         new_queue_items = sib.que.generate_queue_items(sib.tsk.max_id, schema_options=schema_options, task_options=task_options)
         sib.que.add_to_queue(new_queue_items)
+        sib.que.set_last_as_current()
         sib.que.save_queue()
 
-    def print_queue_header(self):
-        self.simbatch_core.que.print_header()
+    def print_queue_info(self):
+        self.simbatch_core.que.print_info()
 
     def print_last_queue_item(self):
         if self.simbatch_core.que.total_queue_items > 0:

@@ -46,7 +46,7 @@ class SimBatchServer:
             self.batch.que.load_queue()            
             if self.batch.que.total_queue_items == 0:
                 self.batch.logger.inf("queue data is empty, nothing loaded")
-                self.batch.que.print_header()
+                self.batch.que.print_info()
         # else:
             # queue is already loaded !
 

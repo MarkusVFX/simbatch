@@ -117,7 +117,7 @@ class Queue:
         self.queue_data = []
 
     #  print project data, mainly for debug
-    def print_header(self):
+    def print_info(self):
         print "\n QUEUE: "
         print "     current queue item id: {}   index: {}   total queue items: {}\n".format(self.current_queue_id,
                                                                                             self.current_queue_index,
@@ -131,10 +131,10 @@ class Queue:
 
     @staticmethod
     def print_queue_item(qi):
-        print "      queue item: {}    {} {} {}     {} {} \n     script:{}".format(qi.queue_item_name,
-                                                                                   qi.sequence, qi.shot, qi.take,
-                                                                                   qi.frame_from, qi.frame_to,
-                                                                                   qi.get_evolution_script_with_nl())
+        print "      queue item: {}    {} {} {}     {} {} \n       script:{}".format(qi.queue_item_name,
+                                                                                     qi.sequence, qi.shot, qi.take,
+                                                                                     qi.frame_from, qi.frame_to,
+                                                                                     qi.get_evolution_script_with_nl())
 
     def print_all(self):
         if self.total_queue_items == 0:
@@ -166,6 +166,9 @@ class Queue:
                 return i
         self.clear_current_queue_item()
         return False
+
+    def set_last_as_current(self):
+        self.update_current_from_id(self.queue_data[-1].id)
 
     def clear_current_queue_item(self):
         self.current_queue_id = None
@@ -349,7 +352,7 @@ class Queue:
         if len(json_file) == 0:
             json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_QUEUE_FILE_NAME
         if self.comfun.file_exists(json_file, info="queue file"):
-            self.batch.logger.db(("loading queue items: ", json_file))
+            self.batch.logger.inf(("loading queue items: ", json_file))
             json_nodes = self.comfun.load_json_file(json_file)
             if json_nodes is not None and "queueItems" in json_nodes.keys():
                 if json_nodes['queueItems']['meta']['total'] > 0:
@@ -491,12 +494,14 @@ class Queue:
             based_on_task = copy.deepcopy(tsk.get_task_by_id(task_id))
         else:
             based_on_task = task_options.proxy_task
+            self.batch.logger.db("generate_queue_items with user's task_options", nl=True)
 
         if schema_options is None:
             schema_index = sch.get_index_by_id(based_on_task.schema_id)
             based_on_schema = sch.schemas_data[schema_index]
         else:
             based_on_schema = schema_options.proxy_schema
+            self.batch.logger.db("generate_queue_items with user's schema_options")
 
         all_evos = self.get_evos_from_action_inputs(action_inputs)
 

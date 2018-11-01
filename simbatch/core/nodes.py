@@ -98,15 +98,16 @@ class SimNodes:
                                                           int(li['stateId']), li['stateFile'], li['desc'])
                             self.add_simnode(new_simnode_item)
                         else:
-                            self.batch.logger.wrn(("simnode json data not consistent:", len(li),
+                            self.batch.logger.wrn(("simnode json data not consistent: ", len(li),
                                                    len(NODES_ITEM_FIELDS_NAMES)))
+                else:
+                    self.batch.logger.wrn(("no nodes data in : ", json_file))
                 return True
             else:
-                self.batch.logger.wrn(("no nodes data in : ", json_file))
-                return False
+                self.batch.logger.err(("wrong format data in: ", json_file))
         else:
-            self.batch.logger.wrn(("no simnodes file: ", json_file))
-            return False
+            self.batch.logger.err(("no simnodes file: ", json_file))
+        return False
 
     def load_nodes_from_mysql(self):
         # PRO VERSION

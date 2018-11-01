@@ -325,16 +325,7 @@ class Tasks:
         self.current_task_index = None
         # TODO check clear UI val (last current...)
         if clear_stored_data:
-            if self.sts.store_data_mode == 1:
-                if self.clear_json_tasks_file():
-                    return True
-                else:
-                    return False
-            if self.sts.store_data_mode == 2:
-                if self.clear_tasks_in_mysql():
-                    return True
-                else:
-                    return False
+            return self.save_tasks()
         return True
 
     def load_tasks(self):
@@ -362,14 +353,15 @@ class Tasks:
                                                      li['options'], int(li['user']), int(li['prior']), li['desc'])
                             self.add_task(new_task_item)
                         else:
-                            self.logger.wrn(("task json data not consistent:", len(li), len(TASK_ITEM_FIELDS_NAMES)))
-                    return True
+                            self.logger.wrn(("task json data not consistent: ", len(li), len(TASK_ITEM_FIELDS_NAMES)))
+                else:
+                    self.logger.wrn(("no tasks data in: ", json_file))
+                return True
             else:
-                self.logger.wrn(("no tasks data in : ", json_file))
-                return False
+                self.logger.err(("wrong format data: ", json_file))
         else:
-            self.logger.wrn(("no schema file: ", json_file))
-            return False
+            self.logger.err(("no schema file: ", json_file))
+        return False
 
     def load_tasks_from_mysql(self):
         # PRO VERSION

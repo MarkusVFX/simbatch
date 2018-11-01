@@ -273,7 +273,9 @@ class Projects:
         if project_to_add.is_default == 1:
             self.set_proj_as_default(proj_id=project_to_add.id)
         if do_save:
-            self.save_projects()
+            ret = self.save_projects()
+            if ret is False:
+                return False
         return project_to_add.id
 
     def update_project(self, mock_project, do_save=False):   # "mock_project" used for transfer data from ui
@@ -347,16 +349,7 @@ class Projects:
         self.current_project_id = None
         self.current_project_index = None
         if clear_stored_data:
-            if self.sts.store_data_mode == 1:
-                if self.clear_json_project_file():
-                    return True
-                else:
-                    return False
-            if self.sts.store_data_mode == 2:
-                if self.clear_projects_in_mysql():
-                    return True
-                else:
-                    return False
+            return self.save_projects()
         return True
 
     #  example data for beginner users and for tests
@@ -403,14 +396,16 @@ class Projects:
                                                         li['zerosInVersion'])
                             self.add_project(new_project)
                         else:
-                            self.batch.logger.err(("proj data not consistent", len(li), len(PROJECT_ITEM_FIELDS_NAMES)))
-                    return True
+                            self.batch.logger.err(("proj data not consistent ", len(li),
+                                                   len(PROJECT_ITEM_FIELDS_NAMES)))
+                else:
+                    self.batch.logger.wrn(("no projects data in: ", json_file))
+                return True
             else:
-                self.batch.logger.wrn(("no projects data in : ", json_file))
-                return False
+                self.batch.logger.err(("wrong format data in: ", json_file))
         else:
-            self.batch.logger.wrn(("projects file not exists : ", json_file))
-            return False
+            self.batch.logger.err(("projects file not exists: ", json_file))
+        return False
 
     #  load projects data from sql
     def load_projects_from_mysql(self):

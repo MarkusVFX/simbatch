@@ -279,15 +279,67 @@ class StorageInOut:
         self.comfun.create_directory(directory + "computed_setups" + self.sts.dir_separator)
         self.comfun.create_directory(directory + "prevs" + self.sts.dir_separator)
         self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
-            
+
     def create_example_data(self):
-        self.prj.create_example_project_data(do_save=True)
-        self.batch.sch.create_example_schemas_data(do_save=True)
-        self.batch.tsk.create_example_tasks_data(do_save=True)
-        self.batch.que.create_example_queue_data(do_save=True)
+        self.prj.create_example_project_data(do_save=True)  # TODO move to io.py
+        self.batch.sch.create_example_schemas_data(do_save=True)  # TODO move to io.py
+        self.batch.tsk.create_example_tasks_data(do_save=True)  # TODO move to io.py
+        self.batch.que.create_example_queue_data(do_save=True)  # TODO move to io.py
         # self.batch.nod.createSampleData()  # TODO
-        self.batch.nod.save_nodes()
+        # self.batch.nod.save_nodes()
         self.batch.logger.inf("Created sample data")
+
+    def create_api_example_data(self):
+        if self.batch.prj.is_project_exists("API example", msg=False) is False:
+            api_project = self.batch.prj.get_example_single_project()
+            api_project.project_name = "API example"
+            api_project.description = "proj created by API as example"
+            api_project_id = self.batch.prj.add_project(api_project, do_save=True)
+            if api_project_id is not None:
+                self.batch.logger.inf("Created API project example")
+            else:
+                self.batch.logger.wrn("NOT created API project example")
+                return False
+        else:
+            api_project_id = self.batch.prj.get_id_from_name("API example")
+
+        if self.batch.sch.is_schema_exists("Simple Schema", msg=False) is False:
+            api_simple_schema = self.batch.sch.get_example_single_schema()
+            api_simple_schema.schema_name = "Simple Schema"
+            api_simple_schema.actions_array = []
+            api_simple_schema.project_id = api_project_id
+
+            ret = self.batch.sch.add_schema(api_simple_schema, do_save=True)
+            if ret is not False:
+                api_schema_id = ret
+                self.batch.logger.inf("Created API schema example")
+            else:
+                self.batch.logger.wrn("NOT created API schema example")
+                return False
+        else:
+            api_schema_id = self.batch.sch.get_id_by_name("Simple Schema")
+
+        if self.batch.tsk.is_task_exists("API tsk 1", msg=False) is False:
+            api_task_1 = self.batch.tsk.get_blank_task()
+            api_task_1.task_name = "API tsk 1"
+            api_task_1.state_id = self.batch.sts.INDEX_STATE_WAITING
+            api_task_1.state = self.batch.sts.states_visible_names[api_task_1.state_id]
+            api_task_1.project_id = api_project_id
+            api_task_1.schema_id = api_schema_id
+            api_task_1.shot = "api01"
+            api_task_1.description = "API example task 01"
+            ret = self.batch.tsk.add_task(api_task_1, do_save=True)
+            if ret is not False:
+                self.batch.logger.inf("Created API task example")
+            else:
+                self.batch.logger.wrn("NOT created API task example")
+                return False
+        else:
+            return True   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
+
+    def create_unit_tests_example_data(self):
+
+        self.batch.logger.inf("Created unit tests sample data")
 
     def check_any_data_to_load_exisit(self):
         if self.sts.store_data_mode == 1:

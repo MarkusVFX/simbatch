@@ -241,16 +241,7 @@ class Queue:
         self.current_queue_index = None
         # TODO check clear UI val (last current...)
         if clear_stored_data:
-            if self.sts.store_data_mode == 1:
-                if self.clear_json_queue_file():
-                    return True
-                else:
-                    return False
-            if self.sts.store_data_mode == 2:
-                if self.clear_queue_items_in_mysql():
-                    return True
-                else:
-                    return False
+            return self.save_queue()
         return True
 
     def add_to_queue(self, queue_items, do_save=False):
@@ -297,7 +288,7 @@ class Queue:
             self.batch.logger.err("queue item data not removed, item not found!")
             return False
 
-    def remove_all_queue_items(self, only_done=False):
+    def remove_queue_items(self, only_done=False):
         if only_done:
             for qi in copy.deepcopy(self.queue_data):
                 if qi.state_id == self.batch.sts.INDEX_STATE_DONE:
@@ -367,12 +358,13 @@ class Queue:
                                                        li['time'], int(li['projId']), "TMP")  # TODO int(li['softId'])
                             self.add_to_queue((new_queue_item, ))
                         else:
-                            self.batch.logger.wrn(("queue json data not consistent:",
-                                                   len(li), len(QUEUE_ITEM_FIELDS_NAMES)))
-                    return True
+                            self.batch.logger.wrn(("queue json data not consistent:", len(li),
+                                                   len(QUEUE_ITEM_FIELDS_NAMES)))
+                else:
+                    self.batch.logger.wrn(("no queue data in : ", json_file))
+                return True
             else:
-                self.batch.logger.wrn(("no queue data in : ", json_file))
-                return False
+                self.batch.logger.wrn(("wrong format data in: ", json_file))
         else:
             self.batch.logger.wrn(("queue file doesn't exist: ", json_file))
         return False
@@ -483,12 +475,10 @@ class Queue:
         return all_evos
 
     """ marker ATQ 200   generate queue items   """
-    def generate_queue_items(self, task_id, schema_options=None, task_options=None):
+    def generate_queue_items(self, task_id, evo=None, schema_options=None, task_options=None):
         tsk = self.batch.tsk
         sch = self.batch.sch
         queue_items = []
-        
-        action_inputs=None    # TODO  generate from schema or schema optionss
         
         if task_options is None:
             based_on_task = copy.deepcopy(tsk.get_task_by_id(task_id))
@@ -503,11 +493,22 @@ class Queue:
             based_on_schema = schema_options.proxy_schema
             self.batch.logger.db("generate_queue_items with user's schema_options")
 
+        if evo is not None:
+            # TO DO upddate  based_on_schema
+            evolutions = sib.pat.get_evolutions_from_string(evo)
+            # TODO EVO !!!
+            pass
+
+
+        action_inputs = None    # TODO  generate from schema or schema options
         all_evos = self.get_evos_from_action_inputs(action_inputs)
 
         """ marker SO (SchemaOptions) send to compile   """
         """ marker TO (TaskOptions)   send to compile   """
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
+        template_queue_item.print_this()
+        #  mmmm
+
         template_queue_item.evolution_script = self.generate_template_evo_script(action_inputs)
         if template_queue_item is not None:
             if len(all_evos) == 0:

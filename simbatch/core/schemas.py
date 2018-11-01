@@ -456,16 +456,7 @@ class Schemas:
         self.current_schema_index = None
         # TODO check clear UI val (last current...)
         if clear_stored_data:
-            if self.sts.store_data_mode == 1:
-                if self.clear_json_schema_file():
-                    return True
-                else:
-                    return False
-            if self.sts.store_data_mode == 2:
-                if self.clear_schemas_in_mysql():
-                    return True
-                else:
-                    return False
+            return self.save_schemas()
         return True
 
     def add_examples_actions_to_all_schemas(self):
@@ -522,15 +513,16 @@ class Schemas:
                                                          int(li['version']), li['desc'])
                             self.add_schema(new_schema_item)
                         else:
-                            self.batch.logger.err(("schema json data not consistent:", len(li),
+                            self.batch.logger.err(("schema json data not consistent: ", len(li),
                                                    len(SCHEMA_ITEM_FIELDS_NAMES)))
-                    return True
+                else:
+                    self.batch.logger.wrn(("no projects data in: ", json_file))
+                return True
             else:
-                self.batch.logger.wrn(("no projects data in : ", json_file))
-                return False
+                self.batch.logger.err(("wrong format data: ", json_file))
         else:
             self.batch.logger.err(("no schema file: ", json_file))
-            return False
+        return False
 
     def load_schemas_from_mysql(self):
         # PRO VERSION

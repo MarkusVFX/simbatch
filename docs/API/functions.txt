@@ -1,0 +1,113 @@
+API v_1.0
+
+
+"""  SimBatchAPI """
+# Initialization
+import core.api as simbatchapi
+api = simbatchapi.SimBatchAPI()
+
+
+"""  hello_world  """
+# Hello World Test
+api.hello_world()
+
+
+"""  get_settings_path  """
+# printing SETTINGS_PATH
+print "settings data: ", api.get_settings_path()
+
+
+"""  get_data_path  """
+# printing DATA_PATH
+print "data dir: ", api.get_data_path()
+
+
+"""  print_basic_data_info  """
+# print info about PROJECTS, SCHEMAS, TASKS, QUEUE, NODES, DEFINITION and ENV
+print_basic_data_info()
+
+
+"""  print_queue_info  """
+# print queue info
+api.print_queue_info()
+
+
+"""  print_last_queue_item  """
+# print last queue item
+api.print_last_queue_item()
+
+
+"""  api.load_data  """
+# Loading data from DATA_PATH
+api.load_data()
+
+
+"""  create_example_data_if_not_exists  """
+# create standard example database records
+api.create_example_data_if_not_exists()
+
+
+"""  create_api_example_if_not_exists  """
+# create 'API example' project dedicated for API testing functions
+api.create_api_example_if_not_exists()
+
+
+"""  set_current_definition("definition name")  """
+# set current definition by name
+api.set_current_definition("Maya")
+
+
+"""  set_current_project([last=True, project_id=int])  """
+# set current project by id or last
+api.set_current_project()
+
+
+"""  set_current_schema([last=True, schema_id=int])  """
+# set current schema  by id or last
+api.set_current_schema()
+
+
+"""  set_current_task([last=True, task_id=int])  """
+# set current task by id or last
+api.set_current_task()
+
+
+"""  clear_green_items_from_queue  """
+# cleanup queue by removing all DONE queue items
+api.clear_green_items_from_queue()
+
+
+"""  add_current_task_to_queue([evo=string, schema_options=schema_options_object, task_options=])  """
+# add task to queue, by default last with no options
+# evo: string with parameters and values for test sim. If schema has multiple actions with sim engines, values will be tested with to first one
+# schema_options: user options stored in schema_options_object
+# task_options: user options stored in task_options_object
+api.add_current_task_to_queue()
+api.add_current_task_to_queue(evo="BND 111 222, dmp 0.05 0.07, sTr 40 50")
+api.add_current_task_to_queue(schema_options=schema_options, task_options=task_options)
+
+
+"""  iii  """
+#
+
+
+
+"""  iii  """
+#
+
+
+
+"""  iii  """
+#
+
+
+
+
+
+
+
+
+
+
+
+

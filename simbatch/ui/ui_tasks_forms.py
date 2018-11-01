@@ -392,7 +392,8 @@ class AddToQueueForm(QWidget):
                                                                with_new_line=False, evo="1")
 
         print "\n [INF] GENERATE QUEUE ITEMS"
-        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, action_inputs=self.actions_options)
+        schema_options = None   # TODO !!!  from self.actions_options
+        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, schema_options=schema_options)
 
         for i, q in enumerate(qi):
             print "gen qi: ", i, q

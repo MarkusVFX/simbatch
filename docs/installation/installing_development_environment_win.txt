@@ -1,11 +1,14 @@
 :)
 
+
 0 install python with PySide, for detailied information please see installing_standalone_win.txt
+
 
 
 1 installing PyTest
   execute command:
   c:\Python27\Scripts\pip install -U pytest
+  (if $pytest -xvq dosnt work properly try: python -m pytest path_to_simbatch\tests -xvq)
 
 
 
@@ -32,7 +35,7 @@
   $ git clone https://github.com/MarkusVFX/simbatch.git  c:/my_local_git_directory
   (you can also fork this repository and develop your own branch)
   
-  
+
 4b if you would like to commit your changes, set up git:
 	
   $ git config --global user.name "yourname"
@@ -49,11 +52,4 @@
 	$ git add filename_and_path
 	$ git commit -m "info about changes"
 	$ git push
-	
-
-
-
-
-
-
 

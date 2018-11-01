@@ -29,7 +29,7 @@
         self.collect_options_from_widgets()
         ...
         # marker ATQ 200
-        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, action_inputs=form_atq.actions_options, schema_options=schema_options, task_options=task_options)
+        form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, schema_options=schema_options, task_options=task_options)
         ...
         self.batch.que.add_to_queue(form_queue_items, do_save=True)
 
@@ -51,7 +51,7 @@
 
 #queue
     """ marker ATQ 200   generate queue items   """
-    def generate_queue_items(self, task_id, action_inputs=None, schema_options=None, task_options=None):
+    def generate_queue_items(self, task_id, evo=None, schema_options=None, task_options=None):
         ...
         # marker ATQ 202
         all_evos = self.get_evos_from_action_inputs(action_inputs)

@@ -544,10 +544,9 @@ class TasksUI:
                 self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver\
 
                 """ marker TO     TODO"""
-                schema_options = None
+                schema_options = None  #  form_atq.actions_options
                 task_options = None
                 form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id,
-                                                                       action_inputs=form_atq.actions_options,
                                                                        schema_options=schema_options,
                                                                        task_options=form_atq.task_options)
                 if form_queue_items is not None and len(form_queue_items) > 0:

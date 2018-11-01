@@ -1,6 +1,6 @@
 :)
 
-0 install python with PySide, for information please go to installing_standalone_win.txt
+0 install python with PySide, for detailied information please see installing_standalone_win.txt
 
 
 1 installing PyTest

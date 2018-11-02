@@ -151,12 +151,15 @@ class SimNodes:
         # PRO VERSION
         self.batch.logger.inf("PRO version with SQL")
 
-    def clear_all_nodes_data(self):
+    def clear_all_nodes_data(self, clear_stored_data=False):
         del self.nodes_data[:]
         self.max_id = 0
         self.total_nodes = 0
         self.current_node_id = -1
         self.current_node_index = -1
+        if clear_stored_data:
+            return self.save_nodes()
+        return True
 
     def get_node_state(self, state_file):     # TODO tryToCreateIfNotExist = False,
         if self.comfun.file_exists(state_file, "get state file txt"):

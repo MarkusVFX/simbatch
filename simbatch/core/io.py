@@ -293,7 +293,7 @@ class StorageInOut:
         if self.batch.prj.is_project_exists("API example", msg=False) is False:
             api_project = self.batch.prj.get_example_single_project()
             api_project.project_name = "API example"
-            api_project.description = "proj created by API as example"
+            api_project.description = "project created by API as example"
             api_project_id = self.batch.prj.add_project(api_project, do_save=True)
             if api_project_id is not None:
                 self.batch.logger.inf("Created API project example")
@@ -338,7 +338,6 @@ class StorageInOut:
             return True   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
 
     def create_unit_tests_example_data(self):
-
         self.batch.logger.inf("Created unit tests sample data")
 
     def check_any_data_to_load_exisit(self):

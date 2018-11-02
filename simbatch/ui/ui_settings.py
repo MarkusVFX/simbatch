@@ -527,10 +527,10 @@ class SettingsUI:
                 batch.dfn.create_example_definition(do_save=True)
                 self.batch.logger.inf("Created sample definition")
             else:
-                msg = "Definition not created, directory {} not exists".format(self.batch.sts.store_definitions_directory_abs)
+                sdda = self.batch.sts.store_definitions_directory_abs
+                msg = "Definition not created, directory {} not exists".format(sdda)
                 self.batch.logger.wrn(msg)
                 self.top_ui.set_top_info(msg, 7)
-
 
     def on_click_clear_all_data(self):
         batch = self.batch
@@ -538,8 +538,9 @@ class SettingsUI:
         batch.sch.clear_all_schemas_data(clear_stored_data=True)
         batch.tsk.clear_all_tasks_data(clear_stored_data=True)
         batch.que.clear_all_queue_items(clear_stored_data=True)
+        batch.nod.clear_all_nodes_data(clear_stored_data=True)
         # batch.que.clearSampleData(taskID, projID)  # TODO
-        # batch.nod.clearSampleData()  # TODO
+        # batch.nod.clearSampleData()
         self.batch.logger.inf("Cleared sample data")
         self.mainw.refresh_ui_with_reload_data()
 

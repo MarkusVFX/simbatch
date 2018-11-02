@@ -52,7 +52,7 @@ class SingleDefinition:
     prev_ext = ""   # "prevExt" without dot "png"
     setup_ext = ""  # "setupExt" without dot
 
-    multi_actions_array = []    # old  GroupAction  grouped_actions_array
+    multi_actions_array = []    # array of MultiAction objects
     total_actions = 0
     action_names = []
 

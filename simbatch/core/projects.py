@@ -180,12 +180,13 @@ class Projects:
         return None
 
     def is_project_exists(self, name, msg=True):
-        if self.get_id_from_name(name, msg=msg) == None:
+        if self.get_id_from_name(name, msg=msg) is None:
             return False
         else:
             return True
-            
-    def get_example_single_project(self):
+
+    @staticmethod
+    def get_example_single_project():
         return SingleProject(0, "Blank Proj", 1, 0, "defState", "proj_dir", "woking_dir",
                                      "cam", "cache", "env", "props", "scripts", "custom",
                                      "s_<sh##>", "description")

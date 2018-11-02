@@ -485,8 +485,8 @@ class Tasks:
                 task_options = self.batch.tsk.create_task_options_object(task_to_add)
             task_options_proxy = task_options.proxy_task
 
-            "" marker SO (SchemaOptions)   send to compile   ""
-            "" marker TO (TaskOptions)   send to compile   ""
+            "" x marker SO (SchemaOptions)   send to compile   ""
+            "" x marker TO (TaskOptions)   send to compile   ""
             template_queue_item = self.generate_template_queue_item(task_to_add, schema_to_queued, task_options_proxy)
             print "evolutions:" , evolutions  ### ['Bnd 111 222']
             if template_queue_item is not None:

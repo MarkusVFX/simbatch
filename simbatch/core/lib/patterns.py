@@ -14,7 +14,7 @@ class Patterns:    # TODO  TESTS !!!!
         self.comfun = CommonFunctions(self.logger)
 
     """ convert string    'BNd  2      44; sTr 1 2  '   to  'BND  2.0  44.0 ;  STR  1.0  2.0'   """
-    def get_evolutions_from_string(self, evo_str):
+    def get_params_val_arr_from_string(self, evo_str):   # get array of arrays of params with values !
         out_evos_array = []
         evos_arr = evo_str.split(";")
         evo_count_all = 1

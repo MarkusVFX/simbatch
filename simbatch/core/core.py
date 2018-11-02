@@ -136,7 +136,7 @@ class SimBatch:
     def load_data(self):
         if self.sts.loading_state >= 4:
             ret_def = self.dfn.load_definitions()
-            if self.sio.check_any_data_to_load_exisit(): 
+            if self.sio.check_any_data_to_load_exist():
                 ret_prj = self.prj.load_projects()
                 if ret_prj is not False:
                     self.prj.init_default_proj()

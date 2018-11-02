@@ -59,11 +59,11 @@ class SingleAction:
     """ Single action with template"""
     name = ""
     evos_possible = False  # True for sim engines with evolutions possible BND, DMP, ...
-    mode = None         # one of nCloth, nHair, Fume ...   for Maya simulate    BLAST, RENDER for prev
-    # default_value = ""  # pattern changed when add to queue
+    mode = None         # nCloth, nHair, Fume ... for Maya simulate ; BLAST, RENDER for prev; (defined in definitions)
+    # default_value = ""  # template is a def val !!!
     actual_value = ""   # var set by user or default_value, finally used for generate action_script from template
-    template = ""       # use template for create absolute ...
-    parameters = None   # for nucleus engine it's  BND STR MAS
+    template = ""       # use template for create absolute script (defined in definitions)
+    parameters = None   # for nucleus engine it's  BND STR MAS (defined in definitions)
     description = ""
     json_FIELDS_NAMES = ACTION_DATA_FIELDS_NAMES
     ui = None
@@ -93,7 +93,7 @@ class SingleAction:
                                                                                    self.ui)
 
     def __str__(self):
-        return "SingleAction  " + self.name + self.description + self.template
+        return "SingleAction {} {} {} ".format(self.name, self.description, self.template)
 
     def print_minimum(self):
         print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
@@ -156,7 +156,7 @@ class SingleAction:
         return scr
 
 
-class MultiAction:    # old GroupedActions
+class MultiAction:
     """
     Grouped actions class is container for ONE or more SingleAction objects
     this container grouping similar actions, few actions of one type  or different versions of actions
@@ -174,7 +174,7 @@ class MultiAction:    # old GroupedActions
         self.logger = Logger()
 
     def __repr__(self):
-        return "MultiAction({},{})".format(self.name, self.name)
+        return "MultiAction({},{})".format(self.multi_id, self.name)
 
     def __str__(self):
         return "MultiAction  name:" + self.name

@@ -211,7 +211,7 @@ class RadioButtons:
 class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    For add to queue use: ActionWidgetATQ
     # action_name = ""
     # action_sub_mode = ""
-    multi_action = None  # MultiAction  # GroupAction
+    multi_action = None  # MultiAction
     qt_id = None
     qt_layout = None
     qt_label = None
@@ -226,7 +226,7 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
 
     widget_id = None
 
-    current_action_index = 0   # current index from GroupAction;  0 for single action
+    current_action_index = 0   # current index from MultiAction;  0 for single action
 
     batch = None
     logger = None
@@ -436,7 +436,7 @@ class ActionWidgetATQ(QWidget):  # QWidget
         self.check_evos()
 
     def check_evos(self):
-        ret = self.batch.pat.get_evolutions_from_string(self.qt_evo_edit_line_widget.qt_edit_line.text())
+        ret = self.batch.pat.get_params_val_arr_from_string(self.qt_evo_edit_line_widget.qt_edit_line.text())
 
         self.evos_array = ret[1]
         self.show_number_evolutions(ret[0])

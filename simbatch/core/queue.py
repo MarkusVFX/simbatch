@@ -64,8 +64,8 @@ class QueueItem:
                                                                             self.evolution_nr, self.evolution_script)
 
     def print_this(self):
-        print "\n QUEUE ITEM: "
-        print "   id: {}   seq|sh|tk: {}|{}|{} \n".format(self.id, self.sequence, self.shot, self.take)
+        print "\n QUEUE ITEM: {}".format(self.queue_item_name)
+        print "   id: {}   [seq|sh|tk] : [{}|{}|{}] \n".format(self.id, self.sequence, self.shot, self.take)
         print "   ver:{}  evo_nr: {}   evo: {}    \n".format(self.version, self.evolution_nr, self.evolution)
         print "   evolution_script:{}\n".format(self.evolution_script)
 
@@ -455,7 +455,7 @@ class Queue:
         return templ
 
     """ marker ATQ 202   generate all evos arr with scripts   """
-    def get_evos_from_action_inputs(self, action_inputs):
+    def get_evos_from_action_inputs(self, action_inputs):   # depreciated!
         all_evos = []
         found_evos = 0
         if action_inputs is None:
@@ -463,7 +463,7 @@ class Queue:
         for i, ai in enumerate(action_inputs):
             if len(ai) > 1:
                 print "evo in action input: ", i, ai[1]
-                ret = self.batch.pat.get_evolutions_from_string(ai[1])
+                ret = self.batch.pat.get_params_val_arr_from_string(ai[1])
                 if ret[0] > 0:
                     found_evos += ret[0]
 
@@ -474,15 +474,35 @@ class Queue:
 
         return all_evos
 
+    """ marker ATQ 302   generate all evos arr (scripts for evolving parameters)   """
+    def get_evos_from_schema_actions(self, schema):
+        all_evos = []
+        if schema is None:
+            return all_evos
+        for i, ai in enumerate(schema.actions_array):
+            if ai.evos_possible:
+            # if len(ai) > 1:
+                print "evo in action input: ", i, ai.actual_value
+                ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
+                if ret[0] > 0:   # ret[0] count evos
+                    for ie in ret[1]:  # TODO optimize, create EVOS class
+                        for c, subie in enumerate(ie):
+                            if c > 0:
+                                all_evos.append(
+                                    [ie[0] + ":" + subie, "interactions.set_param(\"" + ie[0] + "\"," + subie + ")"])
+
+        return all_evos
+
     """ marker ATQ 200   generate queue items   """
     def generate_queue_items(self, task_id, evo=None, schema_options=None, task_options=None):
         tsk = self.batch.tsk
         sch = self.batch.sch
         queue_items = []
-        
+
         if task_options is None:
             based_on_task = copy.deepcopy(tsk.get_task_by_id(task_id))
         else:
+            # marker TO (TaskOptions)   use
             based_on_task = task_options.proxy_task
             self.batch.logger.db("generate_queue_items with user's task_options", nl=True)
 
@@ -490,28 +510,30 @@ class Queue:
             schema_index = sch.get_index_by_id(based_on_task.schema_id)
             based_on_schema = sch.schemas_data[schema_index]
         else:
+            # marker SO (SchemaOptions) use
             based_on_schema = schema_options.proxy_schema
             self.batch.logger.db("generate_queue_items with user's schema_options")
 
         if evo is not None:
-            # TO DO upddate  based_on_schema
-            evolutions = sib.pat.get_evolutions_from_string(evo)
-            # TODO EVO !!!
-            pass
+            evo_action_index = based_on_schema.get_first_evos_possible()
+            if evo_action_index is not None:
+                based_on_schema.actions_array[evo_action_index].actual_value = evo
 
-
-        action_inputs = None    # TODO  generate from schema or schema options
-        all_evos = self.get_evos_from_action_inputs(action_inputs)
-
-        """ marker SO (SchemaOptions) send to compile   """
-        """ marker TO (TaskOptions)   send to compile   """
+        # marker ATQ 210
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
-        template_queue_item.print_this()
-        #  mmmm
-
-        template_queue_item.evolution_script = self.generate_template_evo_script(action_inputs)
         if template_queue_item is not None:
-            if len(all_evos) == 0:
+            template_queue_item.print_this()
+
+            # marker ATQ 302
+            schema_evos = self.get_evos_from_schema_actions(based_on_schema)
+
+
+            # action_inputs = None    # TODO  generate from schema or schema options
+            # all_evos = self.get_evos_from_action_inputs(action_inputs)   # depreciated!
+            # template_queue_item.evolution_script = self.generate_template_evo_script(action_inputs)
+
+
+            if len(schema_evos) == 0:
                 template_queue_item.generate_queue_item_name(based_on_task, with_update=True)
                 template_queue_item.evolution = ""
 
@@ -524,7 +546,7 @@ class Queue:
                 queue_items.append(template_queue_item)
 
             else:
-                for i, single_evo in enumerate(all_evos):
+                for i, single_evo in enumerate(schema_evos):
                     evo_i_s = self.comfun.str_with_zeros(i + 1, zeros=2)
                     queue_item = copy.deepcopy(template_queue_item)
                     queue_item.generate_queue_item_name(based_on_task, with_update=True, with_sufix=" [e:"+evo_i_s+"]")

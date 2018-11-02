@@ -107,6 +107,12 @@ class SchemaItem:
                         return i
         return None
 
+    def get_first_evos_possible(self):
+        for i, act in enumerate(self.actions_array):
+            if act.evos_possible:
+                return i
+        return None
+
     # def actions_to_string(self):
     #     for a in self.actions_array:
     #         self.actions_string += a + "|"
@@ -139,7 +145,7 @@ class SchemaItem:
 
             if parameters is not None:
                 if count_actions_with_evos == action_with_evo_index:
-                    ret = batch.pat.get_evolutions_from_string(evos_str)
+                    ret = batch.pat.get_params_val_arr_from_string(evos_str)
                     tmp2_arr = []
                     tmp2i_arr = []
                     for ev_params in ret[1]:
@@ -312,7 +318,6 @@ class Schemas:
             return False
         else:
             return True
-        
         
     def update_current_schema(self, schema_id=-1, index=-1, last=-1):
         if last == 1:

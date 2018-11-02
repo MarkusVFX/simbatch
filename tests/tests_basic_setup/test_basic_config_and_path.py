@@ -48,3 +48,35 @@ def test_check_data_access(sett):
     else:
         # PRO version with sql
         pass
+
+def test_is_data_exist(sett, capsys):
+    if sett.store_data_mode == 1:
+        assert sett.JSON_PROJECTS_FILE_NAME is not None
+        prj_file = sett.store_data_json_directory_abs + sett.JSON_PROJECTS_FILE_NAME
+        if sett.comfun.file_exists(prj_file) is False:
+            with capsys.disabled():
+                print "\n[pytest WRN] Projects data file not exist: ", prj_file
+        assert sett.JSON_SCHEMAS_FILE_NAME is not None
+        sch_file = sett.store_data_json_directory_abs + sett.JSON_SCHEMAS_FILE_NAME
+        if sett.comfun.file_exists(sch_file) is False:
+            with capsys.disabled():
+                print "\n[pytest WRN] Schemas data file not exist: ", sch_file
+        assert sett.JSON_TASKS_FILE_NAME is not None
+        tsk_file = sett.store_data_json_directory_abs + sett.JSON_TASKS_FILE_NAME
+        if sett.comfun.file_exists(tsk_file) is False:
+            with capsys.disabled():
+                print "\n[pytest WRN] Tasks data file not exist: ", tsk_file
+        assert sett.JSON_QUEUE_FILE_NAME is not None
+        que_file = sett.store_data_json_directory_abs + sett.JSON_QUEUE_FILE_NAME
+        if sett.comfun.file_exists(que_file) is False:
+            with capsys.disabled():
+                print "\n[pytest WRN] Queue data file not exist: ", que_file
+        assert sett.JSON_SIMNODES_FILE_NAME is not None
+        nod_file = sett.store_data_json_directory_abs + sett.JSON_SIMNODES_FILE_NAME
+        if sett.comfun.file_exists(nod_file) is False:
+            with capsys.disabled():
+                print "\n[pytest WRN] Project data file not exist: ", nod_file
+    else:
+        # PRO version with sql
+        pass
+

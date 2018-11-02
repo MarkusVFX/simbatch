@@ -60,10 +60,14 @@ def test_check_loaded_data(sib):
 
 
 def test_data_files(sib):
-    assert sib.sts.store_data_json_directory_abs is not None
-    assert len(sib.sts.store_data_json_directory_abs) > 0
-    assert sib.sts.JSON_PROJECTS_FILE_NAME is not None
-    assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_PROJECTS_FILE_NAME) is True
+    if sib.sts.store_data_mode == 1:
+        assert sib.sts.store_data_json_directory_abs is not None
+        assert len(sib.sts.store_data_json_directory_abs) > 0
+        assert sib.sts.JSON_PROJECTS_FILE_NAME is not None
+        assert sib.comfun.file_exists(sib.sts.store_data_json_directory_abs + sib.sts.JSON_PROJECTS_FILE_NAME) is True
+    else:
+        # PRO version with sql
+        pass
 
 
 def test_load_data(sib):

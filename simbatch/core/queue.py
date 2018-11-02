@@ -413,7 +413,7 @@ class Queue:
 
         return scr
 
-    """ marker ATQ 210   generate template   """
+    """ marker ATQ 210   generate queue item template   """
     def generate_template_queue_item(self, task, schema):
         """  generate template for multi use on add to queue process   """
 
@@ -434,24 +434,33 @@ class Queue:
         else:
             return None
 
-    def generate_template_evo_script(self, action_inputs):
+    # TODO remove , cleanup
+    # def old generate_template_evo_script(self, action_inputs):
+    #     scr = ""
+    #     if action_inputs is None:
+    #         return ""
+    #     for i, act in enumerate(self.batch.sch.current_schema.actions_array):
+    #         if len(action_inputs[i]) > 1:
+    #             scr += "[evo_scr]  ; "
+    #         scr += act.generate_script_from_action_template(self.batch, action_inputs[i][0], evo="[evo]") + "; "
+    #     return scr
+
+    """ marker ATQ 211   generate template script   """
+    def generate_template_evo_script(self, schema):
         scr = ""
-        if action_inputs is None:
+        if schema is None:
             return ""
-        for i, act in enumerate(self.batch.sch.current_schema.actions_array):
-            if len(action_inputs[i]) > 1:
+        for i, act in enumerate(schema.actions_array):
+            if act.evos_possible:
                 scr += "[evo_scr]  ; "
-            scr += act.generate_script_from_action_template(self.batch, action_inputs[i][0], evo="[evo]") + "; "
+            scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]") + "; "
         return scr
 
     def fill_evos_in_template(self, templ, evo=None, evo_scr=""):
         if evo is None:
             evo = "zzz_evo_www"
         templ = templ.replace("[evo]", evo)
-
-
         templ = templ.replace("[evo_scr]", evo_scr)
-
         return templ
 
     """ marker ATQ 202   generate all evos arr with scripts   """
@@ -475,21 +484,23 @@ class Queue:
         return all_evos
 
     """ marker ATQ 302   generate all evos arr (scripts for evolving parameters)   """
-    def get_evos_from_schema_actions(self, schema):
+    def get_array_of_scripts_params_val_from_schema_actions(self, schema):
         all_evos = []
         if schema is None:
             return all_evos
         for i, ai in enumerate(schema.actions_array):
             if ai.evos_possible:
-            # if len(ai) > 1:
-                print "evo in action input: ", i, ai.actual_value
+                # print "evo in action input: ", i, ai.actual_value
                 ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
                 if ret[0] > 0:   # ret[0] count evos
-                    for ie in ret[1]:  # TODO optimize, create EVOS class
+                    for ie in ret[1]:  # ['STR', '4.0', '5.0', '6.0']  # TODO optimize, create EVOS class
+                        param_arr = []
                         for c, subie in enumerate(ie):
                             if c > 0:
-                                all_evos.append(
-                                    [ie[0] + ":" + subie, "interactions.set_param(\"" + ie[0] + "\"," + subie + ")"])
+                                descr = ie[0] + ":" + subie
+                                scr = "interactions.set_param(\"" + ie[0] + "\"," + subie + ")"
+                                param_arr.append([descr, scr])
+                        all_evos.append(param_arr)
 
         return all_evos
 
@@ -521,19 +532,26 @@ class Queue:
 
         # marker ATQ 210
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
+
+        # marker ATQ 211
+        template_script = self.generate_template_evo_script(based_on_schema)
+
         if template_queue_item is not None:
             template_queue_item.print_this()
 
+            template_queue_item.evolution_script = template_script
+
             # marker ATQ 302
-            schema_evos = self.get_evos_from_schema_actions(based_on_schema)
+            arr_scripts_params = self.get_array_of_scripts_params_val_from_schema_actions(based_on_schema)
+
+            all_evo_combinations_array = self.do_params_combinations(arr_scripts_params)
 
 
             # action_inputs = None    # TODO  generate from schema or schema options
             # all_evos = self.get_evos_from_action_inputs(action_inputs)   # depreciated!
             # template_queue_item.evolution_script = self.generate_template_evo_script(action_inputs)
 
-
-            if len(schema_evos) == 0:
+            if len(all_evo_combinations_array) == 0:
                 template_queue_item.generate_queue_item_name(based_on_task, with_update=True)
                 template_queue_item.evolution = ""
 
@@ -546,22 +564,53 @@ class Queue:
                 queue_items.append(template_queue_item)
 
             else:
-                for i, single_evo in enumerate(schema_evos):
+                for i, single_evo in enumerate(all_evo_combinations_array):
                     evo_i_s = self.comfun.str_with_zeros(i + 1, zeros=2)
                     queue_item = copy.deepcopy(template_queue_item)
                     queue_item.generate_queue_item_name(based_on_task, with_update=True, with_sufix=" [e:"+evo_i_s+"]")
                     queue_item.evolution = single_evo[0]
                     queue_item.evolution_nr = i + 1
-
                     #
                     script = self.fill_evos_in_template(template_queue_item.evolution_script, evo="_evo"+evo_i_s,
                                                         evo_scr=single_evo[1])
                     queue_item.evolution_script = script
                     #
-
                     queue_items.append(queue_item)
 
         else:
             self.batch.logger.err("template_queue_item is None")
         return queue_items
 
+    def do_params_combinations(self, arr_in):
+        if len(arr_in) == 0:
+            return []
+        else:
+            all_combs = []
+            tmp_combs = []
+            # for i, ai in enumerate(arr_in):
+            arr_in.reverse()
+            # print " arr_inarr_inarr_in ", arr_in, "\n\n"
+            for i in range(0, len(arr_in)):
+                popi = arr_in.pop()
+                for j, pj in enumerate(popi):
+                    # print "\npop:", i,  pj
+                    if i == 0:
+                        tmp_combs.append([pj[0], pj[1][4]])
+                    else:
+                        tmp_arr = []
+                        for m in tmp_combs:
+                            # print "\n  tmp_combs : ",tmp_combs
+                            tmp_arr.append([[pj[0], pj[1][4]], m])
+                            # tmp_arr.append(pj)
+                            # tmp_arr.append(m)
+                            # m = m.append([pj[0], pj[1][4]])
+                            # print "\n  m : ", m[0],  "______" ,  tmp_arr
+                        #all_combs = copy.deepcopy(tmp_arr)
+
+                        all_combs.extend(tmp_arr)
+                        # print " AK ", len(all_combs), "_", all_combs, "\n\n"
+                #for j, aj in enumerate(ai):
+                    # print ai[i][0]
+
+            # print " \n\n len:  ", len(all_combs), len(all_combs[0]),  " \n\n  ", all_combs, "\n\n"
+            return all_combs

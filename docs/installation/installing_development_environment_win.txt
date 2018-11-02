@@ -8,7 +8,7 @@
 1 installing PyTest
   execute command:
   c:\Python27\Scripts\pip install -U pytest
-  (if $pytest -xvq dosnt work properly try: python -m pytest path_to_simbatch\tests -xvq)
+  (if '$pytest -xvq' dosnt work properly try: '$python -m pytest path_to_simbatch\tests -xvq')
 
 
 

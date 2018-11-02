@@ -53,24 +53,53 @@
     """ marker ATQ 200   generate queue items   """
     def generate_queue_items(self, task_id, evo=None, schema_options=None, task_options=None):
         ...
-        # marker ATQ 202
-        all_evos = self.get_evos_from_action_inputs(action_inputs)
+            # marker TO (TaskOptions)   use
+            based_on_task = task_options.proxy_task
         ...
+            # marker SO (SchemaOptions) use
+            based_on_schema = schema_options.proxy_schema
+        ...
+        if evo is not None:
+        ...
+
         # marker ATQ 210
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
-       
+        ...
+
+        # marker ATQ 211
+        template_script = self.generate_template_evo_script(based_on_schema)
+
+
+        # marker ATQ 202
+        all_evos = self.get_evos_from_action_inputs(action_inputs)    # depreciated!
+        ...
+
+
+
+
+
+
        
 #queue     
     """ marker ATQ 202   generate all evos arr with scripts   """
-    def get_evos_from_action_inputs(self, action_inputs):
+    def get_evos_from_action_inputs(self, action_inputs):    # depreciated!
         ...
         return all_evos
         
 
 #queue
-    """ marker ATQ 210   generate template   """
+    """ marker ATQ 210   generate queue item template   """
     def generate_template_queue_item(self, task, schema):
         """  generate template for multi use on add to queue process   """
+
+#queue
+    """ marker ATQ 211   generate template script   """
+    def generate_template_evo_script(self, schema):
+        ...
+            if act.evos_possible:
+                scr += "[evo_scr]  ; "
+        ...
+        return scr
 
 #schemas
     """ marker ATQ 212   get evo scripts   """
@@ -112,13 +141,13 @@
 # EVO CHECK
 #patterns
     """ convert string    'BNd  2      44; sTr 1 2  '   to  'BND  2.0  44.0 ;  STR  1.0  2.0'   """
-    def get_evolutions_from_string(self, evo_str):
+    def get_params_val_arr_from_string(self, evo_str):
         ...
         return evo_count_all, out_evos_array
         
         
         # use :
-        # batch.pat.get_evolutions_from_string("bnd 1 2")
+        # batch.pat.get_params_val_arr_from_string("bnd 1 2")
     
     
 

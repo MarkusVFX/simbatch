@@ -12,6 +12,7 @@ simbatch/definitions/interaction_example.json
 
 simbatch/server/break.txt
 simbatch/server/break__.txt
+simbatch/server/log.txt
 
 env/
 build/
@@ -25,4 +26,4 @@ __pycache__/
 .pytest_cache/
 
 Thumbs.db
-log.txt
+

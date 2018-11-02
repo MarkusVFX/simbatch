@@ -337,10 +337,63 @@ class StorageInOut:
         else:
             return True   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
 
-    def create_unit_tests_example_data(self):
-        self.batch.logger.inf("Created unit tests sample data")
+    def create_unit_tests_example_data(self, do_save=False):
+        if self.batch.prj.is_project_exists("pytest proj", msg=False) is False:
+            ut_project = self.batch.prj.get_example_single_project()
+            ut_project.project_name = "pytest proj"
+            ut_project.description = "project for unit tests"
+            ut_proj_id = self.batch.prj.add_project(ut_project, do_save=do_save)
+            if ut_proj_id is not None:
+                self.batch.logger.inf("Created unit tests project example")
+            else:
+                self.batch.logger.wrn("NOT created unit tests project example")
+                return False
+        else:
+            ut_proj_id = self.batch.prj.get_id_from_name("pytest proj")
 
-    def check_any_data_to_load_exisit(self):
+        if self.batch.sch.is_schema_exists("unit tests schema", msg=False) is False:
+            ut_simple_schema = self.batch.sch.get_example_single_schema()
+            ut_simple_schema.schema_name = "unit tests schema"
+            ut_simple_schema.actions_array = []
+            ut_simple_schema.project_id = ut_proj_id
+
+            maya_def = self.batch.dfn.get_definition_by_name("Maya")
+            if maya_def is None:
+                self.batch.logger.err("Maya definition NOT found!")
+            else:
+                ut_simple_schema.add_action_to_schema(maya_def.multi_actions_array[0].actions[0])
+                ut_simple_schema.add_action_to_schema(maya_def.multi_actions_array[3].actions[0])
+                ut_simple_schema.add_action_to_schema(maya_def.multi_actions_array[4].actions[0])
+                ut_simple_schema.add_action_to_schema(maya_def.multi_actions_array[5].actions[0])
+
+            ut_schema_id = self.batch.sch.add_schema(ut_simple_schema, do_save=do_save)
+            if ut_schema_id is not False:
+                self.batch.logger.inf("Created API schema example")
+            else:
+                self.batch.logger.wrn("NOT created API schema example")
+                return False
+        else:
+            ut_schema_id = self.batch.sch.get_id_by_name("unit tests schema")
+
+        if self.batch.tsk.is_task_exists("unit tests tsk 1", msg=False) is False:
+            ut_task_1 = self.batch.tsk.get_blank_task()
+            ut_task_1.task_name = "unit tests tsk 1"
+            ut_task_1.state_id = self.batch.sts.INDEX_STATE_WAITING
+            ut_task_1.state = self.batch.sts.states_visible_names[ut_task_1.state_id]
+            ut_task_1.project_id = ut_proj_id
+            ut_task_1.schema_id = ut_schema_id
+            ut_task_1.shot = "ut01"
+            ut_task_1.description = "unit tests example task 01"
+            ret = self.batch.tsk.add_task(ut_task_1, do_save=do_save)
+            if ret is not False:
+                self.batch.logger.inf("Created unit tests task example")
+            else:
+                self.batch.logger.wrn("NOT created unit tests task example")
+                return False
+        else:
+            return True   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
+
+    def check_any_data_to_load_exist(self):
         if self.sts.store_data_mode == 1:
             return self.get_files_from_dir(self.sts.store_data_json_directory_abs, types="json")
         else:

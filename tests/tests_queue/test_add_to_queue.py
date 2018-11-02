@@ -79,19 +79,25 @@ def test_get_params_val_arr_from_string(sib):
 def test_get_array_of_scripts_params_val_from_schema_actions(sib):
     print "\n\n___ scripts_params ___"
     arr_scripts_params = sib.que.get_array_of_scripts_params_val_from_schema_actions(sib.sch.current_schema)
-    print arr_scripts_params
+    print "\n", arr_scripts_params
 
     evo_action_index = sib.sch.current_schema.get_first_evos_possible()
     if evo_action_index is not None:
         sib.sch.current_schema.actions_array[evo_action_index].actual_value = "Bnd 5 55"
     arr_scripts_params = sib.que.get_array_of_scripts_params_val_from_schema_actions(sib.sch.current_schema)
-    print arr_scripts_params
+    print "\n", arr_scripts_params
 
     evo_action_index = sib.sch.current_schema.get_first_evos_possible()
     if evo_action_index is not None:
         sib.sch.current_schema.actions_array[evo_action_index].actual_value = "bND 5 55; MAS 1 2 3"
     arr_scripts_params = sib.que.get_array_of_scripts_params_val_from_schema_actions(sib.sch.current_schema)
-    print arr_scripts_params
+    print "\n", arr_scripts_params
+
+    evo_action_index = sib.sch.current_schema.get_first_evos_possible()
+    if evo_action_index is not None:
+        sib.sch.current_schema.actions_array[evo_action_index].actual_value = "bND 5 55; MAS 1 2 3; STI 300 303"
+    arr_scripts_params = sib.que.get_array_of_scripts_params_val_from_schema_actions(sib.sch.current_schema)
+    print "\n", arr_scripts_params
 
 
 def test_do_params_combinations(sib):

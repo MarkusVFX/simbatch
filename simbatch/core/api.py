@@ -31,17 +31,18 @@ class SimBatchAPI:
     def create_api_example_if_not_exists(self):
         ret = self.simbatch_core.sio.create_api_example_data()
         if ret is not False:
-            api_task_id = ret
-            self.set_current_definition("Maya")
-            self.set_current_project(last=True)
-            self.set_current_schema(last=True)
-            self.set_current_task(last=True)
-            task_options = self.create_task_options_object(task=api_task_1)
-            task_options.set_task_value("description", "example api")
-            self.add_current_task_to_queue(task_options=task_options)
-            self.batch.logger.inf("Created API task example")
+            if ret > 0: 
+                api_task_id = ret
+                self.set_current_definition("Maya")
+                self.set_current_project(last=True)
+                self.set_current_schema(last=True)
+                self.set_current_task(last=True)
+                task_options = self.create_task_options_object()  #vtask=api_task_1
+                task_options.set_task_value("description", "example api")
+                self.add_current_task_to_queue(task_options=task_options)
+                self.simbatch_core.logger.inf("Created API task example")
         else:
-            self.batch.logger.err("Not created API task example")
+            self.simbatch_core.logger.err("Not created API task example")
             api_task_id = 0
             
 

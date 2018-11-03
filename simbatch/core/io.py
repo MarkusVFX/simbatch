@@ -331,11 +331,12 @@ class StorageInOut:
             ret = self.batch.tsk.add_task(api_task_1, do_save=True)
             if ret is not False:
                 self.batch.logger.inf("Created API task example")
+                return ret
             else:
                 self.batch.logger.wrn("NOT created API task example")
                 return False
         else:
-            return True   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
+            return 0   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
 
     def create_unit_tests_example_data(self, do_save=False):
         if self.batch.prj.is_project_exists("pytest proj", msg=False) is False:

@@ -101,7 +101,7 @@ class SimNodes:
                             self.batch.logger.wrn(("simnode json data not consistent: ", len(li),
                                                    len(NODES_ITEM_FIELDS_NAMES)))
                 else:
-                    self.batch.logger.wrn(("no nodes data in : ", json_file))
+                    self.batch.logger.inf(("no nodes data in : ", json_file))
                 return True
             else:
                 self.batch.logger.err(("wrong format data in: ", json_file))

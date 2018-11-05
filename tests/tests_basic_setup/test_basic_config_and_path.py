@@ -7,7 +7,12 @@ from simbatch.core.lib.common import Logger
 @pytest.fixture(scope="module")
 def sett():
     # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    settings_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + "config_tests.ini"
+    tests_settings_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + "config_tests.ini"
+    if settings.comfun.file_exists(tests_settings_file):
+        settings_file = tests_settings_file
+    else:
+        settings_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + os.sep + "simbatch"
+        settings_file = settings_dir + os.sep + "config_tests.ini"
     return settings.Settings(Logger(), 5, ini_file=settings_file)
 
 
@@ -48,6 +53,7 @@ def test_check_data_access(sett):
     else:
         # PRO version with sql
         pass
+
 
 def test_is_data_exist(sett, capsys):
     if sett.store_data_mode == 1:

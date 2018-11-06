@@ -36,7 +36,28 @@
 						"template": ["subprocess.Popen(", "<ui>", ", shell=True)"]
 					}
 				}
-			}
+			},
+			"3":{
+				"id": 2,
+				"type": "multi",
+				"name": "Loop",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "over files",
+						"desc": "loop over files",
+						"ui": ["<start_directory>", ["Get start dir","[get_directory]"]],
+						"template": ["interactions.sa_loop_over_files(", "<ui>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "over dirs",
+						"desc": "loop over directories",
+						"ui": ["<start_directory>", ["Get start dir","[get_directory]"]],
+						"template": ["interactions.sa_loop_over_dir(", "<ui>", ")"]
+					}
+				}
+            }
 		}
 	}
 }

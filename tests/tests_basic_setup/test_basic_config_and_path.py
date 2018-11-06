@@ -1,4 +1,5 @@
 import os
+import re
 import pytest
 from simbatch.core import settings
 from simbatch.core.lib.common import Logger
@@ -6,14 +7,48 @@ from simbatch.core.lib.common import Logger
 
 @pytest.fixture(scope="module")
 def sett():
-    # TODO pytest-datadir pytest-datafiles      vs       (   path.dirname( path.realpath(sys.argv[0]) )
-    tests_settings_file = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + "config_tests.ini"
-    if settings.comfun.file_exists(tests_settings_file):
-        settings_file = tests_settings_file
-    else:
-        settings_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + os.sep + "simbatch"
-        settings_file = settings_dir + os.sep + "config_tests.ini"
-    return settings.Settings(Logger(), 5, ini_file=settings_file)
+    #return settings.Settings(Logger(), 5)
+    return settings.Settings(Logger(), 5, ini_path="tests")
+
+
+def test_get_ini_file_and_path(sett):
+    if sett.current_os == 1:  # linux
+        assert re.match(r'^.*/(?!.*/)(.*)$', sett.get_ini_file_and_path())
+    if sett.current_os == 2:  # win
+        assert re.match(r'[a-zA-Z]:\\((?:[a-zA-Z0-9() ]*\\)*).*', sett.get_ini_file_and_path())
+        # TODO  add network path for regex:   //srv/storage/sib/config.ini
+
+
+def test_empty_get_ini_file_and_path(sett):
+    if sett.current_os == 1:   # linux
+        assert re.match(r'^.*/(?!.*/)(.*)$', sett.get_ini_file_and_path("", ""))
+    if sett.current_os == 2:   # win
+        assert re.match(r'[a-zA-Z]:\\((?:[a-zA-Z0-9() ]*\\)*).*', sett.get_ini_file_and_path("", ""))
+        # TODO  add network path for regex:   //srv/storage/sib/config.ini
+
+
+def test_absolute_get_ini_file_and_path(sett):
+    assert sett.get_ini_file_and_path(ini_file="s:\\test.ini", check_is_exists=False) == "s:\\test.ini"
+
+
+def test_params_get_ini_file_and_path(sett):
+
+    print "we we we ", sett.ini_file
+    assert sett.get_ini_file_and_path("s:\\", "test.ini", check_is_exists=False) == "s:\\test.ini"
+    assert sett.get_ini_file_and_path(ini_path="s:\\", check_is_exists=False) == "s:\\config.ini"
+    assert sett.get_ini_file_and_path(ini_path="s:\\sib\\", ini_file="test.ini", check_is_exists=False) == "s:\\sib\\test.ini"
+    assert sett.get_ini_file_and_path("s:\\", check_is_exists=False) == "s:\\config.ini"
+    assert sett.get_ini_file_and_path("//srv/storage/", "conf.ini", check_is_exists=False) == "//srv/storage/conf.ini"
+    assert sett.get_ini_file_and_path("/srv/", "", check_is_exists=False) == "/srv/config.ini"
+    assert sett.get_ini_file_and_path("/srv/", "custom_config.ini", check_is_exists=False) == "/srv/custom_config.ini"
+
+
+def test_options_get_ini_file_and_path(sett):
+    tests_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + sett.dir_separator
+    tests_dir = tests_dir + "tests" + sett.dir_separator
+    assert sett.get_ini_file_and_path(ini_path="tests", check_is_exists=False) == tests_dir + "config_tests.ini"
+    custom_tests_config_file = sett.get_ini_file_and_path(ini_path="tests", ini_file="testing.dat", check_is_exists=False)
+    assert custom_tests_config_file == tests_dir + "testing.dat"
 
 
 def test_settings_file(sett):

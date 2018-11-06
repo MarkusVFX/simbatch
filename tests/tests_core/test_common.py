@@ -1,5 +1,5 @@
 from random import randint
-from os import path
+from os import path, sep
 from shutil import rmtree
 from time import sleep
 from simbatch.core.lib import common
@@ -7,7 +7,7 @@ import pytest
 
 
 # TODO check dir on prepare tests
-TESTING_AREA_DIR = "S:/simbatch/data/"
+TESTING_AREA_DIR = path.dirname(path.dirname(path.abspath(__file__))) + sep
 TEST_DIR = "test_dir/"
 random_file = None
 
@@ -17,8 +17,8 @@ def comfun():
     return common.CommonFunctions()
 
 
-def test_prepare_env():
-    if path.exists(TESTING_AREA_DIR+TEST_DIR) is True: # clear TESTING_AREA_DIR
+def test_prepare_env(comfun):
+    if path.exists(TESTING_AREA_DIR+TEST_DIR) is True:  # clear TESTING_AREA_DIR
         print "\n\n [test db] dir exists:", TESTING_AREA_DIR+TEST_DIR
         rmtree(TESTING_AREA_DIR+TEST_DIR, ignore_errors=True)
         sleep(5) # case TEST_DIR is user's current directory
@@ -132,6 +132,7 @@ def test_get_proper_path_01(comfun):
 
 def test_get_proper_path_02(comfun):
     assert comfun.get_proper_path("c:/cee") == "c:/cee/"
+
 
 def test_get_proper_path_03(comfun):
     assert comfun.get_proper_path("\\\\proj\\cee") == "\\\\proj\\cee\\"

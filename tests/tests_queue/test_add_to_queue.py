@@ -118,6 +118,7 @@ def test_generate_queue_items(sib):
 
 def test_generate_queue_items_evo(sib):
     print "\n\n___ queue_items with evo ___"
+    assert len(sib.tsk.tasks_data) > 0
     sib.sch.update_current_from_id(sib.tsk.tasks_data[-1].schema_id)
     sib.tsk.update_current_from_id(sib.tsk.max_id)
     # sib.print_important_values()
@@ -128,5 +129,4 @@ def test_generate_queue_items_evo(sib):
     # for qi in qi1:
     #     print "___"
     #     qi.print_this()
-
 

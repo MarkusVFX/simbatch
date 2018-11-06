@@ -562,6 +562,7 @@ class SchemasUI:
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):
         self.batch.logger.db(("adding schema with name: ", new_schema_item.schema_name))
+        self.batch.logger.db(("adding schema based on: ", new_schema_item.based_on_definition))
 
         self.schema_form_create.compile_actions()
         if new_schema_item is None or len(new_schema_item.schema_name) == 0:

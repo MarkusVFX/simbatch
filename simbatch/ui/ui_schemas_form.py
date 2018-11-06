@@ -49,14 +49,14 @@ class SchemaFormCreateOrEdit(QWidget):
         self.top_ui = top
 
     def form_basic_print(self):
-        self.batch.logger.raw("\n schema_item_form_object:")
+        self.batch.logger.raw("\n__schema item FORM object__")
         self.local_schema_item.basic_print()
         self.batch.logger.raw("\n\n form action_widgets count: {}".format(len(self.action_widgets)))
         for i, aw in enumerate(self.action_widgets):
             self.batch.logger.raw(" action_widget {}  {}".format(i, aw.qt_label.text()))
 
     def form_detailed_print(self):
-        self.batch.logger.raw("\nschema_item_form_object:")
+        self.batch.logger.raw("\n__schema item FORM object__")
         self.local_schema_item.detailed_print()
         self.batch.logger.raw("\n\nform action_widgets count:  {}".format(len(self.action_widgets)))
         for i, aw in enumerate(self.action_widgets):
@@ -182,6 +182,7 @@ class SchemaFormCreateOrEdit(QWidget):
             self.batch.dfn.current_definition_index = nr
         self.add_defined_action_buttons(nr)
         self.batch.dfn.update_current_definition(nr)
+        self.local_schema_item.based_on_definition = self.batch.dfn.current_definition.name
 
     def on_radio_change(self, nr):  # on click definition change
         self.batch.logger.db(("on_radio_change definition", nr))

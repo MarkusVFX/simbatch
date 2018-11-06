@@ -6,9 +6,7 @@ import server.server as simbatch_server
 
 app = QApplication([])
 
-#sim_batch = core.SimBatch("Stand-alone")
-
-simbatch = core.SimBatch("Maya", ini_file="config.ini")
+simbatch = core.SimBatch("Stand-alone")   # you can set startup config by changing argument: ini_file="your_config.json"
 loading_data_state = simbatch.load_data()
 server = simbatch_server.SimBatchServer(simbatch, force_local=True)
 

@@ -139,7 +139,7 @@ class Settings:
                             {"posX": 70, "posY": 150, "sizeX": 600, "sizeY": 800, "alwaysOnTop": False}
                         }
 
-    def __init__(self, logger, runtime_env, ini_file="config.ini", force_os=False):
+    def __init__(self, logger, runtime_env, ini_path="", ini_file="", force_os=False):
         self.logger = logger
         if force_os is False:
             if os.name == "posix":
@@ -154,17 +154,16 @@ class Settings:
             self.dir_separator = "\\"
 
         """  STANDALONE """
-        self.store_abs_dir = os.path.abspath("") + self.dir_separator  # os.path.dirname(os.path.realpath(__file__))
+        # self.store_abs_dir = os.path.abspath("") + self.dir_separator  # os.path.dirname(os.path.realpath(__file__))
+        self.store_abs_dir = (os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + self.dir_separator
+                              # + "data" + self.dir_separator
 
         """  MAYA win  C:\Program Files\Autodesk\Maya2014\ """
         # TODO check abs
 
         self.comfun = CommonFunctions()
         self.runtime_env = runtime_env
-        if self.comfun.is_absolute(ini_file):
-            self.ini_file = ini_file
-        else:
-            self.ini_file = os.path.abspath(ini_file)
+        self.ini_file = self.get_ini_file_and_path(ini_path, ini_file)
 
         """ check and force DEV config """
         if self.comfun.file_exists(os.path.join(os.path.dirname(self.ini_file), "config_dev.ini"), info=False):
@@ -234,6 +233,48 @@ class Settings:
         for i in range(0, 40):
             self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
             self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
+
+    """  get absolute path config file using relative or empty path/file  """
+    def get_ini_file_and_path(self, ini_path="", ini_file="", check_is_exists=True):
+        if ini_file == "":
+            if ini_path != "tests":
+                ini_file = "config.ini"
+            else:
+                ini_file = "config_tests.ini"
+        if self.comfun.is_absolute(ini_file):
+            ini_file_and_path = ini_file
+        else:
+            if ini_path == "":
+                check_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + self.dir_separator
+                ini_file_and_path = check_ini_path + ini_file
+                if check_is_exists:
+                    if self.comfun.file_exists(check_ini_path + ini_file) is False:
+                        self.logger.err((" CONFIG FILE NOT EXIST:", (check_ini_path + ini_file)))
+            else:
+                if ini_path == "tests":
+                    check_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    check_ini_path = os.path.dirname(check_ini_path) + self.dir_separator + "tests"   # cd ../tests
+                    check_ini_path += self.dir_separator
+                    ini_file_and_path = check_ini_path + ini_file
+                    if check_is_exists:
+                        if self.comfun.file_exists(check_ini_path + ini_file) is False:
+                            self.logger.err((" CONFIG FILE FOR TESTS NOT EXIST:", (check_ini_path + ini_file)))
+                else:
+                    ini_file_and_path = ini_path + ini_file
+                    if check_is_exists:
+                        if self.comfun.is_absolute(ini_path):
+                            if self.comfun.path_exists(ini_path):
+                                if self.comfun.file_exists(ini_path + ini_file) is False:
+                                    self.logger.err(("CONFIG FILE DO NOT EXIST IN CUSTOM PATH:", (ini_path + ini_file)))
+                                else:
+                                    pass   # the config file happily exists :)
+                            else:
+                                self.logger.err((" CONFIG PATH DO NOT EXIST:", ini_path))
+                        else:
+                            self.logger.err((" CONFIG PATH IS NOT ABSOLUTE:", ini_path))
+            if self.comfun.is_absolute(ini_path):
+                ini_file_and_path = ini_path + ini_file
+        return ini_file_and_path
 
     def update_absolute_directories(self):
         data_path = self.store_data_json_directory

@@ -294,13 +294,13 @@ class CommonFunctions:
     @staticmethod
     def is_absolute(check_path):
         if len(check_path) > 2:
-            if check_path[1] == ":" and check_path[2] == "\\":
+            if check_path[0] == "/":  # linux
                 return True
-            if check_path[1] == ":" and check_path[2] == "/":
+            if check_path[1] == ":" and check_path[2] == "\\":  # win storage
                 return True
-            if check_path[0] == "\\" and check_path[1] == "\\":
+            if check_path[1] == ":" and check_path[2] == "/":  # win storage nice notation
                 return True
-            if check_path[0] == "/":
+            if check_path[0] == "\\" and check_path[1] == "\\":  # win network
                 return True
         return False
 

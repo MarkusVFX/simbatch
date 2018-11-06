@@ -5,6 +5,7 @@
 			"version": 1,
 			"software": "Stand-alone",
 			"totalActions": 2,
+            "interactionScript": "interactions_standalone.py",
 			"format": "more about json format: http://json-schema.org/ or http://json.org"
 		},
 		"actions": {
@@ -36,9 +37,11 @@
 						"template": ["subprocess.Popen(", "<ui>", ", shell=True)"]
 					}
 				}
-			},
+			}
+        },
+        "todo":{
 			"3":{
-				"id": 2,
+				"id": 3,
 				"type": "multi",
 				"name": "Loop",
 				"subActions":{
@@ -57,7 +60,58 @@
 						"template": ["interactions.sa_loop_over_dir(", "<ui>", ")"]
 					}
 				}
-            }
+            },
+			"4":{
+				"id": 4,
+				"type": "multi",
+				"name": "Print Info",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "simple",
+						"desc": "simple file info",
+                        "ui" : ["*.*", ["Reset Filter","interactions.reset_filter"]],
+						"template": ["interactions.simple_info_print()"]
+					},
+					"2": {
+						"id": 0,
+						"mode": "detailed",
+						"desc": "detailed file info",
+						"ui" : ["*.*|time|date|size", ["Reset Details","interactions.reset_details"]],
+						"template": ["interactions.detailed_info_print()"]
+					}
+                }
+			},
+			"5":{
+				"id": 5,
+				"type": "multi",
+				"name": "File",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "copy",
+						"desc": "copy file",
+						"ui" : ["*.*", ["Reset Filter","interactions.reset_filter"]],
+						"template": ["interactions.detailed_info_print()"],
+                        "params":{
+                            "paramsTemplate": ["interactions.copy_with(", "<s>", ")"],
+                            "paramsList":{
+                                "PRE": ["prefix", "add_prefix", "[copy_]", "add prefix"],
+                                "POF": ["postfix", "add_postfix", "[_copy]", "add postfix"],
+                                "REP": ["replace", "replace", "[<queue_id>]", "replace"],
+                                "SUB": ["subfolder", "subfolder", "", "to sub folder"]
+                            }
+                        }
+					},
+					"2": {
+						"id": 2,
+						"mode": "delete",
+						"desc": "delete file",
+                        "ui" : ["*.*", ["Reset Filter","interactions.reset_filter"]],
+						"template": ["interactions.simple_info_print()"]
+					}
+                }
+			}
 		}
 	}
 }

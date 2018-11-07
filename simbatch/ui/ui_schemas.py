@@ -323,7 +323,7 @@ class SchemasUI:
         if base_setup[0] == 1:
             self.batch.dfn.current_interactions.schema_item_double_click(base_setup[1])
         else:
-            self.batch.logger.err((" Base setup from schema dclick error :", base_setup))
+            self.batch.logger.err((" schema double click error :", base_setup))
 
     def on_menu_save_as_next_version(self):
         cur_sch_index = self.batch.sch.current_schema_index

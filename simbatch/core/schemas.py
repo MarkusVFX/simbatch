@@ -468,7 +468,7 @@ class Schemas:
         for sch in self.schemas_data:
             sch.add_example_actions_to_schema()
 
-    def get_example_single_schema(self):
+    def get_example_single_schema(self):   # TODO get_blank_schema+
         return SchemaItem(0, "schema example", 22, "ACTIVE", 1, "example_definition", [], 1, "schema example")
         
     def create_example_schemas_data(self, do_save=True):

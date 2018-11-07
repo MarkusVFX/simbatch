@@ -3,8 +3,8 @@
 show_info = False
 
 add_to_queue_single = False
-add_to_queue_multi = False
-add_to_queue_with_param = True
+add_to_queue_multi = True
+add_to_queue_with_param = False
 
 clear_queue = True
 
@@ -56,7 +56,7 @@ if add_to_queue_single is True:
 
 """ add last task to queue with evolutions """
 if add_to_queue_multi is True:
-    evo_str = "BND 111 222"
+    evo_str = "BND 1 2; sTr 30 40"
     api.add_current_task_to_queue(evo=evo_str)
 
 

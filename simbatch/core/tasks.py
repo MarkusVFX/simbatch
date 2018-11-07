@@ -147,7 +147,7 @@ class Tasks:
         return None
         
     def is_task_exists(self, name, msg=True):
-        if self.get_id_by_name(name, msg=msg) == None:
+        if self.get_id_by_name(name, msg=msg) is None:
             return False
         else:
             return True

@@ -44,7 +44,6 @@ class SimBatchAPI:
         else:
             self.simbatch_core.logger.err("Not created API task example")
             api_task_id = 0
-            
 
     def print_basic_data_info(self):
         self.simbatch_core.print_important_values()

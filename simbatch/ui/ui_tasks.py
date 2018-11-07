@@ -541,16 +541,13 @@ class TasksUI:
 
                 self.batch.tsk.increase_queue_ver()
 
-                self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver\
+                self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver
 
-                """ marker TO     TODO"""
-                schema_options = None  #  form_atq.actions_options
-                task_options = None
                 form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id,
-                                                                       schema_options=schema_options,
+                                                                       schema_options=form_atq.schema_options,
                                                                        task_options=form_atq.task_options)
                 if form_queue_items is not None and len(form_queue_items) > 0:
-                    self.batch.logger.db(("q items generated !", form_queue_items, form_queue_items[0].description))
+                    self.batch.logger.db("{} items generated !".format(len(form_queue_items)))
                     self.batch.que.add_to_queue(form_queue_items, do_save=True)
                     self.mainw.que_ui.update_all_queue()
                 else:

@@ -272,14 +272,14 @@ class TasksFormCreateOrEdit(QWidget):
 class AddToQueueForm(QWidget):
     batch = None
     comfun = None
-    actions_options = []         # user inputs for all actions (options with parameters)
+    # actions_options = []       # user inputs for all actions (options with parameters)
     task_options = None          # user inputs (task_proxy)
+    schema_options = None        # user inputs (schema_proxy)
 
     qt_edit_button_frame_from = None
     qt_edit_button_frame_to = None
     qt_edit_button_sim_from = None
     qt_edit_button_sim_to = None
-    # qt_edit_button_version = None   # removed
     qt_edit_button_prior = None
     qt_gb_add_to_queue_now = None
     qt_lay_actions = None
@@ -376,7 +376,7 @@ class AddToQueueForm(QWidget):
 
         if print_all:
             print "\n [INF] PRINT ACTIONS OPTIONS"
-            for i, op in enumerate(self.actions_options):
+            for i, op in enumerate(self.schema_options.proxy_schema.actions_array):
                 print i, op
             if self.task_options is not None:
                 print "\n [INF] PRINT TASK OPTIONS"
@@ -388,24 +388,29 @@ class AddToQueueForm(QWidget):
         if print_all:
             print "\n [INF] PRINT OPTIONS"
             for i, act in enumerate(self.batch.sch.current_schema.actions_array):
-                print act.generate_script_from_action_template(self.batch, self.actions_options[i][0],
-                                                               with_new_line=False, evo="1")
+                print act.generate_script_from_action_template(self.batch, act.actual_value, with_new_line=False,
+                                                               evo="1")
+
+        print "\n [INF] GENERATE EVO"
+
+        # schema_options.actions_array = self.actions_options
+        # self.schema_options.proxy_schema.actions_array.actual_value
+        # marker ATQ 302
+        proxy_sch = self.schema_options.proxy_schema
+        print "_ps: ", proxy_sch
+        arr_scripts_params = self.batch.que.get_array_of_scripts_params_val_from_schema_actions(proxy_sch)
+        print "_ap: ", arr_scripts_params
+        # marker ATQ 303
+        all_evo_combinations_array = self.batch.que.do_params_combinations(arr_scripts_params)
+        print "_eo: ", all_evo_combinations_array
 
         print "\n [INF] GENERATE QUEUE ITEMS"
-        schema_options = None   # TODO !!!  from self.actions_options
-        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, schema_options=schema_options)
+        qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, schema_options=self.schema_options)
 
         for i, q in enumerate(qi):
             print "gen qi: ", i, q
 
         print "\n [INF] END"
-
-        """
-        evos = "TIM 1 2 3"
-        evo_action_index = 1
-        print self.batch.sch.current_schema.get_evo_scripts_array(self.batch, evos, evo_action_index)
-        # self.generate_script_from_Xactions
-        """
 
     def update_form(self):
         current_task = self.tsk.current_task
@@ -445,7 +450,6 @@ class AddToQueueForm(QWidget):
                 check_str = str(act.actual_value)
                 val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str, param="[evo]")
 
-                # print " ret ret ret", val_str
                 if val_str is None:
                     val_str = "None"
 
@@ -505,21 +509,26 @@ class AddToQueueForm(QWidget):
     """ marker ATQ 100   collect options   """
     def collect_options_from_widgets(self):
         self.batch.logger.db("colecting user options from widgets ...")
-        del self.actions_options[:]
-        self.collect_options_from_action_widgets()
+        # del self.actions_options[:]
+        self.schema_options = self.collect_options_from_action_widgets()
         self.task_options = self.collect_options_from_task_widgets()
 
     def collect_options_from_action_widgets(self):
+        so = self.batch.sch.create_schema_options_object()
         for i, wa in enumerate(self.actions_widgets_array):
             opt = wa.qt_edit_line_widget.qt_edit_line.text()
             evo = ""
             if wa.qt_combo_param is not None:
                 evo = wa.qt_evo_edit_line_widget.qt_edit_line.text()
 
-            if len(evo) > 4:   # TODO check is evo or  random string !
-                self.actions_options.append([opt, evo])
+            if len(evo) > 4:   # TODO check is it evo or random string !
+                #self.actions_options.append([opt, evo])
+                so.proxy_schema.actions_array[i].actual_value = evo
+                # TODO lose opt !!!!
             else:
-                self.actions_options.append([opt])
+                #self.actions_options.append([opt])
+                so.proxy_schema.actions_array[i].actual_value = opt
+        return so
 
     def collect_options_from_task_widgets(self):
         task_options = self.tsk.create_task_options_object()

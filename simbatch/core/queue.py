@@ -489,11 +489,8 @@ class Queue:
         if schema is None:
             return all_evos
 
-        print "zzz z  ", all_evos
         for i, ai in enumerate(schema.actions_array):
             if ai.evos_possible:
-
-                print "zzz z z ", ai.actual_value
                 ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
                 if ret[0] > 0:   # ret[0] count evos
                     for ie in ret[1]:  # ['STR', '4.0', '5.0', '6.0']  # TODO optimize, create EVOS class
@@ -504,7 +501,6 @@ class Queue:
                                 scr = "interactions.set_param(\"" + ie[0] + "\"," + subie + ")"
                                 param_arr.append([descr, scr])
                         all_evos.append(param_arr)
-                        print "zzz z z z ", param_arr
         return all_evos
 
     """ marker ATQ 200   generate queue items   """
@@ -603,6 +599,10 @@ class Queue:
             all_combs = []
             tmp_combs = []
             copy_arr_in = (copy.deepcopy(arr_in))
+            if len(copy_arr_in) == 1:
+                for j, pj in enumerate(copy_arr_in[0]):
+                    all_combs.append([[pj[0], pj[1]]])
+                return all_combs
             for i in range(0, len(copy_arr_in)):
                 popi = copy_arr_in.pop()
                 for j, pj in enumerate(popi):

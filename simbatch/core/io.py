@@ -303,21 +303,46 @@ class StorageInOut:
         else:
             api_project_id = self.batch.prj.get_id_from_name("API example")
 
-        if self.batch.sch.is_schema_exists("Simple Schema", msg=False) is False:
+        if self.batch.sch.is_schema_exists("API simple Schema", msg=False) is False:
             api_simple_schema = self.batch.sch.get_example_single_schema()
-            api_simple_schema.schema_name = "Simple Schema"
-            api_simple_schema.actions_array = []
+            api_simple_schema.schema_name = "API simple Schema"
+            api_simple_schema.description = "api schema"
             api_simple_schema.project_id = api_project_id
+
+            as_def = self.batch.dfn.get_definition_by_name("Stand-alone")
+            if as_def is None:
+                self.batch.logger.err("Stand-alone definition NOT found!")
+                self.batch.logger.err("Example data will be incomplete!")
+            else:
+                api_simple_schema.based_on_definition = as_def.name
+                api_simple_schema.add_action_to_schema(as_def.multi_actions_array[0].actions[0])
+                api_simple_schema.add_action_to_schema(as_def.multi_actions_array[1].actions[0])
 
             ret = self.batch.sch.add_schema(api_simple_schema, do_save=True)
             if ret is not False:
                 api_schema_id = ret
-                self.batch.logger.inf("Created API schema example")
+                self.batch.logger.inf("Created API stand-alone schema example")
+                maya_def = self.batch.dfn.get_definition_by_name("Maya")
+                if maya_def is None:
+                    self.batch.logger.err("Maya definition NOT found!")
+                else:
+                    api_maya_schema = self.batch.sch.get_example_single_schema()
+                    api_maya_schema.schema_name = "API Maya Schema"
+                    api_maya_schema.description = "api maya schema"
+                    api_maya_schema.project_id = api_project_id
+                    api_maya_schema.based_on_definition = maya_def.name
+                    api_maya_schema.add_action_to_schema(maya_def.multi_actions_array[0].actions[0])
+                    api_maya_schema.add_action_to_schema(maya_def.multi_actions_array[3].actions[0])
+                    api_maya_schema.add_action_to_schema(maya_def.multi_actions_array[4].actions[0])
+                    ret2 = self.batch.sch.add_schema(api_maya_schema, do_save=True)
+                    if ret2 is not False:
+                        api_maya_schema_id = ret2
+                        self.batch.logger.inf("Created API Maya schema example")
             else:
                 self.batch.logger.wrn("NOT created API schema example")
                 return False
         else:
-            api_schema_id = self.batch.sch.get_id_by_name("Simple Schema")
+            api_schema_id = self.batch.sch.get_id_by_name("API simple Schema")
 
         if self.batch.tsk.is_task_exists("API tsk 1", msg=False) is False:
             api_task_1 = self.batch.tsk.get_blank_task()
@@ -331,6 +356,21 @@ class StorageInOut:
             ret = self.batch.tsk.add_task(api_task_1, do_save=True)
             if ret is not False:
                 self.batch.logger.inf("Created API task example")
+                if api_maya_schema_id is not None:
+                    api_task_2 = self.batch.tsk.get_blank_task()
+                    api_task_2.task_name = "API maya"
+                    api_task_2.state_id = self.batch.sts.INDEX_STATE_WAITING
+                    api_task_2.state = self.batch.sts.states_visible_names[api_task_2.state_id]
+                    api_task_2.project_id = api_project_id
+                    api_task_2.schema_id = api_maya_schema_id
+                    api_task_2.sequence = "K"
+                    api_task_2.shot = "02"
+                    api_task_2.sim_frame_end = 222
+                    api_task_2.prev_frame_end = 220
+                    api_task_2.description = "API maya task"
+                    ret2 = self.batch.tsk.add_task(api_task_2, do_save=True)
+                    if ret2 is not False:
+                        self.batch.logger.inf("Created API maya task example")
                 return ret
             else:
                 self.batch.logger.wrn("NOT created API task example")

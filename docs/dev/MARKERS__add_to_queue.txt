@@ -68,10 +68,14 @@
 
         # marker ATQ 211
         template_script = self.generate_template_evo_script(based_on_schema)
+        ...
 
+            # marker ATQ 302
+            arr_scripts_params = self.get_array_of_scripts_params_val_from_schema_actions(based_on_schema)
 
-        # marker ATQ 202
-        all_evos = self.get_evos_from_action_inputs(action_inputs)    # depreciated!
+            # marker ATQ 303
+            all_evo_combinations_array = self.do_params_combinations(arr_scripts_params)
+
         ...
 
 

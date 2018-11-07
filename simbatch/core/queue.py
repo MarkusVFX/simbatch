@@ -456,7 +456,7 @@ class Queue:
             scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]") + "; "
         return scr
 
-    def fill_evos_in_template(self, templ, evo=None, evo_scr=""):
+    def fill_evos_in_script_template(self, templ, evo=None, evo_scr=""):
         if evo is None:
             evo = "zzz_evo_www"
         templ = templ.replace("[evo]", evo)
@@ -488,9 +488,12 @@ class Queue:
         all_evos = []
         if schema is None:
             return all_evos
+
+        print "zzz z  ", all_evos
         for i, ai in enumerate(schema.actions_array):
             if ai.evos_possible:
-                # print "evo in action input: ", i, ai.actual_value
+
+                print "zzz z z ", ai.actual_value
                 ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
                 if ret[0] > 0:   # ret[0] count evos
                     for ie in ret[1]:  # ['STR', '4.0', '5.0', '6.0']  # TODO optimize, create EVOS class
@@ -501,7 +504,7 @@ class Queue:
                                 scr = "interactions.set_param(\"" + ie[0] + "\"," + subie + ")"
                                 param_arr.append([descr, scr])
                         all_evos.append(param_arr)
-
+                        print "zzz z z z ", param_arr
         return all_evos
 
     """ marker ATQ 200   generate queue items   """
@@ -537,15 +540,14 @@ class Queue:
         template_script = self.generate_template_evo_script(based_on_schema)
 
         if template_queue_item is not None:
-            template_queue_item.print_this()
-
+            # template_queue_item.print_this()
             template_queue_item.evolution_script = template_script
 
             # marker ATQ 302
             arr_scripts_params = self.get_array_of_scripts_params_val_from_schema_actions(based_on_schema)
 
+            # marker ATQ 303
             all_evo_combinations_array = self.do_params_combinations(arr_scripts_params)
-
 
             # action_inputs = None    # TODO  generate from schema or schema options
             # all_evos = self.get_evos_from_action_inputs(action_inputs)   # depreciated!
@@ -557,23 +559,26 @@ class Queue:
 
                 #
                 # script = self.generate_script_from_Xactions(self.batch, based_on_schema)
-                script = self.fill_evos_in_template(template_queue_item.evolution_script, evo=None)
+                script = self.fill_evos_in_script_template(template_queue_item.evolution_script, evo=None)
                 template_queue_item.evolution_script = script
                 #
 
                 queue_items.append(template_queue_item)
-
             else:
                 for i, single_evo in enumerate(all_evo_combinations_array):
                     evo_i_s = self.comfun.str_with_zeros(i + 1, zeros=2)
                     queue_item = copy.deepcopy(template_queue_item)
                     queue_item.generate_queue_item_name(based_on_task, with_update=True, with_sufix=" [e:"+evo_i_s+"]")
-                    queue_item.evolution = single_evo[0]
+
+                    #  marker ATQ 304
+                    single_evo_params = self.get_params_from_evo_combinations(single_evo)
+                    queue_item.evolution = single_evo_params[0]
                     queue_item.evolution_nr = i + 1
                     #
-                    script = self.fill_evos_in_template(template_queue_item.evolution_script, evo="_evo"+evo_i_s,
-                                                        evo_scr=single_evo[1])
+                    script = self.fill_evos_in_script_template(template_queue_item.evolution_script, evo="_evo"+evo_i_s,
+                                                               evo_scr=single_evo_params[1])
                     queue_item.evolution_script = script
+
                     #
                     queue_items.append(queue_item)
 
@@ -581,36 +586,31 @@ class Queue:
             self.batch.logger.err("template_queue_item is None")
         return queue_items
 
+    """ marker ATQ 304   get scripts set_param  from combinations array   """
+    def get_params_from_evo_combinations(self, arr):
+        scripts_str = ""
+        info_str = ""
+        for i in arr:
+            scripts_str += i[1] + ";"
+            info_str += i[0] + ";"
+        return (info_str, scripts_str)
+
+    """ marker ATQ 303   generate queue items   """
     def do_params_combinations(self, arr_in):
         if len(arr_in) == 0:
             return []
         else:
             all_combs = []
             tmp_combs = []
-            # for i, ai in enumerate(arr_in):
-            arr_in.reverse()
-            # print " arr_inarr_inarr_in ", arr_in, "\n\n"
-            for i in range(0, len(arr_in)):
-                popi = arr_in.pop()
+            copy_arr_in = (copy.deepcopy(arr_in))
+            for i in range(0, len(copy_arr_in)):
+                popi = copy_arr_in.pop()
                 for j, pj in enumerate(popi):
-                    # print "\npop:", i,  pj
                     if i == 0:
-                        tmp_combs.append([pj[0], pj[1][4]])
+                        tmp_combs.append([pj[0], pj[1]])
                     else:
                         tmp_arr = []
                         for m in tmp_combs:
-                            # print "\n  tmp_combs : ",tmp_combs
-                            tmp_arr.append([[pj[0], pj[1][4]], m])
-                            # tmp_arr.append(pj)
-                            # tmp_arr.append(m)
-                            # m = m.append([pj[0], pj[1][4]])
-                            # print "\n  m : ", m[0],  "______" ,  tmp_arr
-                        #all_combs = copy.deepcopy(tmp_arr)
-
+                            tmp_arr.append([[pj[0], pj[1]], m])
                         all_combs.extend(tmp_arr)
-                        # print " AK ", len(all_combs), "_", all_combs, "\n\n"
-                #for j, aj in enumerate(ai):
-                    # print ai[i][0]
-
-            # print " \n\n len:  ", len(all_combs), len(all_combs[0]),  " \n\n  ", all_combs, "\n\n"
             return all_combs

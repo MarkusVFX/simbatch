@@ -107,6 +107,11 @@ def test_do_params_combinations(sib):
     all_evo_combinations_array = sib.que.do_params_combinations(arr_scripts_params)
     print "\n", all_evo_combinations_array
 
+    in_arr = [[[u'STR:7.0', u'i'], [u'STR:8.0', u'i']]]
+    assert len(sib.que.do_params_combinations(in_arr)) == 2   # TODO check value !!!
+    in_arr = [[[u'STR:7.0', u'i'], [u'STR:8.0', u'i']],[[u'LFT:1.0', u'i'], [u'LFT:2.0', u'i']]]
+    assert len(sib.que.do_params_combinations(in_arr)) == 4   # TODO check value !!!
+
 
 def test_generate_queue_items(sib):
     print "\n\n___ queue_items ___"

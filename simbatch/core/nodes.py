@@ -69,7 +69,11 @@ class SimNodes:
             self.batch.logger.err(" total:{}  len:{}".format(self.total_nodes, len(self.nodes_data)))
             return False
 
-    def add_simnode(self, single_node):
+    @staticmethod
+    def get_new_node(node_name, node_state, node_state_id, state_file, desc):
+        return SingleNode(0, node_name, node_state, node_state_id, state_file, desc)
+
+    def add_simnode(self, single_node, do_save=False):
         if single_node.id > 0:
             self.max_id = single_node.id
         else:
@@ -77,6 +81,22 @@ class SimNodes:
             single_node.id = self.max_id
         self.nodes_data.append(single_node)
         self.total_nodes += 1
+        if do_save is True:
+            return self.save_nodes()
+        else:
+            return True
+
+    def remove_node(self, node_id, do_save=False):
+        for i, node in enumerate(self.nodes_data):
+            if node.id == node_id:
+                del self.nodes_data[i]
+                self.total_nodes -= 1
+                break
+
+        if do_save is True:
+            return self.save_nodes()
+        else:
+            return True
 
     def load_nodes(self):
         if self.batch.sts.store_data_mode == 1:
@@ -205,6 +225,8 @@ class SimNodes:
         else:
             self.batch.logger.err(("server state file not exist: ", server_state_file))
             return ""
+
+
 #
 # For network and multi node implementation
 # please ask about PRO version

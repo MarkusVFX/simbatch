@@ -9,7 +9,7 @@ server = simbatch_server.SimBatchServer(no_gui_batch)
 if len(sys.argv) > 1:
     arg = sys.argv[1]
     if arg == "1" or arg == "one":
-        print "  [INF] run single job : ", len(sys.argv), sys.argv[1]
+        print "  [INF] run single job"
         server.run(mode="single")
     else:
         print "  [WRN] unknown arg  : ", len(sys.argv), sys.argv[1]

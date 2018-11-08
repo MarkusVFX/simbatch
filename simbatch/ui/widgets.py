@@ -71,8 +71,8 @@ class EditLineWithButtons:
     button_3 = None
     label = None
 
-    def __init__(self, label_text, edit_text_string="", label_minimum_size=0, text_on_button_1="", text_on_button_2="", text_on_button_3="",
-                 button_width=0, align_right=0, edit_minimum_size=0, edit_maximum_size=0):
+    def __init__(self, label_text, edit_text_string="", label_minimum_size=0, text_on_button_1="", text_on_button_2="",
+                 text_on_button_3="", button_width=0, align_right=0, edit_minimum_size=0, edit_maximum_size=0):
         self.qt_widget_layout = QHBoxLayout()
         if edit_text_string is not None:
             self.qt_edit_line = QLineEdit(edit_text_string)

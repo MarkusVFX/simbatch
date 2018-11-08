@@ -278,7 +278,7 @@ class NodesUI:
             else:
                 self.top_ui.set_top_info("Name not defined in state file!", 8)
         else:
-            self.top_ui.set_top_info("State file not exist ", 8)
+            self.top_ui.set_top_info("State file not exist, please insert name manually ", 8)
 
     def on_click_path_get(self):
         # self.batch.comfun.file_dialog_to_edit_line(self.qt_form_add_node_el_path, QFileDialog, "")
@@ -301,24 +301,33 @@ class NodesUI:
         desc = self.batch.comfun.get_current_time()
         node_dir = self.qt_form_add_node_el_path.text()
 
-        if len(node_dir) == 0:
-            self.top_ui.set_top_info("Please set path first!", 8)
-        else:
+        if len(node_dir) > 0:
             if self.batch.comfun.path_exists(node_dir):
-                state_file = node_dir + "state.txt"   # TODO  move to setttings  or add custom
-                node_name = self.qt_form_add_node_el_path.text()
-                node_state_id = self.batch.sts.INDEX_STATE_ACTIVE
-                if self.batch.comfun.file_exists(state_file):
-                    ret = self.batch.nod.get_node_state(state_file)
-                    if ret > 0:
-                        node_state_id = ret
-                node_state = self.batch.sts.states_visible_names[node_state_id]
+                node_name = self.qt_form_add_node_el_name.text()
+                if len(node_name) > 0:
+                    state_file = node_dir + "state.txt"   # TODO  move to setttings  or add custom
 
-                new_node = self.batch.nod.get_new_node(node_name, node_state, node_state_id, state_file, desc)
-                self.batch.nod.add_simnode(new_node, do_save=True)
-                self.reset_list()
+                    node_state_id = self.batch.sts.INDEX_STATE_ACTIVE
+                    if self.batch.comfun.file_exists(state_file):
+                        ret = self.batch.nod.get_node_state(state_file)
+                        if ret > 0:
+                            node_state_id = ret
+                        self.batch.nod.set_node_state(state_file, node_name, node_state_id)  # rename according to EL
+                    else:
+                        self.batch.nod.create_node_state_file(state_file, node_name, node_state_id)
+                        # TODO  server py files !!!
+
+                    node_state = self.batch.sts.states_visible_names[node_state_id]
+
+                    new_node = self.batch.nod.get_new_node(node_name, node_state, node_state_id, state_file, desc)
+                    self.batch.nod.add_simnode(new_node, do_save=True)
+                    self.reset_list()
+                else:
+                    self.top_ui.set_top_info("Please set sim node name! ", 9)
             else:
                 self.top_ui.set_top_info("Directory not exist ", 9)
+        else:
+            self.top_ui.set_top_info("Please set path first!", 8)
 
     def on_click_show_remove_node_form(self):
         if self.remove_node_form_state == 0:

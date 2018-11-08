@@ -59,6 +59,14 @@ class NodesUI:
     nod = None
     comfun = None
 
+    add_node_form_state = 0
+    remove_node_form_state = 0
+
+    qt_form_add_node = None
+    qt_form_add_node_el_path = None
+    qt_form_add_node_el_name = None
+    qt_form_remove_node = None
+
     freeze_list_on_changed = 0
     last_node_list_index = None   # used for list item color change to unselected
 
@@ -93,6 +101,7 @@ class NodesUI:
         qt_lay_nodes_main.setContentsMargins(0, 0, 0, 0)
 
         qt_lay_nodes_list = QHBoxLayout()
+        qt_lay_nodes_forms = QVBoxLayout()
         qt_lay_nodes_buttons = QHBoxLayout()
 
         qt_b_add_node = QPushButton("Add Node ")
@@ -106,15 +115,79 @@ class NodesUI:
         qt_lay_nodes_buttons.addWidget(qt_b_restart_node)
         qt_lay_nodes_buttons.addWidget(qt_b_refresh_nodes)
 
-        qt_b_add_node.clicked.connect(self.add_node)
-        qt_b_remove_node.clicked.connect(self.on_remove_node)
+        qt_b_add_node.clicked.connect(self.on_click_show_add_node_form)
+        qt_b_remove_node.clicked.connect(self.on_click_show_remove_node_form)
         qt_b_restart_node.clicked.connect(self.on_restart_node)
         qt_b_refresh_nodes.clicked.connect(self.on_refresh_nodes)
 
-        qt_lay_nodes_main.addLayout(qt_lay_nodes_list)
-        qt_lay_nodes_main.addLayout(qt_lay_nodes_buttons)
+        # ADD
+        # ADD ADD
+        # ADD ADD ADD
+        qt_form_add_node = QWidget()
+        self.qt_form_add_node = qt_form_add_node
+        qt_form_add_node_layout_ext = QVBoxLayout()
+        qt_form_add_node.setLayout(qt_form_add_node_layout_ext)
 
-        # get_node_state
+        qt_form_add_node_layout = QFormLayout()
+
+        wfa_path = EditLineWithButtons("Path: ", text_on_button_1="Get dir",  text_on_button_2="Check")
+        wfa_path.button_1.clicked.connect(self.on_click_path_get)
+        wfa_path.button_2.clicked.connect(self.on_click_path_check)
+        # wfa_path.qt_edit_line.textChanged.connect(self.on_changed_add_node)
+        self.qt_form_add_node_el_path = wfa_path.qt_edit_line
+
+        wfa_name = EditLineWithButtons("Name: ", text_on_button_1="Get from path")
+        wfa_name.button_1.clicked.connect(self.on_click_name_from_file)
+        self.qt_form_add_node_el_name = wfa_name.qt_edit_line
+
+        wfr_button_add = ButtonWithCheckBoxes("Add Now", button_width=155, label_text=" ")
+        wfr_button_add.button.clicked.connect(self.on_click_add_node)
+
+        qt_form_add_node_layout.addRow(" ", QLabel("   "))
+        qt_form_add_node_layout.addRow(" ", wfa_path.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", wfa_name.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", wfr_button_add.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", QLabel("   "))
+
+        qt_gb_add_node = QGroupBox()
+        qt_gb_add_node.setLayout(qt_form_add_node_layout)
+        qt_form_add_node_layout_ext.addWidget(qt_gb_add_node)
+        qt_gb_add_node.setTitle("Add Sim Node Path")
+
+
+        # REMOVE
+        # REMOVE REMOVE
+        # REMOVE REMOVE REMOVE
+        qt_form_remove_node = QWidget()
+        self.qt_form_remove_node = qt_form_remove_node
+        qt_form_remove_node_layout_ext = QVBoxLayout()
+        qt_form_remove_node.setLayout(qt_form_remove_node_layout_ext)
+
+        qt_form_remove_node_layout = QFormLayout()
+
+        wfr_buttons = ButtonWithCheckBoxes("Yes, remove", label_text="Remove selected ?        ")
+        wfr_buttons.button.clicked.connect(self.on_click_confirmed_remove_node)
+
+        qt_form_remove_node_layout.addRow(" ", QLabel("   "))
+        qt_form_remove_node_layout.addRow(" ", wfr_buttons.qt_widget_layout)
+        qt_form_remove_node_layout.addRow(" ", QLabel("   "))
+
+        qt_gb_remove_node = QGroupBox()
+        qt_gb_remove_node.setLayout(qt_form_remove_node_layout)
+        qt_form_remove_node_layout_ext.addWidget(qt_gb_remove_node)
+        qt_gb_remove_node.setTitle("Remove Sim Node")
+
+
+        # TAB LAY
+        # TAB LAY LAY
+        # TAB LAY LAY LAY
+
+        self.hide_all_forms()
+
+        self.comfun.add_wigdets(qt_lay_nodes_forms, [qt_form_add_node, qt_form_remove_node])
+
+        self.comfun.add_layouts(qt_lay_nodes_main, [qt_lay_nodes_list, qt_lay_nodes_forms, qt_lay_nodes_buttons])
+
         self.init_nodes()
 
     def init_nodes(self):
@@ -157,8 +230,8 @@ class NodesUI:
         # self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
 
-    def on_menu_remove(self):    # TODO
-        self.batch.logger.db("on menu: Remove  TODO")
+    def on_menu_remove(self):
+        self.on_click_confirmed_remove_node()
 
     def on_menu_reset(self):
         self.batch.logger.db("on menu: Reset")
@@ -175,11 +248,96 @@ class NodesUI:
         while self.qt_list_nodes.count() > 0:
             self.qt_list_nodes.takeItem(0)
 
-    def add_node(self):    # TODO
-        self.batch.logger.raw(" TODO: add_node ")
+    def hide_all_forms(self):
+        self.qt_form_add_node.hide()
+        self.qt_form_remove_node.hide()
+        self.add_node_form_state = 0
+        self.remove_node_form_state = 0
 
-    def on_remove_node(self):    # TODO
-        self.batch.logger.raw(" TODO: on_remove_node ")
+    def on_click_show_add_node_form(self):
+        if self.add_node_form_state == 0:
+            self.hide_all_forms()
+            self.qt_form_add_node.show()
+            self.add_node_form_state = 1
+        else:
+            self.qt_form_add_node.hide()
+            self.add_node_form_state = 0
+
+    def on_click_name_from_file(self):
+        dir = self.qt_form_add_node_el_path.text()
+        file = "state.txt"   # TODO  move to setttings  or add custom
+
+        if len(dir) == 0:
+            self.top_ui.set_top_info("Please set path first!", 8)
+            return False
+        if self.batch.comfun.file_exists(dir + file):
+            ret = self.batch.nod.get_server_name_from_file(dir + file)
+            if len(ret) > 0:
+                self.qt_form_add_node_el_name.setText(ret)
+                self.top_ui.set_top_info("Found name: " + ret, 4)
+            else:
+                self.top_ui.set_top_info("Name not defined in state file!", 8)
+        else:
+            self.top_ui.set_top_info("State file not exist ", 8)
+
+    def on_click_path_get(self):
+        # self.batch.comfun.file_dialog_to_edit_line(self.qt_form_add_node_el_path, QFileDialog, "")
+        self.batch.comfun.get_dialog_directory(self.qt_form_add_node_el_path, QFileDialog,
+                                               dir_separator=self.batch.sts.dir_separator)
+
+    def on_click_path_check(self):
+        dir = self.qt_form_add_node_el_path.text()
+        file = "state.txt"   # TODO  move to setttings  or add custom
+        if self.batch.comfun.path_exists(dir):
+            if self.batch.comfun.file_exists(dir+file):
+                self.top_ui.set_top_info("Directory exist, state file exist ", 4)
+            else:
+                self.top_ui.set_top_info("Directory exist, state file not exist ", 4)
+        else:
+            self.top_ui.set_top_info("Directory not exist ", 7)
+
+    def on_click_add_node(self):
+        self.batch.logger.db(("add_node",  "add"))
+        desc = self.batch.comfun.get_current_time()
+        node_dir = self.qt_form_add_node_el_path.text()
+
+        if len(node_dir) == 0:
+            self.top_ui.set_top_info("Please set path first!", 8)
+        else:
+            if self.batch.comfun.path_exists(node_dir):
+                state_file = node_dir + "state.txt"   # TODO  move to setttings  or add custom
+                node_name = self.qt_form_add_node_el_path.text()
+                node_state_id = self.batch.sts.INDEX_STATE_ACTIVE
+                if self.batch.comfun.file_exists(state_file):
+                    ret = self.batch.nod.get_node_state(state_file)
+                    if ret > 0:
+                        node_state_id = ret
+                node_state = self.batch.sts.states_visible_names[node_state_id]
+
+                new_node = self.batch.nod.get_new_node(node_name, node_state, node_state_id, state_file, desc)
+                self.batch.nod.add_simnode(new_node, do_save=True)
+                self.reset_list()
+            else:
+                self.top_ui.set_top_info("Directory not exist ", 9)
+
+    def on_click_show_remove_node_form(self):
+        if self.remove_node_form_state == 0:
+            self.hide_all_forms()
+            self.qt_form_remove_node.show()
+            self.remove_node_form_state = 1
+        else:
+            self.qt_form_remove_node.hide()
+            self.remove_node_form_state = 0
+
+    def on_click_confirmed_remove_node(self):
+        if self.nod.current_node_index >= 0:
+            current_node = self.nod.nodes_data[self.nod.current_node_index]
+            self.batch.logger.db(("remove node:", current_node.id, current_node.node_name))
+            self.nod.remove_node(current_node.id, do_save=True)
+            self.reset_list()
+        else:
+            self.batch.logger.wrn("(on restart node) PLEASE SELECT ITEM FIRST")
+            self.top_ui.set_top_info(" Select item first ", 7)
 
     def on_restart_node(self):
         if self.nod.current_node_index >= 0:
@@ -200,21 +358,11 @@ class NodesUI:
         self.clear_list()
         self.nod.clear_all_nodes_data()
         self.nod.load_nodes()
-        # self.nod.checkNodesState()     #TODO
-        self.batch.initNodes(self.qt_list_nodes)
-        do_update_node_data_file = self.nod.checkNodesStateFiles()
-        if do_update_node_data_file == 1:     # TODO optimize  up
-            self.batch.logger.db("do_update_node_data_file")
-            self.nod.save_nodes()
-            self.clear_list()
-            self.nod.clear_all_nodes_data()
-            self.nod.load_nodes()
-            # self.nod.checkNodesState()   ### TODO
-            self.batch.initNodes(self.qt_list_nodes)
+        self.reset_list()
 
     def on_list_nodes_current_changed(self, x):
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
-            self.batch.logger.deepdb(("simnodes chngd freeze_list_on_changed", self.qt_list_nodes.currentRow()))
+            self.batch.logger.deepdb(("simnodes change freeze_list_on_changed", self.qt_list_nodes.currentRow()))
         else:
             self.batch.logger.inf(("on_list_current_changed", self.qt_list_nodes.currentRow()))
 
@@ -241,4 +389,4 @@ class NodesUI:
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current node:   " + cur_node.node_name)
             else:
-                self.batch.logger.wrn(("(on chng) Wrong current_list_index: ", current_list_index))
+                self.batch.logger.wrn(("(on change) Wrong current_list_index: ", current_list_index))

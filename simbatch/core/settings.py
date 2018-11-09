@@ -323,7 +323,11 @@ class Settings:
         if self.comfun.file_exists(self.ini_file, info="settings init"):
             self.loading_state = 1
             with open(self.ini_file) as f:
-                self.json_settings_data = json.load(f)
+                try:
+                    self.json_settings_data = json.load(f)
+                except:
+                    print " [ERR] json.load(f) exception ", f
+                    pass
                 ret = self.check_data_integration()
                 if ret:
                     self.debug_level = self.json_settings_data["debugLevel"]["current"]
@@ -442,6 +446,7 @@ class Settings:
         if errors == 0:
             return True
         else:
+            print " [ERR] found ", errors, " errors in config file"
             return False
 
     def update_ui_colors(self):

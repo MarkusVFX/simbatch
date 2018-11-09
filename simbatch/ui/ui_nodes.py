@@ -229,6 +229,20 @@ class NodesUI:
         self.init_nodes()
         # self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
+        
+    def set_state(self,state_id)
+        self.batch.nod.current_node_index
+        # TODO WOT
+        self.batch.nod.set_node_state  state_file, server_name, state_id)
+        
+    def on_menu_set_waiting(self):
+        self.set_state(self.batch.sts.INDEX_STATE_WAITING)
+        
+    def on_menu_set_working(self):
+        self.set_state(self.batch.sts.INDEX_STATE_WORKING)
+        
+    def on_menu_set_offline(self):
+        self.set_state(self.batch.sts.INDEX_STATE_OFFLINE)
 
     def on_menu_remove(self):
         self.on_click_confirmed_remove_node()
@@ -241,6 +255,9 @@ class NodesUI:
         global_pos = self.qt_list_nodes.mapToGlobal(pos)
         qt_right_menu = QMenu()
         qt_right_menu.addAction("Reset Node", self.on_menu_reset)
+        qt_right_menu.addAction("Set WAITING", self.on_menu_set_waiting)
+        qt_right_menu.addAction("Set ACTIVE", self.on_menu_set_active)
+        qt_right_menu.addAction("Set OFFLINE", self.on_menu_set_offline)
         qt_right_menu.addAction("Remove Node", self.on_menu_remove)
         qt_right_menu.exec_(global_pos)
 

@@ -47,13 +47,13 @@ class SimNodes:
     def print_current(self):
         if self.current_node_index is not None and self.current_node_index > 0:
             n = self.nodes_data[self.current_node_index]
-            self.batch.logger.raw((" node: ", n.node_name, n.state, n.description))
+            self.batch.logger.raw("\n current node: {}  {}  {}".format(n.node_name, n.state, n.description))
         else:
-            self.batch.logger.raw((" no current node, index: ", self.current_node_index))
+            self.batch.logger.raw("\n no current node, index: {} ".format(self.current_node_index))
 
     def print_all(self):
         for n in self.nodes_data:
-            self.batch.logger.raw((" node: ", n.node_name, n.state, n.state_id, n.description, n.state_file))
+            self.batch.logger.raw("\n {} {}    {} ({})  {} \n  {}".format(n.id, n.node_name, n.state, n.state_id, n.description, n.state_file))
 
     def get_index_by_id(self, get_id):
         for i, nod in enumerate(self.nodes_data):

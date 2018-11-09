@@ -168,7 +168,11 @@ class SimBatchServer:
                 subprocess.Popen(comm, shell=True)
             if self.batch.sts.current_os == 2:
                 comm = "maya.exe -script " + script  # mayabatch   self.mayaExeFilePath +
-                subprocess.Popen(comm, shell=True)
+                try:
+                    subprocess.Popen(comm, shell=True)
+                except:
+                    print "[ERR] command not recognized ", comm
+                    pass
         except:
             self.batch.logger.err(("run_external_software", script))
             pass

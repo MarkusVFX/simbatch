@@ -175,7 +175,20 @@ class SimBatchServer:
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
     """ marker SIM 010   running   """
-    def run(self, mode="all"):
+    def run(self, argv=None, mode="all"):
+        if self.batch.sts.loading_state < 4:
+            print " [ERR] settings not loaded properly: ", self.batch.sts.loading_state
+            return False
+            
+        if len(argv) > 1:
+            arg = argv[1]
+            if arg == "1" or arg == "one":
+                print "  [INF] run single job"
+                mode="single"
+            else:
+                print "  [WRN] unknown arg  : ", len(argv), argv[1]
+                return False
+    
         if mode == "single":
             self.loops_limit = 1
             self.batch.logger.inf("run sim one")

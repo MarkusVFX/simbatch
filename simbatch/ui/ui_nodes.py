@@ -68,7 +68,9 @@ class NodesUI:
     qt_form_remove_node = None
 
     freeze_list_on_changed = 0
-    last_node_list_index = None   # used for list item color change to unselected
+    # last_node_list_index = None   # used for list item color change to unselected
+    current_list_item_index = None
+    last_list_item_index = None
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
@@ -106,19 +108,19 @@ class NodesUI:
 
         qt_b_add_node = QPushButton("Add Node ")
         qt_b_remove_node = QPushButton("Remove Node ")
-        qt_b_restart_node = QPushButton("Restart Node ")
-        qt_b_refresh_nodes = QPushButton("Refresh Nodes")
+        qt_b_reset_node = QPushButton("Reset Node ")
+        qt_b_update_nodes = QPushButton("Update from nodes")
 
         qt_lay_nodes_list.addWidget(qt_list_nodes)
         qt_lay_nodes_buttons.addWidget(qt_b_add_node)
         qt_lay_nodes_buttons.addWidget(qt_b_remove_node)
-        qt_lay_nodes_buttons.addWidget(qt_b_restart_node)
-        qt_lay_nodes_buttons.addWidget(qt_b_refresh_nodes)
+        qt_lay_nodes_buttons.addWidget(qt_b_reset_node)
+        qt_lay_nodes_buttons.addWidget(qt_b_update_nodes)
 
         qt_b_add_node.clicked.connect(self.on_click_show_add_node_form)
         qt_b_remove_node.clicked.connect(self.on_click_show_remove_node_form)
-        qt_b_restart_node.clicked.connect(self.on_restart_node)
-        qt_b_refresh_nodes.clicked.connect(self.on_refresh_nodes)
+        qt_b_reset_node.clicked.connect(self.on_reset_node)
+        qt_b_update_nodes.clicked.connect(self.on_update_nodes)
 
         # ADD
         # ADD ADD
@@ -229,11 +231,35 @@ class NodesUI:
         self.init_nodes()
         # self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
-        
-    def set_state(self,state_id)
-        self.batch.nod.current_node_index
-        # TODO WOT
-        self.batch.nod.set_node_state  state_file, server_name, state_id)
+
+    def set_state_in_node_state_file(self, state_id):
+        """  set state in config file  """
+        cur_nod = self.batch.nod.current_node
+        return self.batch.nod.set_node_state(cur_nod.state_file, cur_nod.node_name, state_id)
+
+    def set_state_in_database(self, state_id):
+        """  set state in database  """
+        cur_nod = self.batch.nod.current_node
+        cur_nod.state = self.sts.states_visible_names[state_id]
+        cur_nod.state_id = state_id
+        self.batch.nod.save_nodes()
+
+    def set_state(self, state_id):
+        if self.batch.nod.current_node is not None:
+            ret = self.set_state_in_node_state_file(state_id)
+            if ret:
+                self.set_state_in_database(state_id)
+                self.reset_list()
+                self.top_ui.set_top_info(" State updated ", 1)
+            else:
+                if self.batch.comfun.file_exists(self.batch.nod.current_node.state_file):
+                    self.batch.logger.err("Simode state file NOT updated!")
+                    self.top_ui.set_top_info(" State NOT updated !", 8)
+                else:
+                    self.batch.logger.err("Simnode state file NOT updated! File not exist!")
+                    self.top_ui.set_top_info(" State NOT updated ! Simnode state file not exist!", 8)
+        else:
+            self.batch.logger.wrn("Current node is None!")
         
     def on_menu_set_waiting(self):
         self.set_state(self.batch.sts.INDEX_STATE_WAITING)
@@ -249,14 +275,14 @@ class NodesUI:
 
     def on_menu_reset(self):
         self.batch.logger.db("on menu: Reset")
-        self.on_restart_node()
+        self.on_reset_node()
 
     def show_right_click_menu(self, pos):
         global_pos = self.qt_list_nodes.mapToGlobal(pos)
         qt_right_menu = QMenu()
         qt_right_menu.addAction("Reset Node", self.on_menu_reset)
         qt_right_menu.addAction("Set WAITING", self.on_menu_set_waiting)
-        qt_right_menu.addAction("Set ACTIVE", self.on_menu_set_active)
+        qt_right_menu.addAction("Set WORKING", self.on_menu_set_working)
         qt_right_menu.addAction("Set OFFLINE", self.on_menu_set_offline)
         qt_right_menu.addAction("Remove Node", self.on_menu_remove)
         qt_right_menu.exec_(global_pos)
@@ -324,7 +350,7 @@ class NodesUI:
                 if len(node_name) > 0:
                     state_file = node_dir + "state.txt"   # TODO  move to setttings  or add custom
 
-                    node_state_id = self.batch.sts.INDEX_STATE_ACTIVE
+                    node_state_id = self.batch.sts.INDEX_STATE_WAITING
                     if self.batch.comfun.file_exists(state_file):
                         ret = self.batch.nod.get_node_state(state_file)
                         if ret > 0:
@@ -361,29 +387,43 @@ class NodesUI:
             self.batch.logger.db(("remove node:", current_node.id, current_node.node_name))
             self.nod.remove_node(current_node.id, do_save=True)
             self.reset_list()
+            self.hide_all_forms()
         else:
-            self.batch.logger.wrn("(on restart node) PLEASE SELECT ITEM FIRST")
+            self.batch.logger.wrn("(on remove node) PLEASE SELECT ITEM FIRST")
             self.top_ui.set_top_info(" Select item first ", 7)
 
-    def on_restart_node(self):
+    def on_reset_node(self):
         if self.nod.current_node_index >= 0:
             current_node = self.nod.nodes_data[self.nod.current_node_index]
-            srv_name = self.nod.get_server_name_from_file(current_node.state_file)
-            self.batch.logger.db(("set IDLE to node:", srv_name))
-            self.nod.set_node_state(current_node.state_file, srv_name, 2)
+
+            default_state_id = self.batch.sts.INDEX_STATE_WAITING
+
+            if self.batch.comfun.file_exists(current_node.state_file) is False:
+                self.batch.nod.create_node_state_file(current_node.state_file, current_node.node_name, default_state_id)
+                self.top_ui.set_top_info("Simnode state file created", 4)
+            else:
+                srv_name = current_node.node_name
+                self.batch.logger.db(("Set WAITING state to node:", srv_name))
+                self.nod.set_node_state(current_node.state_file, srv_name, default_state_id)
+                self.top_ui.set_top_info("Simnode state file updated", 4)
+            current_node.state_id = default_state_id
+            current_node.state = self.batch.sts.states_visible_names[default_state_id]
+            self.batch.nod.save_nodes()
+            self.reset_list()
         else:
-            self.batch.logger.wrn("(on restart node) PLEASE SELECT ITEM FIRST")
+            self.batch.logger.wrn("(on reset node) PLEASE SELECT ITEM FIRST")
             self.top_ui.set_top_info(" Select item first ", 7)
 
     def on_menu_reset(self):
         self.batch.logger.db("on menu: Reset")
-        self.on_restart_node()
+        self.on_reset_node()
 
-    def on_refresh_nodes(self):
-        self.batch.logger.db("on_refresh_nodes")
+    def on_update_nodes(self):
+        self.batch.logger.db("on_update_nodes")
         self.clear_list()
         self.nod.clear_all_nodes_data()
         self.nod.load_nodes()
+        self.nod.update_from_nodes(with_save=True)
         self.reset_list()
 
     def on_list_nodes_current_changed(self, x):
@@ -391,19 +431,24 @@ class NodesUI:
             self.batch.logger.deepdb(("simnodes change freeze_list_on_changed", self.qt_list_nodes.currentRow()))
         else:
             self.batch.logger.inf(("on_list_current_changed", self.qt_list_nodes.currentRow()))
-
-            self.last_node_list_index = self.batch.nod.current_node_index
+            self.last_list_item_index = self.current_list_item_index
             current_list_index = self.qt_list_nodes.currentRow() - 1
-            self.batch.nod.current_node_index = current_list_index
+            self.current_list_item_index = current_list_index
+
             self.batch.nod.update_current_from_index(current_list_index)
 
-            # update color of last item list
-            if self.last_node_list_index >= 0:
-                last_item = self.qt_list_nodes.item(self.last_node_list_index + 1)
-                last_node_state_id = self.batch.nod.nodes_data[self.last_node_list_index].state_id
-                color_index = last_node_state_id
-                if last_item is not None:
-                    last_item.setBackground(self.batch.sts.state_colors[color_index].color())
+            if self.last_list_item_index is not None:
+                if self.last_list_item_index is not None and self.last_list_item_index < len(self.batch.nod.nodes_data):
+                    item = self.qt_list_nodes.item(self.last_list_item_index + 1)
+
+                    if item is not None and self.last_list_item_index is not None:
+                        color_index = self.batch.nod.nodes_data[self.last_list_item_index].state_id
+                        item.setBackground(self.batch.sts.state_colors[color_index].color())
+                else:
+                    self.batch.logger.wrn("Wrong last_list_item_index {} vs {} ".format(self.last_list_item_index,
+                                                                                        len(self.batch.nod.nodes_data)))
+            else:
+                self.batch.logger.db("last_list_item_index is None")
 
             # update top info and color of current item list
             if 0 <= current_list_index < len(self.batch.nod.nodes_data):

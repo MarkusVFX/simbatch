@@ -325,7 +325,7 @@ class Settings:
             with open(self.ini_file) as f:
                 try:
                     self.json_settings_data = json.load(f)
-                except:
+                except IOError:
                     print " [ERR] json.load(f) exception ", f
                     pass
                 ret = self.check_data_integration()

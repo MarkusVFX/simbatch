@@ -47,13 +47,20 @@ class SimNodes:
     def print_current(self):
         if self.current_node_index is not None and self.current_node_index > 0:
             n = self.nodes_data[self.current_node_index]
-            self.batch.logger.raw((" node: ", n.nodeName, n.state, n.description))
+            self.batch.logger.raw((" node: ", n.node_name, n.state, n.description))
         else:
             self.batch.logger.raw((" no current node, index: ", self.current_node_index))
 
     def print_all(self):
         for n in self.nodes_data:
-            self.batch.logger.raw((" node: ", n.nodeName, n.state, n.description))
+            self.batch.logger.raw((" node: ", n.node_name, n.state, n.state_id, n.description, n.state_file))
+
+    def get_index_by_id(self, get_id):
+        for i, nod in enumerate(self.nodes_data):
+            if nod.id == get_id:
+                return i
+        self.batch.logger.wrn(("no node with ID: ", get_id))
+        return None
 
     #  update id, index and current for fast use by all modules
     def update_current_from_index(self, index):
@@ -85,6 +92,23 @@ class SimNodes:
             return self.save_nodes()
         else:
             return True
+
+    def update_from_nodes(self, with_save=False):
+        """  update current nodes_data from simnodes  """
+        changes_count = 0
+        for nod in self.nodes_data:
+            real_node_state_id = self.get_node_state(nod.state_file)
+            if nod.state_id != real_node_state_id:
+                if real_node_state_id < 0:
+                    nod.state_id = self.batch.sts.INDEX_STATE_OFFLINE
+                    nod.state = self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_OFFLINE]
+                    changes_count += 1
+                else:
+                    nod.state_id = real_node_state_id
+                    nod.state = self.batch.sts.states_visible_names[real_node_state_id]
+                    changes_count += 1
+            if with_save and changes_count > 0:
+                self.save_nodes()
 
     def remove_node(self, node_id, do_save=False):
         for i, node in enumerate(self.nodes_data):
@@ -201,20 +225,32 @@ class SimNodes:
     def create_node_state_file(self, state_file, server_name, state):
         if self.comfun.file_exists(state_file, "set state file txt") is False:
             self.batch.logger.deepdb((" [db] set state : ", state))
-            f = open(state_file, 'w')
-            f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
-            f.close()
+            try:
+                f = open(state_file, 'w')
+                f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
+                f.close()
+            except IOError:
+                self.logger.err(("Creating state file error:", state_file))
+                return False
+            return True
         else:
-            self.batch.logger.err(("[ERR] file state exist: ", state_file))
+            self.batch.logger.err(("[ERR] state file NOT created, file exist: ", state_file))
+            return False
 
     def set_node_state(self, state_file, server_name, state):
         if self.comfun.file_exists(state_file, "set state file txt"):
             self.batch.logger.deepdb((" [db] set state : ", state))
-            f = open(state_file, 'w')
-            f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
-            f.close()
+            try:
+                f = open(state_file, 'w')
+                f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
+                f.close()
+            except IOError:
+                self.batch.logger.err(("[ERR] node state file NOT updated: ", state_file))
+                return False
+            return True
         else:
             self.batch.logger.err(("[ERR] file set state not exist: ", state_file))
+            return False
 
     def get_server_name_from_file(self, server_state_file):
         if self.comfun.file_exists(server_state_file, "get_server_name_from_file"):

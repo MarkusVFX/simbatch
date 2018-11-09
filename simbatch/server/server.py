@@ -42,7 +42,7 @@ class SimBatchServer:
             self.force_local = True
         self.batch = batch
         self.comfun = batch.comfun
-        if force_local is False:
+        if self.force_local is False:
             self.batch.que.load_queue()            
             if self.batch.que.total_queue_items == 0:
                 self.batch.logger.inf("queue data is empty, nothing loaded")
@@ -52,19 +52,25 @@ class SimBatchServer:
 
         self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
         self.test_server_dir()
+        
+        
+        simnode_state_file = self.server_dir + self.state_file_name
 
         if force_local:
             self.current_simnode_state = 0
         else:
-            self.current_simnode_state = self.batch.nod.get_node_state(self.server_dir + self.state_file_name)
+            self.current_simnode_state = self.batch.nod.get_node_state(simnode_state_file)
 
         if self.current_simnode_state == -1:
-            simnode_state_file = self.server_dir + self.state_file_name
             simnode_state_data = "{};{};{}".format(2, self.server_name, self.comfun.get_current_time())
             self.batch.comfun.save_to_file(simnode_state_file, simnode_state_data)
             self.set_simnode_state(2)
-
-        self.server_name = batch.sts.runtime_env + " (local)"
+        
+        if self.force_local is True:
+            self.server_name = batch.sts.runtime_env + " (local)"
+        else:
+            simnode_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
+            self.server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
         self.batch.logger.inf(("init server :", self.server_name, self.server_dir))
 
     def test_server_dir(self):
@@ -110,6 +116,8 @@ class SimBatchServer:
                                                                                        self.batch.que.current_queue_id,
                                                                                        self.server_name))
                 return False
+            # TODO update node
+            # ret2 = self.batch.nod.set_node_state()
         else:
             self.batch.logger.err(("set_state  update_current_from_id  failed " , queue_id, ret))
 
@@ -160,22 +168,19 @@ class SimBatchServer:
             return 0, None, None, None, None, None  # bool, index, id, script, soft_id  # TODO class
 
     def run_external_software(self, script):
-        try:
-            self.batch.logger.db(("run_external_software", script))
-            if self.batch.sts.current_os == 1:
-                # comm ="mayapy "+script
-                comm = "kate " + script
-                subprocess.Popen(comm, shell=True)
-            if self.batch.sts.current_os == 2:
-                comm = "maya.exe -script " + script  # mayabatch   self.mayaExeFilePath +
-                try:
-                    subprocess.Popen(comm, shell=True)
-                except:
-                    print "[ERR] command not recognized ", comm
-                    pass
-        except:
-            self.batch.logger.err(("run_external_software", script))
-            pass
+        self.batch.logger.db(("run_external_software", script))
+        if self.batch.sts.current_os == 1:
+            # comm ="mayapy "+script
+            comm = "kate " + script
+            subprocess.Popen(comm, shell=True)
+        if self.batch.sts.current_os == 2:
+            comm = "maya.exe -script " + script  # mayabatch   self.mayaExeFilePath +
+            try:
+                ret = subprocess.Popen(comm, shell=True)
+            except:
+                self.batch.logger.err(("Command not recognized/inalid: ", comm))
+                self.batch.logger.err(("run_external_software script:", script))
+                pass
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
     """ marker SIM 010   running   """
@@ -220,7 +225,7 @@ class SimBatchServer:
                     self.batch.logger.err("file state not exist")
                     self.batch.logger.log(("file state not exist", self.server_dir, self.state_file_name))
 
-            if self.current_simnode_state <= 1:   # server waiting or in local mode
+            if self.current_simnode_state <= 2:   # server waiting or in local mode   # TODO cnst 2WAIT 1INIT  0LOCAL
                 if self.current_simnode_state != 0:
                     self.set_simnode_state(2)
                 self.batch.que.clear_all_queue_items()
@@ -231,7 +236,7 @@ class SimBatchServer:
                 if is_something_to_compute[0] == 1:
                     self.report_total_jobs += 1
                     self.batch.logger.inf((self.comfun.get_current_time(), "   there is_something_to_compute",
-                                           is_something_to_compute))
+                                           is_something_to_compute[2]))
                     execute_queue_id = is_something_to_compute[2]  # TODO   ret check and  del
 
                     ret = self.batch.que.update_current_from_id(execute_queue_id)
@@ -263,7 +268,7 @@ class SimBatchServer:
                         job_script = is_something_to_compute[3]
                         job_description = is_something_to_compute[5]
                         generated_script_file = self.server_dir + self.script_execute
-
+                        
                         if self.current_simnode_state != 0:
                             self.set_simnode_state(1)
                         self.generate_script_for_external_software(generated_script_file, job_script, job_description,
@@ -284,7 +289,8 @@ class SimBatchServer:
                 if self.current_simnode_state == 9:
                     self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
                 else:
-                    self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, "is busy"))
+                    state_str = self.batch.sts.states_visible_names[self.current_simnode_state]
+                    self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, state_str))
             """    MAIN EXECUTION  FIN    """
 
             external_breaker = self.server_dir + "break.txt"

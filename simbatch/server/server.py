@@ -96,8 +96,19 @@ class SimBatchServer:
 
     def generate_report(self):   # TODO
         return self.report_total_jobs, self.report_done_jobs
-
+        
+    def set_node_state_to_status_file(self, queue_id, state, state_id, server_name, state_file):
+            return self.batch.nod.set_node_state(state_file, server_name, state_id)
+            
     def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
+        self.set_queue_state(queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time="")
+        state_file = self.batch.nod.get_state_file(server_name=server_name)
+        if state_file is False:
+            self.batch.logger.err(("state file not found by server name: ", server_name))
+        else:
+            self.set_node_state_to_status_file(queue_id, state, state_id, server_name, state_file)
+        
+    def set_queue_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.batch.logger.db(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
         self.batch.que.clear_all_queue_items()  # TODO  check is mode LOCAL ? !!!!
         self.batch.que.load_queue()
@@ -116,8 +127,6 @@ class SimBatchServer:
                                                                                        self.batch.que.current_queue_id,
                                                                                        self.server_name))
                 return False
-            # TODO update node
-            # ret2 = self.batch.nod.set_node_state()
         else:
             self.batch.logger.err(("set_state  update_current_from_id  failed " , queue_id, ret))
 

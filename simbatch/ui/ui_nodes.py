@@ -419,12 +419,23 @@ class NodesUI:
         self.on_reset_node()
 
     def on_update_nodes(self):
+        if self.nod.total_nodes == 0:
+            self.top_ui.set_top_info("No Simnodes in database! If node exists, please add it first")
+            return False
         self.batch.logger.db("on_update_nodes")
-        self.clear_list()
         self.nod.clear_all_nodes_data()
         self.nod.load_nodes()
-        self.nod.update_from_nodes(with_save=True)
-        self.reset_list()
+
+        ret = self.nod.detect_duplicates_by_state_file()
+        if ret[0] > 0:
+            self.top_ui.set_top_info("Found {} duplicates, please remove it from list. Last id: {}".format(ret[0],
+                                                                                                           ret[1]), 7)
+            return False
+
+        ret2 = self.nod.update_from_nodes(with_save=True)
+        if ret2[1] > 0:
+            self.reset_list()
+        return True
 
     def on_list_nodes_current_changed(self, x):
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()

@@ -23,6 +23,10 @@ class SingleNode:
         self.state_file = state_file
         self.description = description
 
+    def __str__(self):
+        return "SingleNode  node_id:{}  node_name:{}  state:{}  state_id:{}  state_file:{}  description:{}".format(
+            self.id, self.node_name, self.state, self.state_id, self.state_file, self.description)
+
 
 class SimNodes:
     batch = None
@@ -52,6 +56,7 @@ class SimNodes:
             self.batch.logger.raw("\n no current node, index: {} ".format(self.current_node_index))
 
     def print_all(self):
+        self.batch.logger.raw("\n Total nodes in database: {}".format(self.total_nodes))
         for n in self.nodes_data:
             self.batch.logger.raw("\n {} {}    {} ({})  {} \n  {}".format(n.id, n.node_name, n.state, n.state_id, n.description, n.state_file))
 
@@ -93,11 +98,32 @@ class SimNodes:
         else:
             return True
 
+    def detect_duplicates_by_state_file(self):   #  TODO  remove if dup exist
+        dup_count = 0
+        dup_last = None
+        dup_last_id = None
+        for i, nodi in enumerate(self.nodes_data):
+            for j, nodj in enumerate(self.nodes_data):
+                if i != j:
+                    if nodi.state_file == nodj.state_file:
+                        dup_count += 1
+                        dup_last = nodi.state_file
+                        dup_last_id = nodi.id
+
+        if dup_count > 0:
+            self.batch.logger.wrn("Simnode duplicates found ({}) in database. Last id: {}, file:{}".format(dup_count,
+                                                                                                           dup_last_id,
+                                                                                                           dup_last))
+        return dup_count, dup_last_id
+
     def update_from_nodes(self, with_save=False):
         """  update current nodes_data from simnodes  """
         changes_count = 0
+
         for nod in self.nodes_data:
-            real_node_state_id = self.get_node_state(nod.state_file)
+            # real_node_state_id = self.get_node_state(nod.state_file)
+            ret = self.get_node_info_from_state_file(nod.state_file)
+            real_node_state_id = ret[0]
             if nod.state_id != real_node_state_id:
                 if real_node_state_id < 0:
                     nod.state_id = self.batch.sts.INDEX_STATE_OFFLINE
@@ -107,8 +133,16 @@ class SimNodes:
                     nod.state_id = real_node_state_id
                     nod.state = self.batch.sts.states_visible_names[real_node_state_id]
                     changes_count += 1
-            if with_save and changes_count > 0:
-                self.save_nodes()
+
+            if ret[1] is not None:  # offline server, status file not exist -> dont clear not confirmed name :)
+                if nod.node_name != ret[1]:
+                    nod.node_name = ret[1]
+                    changes_count += 1
+
+        if with_save and changes_count > 0:
+            return self.save_nodes(), changes_count
+        else:
+            return True, changes_count
 
     def remove_node(self, node_id, do_save=False):
         for i, node in enumerate(self.nodes_data):
@@ -204,6 +238,36 @@ class SimNodes:
         if clear_stored_data:
             return self.save_nodes()
         return True
+
+    def get_state_file(self, server_name=None):
+        if server_name is not None:
+            for nod in self.nodes_data:
+                if nod.server_name == server_name:
+                    return self.current_node.state_file
+            return False
+        else:  # try get from current
+            if self.current_node is not None:
+                return self.current_node.state_file
+            else:
+                return False
+
+    def get_node_info_from_state_file(self, state_file):
+        if self.comfun.file_exists(state_file, "get state file txt"):
+            f = open(state_file, 'r')
+            first_line = f.readline()
+            f.close()
+            if len(first_line) > 0:
+                li = first_line.split(";")
+            else:
+                li = [-1]
+                self.batch.logger.deepdb((" [db] len(first_line) : ", len(first_line), " ___ ", len(first_line)))
+
+            state_int = self.comfun.int_or_val(li[0], -1)
+            server_name = li[1]
+            self.batch.logger.deepdb((" [db] get state_int : ", state_int))
+            return state_int, server_name
+        else:
+            return -1, None
 
     def get_node_state(self, state_file):     # TODO tryToCreateIfNotExist = False,
         if self.comfun.file_exists(state_file, "get state file txt"):

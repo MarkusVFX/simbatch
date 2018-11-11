@@ -81,11 +81,9 @@ class SettingsUI:
 
         ''' MODE '''
         qt_button_group_data = QButtonGroup()
-        qt_radio_group_mode = QGroupBox()
-        if settings.current_os == 1:  # linux
-            qt_radio_group_mode.setMaximumHeight(155)
-            qt_radio_group_mode.setMinimumHeight(200)
-        qt_radio_group_mode.setTitle("Data options")
+        qt_radio_group_data = QGroupBox()
+        qt_radio_group_data.setMinimumHeight(130)
+        qt_radio_group_data.setTitle("Data options")
         qt_lay_settings_mode = QHBoxLayout()
         qt_label_mode = QLabel("Data store mode: ")
         qt_lay_settings_mode.addWidget(qt_label_mode)
@@ -156,13 +154,32 @@ class SettingsUI:
         qt_settings_create_example_data_button.clicked.connect(self.on_click_create_example_data)
         qt_settings_clear_all_data_button.clicked.connect(self.on_click_clear_all_data)
 
+
         qt_lay_settings_mode_data = QVBoxLayout()
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_mode)
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_data)
         qt_lay_settings_mode_data.addLayout(qt_lay_settings_definitions)
-        qt_lay_settings_mode_data.addLayout(qt_lay_settings_buttons_data)
-
-        qt_radio_group_mode.setLayout(qt_lay_settings_mode_data)
+        qt_lay_settings_mode_data.addLayout(qt_lay_settings_buttons_data) 
+        '''
+        tmp_widgeta = QWidget()
+        qt_lay_settings_mode.setSpacing(0)
+        tmp_widgeta.setLayout(qt_lay_settings_mode)
+        tmp_widgetb = QWidget()
+        qt_lay_settings_data.setSpacing(0)
+        tmp_widgetb.setLayout(qt_lay_settings_data)
+        tmp_widgetc = QWidget()
+        qt_lay_settings_definitions.setSpacing(0)
+        tmp_widgetc.setLayout(qt_lay_settings_definitions)
+        tmp_widgetd = QWidget()
+        qt_lay_settings_buttons_data.setSpacing(0)
+        tmp_widgetd.setLayout(qt_lay_settings_buttons_data)
+        qt_lay_settings_mode_data = QVBoxLayout()
+        qt_lay_settings_mode_data.addWidget(tmp_widgeta)
+        qt_lay_settings_mode_data.addWidget(tmp_widgetb)
+        qt_lay_settings_mode_data.addWidget(tmp_widgetc)
+        qt_lay_settings_mode_data.addWidget(tmp_widgetd)
+        '''
+        qt_radio_group_data.setLayout(qt_lay_settings_mode_data)
 
         ''' MySQL '''
         qt_lay_settings_sql = QFormLayout()
@@ -332,21 +349,23 @@ class SettingsUI:
 
         ''' Add all QGroupBoxes to  qt_scroll_widget  '''
         qt_lay_settings_main.addWidget(qt_group_config_ini)
-        qt_lay_settings_main.addWidget(self.pack_into_extra_widget(qt_radio_group_mode))    # widget size linux fix
-        qt_lay_settings_main.addWidget(self.pack_into_extra_widget(qt_radio_group_colors))  # widget size linux fix
+        qt_lay_settings_main.addWidget(qt_radio_group_data)  # widget size linux fix
+        qt_lay_settings_main.addItem(QSpacerItem(1, 40))
+        qt_lay_settings_main.addWidget(qt_radio_group_colors)  # widget size linux fix
         qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         # qt_lay_settings_main.addWidget(qt_radio_group_sql)   # PRO version
         # qt_lay_settings_main.addWidget(qt_radio_group_user)   # PRO version
         qt_lay_settings_main.addWidget(qt_radio_group_info)
-        qt_lay_settings_main.addItem(QSpacerItem(1, 22))
+        qt_lay_settings_main.addItem(QSpacerItem(1, 20))
 
         qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
 
-    def pack_into_extra_widget(object):
+    def pack_into_extra_widget(self, object):
         extra = QWidget()
         lay = QVBoxLayout()
         lay.addWidget(object)
         extra.setLayout(lay)
+        extra.setMinimumHeight(200)
         return extra
 
     def test_data_config_ini(self):

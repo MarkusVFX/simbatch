@@ -41,7 +41,7 @@ class SettingsUI:
         qt_widget_settings.setLayout(qt_lay_scroll_and_buttons)
         qt_lay_scroll_and_buttons.setContentsMargins(0, 0, 0, 0)
 
-        qt_lay_settings_main = QVBoxLayout()      # layout for group boxes
+        qt_lay_settings_main = QVBoxLayout()      # layout for all settings group boxes
         qt_scroll_widget = QWidget()
         self.qt_scroll_widget = qt_scroll_widget
 
@@ -82,7 +82,9 @@ class SettingsUI:
         ''' MODE '''
         qt_button_group_data = QButtonGroup()
         qt_radio_group_mode = QGroupBox()
-        qt_radio_group_mode.setMaximumHeight(155)
+        if settings.current_os == 1:  # linux
+            qt_radio_group_mode.setMaximumHeight(155)
+            qt_radio_group_mode.setMinimumHeight(200)
         qt_radio_group_mode.setTitle("Data options")
         qt_lay_settings_mode = QHBoxLayout()
         qt_label_mode = QLabel("Data store mode: ")
@@ -256,26 +258,6 @@ class SettingsUI:
         qt_radio_mode_3.clicked.connect(lambda: self.on_clicked_radio_colors(3))
         qt_radio_mode_4.clicked.connect(lambda: self.on_clicked_radio_colors(4))
 
-        # '''  structure '''
-        # qt_lay_settings_structure = QHBoxLayout()
-        # qt_radio_group_structure = QGroupBox()
-        # qt_radio_group_structure.setTitle("Structure")
-        # s1a = QLabel("camera dir : ")
-        # s1b = QLineEdit("<proj_dir>/cam")
-        # s2a = QLabel("env dir : ")
-        # s2b = QLineEdit("<proj_dir>/env")
-        # s3a = QLabel("anim cache : ")
-        # s3b = QLineEdit("<proj_dir>/ani")
-
-        # qt_lay_settings_structure.addWidget(s1a)
-        # qt_lay_settings_structure.addWidget(s1b)
-        # qt_lay_settings_structure.addWidget(s2a)
-        # qt_lay_settings_structure.addWidget(s2b)
-        # qt_lay_settings_structure.addWidget(s3a)
-        # qt_lay_settings_structure.addWidget(s3b)
-
-        # qt_radio_group
-
         ''' Debug level '''
         qt_button_group_debug_level = QButtonGroup()
         qt_radio_group_debug_level = QGroupBox()
@@ -334,6 +316,7 @@ class SettingsUI:
         qt_radio_group_info.setMaximumHeight(130)
         qt_radio_group_info.setLayout(qt_lay_settings_info)
 
+        ''' Settings bottom buttons '''
         qt_lay_settings_buttons = QHBoxLayout()
         qt_lay_settings_buttons.setContentsMargins(40, 4, 40, 13)
 
@@ -347,20 +330,24 @@ class SettingsUI:
         qt_button_save.clicked.connect(self.on_click_save_settings)
         qt_lay_settings_buttons.addWidget(qt_button_save)
 
+        ''' Add all QGroupBoxes to  qt_scroll_widget  '''
         qt_lay_settings_main.addWidget(qt_group_config_ini)
-        qt_lay_settings_main.addWidget(qt_radio_group_mode)
-        # qt_lay_settings_main.addWidget(qt_radio_group_structure)
-        # qt_lay_settings_main.addStretch()
-        qt_lay_settings_main.addWidget(qt_radio_group_colors)
+        qt_lay_settings_main.addWidget(self.pack_into_extra_widget(qt_radio_group_mode))    # widget size linux fix
+        qt_lay_settings_main.addWidget(self.pack_into_extra_widget(qt_radio_group_colors))  # widget size linux fix
         qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         # qt_lay_settings_main.addWidget(qt_radio_group_sql)   # PRO version
         # qt_lay_settings_main.addWidget(qt_radio_group_user)   # PRO version
         qt_lay_settings_main.addWidget(qt_radio_group_info)
         qt_lay_settings_main.addItem(QSpacerItem(1, 22))
 
-
         qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
-        # qt_lay_settings_main.addLayout(qt_lay_settings_buttons)
+
+    def pack_into_extra_widget(object):
+        extra = QWidget()
+        lay = QVBoxLayout()
+        lay.addWidget(object)
+        extra.setLayout(lay)
+        return extra
 
     def test_data_config_ini(self):
         if self.test_exist_config_ini():

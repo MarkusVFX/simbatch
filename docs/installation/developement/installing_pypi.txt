@@ -1,0 +1,15 @@
+
+WIN
+
+
+1) 
+$ cd C:\Python27\Scripts
+$ pip install wheel
+$ pip install twine
+$ pip install tox
+
+# advanced:
+# $ pip install cookiecutter
+# $ pip install virtualenvwrapper     #  virtualenv simbatchtest
+
+

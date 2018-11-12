@@ -49,7 +49,7 @@ class SimNodes:
         self.nodes_data = []
 
     def print_current(self):
-        if self.current_node_index is not None and self.current_node_index > 0:
+        if self.current_node_index is not None and self.current_node_index >= 0:
             n = self.nodes_data[self.current_node_index]
             self.batch.logger.raw("\n current node: {}  {}  {}".format(n.node_name, n.state, n.description))
         else:
@@ -242,8 +242,8 @@ class SimNodes:
     def get_state_file(self, server_name=None):
         if server_name is not None:
             for nod in self.nodes_data:
-                if nod.server_name == server_name:
-                    return self.current_node.state_file
+                if nod.node_name == server_name:
+                    return nod.state_file
             return False
         else:  # try get from current
             if self.current_node is not None:

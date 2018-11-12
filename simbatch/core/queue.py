@@ -394,7 +394,7 @@ class Queue:
     #
     ##
     ###
-    ###    ADD TO QUEUE
+    """   ADD TO QUEUE   """
     ###
     ##
     #
@@ -456,9 +456,10 @@ class Queue:
             scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]") + "; "
         return scr
 
-    def fill_evos_in_script_template(self, templ, evo=None, evo_scr=""):
+    @staticmethod
+    def fill_evos_in_script_template(templ, evo=None, evo_scr=""):
         if evo is None:
-            evo = "zzz_evo_www"
+            evo = "zzz_evo_www"   # TODO  ATQ prrocess
         templ = templ.replace("[evo]", evo)
         templ = templ.replace("[evo_scr]", evo_scr)
         return templ
@@ -589,10 +590,11 @@ class Queue:
         for i in arr:
             scripts_str += i[1] + ";"
             info_str += i[0] + ";"
-        return (info_str, scripts_str)
+        return info_str, scripts_str
 
     """ marker ATQ 303   generate queue items   """
-    def do_params_combinations(self, arr_in):
+    @staticmethod
+    def do_params_combinations(arr_in):
         if len(arr_in) == 0:
             return []
         else:

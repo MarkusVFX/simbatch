@@ -174,5 +174,6 @@ class SimBatch:
         else:
             return False, "config.ini not loaded"
 
+
 if __name__ == "__main__":
     sib = SimBatch(5)

@@ -49,8 +49,6 @@ class PredefinedVariables:
                 # print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
                 try:
                     eval_ret = str(eval(function_to_eval))
-                    # print "    ommand  ", check_str, predefined_item["function"],  predefined_item["type"] , eval_ret
-                    # print "    orrreeee  ", check_str.replace("<" + predefined_item["type"] + ">", eval_ret)
                     check_str = check_str.replace(key_plus, eval_ret)
                     # "<" + predefined_item["type"] + ">"
                 except ValueError:
@@ -289,6 +287,7 @@ class StorageInOut:
         self.batch.logger.inf("Created sample data")
 
     def create_api_example_data(self):
+        api_maya_schema_id = None
         if self.batch.prj.is_project_exists("API example", msg=False) is False:
             api_project = self.batch.prj.get_example_single_project()
             api_project.project_name = "API example"
@@ -609,6 +608,8 @@ class StorageInOut:
         if ret[0] == 1:
             ver = self.batch.tsk.current_task.queue_ver + 1
             version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
+        else:
+            version = "00000"   # TODO
 
         return ret[0], ret[1] + "cache" + self.dir_separator + "cache_v" + version + evo_inject
 

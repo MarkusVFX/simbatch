@@ -139,18 +139,18 @@ class SingleAction:
     def generate_script_from_action_template(self, batch, option, with_new_line=False, evo=""):
         # TODO optimize + mixed var     <dir>\custom_file.bin
 
-        template_with_vaules = copy.deepcopy(self.template)
-        for i, twv in enumerate(template_with_vaules):
+        template_with_values = copy.deepcopy(self.template)
+        for i, twv in enumerate(template_with_values):
             if twv[0] == "<":
                 if twv == "<ui>":
                     if len(option) > 0:
-                        template_with_vaules[i] = option
+                        template_with_values[i] = option
                     else:
-                        template_with_vaules[i] = "empty_option"
+                        template_with_values[i] = "empty_option"
                 else:
-                    template_with_vaules[i] = batch.sio.predefined.convert_predefined_variables_to_values(twv, param=evo)
-                template_with_vaules[i] = "\"" + template_with_vaules[i] + "\""
-        scr = "".join(template_with_vaules)
+                    template_with_values[i] = batch.sio.predefined.convert_predefined_variables_to_values(twv, param=evo)
+                template_with_values[i] = "\"" + template_with_values[i] + "\""
+        scr = "".join(template_with_values)
         if with_new_line:
             scr += "\n"
         return scr

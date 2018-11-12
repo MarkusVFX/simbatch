@@ -58,7 +58,8 @@ class SimNodes:
     def print_all(self):
         self.batch.logger.raw("\n Total nodes in database: {}".format(self.total_nodes))
         for n in self.nodes_data:
-            self.batch.logger.raw("\n {} {}    {} ({})  {} \n  {}".format(n.id, n.node_name, n.state, n.state_id, n.description, n.state_file))
+            self.batch.logger.raw("\n {} {}    {} ({})  {} \n  {}".format(n.id, n.node_name, n.state, n.state_id,
+                                                                          n.description, n.state_file))
 
     def get_index_by_id(self, get_id):
         for i, nod in enumerate(self.nodes_data):
@@ -98,7 +99,7 @@ class SimNodes:
         else:
             return True
 
-    def detect_duplicates_by_state_file(self):   #  TODO  remove if dup exist
+    def detect_duplicates_by_state_file(self):   # TODO  remove if dup exist
         dup_count = 0
         dup_last = None
         dup_last_id = None
@@ -294,7 +295,7 @@ class SimNodes:
                 f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
                 f.close()
             except IOError:
-                self.logger.err(("Creating state file error:", state_file))
+                self.batch.logger.err(("Creating state file error:", state_file))
                 return False
             return True
         else:

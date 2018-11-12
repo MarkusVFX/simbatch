@@ -37,13 +37,14 @@ class SimBatchAPI:
                 self.set_current_project(last=True)
                 self.set_current_schema(last=True)
                 self.set_current_task(last=True)
-                task_options = self.create_task_options_object()  #vtask=api_task_1
+                task_options = self.create_task_options_object()
                 task_options.set_task_value("description", "example api")
                 self.add_current_task_to_queue(task_options=task_options)
                 self.simbatch_core.logger.inf("Created API task example")
         else:
             self.simbatch_core.logger.err("Not created API task example")
             api_task_id = 0
+        return api_task_id
 
     def print_basic_data_info(self):
         self.simbatch_core.print_important_values()

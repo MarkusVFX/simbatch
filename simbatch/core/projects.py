@@ -187,9 +187,8 @@ class Projects:
 
     @staticmethod
     def get_example_single_project():
-        return SingleProject(0, "Blank Proj", 1, 0, "defState", "proj_dir", "woking_dir",
-                                     "cam", "cache", "env", "props", "scripts", "custom",
-                                     "s_<sh##>", "description")
+        return SingleProject(0, "Blank Proj", 1, 0, "defState", "proj_dir", "woking_dir", "cam", "cache", "env",
+                             "props", "scripts", "custom", "s_<sh##>", "description")
     
     #  update id, index and current for fast use by all modules
     def update_current_from_id(self, proj_id):

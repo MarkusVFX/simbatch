@@ -74,7 +74,7 @@ class SettingsUI:
                                               text_on_button_2="Test Access", button_width=85)
 
         elwb_config_ini.button_1.clicked.connect(self.test_data_config_ini)
-        elwb_config_ini.button_2.clicked.connect(self.test_acces_config_ini)
+        elwb_config_ini.button_2.clicked.connect(self.test_access_config_ini)
         qt_lay_config_ini.addLayout(elwb_config_ini.qt_widget_layout)
         qt_lay_config_ini.addLayout(err_info_config_ini.qt_widget_layout)
         qt_group_config_ini.setLayout(qt_lay_config_ini)
@@ -392,7 +392,7 @@ class SettingsUI:
             else:
                 self.top_ui.set_top_info(ini_file+" wrong format ! ", 8)
 
-    def test_acces_config_ini(self):
+    def test_access_config_ini(self):
         if self.test_exist_config_ini():
             ret_W = os.access(self.settings.ini_file, os.W_OK)
             if ret_W:

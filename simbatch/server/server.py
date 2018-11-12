@@ -217,7 +217,7 @@ class SimBatchServer:
             arg = argv[1]
             if arg == "1" or arg == "one":
                 self.batch.logger.inf("run single job")
-                mode="single"
+                mode = "single"
                 self.loops_limit = 1
             else:
                 self.batch.logger.inf(("unknown arg  : ", len(argv), argv[1]))

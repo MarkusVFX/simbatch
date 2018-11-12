@@ -469,6 +469,6 @@ class NodesUI:
                 cur_color = self.batch.sts.state_colors_up[color_index].color()
                 item_c.setBackground(cur_color)
                 if self.top_ui is not None:
-                    self.top_ui.set_top_info("Current node:   " + cur_node.node_name)
+                    self.top_ui.set_top_info("Current node:   " + str(cur_node.node_name))
             else:
                 self.batch.logger.wrn(("(on change) Wrong current_list_index: ", current_list_index))

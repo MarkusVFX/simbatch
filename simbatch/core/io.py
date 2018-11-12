@@ -281,12 +281,11 @@ class StorageInOut:
         self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
 
     def create_example_data(self):
-        self.prj.create_example_project_data(do_save=True)  # TODO move to io.py
-        self.batch.sch.create_example_schemas_data(do_save=True)  # TODO move to io.py
-        self.batch.tsk.create_example_tasks_data(do_save=True)  # TODO move to io.py
-        self.batch.que.create_example_queue_data(do_save=True)  # TODO move to io.py
-        # self.batch.nod.createSampleData()  # TODO
-        # self.batch.nod.save_nodes()
+        self.prj.create_example_project_data(do_save=True)
+        self.batch.sch.create_example_schemas_data(do_save=True)
+        self.batch.tsk.create_example_tasks_data(do_save=True)
+        self.batch.que.create_example_queue_data(do_save=True)
+        self.batch.nod.create_example_nodes_data(do_save=True)
         self.batch.logger.inf("Created sample data")
 
     def create_api_example_data(self):

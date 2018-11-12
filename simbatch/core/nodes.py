@@ -335,6 +335,13 @@ class SimNodes:
             self.batch.logger.err(("server state file not exist: ", server_state_file))
             return ""
 
+    def create_example_nodes_data(self, do_save=True):
+        state_off = self.sts.states_visible_names[self.sts.INDEX_STATE_OFFLINE]
+        state_off_id = self.sts.INDEX_STATE_OFFLINE
+        state_file = "/srv/simbatch/server_1/state.txt"
+        example_node = SingleNode(0, "example sim node", state_off, state_off_id, state_file, "example node 1")
+        self.add_simnode(example_node, do_save=do_save)
+        return True
 
 #
 # For network and multi node implementation

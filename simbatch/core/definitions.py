@@ -303,7 +303,7 @@ class Definitions:
 
     def load_interaction_file(self, file_path):
         self.batch.logger.deepdb(("__load_interaction_file: ", file_path))
-        if self.sts.current_os == 1:
+        if self.sts.current_os == 2:    # win
             file_path = file_path.replace("/", "\\")
         if self.comfun.file_exists(file_path):
             InteractionClass = self.class_from_file(file_path)

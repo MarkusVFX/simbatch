@@ -70,8 +70,8 @@ class SettingsUI:
         err_info_config_ini = SimpleLabel("")   #  err info hidden on start
         self.err_info_config_ini = err_info_config_ini
         err_info_config_ini.hide()
-        elwb_config_ini = EditLineWithButtons(show_ini_file, edit_text_string=None, text_on_button_1="Test Data",
-                                              text_on_button_2="Test Access", button_width=70)
+        elwb_config_ini = EditLineWithButtons(show_ini_file, edit_text_string=None, text_on_button_1="Test Config",
+                                              text_on_button_2="Test Access", button_width=85)
 
         elwb_config_ini.button_1.clicked.connect(self.test_data_config_ini)
         elwb_config_ini.button_2.clicked.connect(self.test_acces_config_ini)
@@ -375,6 +375,7 @@ class SettingsUI:
             self.batch.logger.inf(("RAW config: ", ini))
 
             ini_content = self.comfun.load_json_file(self.settings.ini_file)
+            ini_file = "{} is writable ".format(os.path.basename(self.settings.ini_file))
             vars_count = 0
             if ini_content is not None:
                 ini_elements = ["colorMode", "dataMode", "debugLevel", "sql", "storeData", "window"]
@@ -385,18 +386,19 @@ class SettingsUI:
                         self.batch.logger.err(("missing key in config file ", ie))
                         print "missing key : ", ie
                 if vars_count == len(ini_elements):
-                    self.top_ui.set_top_info("config.ini integrity test OK ", 4)
+                    self.top_ui.set_top_info(ini_file+" integrity test OK ", 4)
                 else:
-                    self.top_ui.set_top_info("config.ini missing keys, more info in log ", 8)
+                    self.top_ui.set_top_info(ini_file+" missing keys, more info in log ", 8)
             else:
-                self.top_ui.set_top_info("config.ini wrong format ! ", 8)
+                self.top_ui.set_top_info(ini_file+" wrong format ! ", 8)
 
     def test_acces_config_ini(self):
         if self.test_exist_config_ini():
             ret_W = os.access(self.settings.ini_file, os.W_OK)
             if ret_W:
-                self.top_ui.set_top_info("config.ini is writable ", 4)
-                self.batch.logger.inf("config.ini is writable")
+                info = "{} is writable ".format(os.path.basename(self.settings.ini_file))
+                self.top_ui.set_top_info(info, 4)
+                self.batch.logger.inf(info)
             else:
                 ret_R = os.access(self.settings.ini_file, os.R_OK)
                 if ret_R:
@@ -407,17 +409,20 @@ class SettingsUI:
                     self.batch.logger.inf("No access to config.ini")
 
     def test_exist_config_ini(self):
+
         ret_d = self.comfun.path_exists(self.comfun.get_path_from_full(self.settings.ini_file), info="config.ini dir")
         if ret_d:
             ret_f = self.comfun.file_exists(self.settings.ini_file, info="config.ini")
             if ret_f:
-                self.top_ui.set_top_info("config.ini exist ", 4)
-                self.batch.logger.inf("config.ini exist")
+                info = "{} exist ".format(os.path.basename(self.settings.ini_file))
+                self.top_ui.set_top_info(info, 4)
+                self.batch.logger.inf(info)
                 return True
             else:
-                self.top_ui.set_top_info("config.ini file not exist !", 9)
-                self.batch.logger.wrn("config.ini file not exist !")
-                self.err_info_config_ini.show("Please initialize SimBatch with proper startup config file")
+                info = "{} file not exist ! ".format(os.path.basename(self.settings.ini_file))
+                self.top_ui.set_top_info(info, 9)
+                self.batch.logger.wrn(info)
+                self.err_info_config_ini.show("Please initialize SimBatch with proper startup configuration file")
                 return False
 
         else:

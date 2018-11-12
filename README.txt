@@ -16,6 +16,9 @@ RealFlow : December 23
 
 SimBATCH PRO VERSION: January 15
 
+
+more info about this tool :  http://www.simbatch.com/
+
 MarkusVFX
 
 

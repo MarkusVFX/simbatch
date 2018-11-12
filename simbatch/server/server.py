@@ -25,7 +25,7 @@ class SimBatchServer:
     batch = None
     force_local = False
     forceSoftware = 0
-    server_name = ""  # TODO  custom name on init
+    server_name = None  # TODO  custom name on init
     server_dir = ""
     state_file_name = "state.txt"
     log_file_name = "log.txt"
@@ -53,13 +53,28 @@ class SimBatchServer:
         self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
         self.test_server_dir()
         
-        
         simnode_state_file = self.server_dir + self.state_file_name
-
+        
+        
         if force_local:
             self.current_simnode_state = 0
         else:
-            self.current_simnode_state = self.batch.nod.get_node_state(simnode_state_file)
+            ret = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
+            if ret[1] is not None:  # state file exists
+                self.current_simnode_state = ret[0]
+                self.server_name = ret[1] 
+                """  check is exist on database  """
+                
+                state_file = self.batch.nod.get_state_file(server_name=ret[1])
+                if state_file is False:
+                    """  try to add simnode state file to database  """
+                    
+                # if state_file != simnode_state_file:
+                    # TODOWIP
+                    # self.batch.nod.create_node_state_file(simnode_state_file)
+                
+            else:
+                self.batch.logger.err(("state file not exist or corupted :", simnode_state_file))
 
         if self.current_simnode_state == -1:
             simnode_state_data = "{};{};{}".format(2, self.server_name, self.comfun.get_current_time())
@@ -67,11 +82,11 @@ class SimBatchServer:
             self.set_simnode_state(2)
         
         if self.force_local is True:
-            self.server_name = batch.sts.runtime_env + " (local)"
+            print_server_name = batch.sts.runtime_env + " (local)"
         else:
             simnode_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
-            self.server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
-        self.batch.logger.inf(("init server :", self.server_name, self.server_dir))
+            print_server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
+        self.batch.logger.inf(("init server :", print_server_name, self.server_dir))
 
     def test_server_dir(self):
         # TODO tesdt write acces   create data dir
@@ -97,7 +112,7 @@ class SimBatchServer:
     def generate_report(self):   # TODO
         return self.report_total_jobs, self.report_done_jobs
         
-    def set_node_state_to_status_file(self, queue_id, state, state_id, server_name, state_file):
+    def set_node_database_state(self, queue_id, state, state_id, server_name, state_file):
             return self.batch.nod.set_node_state(state_file, server_name, state_id)
             
     def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
@@ -106,7 +121,7 @@ class SimBatchServer:
         if state_file is False:
             self.batch.logger.err(("state file not found by server name: ", server_name))
         else:
-            self.set_node_state_to_status_file(queue_id, state, state_id, server_name, state_file)
+            set_node_database_state(queue_id, state, state_id, server_name, state_file)
         
     def set_queue_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.batch.logger.db(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
@@ -201,15 +216,13 @@ class SimBatchServer:
         if len(argv) > 1:
             arg = argv[1]
             if arg == "1" or arg == "one":
-                print "  [INF] run single job"
+                self.batch.logger.inf("run single job")
                 mode="single"
+                self.loops_limit = 1
             else:
-                print "  [WRN] unknown arg  : ", len(argv), argv[1]
+                self.batch.logger.inf(("unknown arg  : ", len(argv), argv[1]))
                 return False
-    
-        if mode == "single":
-            self.loops_limit = 1
-            self.batch.logger.inf("run sim one")
+                
         if mode == "all":
             self.loops_limit = 0
             self.batch.logger.db("\n\n")

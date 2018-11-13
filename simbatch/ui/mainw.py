@@ -50,6 +50,15 @@ class TopMenuUI:
         qt_lbl_info.setFont(qt_font)
         self.qt_lbl_info = qt_lbl_info
         qt_lbl_info.setStyleSheet("""border: 0px solid white;padding-left:7px;""")
+
+        if self.batch.comfun.is_int(self.batch.sts.window[2]):
+            if self.batch.sts.window[2] > 330:
+                qt_lbl_info.setMaximumWidth(self.batch.sts.window[2] - 130)
+            else:
+                qt_lbl_info.setMaximumWidth(200)
+        else:
+            qt_lbl_info.setMaximumWidth(220)  # TODO dynamic size
+
         qt_lay_top_menu.addWidget(qt_lbl_info)
 
         qt_lay_top_menu.addStretch(1)

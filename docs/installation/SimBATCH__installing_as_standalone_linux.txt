@@ -1,0 +1,24 @@
+Short info about Installing SimBATCH on Debian:
+
+
+for easy install use   synaptic package manager  
+
+
+0 update package information
+
+
+1 instal packages:
+python2 .7
+python-pyside.qtcore
+python-pyside.qtgui
+
+
+2 run
+$ python SimBatch.py
+
+
+
+
+
+
+...you can also complie everything from source code, but I'll skip this option ;)

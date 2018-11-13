@@ -352,7 +352,7 @@ class CommonFunctions:
 
     @staticmethod
     def save_json_file(file_name, content):
-        with open(file_name, 'w') as f:
+        with open(file_name, 'w+') as f:
             json.dump(content, f,  indent=2)
         return True   # TODO  Exception
 

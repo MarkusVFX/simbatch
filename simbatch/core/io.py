@@ -266,8 +266,16 @@ class StorageInOut:
 
     def create_data_directory_if_not_exist(self):
         dir_path = self.batch.sts.store_data_json_directory_abs
-        if self.comfun.path_exists(dir_path) is False:
-            self.comfun.create_directory(dir_path)
+        if self.comfun.path_exists(dir_path) is True:
+            return True
+        else:
+            ret = self.comfun.create_directory(dir_path)
+            if ret:
+                self.batch.logger.inf(("Data directory created: ", dir_path))
+                return True
+            else:
+                self.batch.logger.err(("Data directory NOT created: ", dir_path))
+                return False
         
     def create_project_working_directory(self, dir_path):
         self.comfun.create_directory(dir_path)

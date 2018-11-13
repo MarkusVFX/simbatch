@@ -325,13 +325,18 @@ class ProjectsUI:
             self.prj.current_project_index = index
             self.prj.update_current_from_index(index)
         else:
-            self.prj.update_current_from_id(set_active_id)
+            if self.prj.get_index_from_id(set_active_id) is None:
+                self.batch.logger.wrn(("Could NOT update project by id: ", set_active_id))
+            else:
+                self.prj.update_current_from_id(set_active_id)
         self.freeze_list_on_changed = 0
 
     def reload_projects_data_and_refresh_list(self):
         curr_p_id = self.batch.prj.current_project_id
         self.batch.prj.clear_all_projects_data()
         self.batch.prj.load_projects()
+        if self.prj.get_index_from_id(curr_p_id) is None:
+            self.batch.logger.wrn(("Could NOT update project by id: ", curr_p_id))
         self.batch.prj.update_current_from_id(curr_p_id)
         self.reset_list()
 

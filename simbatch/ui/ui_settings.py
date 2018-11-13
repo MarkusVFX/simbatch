@@ -545,15 +545,20 @@ class SettingsUI:
 
     def on_click_clear_all_data(self):
         batch = self.batch
-        batch.prj.clear_all_projects_data(clear_stored_data=True)
-        batch.sch.clear_all_schemas_data(clear_stored_data=True)
-        batch.tsk.clear_all_tasks_data(clear_stored_data=True)
-        batch.que.clear_all_queue_items(clear_stored_data=True)
-        batch.nod.clear_all_nodes_data(clear_stored_data=True)
-        # batch.que.clearSampleData(taskID, projID)  # TODO
-        # batch.nod.clearSampleData()
-        self.batch.logger.inf("Cleared sample data")
-        self.mainw.refresh_ui_with_reload_data()
+        ret = batch.sio.create_data_directory_if_not_exist()
+        if ret:
+            batch.prj.clear_all_projects_data(clear_stored_data=True)
+            batch.sch.clear_all_schemas_data(clear_stored_data=True)
+            batch.tsk.clear_all_tasks_data(clear_stored_data=True)
+            batch.que.clear_all_queue_items(clear_stored_data=True)
+            batch.nod.clear_all_nodes_data(clear_stored_data=True)
+            # batch.que.clearSampleData(taskID, projID)  # TODO
+            # batch.nod.clearSampleData()
+            self.batch.logger.inf("Cleared sample data")
+            self.mainw.refresh_ui_with_reload_data()
+        else:
+            self.batch.logger.wrn("Data directory NOT exist. Can NOT create data directory!")
+            self.top_ui.set_top_info("Can NOT create data directory!", 7)
 
     def resize_settings_widget(self, val):
         self.qt_scroll_widget.setMinimumWidth(val-self.scroll_margin)

@@ -93,8 +93,9 @@ class SimBatchServer:
         pass
 
     def set_simnode_state(self, state):
-        file_and_path = self.server_dir + self.state_file_name
-        self.batch.nod.set_node_state(file_and_path, self.server_name, state)
+        if self.force_local==False:
+            file_and_path = self.server_dir + self.state_file_name
+            self.batch.nod.set_node_state(file_and_path, self.server_name, state)
 
     def add_to_log(self, info, log_file=None):  # TODO move to common
         date = self.comfun.get_current_time()
@@ -117,11 +118,12 @@ class SimBatchServer:
             
     def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.set_queue_state(queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time="")
-        state_file = self.batch.nod.get_state_file(server_name=server_name)
-        if state_file is False:
-            self.batch.logger.err(("state file not found by server name: ", server_name))
-        else:
-            set_node_database_state(queue_id, state, state_id, server_name, state_file)
+        if self.force_local==False:
+            state_file = self.batch.nod.get_state_file(server_name=server_name)
+            if state_file is False:
+                self.batch.logger.err(("state file not found by server name: ", server_name))
+            else:
+                set_node_database_state(queue_id, state, state_id, server_name, state_file)
         
     def set_queue_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.batch.logger.db(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
@@ -208,25 +210,36 @@ class SimBatchServer:
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
     """ marker SIM 010   running   """
-    def run(self, argv=None, mode="all"):
+    def run(self, argv=None):
         if self.batch.sts.loading_state < 4:
             print " [ERR] settings not loaded properly: ", self.batch.sts.loading_state
             return False
             
+        
+        if self.force_local==False:
+            argv = argv[1]
         if len(argv) > 1:
-            arg = argv[1]
-            if arg == "1" or arg == "one":
-                self.batch.logger.inf("run single job")
-                mode = "single"
-                self.loops_limit = 1
+            if argv == "1" or argv == "single":
+                mode="single"
             else:
-                self.batch.logger.inf(("unknown arg  : ", len(argv), argv[1]))
-                return False
+                if argv == "all":
+                    mode = "all"
+                else:
+                    self.batch.logger.inf(("unknown arg  : ", argv))
+                    return False
+        else:
+            mode = "all"
+                
+        if mode == "single":
+            self.loops_limit = 1
+            self.batch.logger.raw("\n")
+            self.batch.logger.inf("run single job")
                 
         if mode == "all":
             self.loops_limit = 0
-            self.batch.logger.db("\n\n")
+            self.batch.logger.raw("\n\n") 
             self.batch.logger.inf("run sim all")
+        
         self.run_loop()
             
     def run_loop(self):
@@ -271,9 +284,9 @@ class SimBatchServer:
 
                     """     RUN SINGLE JOB AS LOCAL     """
                     if self.force_local is True:  # run local
-                        print "\n\nrun_script(generate_script_file)"
-                        print "run_script(generate_script_file)"  # TODO
-                        print "run_script(generate_script_file)"
+                        print "\n\n            [FOO] run_script(generate_script_file)"
+                        print "            [FOO] run_script(generate_script_file)"  # TODO
+                        print "            [FOO] run_script(generate_script_file)"
                         self.set_done(execute_queue_id, self.server_name)
                         self.last_info = "DONE id: {}".format(execute_queue_id)
                         self.report_done_jobs += 1
@@ -281,9 +294,7 @@ class SimBatchServer:
                         is_something_more_to_compute = self.is_something_to_do(force_software=self.forces_software)
 
                         if is_something_more_to_compute[0] == 1:
-                            print ("\n pre run wew" + str(self.loops_counter) + "\n")
                             self.run_loop()
-                            print ("\n post run wew" + str(self.loops_counter) + "\n")
                     else:
                         """     RUN SINGLE JOB AS SIMNODE     """
                         job_id = is_something_to_compute[2]

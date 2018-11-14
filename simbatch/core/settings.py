@@ -373,7 +373,7 @@ class Settings:
                                 """ SETTINGS VALUES ARE OK"""
                                 self.loading_state = 4
                                 if self.debug_level >= 3:
-                                    print "\n\n    [INF] settings loaded ", self.ini_file
+                                    self.logger.inf(("settings loaded ", self.ini_file))
                                 return True
 
                         elif self.store_data_mode == 2:
@@ -416,7 +416,7 @@ class Settings:
         if len(settings_file) == 0:
             settings_file = self.ini_file  # JSON format
         comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True), nl_at_end=True)
-        print ' [INF] settings saved to: ', settings_file
+        self.logger.inf(("settings saved to: ", settings_file))
 
         if self.store_data_mode == 1:
             if comfun.file_exists(data_path + self.JSON_PROJECTS_FILE_NAME) is False:
@@ -438,7 +438,7 @@ class Settings:
         if self.json_settings_data is not None:
             for k in json_keys:
                 if (k in jd) is False:
-                    print " [ERR] missing key:", k
+                    self.logger.err(("missing key: ", k))
                     errors += 1
         else:
             return False
@@ -446,7 +446,7 @@ class Settings:
         if errors == 0:
             return True
         else:
-            print " [ERR] found ", errors, " errors in config file"
+            self.logger.err("found {} errors in config file".format(errors ))
             return False
 
     def update_ui_colors(self):
@@ -481,7 +481,7 @@ class Settings:
                 f.close()
 
                 if self.debug_level >= 3:
-                    print "    [INF] loaded colors: ", color_file
+                    self.logger.inf(("loaded colors: ", color_file))
                 return True
             else:
                 for i in range(0, 40):
@@ -489,9 +489,8 @@ class Settings:
                     self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
 
                 if self.debug_level >= 3:
-                    print " [WRN] not loaded colors: ", color_file
+                    self.logger.wrn(("NOT loaded colors: ", color_file))
                 return False
         else:
-            # TODO dblvl
-            print " [WRN] store_definitions_directory  is None"
+            self.logger.wrn("store_definitions_directory  is None")
             return False

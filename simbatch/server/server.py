@@ -2,6 +2,7 @@ import time
 import os
 import subprocess
 import threading
+import shutil
 
 
 class SimBatchServer:
@@ -92,11 +93,54 @@ class SimBatchServer:
         # TODO tesdt write acces   create data dir
         pass
 
-    def set_simnode_state(self, state):
-        if self.force_local==False:
-            file_and_path = self.server_dir + self.state_file_name
-            self.batch.nod.set_node_state(file_and_path, self.server_name, state)
-
+    def copytree(src, dst, symlinks=False, ignore=None):  #TODO move to common
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join(dst, item)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
+                
+    def copy_file(src_path, dest_path, file, sub_dir=None)    # move to commmon
+        if sub_dir is not None:
+            if len(sub_dir)>0:
+                src_path += self.batch.sts.dir_separator + sub_dir
+                dest_path += self.batch.sts.dir_separator +sub_dir
+            else:
+                self.batch.logger.wrn("sub dir is zero size")
+        try:
+            copyfile(src_path, dest_path)  
+            
+            print "WIP  copy  {}  to  {}".format(source_path , dest_path)
+            copytree
+        except IOError:
+            pass
+        
+    def update_sources_from_server(self):
+        self.update_sources()
+        
+    def update_sources_to_master(self):
+        self.update_sources(reverse_to_master=True)
+        
+    def update_sources(self, reverse_to_master=False):
+        source_path = self.batch.sts.installation_directory_abs + self.batch.sts.dir_separator
+        dest_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + self.batch.sts.dir_separator
+        if reverse_to_master:
+           source_path, dest_path = dest_path, source_path 
+        if source_path is not None:
+            if self.batch.comfun.path_exists(source_path) is True:
+                if self.batch.comfun.path_exists(dest_path) is True:
+                    # if copy
+                    self.copy_file(source_path, dest_path, "server.py", sub_dir = "server")
+                    
+                else:
+                    self.batch.logger.err("(update_sources_from_master) dest path  {}  not exist".format(dest_path))
+            else:
+                self.batch.logger.err("(update_sources_from_master) source path  {}  not exist".format(source_path))
+        else:
+            self.batch.logger.err("(update_sources_from_master) source_path is None")
+        
     def add_to_log(self, info, log_file=None):  # TODO move to common
         date = self.comfun.get_current_time()
         if log_file is None:
@@ -115,6 +159,13 @@ class SimBatchServer:
         
     def set_node_database_state(self, queue_id, state, state_id, server_name, state_file):
             return self.batch.nod.set_node_state(state_file, server_name, state_id)
+            
+    def set_simnode_state(self, stste):     # TODO clean up this !!!!
+            print "\n WIP  set_simnode_state  : ", stste
+            
+        # if self.force_local==False:
+            # file_and_path = self.server_dir + self.state_file_name
+            # self.batch.nod.set_node_state(file_and_path, self.server_name, state)
             
     def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.set_queue_state(queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time="")
@@ -215,18 +266,25 @@ class SimBatchServer:
             print " [ERR] settings not loaded properly: ", self.batch.sts.loading_state
             return False
             
-        
         if self.force_local==False:
             argv = argv[1]
-        if len(argv) > 1:
+            
+        if len(argv) > 0:
             if argv == "1" or argv == "single":
                 mode="single"
             else:
                 if argv == "all":
                     mode = "all"
                 else:
-                    self.batch.logger.inf(("unknown arg  : ", argv))
-                    return False
+                    if argv == "up":
+                        self.update_sources_from_master()
+                        return True
+                    else:
+                        if argv == "update_to_server":
+                            self.update_sources_to_master()
+                        else:
+                            self.batch.logger.inf(("unknown arg  : ", argv))
+                            return False
         else:
             mode = "all"
                 

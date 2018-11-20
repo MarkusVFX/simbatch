@@ -40,6 +40,7 @@ class Settings:
     store_data_backup_directory_abs = None      # dir backup data
     store_definitions_directory = None          # dir with software, actions, engines and param definitions
     store_definitions_directory_abs = None      # dir with software, actions, engines and param definitions
+    installation_directory_abs = None           # dir used for update simnodes core (they can be independent)
     store_abs_dir = ""                          #
     sql = [None, None, None, None]              # "db"  "pass" "port" "user" (PRO version)
     admin_user = None                           # PRO version
@@ -350,6 +351,11 @@ class Settings:
                     wnd = self.json_settings_data["window"]
                     self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]
                     self.always_on_top = wnd["alwaysOnTop"]
+                    
+                    if "simnodes" in self.json_settings_data:
+                        simnodes = self.json_settings_data["simnodes"]
+                        if "master_source" in simnodes:
+                            self.installation_directory_abs = simnodes["master_source"]
 
                     if "startup" in self.json_settings_data.keys():
                         if "tab" in self.json_settings_data["startup"].keys():

@@ -102,7 +102,7 @@ class SimBatchServer:
             else:
                 shutil.copy2(s, d)
                 
-    def copy_file(src_path, dest_path, file, sub_dir=None)    # move to commmon
+    def copy_file(src_path, dest_path, file, sub_dir=None):    # move to commmon
         if sub_dir is not None:
             if len(sub_dir)>0:
                 src_path += self.batch.sts.dir_separator + sub_dir
@@ -110,7 +110,7 @@ class SimBatchServer:
             else:
                 self.batch.logger.wrn("sub dir is zero size")
         try:
-            copyfile(src_path, dest_path)  
+            shutil.copyfile(src_file, dest_file, *, follow_symlinks=True)  
             
             print "WIP  copy  {}  to  {}".format(source_path , dest_path)
             copytree
@@ -131,9 +131,10 @@ class SimBatchServer:
         if source_path is not None:
             if self.batch.comfun.path_exists(source_path) is True:
                 if self.batch.comfun.path_exists(dest_path) is True:
-                    # if copy
+                    #
                     self.copy_file(source_path, dest_path, "server.py", sub_dir = "server")
-                    
+                    self.copytree(source_path, dest_path, sub_dir = "core")
+                    #
                 else:
                     self.batch.logger.err("(update_sources_from_master) dest path  {}  not exist".format(dest_path))
             else:
@@ -158,14 +159,13 @@ class SimBatchServer:
         return self.report_total_jobs, self.report_done_jobs
         
     def set_node_database_state(self, queue_id, state, state_id, server_name, state_file):
-            return self.batch.nod.set_node_state(state_file, server_name, state_id)
+        return self.batch.nod.set_node_state(state_file, server_name, state_id)
             
     def set_simnode_state(self, stste):     # TODO clean up this !!!!
-            print "\n WIP  set_simnode_state  : ", stste
-            
+        print "\n WIP  set_simnode_state  : ", stste
         # if self.force_local==False:
-            # file_and_path = self.server_dir + self.state_file_name
-            # self.batch.nod.set_node_state(file_and_path, self.server_name, state)
+        # file_and_path = self.server_dir + self.state_file_name
+        # self.batch.nod.set_node_state(file_and_path, self.server_name, state)
             
     def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
         self.set_queue_state(queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time="")

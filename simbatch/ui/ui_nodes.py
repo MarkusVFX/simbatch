@@ -106,20 +106,20 @@ class NodesUI:
         qt_lay_nodes_forms = QVBoxLayout()
         qt_lay_nodes_buttons = QHBoxLayout()
 
-        qt_b_add_node = QPushButton("Add Node ")
-        qt_b_remove_node = QPushButton("Remove Node ")
-        qt_b_reset_node = QPushButton("Reset Node ")
-        qt_b_update_nodes = QPushButton("Update from nodes")
+        qt_b_add_node = QPushButton("Add")
+        qt_b_reset_node = QPushButton("Reset")
+        qt_b_remove_node = QPushButton("Remove")
+        qt_b_update_nodes = QPushButton("Reload")
 
         qt_lay_nodes_list.addWidget(qt_list_nodes)
         qt_lay_nodes_buttons.addWidget(qt_b_add_node)
-        qt_lay_nodes_buttons.addWidget(qt_b_remove_node)
         qt_lay_nodes_buttons.addWidget(qt_b_reset_node)
+        qt_lay_nodes_buttons.addWidget(qt_b_remove_node)
         qt_lay_nodes_buttons.addWidget(qt_b_update_nodes)
 
         qt_b_add_node.clicked.connect(self.on_click_show_add_node_form)
-        qt_b_remove_node.clicked.connect(self.on_click_show_remove_node_form)
         qt_b_reset_node.clicked.connect(self.on_reset_node)
+        qt_b_remove_node.clicked.connect(self.on_click_show_remove_node_form)
         qt_b_update_nodes.clicked.connect(self.on_update_nodes)
 
         # ADD
@@ -142,19 +142,21 @@ class NodesUI:
         wfa_name.button_1.clicked.connect(self.on_click_name_from_file)
         self.qt_form_add_node_el_name = wfa_name.qt_edit_line
 
-        wfr_button_add = ButtonWithCheckBoxes("Add Now", button_width=155, label_text=" ")
+        wfr_button_src = ButtonWithCheckBoxes("Copy/Update source files", button_width=155, label_text=" ")
+        wfr_button_add = ButtonWithCheckBoxes("Add Path To Database", button_width=155, label_text=" ")
         wfr_button_add.button.clicked.connect(self.on_click_add_node)
 
         qt_form_add_node_layout.addRow(" ", QLabel("   "))
         qt_form_add_node_layout.addRow(" ", wfa_path.qt_widget_layout)
         qt_form_add_node_layout.addRow(" ", wfa_name.qt_widget_layout)
         qt_form_add_node_layout.addRow(" ", wfr_button_add.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", wfr_button_src.qt_widget_layout)
         qt_form_add_node_layout.addRow(" ", QLabel("   "))
 
         qt_gb_add_node = QGroupBox()
         qt_gb_add_node.setLayout(qt_form_add_node_layout)
         qt_form_add_node_layout_ext.addWidget(qt_gb_add_node)
-        qt_gb_add_node.setTitle("Add Sim Node Path")
+        qt_gb_add_node.setTitle("Add Sim Node")
 
 
         # REMOVE
@@ -363,7 +365,11 @@ class NodesUI:
                     node_state = self.batch.sts.states_visible_names[node_state_id]
 
                     new_node = self.batch.nod.get_new_node(node_name, node_state, node_state_id, state_file, desc)
-                    self.batch.nod.add_simnode(new_node, do_save=True)
+                    ret = self.batch.nod.add_simnode(new_node, do_save=True)
+                    if ret:
+                        self.top_ui.set_top_info("Added simnode: {}".format(node_name), 1)
+                    else:
+                        self.top_ui.set_top_info("Not added simnode! ", 6)
                     self.reset_list()
                 else:
                     self.top_ui.set_top_info("Please set sim node name! ", 9)

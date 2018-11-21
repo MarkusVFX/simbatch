@@ -221,9 +221,9 @@ class TasksUI:
 
         self.hide_all_forms()
 
-        qt_button_create_task = QPushButton("Create  ")
-        qt_button_edit_task = QPushButton("Edit  ")
-        qt_button_remove_task = QPushButton("Remove  ")
+        qt_button_create_task = QPushButton("Create")
+        qt_button_edit_task = QPushButton("Edit")
+        qt_button_remove_task = QPushButton("Remove")
         qt_button_add_to_queue = QPushButton("Add to Queue")
 
         qt_button_create_task.clicked.connect(self.on_click_show_create_form)

@@ -217,19 +217,18 @@ class SchemasUI:
 
         qt_button_schema_create = QPushButton("Create")
         qt_button_schema_copy = QPushButton("Copy")
-        qt_button_schema_edit = QPushButton("Edit")
         qt_button_schema_remove = QPushButton("Remove")
+        qt_button_schema_edit = QPushButton("Edit")
 
         qt_button_schema_create.clicked.connect(self.on_click_show_form_create)
         qt_button_schema_copy.clicked.connect(self.on_click_show_form_copy)
-        qt_button_schema_edit.clicked.connect(self.on_click_show_form_edit)
         qt_button_schema_remove.clicked.connect(self.on_click_show_form_remove)
+        qt_button_schema_edit.clicked.connect(self.on_click_show_form_edit)
 
         qt_lay_schema_list.addWidget(list_schemas)
 
-        self.comfun.add_wigdets(qt_lay_schema_buttons,
-                                [qt_button_schema_create, qt_button_schema_edit, qt_button_schema_copy,
-                                 qt_button_schema_remove])
+        self.comfun.add_wigdets(qt_lay_schema_buttons, [qt_button_schema_create, qt_button_schema_edit,
+                                                        qt_button_schema_remove, qt_button_schema_copy])
 
         self.comfun.add_layouts(qt_lay_schema_main, [qt_lay_schema_list, qt_lay_schema_forms, qt_lay_schema_buttons])
 

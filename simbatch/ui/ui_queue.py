@@ -152,17 +152,17 @@ class QueueUI:
 
         self.qt_button_sim_one = QPushButton("Simulate One")
         self.qt_button_sim_all = QPushButton("Simulate All")
-        qt_button_queue_edit = QPushButton("Edit")
         qt_button_queue_remove = QPushButton("Remove from Queue")
+        qt_button_queue_edit = QPushButton("Edit")
 
         self.qt_button_sim_one.clicked.connect(self.on_click_sim_one)
         self.qt_button_sim_all.clicked.connect(self.on_click_sim_all)
-        qt_button_queue_edit.clicked.connect(self.on_click_edit)
         qt_button_queue_remove.clicked.connect(self.on_click_remove)
+        qt_button_queue_edit.clicked.connect(self.on_click_edit)
 
         qt_lay_queue_list.addWidget(list_queue)
         self.comfun.add_wigdets(qt_lay_queue_buttons, [self.qt_button_sim_one, self.qt_button_sim_all,
-                                                       qt_button_queue_edit, qt_button_queue_remove])
+                                                       qt_button_queue_remove, qt_button_queue_edit])
         self.comfun.add_layouts(qt_lay_queue_main, [qt_lay_queue_list, qt_lay_forms, qt_lay_queue_buttons])
 
         self.init_queue_items()

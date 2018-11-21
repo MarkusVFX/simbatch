@@ -258,20 +258,20 @@ class ProjectsUI:
 
         self.hide_all_forms()
 
-        qt_but_add_form = QPushButton("Add Project")
-        qt_but_edit_form = QPushButton("Edit Project")
-        qt_but_def_project = QPushButton("Set Def Project")
-        qt_but_remove_form = QPushButton("Remove Project")
+        qt_but_add_form = QPushButton("Add")
+        qt_but_edit_form = QPushButton("Edit")
+        qt_but_remove_form = QPushButton("Remove")
+        qt_but_def_project = QPushButton("Set as default")
 
         qt_but_add_form.clicked.connect(self.on_click_add_form)
         qt_but_edit_form.clicked.connect(self.on_click_edit_form)
-        qt_but_def_project.clicked.connect(self.on_click_set_def)
         qt_but_remove_form.clicked.connect(self.on_click_remove_form)
+        qt_but_def_project.clicked.connect(self.on_click_set_def)
 
         qt_lay_projects_lists.addWidget(qt_list_projects)
 
         self.comfun.add_wigdets(qt_lay_projects_buttons,
-                                [qt_but_add_form, qt_but_edit_form, qt_but_def_project, qt_but_remove_form])
+                                [qt_but_add_form, qt_but_edit_form, qt_but_remove_form, qt_but_def_project])
         self.comfun.add_layouts(qt_project_main_layout,
                                 [qt_lay_projects_lists, qt_lay_projects_forms, qt_lay_projects_buttons])
         self.init_projects()

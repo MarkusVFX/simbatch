@@ -32,8 +32,7 @@ def test_absolute_get_ini_file_and_path(sett):
 
 
 def test_params_get_ini_file_and_path(sett):
-
-    print "we we we ", sett.ini_file
+    print "sett.ini_file: ", sett.ini_file
     assert sett.get_ini_file_and_path("s:\\", "test.ini", check_is_exists=False) == "s:\\test.ini"
     assert sett.get_ini_file_and_path(ini_path="s:\\", check_is_exists=False) == "s:\\config.ini"
     assert sett.get_ini_file_and_path(ini_path="s:\\sib\\", ini_file="test.ini", check_is_exists=False) == "s:\\sib\\test.ini"

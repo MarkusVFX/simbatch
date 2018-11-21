@@ -1,9 +1,7 @@
 import time
 import os
-import sys
 import subprocess
 import threading
-import shutil
 
 
 class SimBatchServer:
@@ -56,8 +54,7 @@ class SimBatchServer:
         self.test_server_dir()
         
         simnode_state_file = self.server_dir + self.state_file_name
-        
-        
+
         if force_local:
             self.current_simnode_state = 0
         else:
@@ -72,7 +69,7 @@ class SimBatchServer:
                     """  try to add simnode state file to database  """
                     
                 # if state_file != simnode_state_file:
-                    # TODOWIP
+                    # TODO WIP
                     # self.batch.nod.create_node_state_file(simnode_state_file)
                 
             else:
@@ -91,75 +88,9 @@ class SimBatchServer:
         self.batch.logger.inf(("init server :", print_server_name, self.server_dir))
 
     def test_server_dir(self):
-        # TODO tesdt write acces   create data dir
+        # TODO test write acces   create data dir
         pass
-        
-    def recursive_overwrite(self, src, dest, ends_with=None):     #TODO move to common     add only .py
-        if os.path.isdir(src):
-            if not os.path.isdir(dest):
-                os.makedirs(dest)
-            files = os.listdir(src)
-            for f in files:
-                self.recursive_overwrite(os.path.join(src, f), os.path.join(dest, f), ends_with)
-        else:
-            if ends_with is None:
-                shutil.copyfile(src, dest)
-                self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
-            else:
-                if src.endswith(ends_with):
-                    shutil.copyfile(src, dest)
-                    self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
-                else:
-                    pass
-    
-    def copytree(self, src, dst, symlinks=False, ignore=None, sub_dir=None):  #TODO move to common
-        if sub_dir is not None:
-            if len(sub_dir)>0:
-                src += sub_dir
-                dst += sub_dir
-            else:
-                self.batch.logger.wrn("sub dir is zero size")
-        try:
-            self.recursive_overwrite(src, dst, ".py")
-        except IOError as why:
-            self.batch.logger.err("copytree  IOError  from: {}     to: {}\n{}".format(src, dst, why))
-        except OSError as why:
-            self.batch.logger.err("copytree  OSError  from: {}     to: {}\n{}".format(src, dst, why))
-        except TypeError as why:
-            self.batch.logger.err("copytree  TypeError  from: {}     to: {}\n{}".format(src, dst, why))
-        except:
-            self.batch.logger.err("copytree {}".format(sys.exc_info()[0]))
-        else:
-            self.batch.logger.inf("copytree  from: {}     to: {}\n".format(src, dst))
-                
-                
-    def copy_file(self, src_path, dest_path, file, sub_dir=None):    # move to commmon
-        if sub_dir is not None:
-            if len(sub_dir)>0:
-                src_path += sub_dir + self.batch.sts.dir_separator
-                dest_path += sub_dir + self.batch.sts.dir_separator
-            else:
-                self.batch.logger.wrn("sub dir is zero size")
-        try:
-            src_file = src_path + file
-            dest_file = dest_path + file
-            shutil.copyfile(src_file, dest_file)  
-            
-        except IOError as why:
-            self.batch.logger.err("copy_file  IOError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
-        except OSError as why:
-            self.batch.logger.err("copy_file  OSError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
-        except TypeError as why:
-            self.batch.logger.err("copy_file  TypeError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
-        except NameError as why:
-            self.batch.logger.err("copy_file  NameError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
-        except:
-            self.batch.logger.err("copy_file {}".format(sys.exc_info()[0]))
-        else:
-            self.batch.logger.inf("copy_file  from: {}     to: {}\n".format(src_file, dest_file))
-        
-            
-        
+
     def update_sources_from_master(self):
         self.update_sources()
         
@@ -168,25 +99,26 @@ class SimBatchServer:
         
     def update_sources(self, reverse_to_master=False):
         if self.batch.sts.installation_directory_abs is not None:
-            source_path = self.batch.sts.installation_directory_abs + "/"    # self.batch.sts.dir_separator  vs universal separator
-            dest_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) +  "/"    # self.batch.sts.dir_separator  vs universal separator
-        
+            # TODO self.batch.sts.dir_separator  vs universal separator
+            source_path = self.batch.sts.installation_directory_abs + "/"
+            dst_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/"
+
             if reverse_to_master:
-               source_path, dest_path = dest_path, source_path 
+                source_path, dst_path = dst_path, source_path
             
             if self.batch.sts.current_os == 2:
                 source_path = self.batch.comfun.convert_to_win_path(source_path)
-                dest_path = self.batch.comfun.convert_to_win_path(dest_path)
+                dst_path = self.batch.comfun.convert_to_win_path(dst_path)
             
             if self.batch.comfun.path_exists(source_path) is True:
-                if self.batch.comfun.path_exists(dest_path) is True:
+                if self.batch.comfun.path_exists(dst_path) is True:
                     #
                     self.batch.logger.inf(("update sources from  {}  ".format(source_path)), nl=True)
-                    self.copy_file(source_path, dest_path, "server.py", sub_dir = "server")
-                    self.copytree(str(source_path), str(dest_path), sub_dir = "core")
+                    self.batch.sio.copy_file(source_path, dst_path, "server.py", sub_dir="server")
+                    self.batch.sio.copy_tree(str(source_path), str(dst_path), sub_dir="core")
                     #
                 else:
-                    self.batch.logger.err("(update_sources_from_master) dest path  {}  not exist".format(dest_path))
+                    self.batch.logger.err("(update_sources_from_master) dest path  {}  not exist".format(dst_path))
             else:
                 self.batch.logger.err("(update_sources_from_master) source path  {}  not exist".format(source_path))
         else:
@@ -212,21 +144,14 @@ class SimBatchServer:
         return self.batch.nod.set_node_state(state_file, server_name, state_id)
             
     def set_simnode_state(self, stste):     # TODO clean up this !!!!
-        print "\n WIP  set_simnode_state  : ", stste
+        print "\n WIP  set_simnode_state  : ", stste, self.batch.sts.dir_separator
+
         # if self.force_local==False:
         # file_and_path = self.server_dir + self.state_file_name
         # self.batch.nod.set_node_state(file_and_path, self.server_name, state)
-            
-    def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
-        self.set_queue_state(queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time="")
-        if self.force_local==False:
-            state_file = self.batch.nod.get_state_file(server_name=server_name)
-            if state_file is False:
-                self.batch.logger.err(("state file not found by server name: ", server_name))
-            else:
-                set_node_database_state(queue_id, state, state_id, server_name, state_file)
-        
-    def set_queue_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
+
+    def set_queue_item_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False,
+                             set_time=""):
         self.batch.logger.db(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
         self.batch.que.clear_all_queue_items()  # TODO  check is mode LOCAL ? !!!!
         self.batch.que.load_queue()
@@ -246,7 +171,7 @@ class SimBatchServer:
                                                                                        self.server_name))
                 return False
         else:
-            self.batch.logger.err(("set_state  update_current_from_id  failed " , queue_id, ret))
+            self.batch.logger.err(("set_state  update_current_from_id  failed ", queue_id, ret))
 
         if with_save is True:
             ret = self.batch.que.save_queue()
@@ -257,14 +182,26 @@ class SimBatchServer:
         else:
             return True
 
-    def set_working(self, queue_id, server_name, with_save=True):  # setStatus
-        return self.set_state(queue_id, "WORKING", 4, server_name, with_save=with_save, add_current_time=True)
+    """
+    def set_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time=""):
+        self.set_queue_state(queue_id, state, state_id, server_name, with_save=True, add_current_time=False, set_time="")
+        if self.force_local is False:
+            state_file = self.batch.nod.get_state_file(server_name=server_name)
+            if state_file is False:
+                self.batch.logger.err(("state file not found by server name: ", server_name))
+            else:
+                # set_node_database_state(queue_id, state, state_id, server_name, state_file)
+                self.set_simnode_state(10000)  # WIP TODO
+    """
 
-    def set_done(self, queue_id, server_name="", with_save=True, set_time=None):  # setStatus
-        return self.set_state(queue_id, "DONE", 11, server_name, with_save=with_save, set_time=set_time)
+    def set_queue_item_working(self, queue_id, server_name, with_save=True):  # setStatus
+        return self.set_queue_item_state(queue_id, "WORKING", 4, server_name, with_save=with_save, add_current_time=True)
 
-    def set_error(self, queue_id, server_name, with_save=True):  # setStatus
-        return self.set_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
+    def set_queue_item_done(self, queue_id, server_name="", with_save=True, set_time=None):  # setStatus
+        return self.set_queue_item_state(queue_id, "DONE", 11, server_name, with_save=with_save, set_time=set_time)
+
+    def set_queue_item_error(self, queue_id, server_name, with_save=True):  # setStatus
+        return self.set_queue_item_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
     def generate_script_for_external_software(self, py_file, job_script, job_description, job_id):
         script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n\n"
@@ -297,13 +234,12 @@ class SimBatchServer:
     def run_external_software(self, script):
         self.batch.logger.db(("run_external_software", script))
         if self.batch.sts.current_os == 1:
-            # comm ="mayapy "+script
-            comm = "kate " + script
+            comm = "kate " + script  # TODO universal info/text/message
             subprocess.Popen(comm, shell=True)
         if self.batch.sts.current_os == 2:
             comm = "maya.exe -script " + script  # mayabatch   self.mayaExeFilePath +
             try:
-                ret = subprocess.Popen(comm, shell=True)
+                subprocess.Popen(comm, shell=True)
             except:
                 self.batch.logger.err(("Command not recognized/inalid: ", comm))
                 self.batch.logger.err(("run_external_software script:", script))
@@ -316,12 +252,12 @@ class SimBatchServer:
             print " [ERR] settings not loaded properly: ", self.batch.sts.loading_state
             return False
             
-        if self.force_local==False:
+        if self.force_local is False:
             argv = argv[1]
             
         if len(argv) > 0:
             if argv == "1" or argv == "single":
-                mode="single"
+                mode = "single"
             else:
                 if argv == "all":
                     mode = "all"
@@ -387,7 +323,7 @@ class SimBatchServer:
                     if ret is False:
                         self.batch.logger.err(("current queue item not updated! id:", execute_queue_id))
 
-                    ret = self.set_working(execute_queue_id, self.server_name)
+                    ret = self.set_queue_item_working(execute_queue_id, self.server_name)
                     if ret is False:
                         self.batch.logger.err(("current queue item set_working failed! id:", execute_queue_id))
 
@@ -396,7 +332,7 @@ class SimBatchServer:
                         print "\n\n            [FOO] run_script(generate_script_file)"
                         print "            [FOO] run_script(generate_script_file)"  # TODO
                         print "            [FOO] run_script(generate_script_file)"
-                        self.set_done(execute_queue_id, self.server_name)
+                        self.set_queue_item_done(execute_queue_id, self.server_name)
                         self.last_info = "DONE id: {}".format(execute_queue_id)
                         self.report_done_jobs += 1
                         #######

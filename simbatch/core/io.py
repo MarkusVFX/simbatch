@@ -1,6 +1,7 @@
 import os
 import re
-import lib.common as comfun
+import sys
+import shutil
 
 
 class PredefinedVariables:
@@ -259,6 +260,69 @@ class StorageInOut:
                 else:
                     files.append(fi)
         return files
+
+    def recursive_overwrite(self, src, dest, ends_with=None):
+        if os.path.isdir(src):
+            if not os.path.isdir(dest):
+                os.makedirs(dest)
+            files = os.listdir(src)
+            for f in files:
+                self.recursive_overwrite(os.path.join(src, f), os.path.join(dest, f), ends_with)
+        else:
+            if ends_with is None:
+                shutil.copyfile(src, dest)
+                self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
+            else:
+                if src.endswith(ends_with):
+                    shutil.copyfile(src, dest)
+                    self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
+                else:
+                    pass
+
+    def copy_tree(self, src, dst, sub_dir=None):
+        if sub_dir is not None:
+            if len(sub_dir) > 0:
+                src += sub_dir
+                dst += sub_dir
+            else:
+                self.batch.logger.wrn("sub dir is zero size")
+        try:
+            self.recursive_overwrite(src, dst, ends_with=".py")
+        except IOError as why:
+            self.batch.logger.err("copy_tree  IOError  from: {}     to: {}\n{}".format(src, dst, why))
+        except OSError as why:
+            self.batch.logger.err("copy_tree  OSError  from: {}     to: {}\n{}".format(src, dst, why))
+        except TypeError as why:
+            self.batch.logger.err("copy_tree  TypeError  from: {}     to: {}\n{}".format(src, dst, why))
+        except:
+            self.batch.logger.err("copy_tree {}".format(sys.exc_info()[0]))
+        else:
+            self.batch.logger.inf("copy_tree  from: {}     to: {}\n".format(src, dst))
+
+    def copy_file(self, src_path, dst_path, file_name, sub_dir=None):
+        if sub_dir is not None:
+            if len(sub_dir) > 0:
+                src_path += sub_dir + self.batch.sts.dir_separator
+                dst_path += sub_dir + self.batch.sts.dir_separator
+            else:
+                self.batch.logger.wrn("sub dir is zero size")
+
+        src_file = src_path + file_name
+        dst_file = dst_path + file_name
+        try:
+            shutil.copyfile(src_file, dst_file)
+        except IOError as why:
+            self.batch.logger.err("copy_file  IOError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+        except OSError as why:
+            self.batch.logger.err("copy_file  OSError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+        except TypeError as why:
+            self.batch.logger.err("copy_file  TypeError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+        except NameError as why:
+            self.batch.logger.err("copy_file  NameError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+        except:
+            self.batch.logger.err("copy_file {}".format(sys.exc_info()[0]))
+        else:
+            self.batch.logger.inf("copy_file  from: {}     to: {}\n".format(src_file, dst_file))
         
     @staticmethod
     def get_flat_name(name):

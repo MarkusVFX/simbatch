@@ -1,5 +1,6 @@
 import time
 import os
+import sys
 import subprocess
 import threading
 import shutil
@@ -92,55 +93,104 @@ class SimBatchServer:
     def test_server_dir(self):
         # TODO tesdt write acces   create data dir
         pass
-
-    def copytree(src, dst, symlinks=False, ignore=None):  #TODO move to common
-        for item in os.listdir(src):
-            s = os.path.join(src, item)
-            d = os.path.join(dst, item)
-            if os.path.isdir(s):
-                shutil.copytree(s, d, symlinks, ignore)
+        
+    def recursive_overwrite(self, src, dest, ends_with=None):     #TODO move to common     add only .py
+        if os.path.isdir(src):
+            if not os.path.isdir(dest):
+                os.makedirs(dest)
+            files = os.listdir(src)
+            for f in files:
+                self.recursive_overwrite(os.path.join(src, f), os.path.join(dest, f), ends_with)
+        else:
+            if ends_with is None:
+                shutil.copyfile(src, dest)
+                self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
             else:
-                shutil.copy2(s, d)
-                
-    def copy_file(src_path, dest_path, file, sub_dir=None):    # move to commmon
+                if src.endswith(ends_with):
+                    shutil.copyfile(src, dest)
+                    self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
+                else:
+                    pass
+    
+    def copytree(self, src, dst, symlinks=False, ignore=None, sub_dir=None):  #TODO move to common
         if sub_dir is not None:
             if len(sub_dir)>0:
-                src_path += self.batch.sts.dir_separator + sub_dir
-                dest_path += self.batch.sts.dir_separator +sub_dir
+                src += sub_dir
+                dst += sub_dir
             else:
                 self.batch.logger.wrn("sub dir is zero size")
         try:
-            shutil.copyfile(src_file, dest_file, *, follow_symlinks=True)  
+            self.recursive_overwrite(src, dst, ".py")
+        except IOError as why:
+            self.batch.logger.err("copytree  IOError  from: {}     to: {}\n{}".format(src, dst, why))
+        except OSError as why:
+            self.batch.logger.err("copytree  OSError  from: {}     to: {}\n{}".format(src, dst, why))
+        except TypeError as why:
+            self.batch.logger.err("copytree  TypeError  from: {}     to: {}\n{}".format(src, dst, why))
+        except:
+            self.batch.logger.err("copytree {}".format(sys.exc_info()[0]))
+        else:
+            self.batch.logger.inf("copytree  from: {}     to: {}\n".format(src, dst))
+                
+                
+    def copy_file(self, src_path, dest_path, file, sub_dir=None):    # move to commmon
+        if sub_dir is not None:
+            if len(sub_dir)>0:
+                src_path += sub_dir + self.batch.sts.dir_separator
+                dest_path += sub_dir + self.batch.sts.dir_separator
+            else:
+                self.batch.logger.wrn("sub dir is zero size")
+        try:
+            src_file = src_path + file
+            dest_file = dest_path + file
+            shutil.copyfile(src_file, dest_file)  
             
-            print "WIP  copy  {}  to  {}".format(source_path , dest_path)
-            copytree
-        except IOError:
-            pass
+        except IOError as why:
+            self.batch.logger.err("copy_file  IOError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
+        except OSError as why:
+            self.batch.logger.err("copy_file  OSError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
+        except TypeError as why:
+            self.batch.logger.err("copy_file  TypeError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
+        except NameError as why:
+            self.batch.logger.err("copy_file  NameError  from: {}     to: {}\n{}".format(src_file, dest_file, why))
+        except:
+            self.batch.logger.err("copy_file {}".format(sys.exc_info()[0]))
+        else:
+            self.batch.logger.inf("copy_file  from: {}     to: {}\n".format(src_file, dest_file))
         
-    def update_sources_from_server(self):
+            
+        
+    def update_sources_from_master(self):
         self.update_sources()
         
     def update_sources_to_master(self):
         self.update_sources(reverse_to_master=True)
         
     def update_sources(self, reverse_to_master=False):
-        source_path = self.batch.sts.installation_directory_abs + self.batch.sts.dir_separator
-        dest_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + self.batch.sts.dir_separator
-        if reverse_to_master:
-           source_path, dest_path = dest_path, source_path 
-        if source_path is not None:
+        if self.batch.sts.installation_directory_abs is not None:
+            source_path = self.batch.sts.installation_directory_abs + "/"    # self.batch.sts.dir_separator  vs universal separator
+            dest_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) +  "/"    # self.batch.sts.dir_separator  vs universal separator
+        
+            if reverse_to_master:
+               source_path, dest_path = dest_path, source_path 
+            
+            if self.batch.sts.current_os == 2:
+                source_path = self.batch.comfun.convert_to_win_path(source_path)
+                dest_path = self.batch.comfun.convert_to_win_path(dest_path)
+            
             if self.batch.comfun.path_exists(source_path) is True:
                 if self.batch.comfun.path_exists(dest_path) is True:
                     #
+                    self.batch.logger.inf(("update sources from  {}  ".format(source_path)), nl=True)
                     self.copy_file(source_path, dest_path, "server.py", sub_dir = "server")
-                    self.copytree(source_path, dest_path, sub_dir = "core")
+                    self.copytree(str(source_path), str(dest_path), sub_dir = "core")
                     #
                 else:
                     self.batch.logger.err("(update_sources_from_master) dest path  {}  not exist".format(dest_path))
             else:
                 self.batch.logger.err("(update_sources_from_master) source path  {}  not exist".format(source_path))
         else:
-            self.batch.logger.err("(update_sources_from_master) source_path is None")
+            self.batch.logger.err("(update_sources_from_master) installation_directory_abs is not defined")
         
     def add_to_log(self, info, log_file=None):  # TODO move to common
         date = self.comfun.get_current_time()
@@ -280,8 +330,9 @@ class SimBatchServer:
                         self.update_sources_from_master()
                         return True
                     else:
-                        if argv == "update_to_server":
+                        if argv == "update_to_master":
                             self.update_sources_to_master()
+                            return True
                         else:
                             self.batch.logger.inf(("unknown arg  : ", argv))
                             return False

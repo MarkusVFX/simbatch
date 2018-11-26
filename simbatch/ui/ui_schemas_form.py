@@ -237,17 +237,14 @@ class SchemaFormCreateOrEdit(QWidget):
                     button_2_caption = multi_action.actions[0].ui[2][0]
                     button_2_function_str = multi_action.actions[0].ui[2][1]
 
-        batch = self.batch   # share logger and interaction from definition
+        batch = self.batch   '''  share logger and interaction from definition  '''
         top = self.top_ui
         if multi_action.actions_count == 0:   # incorrectly defined action
             dummy_multiaction = self.batch.dfn.create_multiaction(-1, "empty action")
             action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", dummy_multiaction)
-            # first_action = self.batch.dfn.create_single_action(multi_action.name, "err", "empty multiaction", "null")
         else:
-            # first_action = multi_action.actions[0]
 
             if multi_action.actions_count == 1:   # single action, no combo
-                # print "ui ui ui ", multi_action.actions[0].actual_value , "___" , multi_action.actions[0]
                 if len(multi_action.actions[0].actual_value) == 0:
                     # multi_action.actions[0].actual_value = multi_action.actions[0].default_value
                     multi_action.actions[0].actual_value = multi_action.actions[0].ui[0]

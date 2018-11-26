@@ -148,13 +148,13 @@ class Definitions:
     def __str__(self):
         return "Definitions,  current_definition:" + str(self.current_definition)
 
-    #  print project data, for debug
+    '''  print project data, for debug  '''
     def print_current(self):
         print "     current definition index: {}   name: {}  total_: {}\n".format(self.current_definition_index,
                                                                                   self.current_definition_name,
                                                                                   self.total_definitions)
 
-    #  print definitions data, for debug
+    '''  print definitions data, for debug  '''
     def print_total(self, print_children=False):
         if print_children:
             for i, d in enumerate(self.definitions_array):

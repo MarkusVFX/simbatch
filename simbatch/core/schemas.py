@@ -191,8 +191,6 @@ class SchemaItem:
                         out_arr.append(combi)
                         outi_arr.append(combii)
 
-                    # print "zz",  len(out_arr), sum_len , out_arr
-                    # print "zzi",  len(outi_arr), sum_len , outi_arr
                     return outi_arr, out_arr
 
                 count_actions_with_evos += 1
@@ -223,7 +221,7 @@ class Schemas:
     def get_blank_schema():
         return SchemaItem(0, "", 1, "NULL", 1, "blank defn", [], 1, "")
 
-    #  print schema data, for debug
+    '''  print schema data, for debug  '''
     def print_schema(self, schema=None):
         prefix = ""
         if schema is None:
@@ -591,7 +589,7 @@ class Schemas:
                     if a.user_value == a.ui[0]:
                         # print "       action   : ", a.soft_id, a.action_type, a.action_param
                         pass
-                        # TODO  get_all_object_from_all_schemas
+                        # TODO WIP get_all_object_from_all_schemas
 
     def copy_schema(self, source_schema_index, proj_target_id):
         if 0 <= source_schema_index < len(self.schemas_data):

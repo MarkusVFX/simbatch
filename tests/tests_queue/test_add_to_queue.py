@@ -32,7 +32,6 @@ def test_set_prj_sch_tsk(sib):
     sib.sch.update_current_from_id(sib.tsk.tasks_data[-1].schema_id)
     sib.tsk.update_current_from_id(sib.tsk.max_id)
 
-    # assert sib.sch.current_schema_id > 0
     assert sib.tsk.current_task_id > 0
 
     sib.que.remove_queue_items(only_done=True)
@@ -42,8 +41,6 @@ def test_generate_template_queue_item(sib):
     print "\n\n___ template_queue_item ___"
     template_queue_item = sib.que.generate_template_queue_item(sib.tsk.current_task, sib.sch.current_schema)
     assert template_queue_item.shot == "ut01"
-    # print " template_queue_item: ", template_queue_item
-    # print " script: ", template_queue_item.evolution_script
     template_queue_item.print_this()
 
 
@@ -103,7 +100,6 @@ def test_get_array_of_scripts_params_val_from_schema_actions(sib):
 def test_do_params_combinations(sib):
     print "\n\n___ params_combinations ___"
     arr_scripts_params = sib.que.get_array_of_scripts_params_val_from_schema_actions(sib.sch.current_schema)
-    # print arr_scripts_params
     all_evo_combinations_array = sib.que.do_params_combinations(arr_scripts_params)
     print "\n", all_evo_combinations_array
 
@@ -119,6 +115,7 @@ def test_generate_queue_items(sib):
     # for qi in qi1:
     #     print "___"
     #     qi.print_this()
+    # WIP
 
 
 def test_generate_queue_items_evo(sib):
@@ -134,4 +131,5 @@ def test_generate_queue_items_evo(sib):
     # for qi in qi1:
     #     print "___"
     #     qi.print_this()
+    # WIP
 

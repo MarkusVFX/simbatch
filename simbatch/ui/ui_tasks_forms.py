@@ -160,7 +160,6 @@ class TasksFormCreateOrEdit(QWidget):
         arr_index = 0
         for sch_id in self.schemas_id_array:
             if sch_id == cur_task.schema_id:
-                # print " ____set edit  ", arr_index
                 self.qt_schema_name_combo.setCurrentIndex(arr_index)
             arr_index += 1
 

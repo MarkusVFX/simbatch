@@ -117,7 +117,7 @@ class Queue:
         self.comfun = batch.comfun
         self.queue_data = []
 
-    #  print project data, mainly for debug
+    '''   print project data, mainly for debug  '''
     def print_info(self):
         print "\n QUEUE: "
         print "     current queue item id: {}   index: {}   total queue items: {}\n".format(self.current_queue_id,
@@ -467,7 +467,6 @@ class Queue:
             return all_evos
         for i, ai in enumerate(action_inputs):
             if len(ai) > 1:
-                print "evo in action input: ", i, ai[1]
                 ret = self.batch.pat.get_params_val_arr_from_string(ai[1])
                 if ret[0] > 0:
                     found_evos += ret[0]

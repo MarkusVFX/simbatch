@@ -51,7 +51,7 @@ class SettingsUI:
             qt_scroll_widget.setMinimumWidth(400)
 
         if self.settings.runtime_env == "Maya":
-            qt_scroll_widget.setMinimumHeight(400)
+            qt_scroll_widget.setMinimumHeight(460)
         else:
             qt_scroll_widget.setMinimumHeight(400)
 
@@ -371,7 +371,6 @@ class SettingsUI:
     def test_data_config_ini(self):
         if self.test_exist_config_ini():
             ini = self.comfun.load_from_file(self.settings.ini_file)
-            # print "RAW config:\n ", ini
             self.batch.logger.inf(("RAW config: ", ini))
 
             ini_content = self.comfun.load_json_file(self.settings.ini_file)
@@ -384,7 +383,6 @@ class SettingsUI:
                         vars_count += 1
                     else:
                         self.batch.logger.err(("missing key in config file ", ie))
-                        print "missing key : ", ie
                 if vars_count == len(ini_elements):
                     self.top_ui.set_top_info(ini_file+" integrity test OK ", 4)
                 else:

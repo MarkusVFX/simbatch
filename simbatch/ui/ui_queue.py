@@ -152,17 +152,17 @@ class QueueUI:
 
         self.qt_button_sim_one = QPushButton("Simulate One")
         self.qt_button_sim_all = QPushButton("Simulate All")
-        qt_button_queue_remove = QPushButton("Remove from Queue")
-        qt_button_queue_edit = QPushButton("Edit")
+        self.qt_button_queue_remove = QPushButton("Remove from Queue")
+        self.qt_button_queue_edit = QPushButton("Edit")
 
         self.qt_button_sim_one.clicked.connect(self.on_click_sim_one)
         self.qt_button_sim_all.clicked.connect(self.on_click_sim_all)
-        qt_button_queue_remove.clicked.connect(self.on_click_remove)
-        qt_button_queue_edit.clicked.connect(self.on_click_edit)
+        self.qt_button_queue_remove.clicked.connect(self.on_click_remove)
+        self.qt_button_queue_edit.clicked.connect(self.on_click_edit)
 
         qt_lay_queue_list.addWidget(list_queue)
         self.comfun.add_wigdets(qt_lay_queue_buttons, [self.qt_button_sim_one, self.qt_button_sim_all,
-                                                       qt_button_queue_remove, qt_button_queue_edit])
+                                                       self.qt_button_queue_remove, self.qt_button_queue_edit])
         self.comfun.add_layouts(qt_lay_queue_main, [qt_lay_queue_list, qt_lay_forms, qt_lay_queue_buttons])
 
         self.init_queue_items()
@@ -197,12 +197,16 @@ class QueueUI:
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
-        index = self.batch.que.current_queue_index
+        current_id = self.batch.que.current_queue_id
         self.clear_list(with_freeze=False)
         self.init_queue_items()
-        if index is not None:
-            self.batch.que.current_queue_index = index
-            self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
+        if current_id is not None:
+            index = self.batch.que.get_index_by_id(current_id)
+            if index is not None:
+                self.batch.que.current_queue_index = index
+                self.batch.que.current_queue_id = self.batch.que.queue_data[self.batch.que.current_queue_index].id
+            else:
+                self.batch.que.current_queue_id = None   # not exist anymore
             # TODO highlight q item
         self.freeze_list_on_changed = 0
 
@@ -274,6 +278,9 @@ class QueueUI:
 
     def on_click_menu_queue_item_remove(self):
         self.on_click_confirmed_remove_queue_item()
+        
+    def on_click_menu_queue_item_remove_all_green(self):
+        self.on_click_confirmed_remove_queue_items_green()
 
     @staticmethod
     def on_click_menu_spacer():
@@ -291,6 +298,7 @@ class QueueUI:
         qt_right_menu.addAction("Locate prev", self.on_menu_locate_prev)
         qt_right_menu.addAction("Open computed scene", self.on_menu_open_computed_scene)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
+        qt_right_menu.addAction("Remove All Green", self.on_click_menu_queue_item_remove_all_green)
         qt_right_menu.addAction("Remove", self.on_click_menu_queue_item_remove)
         qt_right_menu.exec_(global_cursor_pos)
 
@@ -314,9 +322,15 @@ class QueueUI:
         wigdet_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
 
-    def simulate_buttons_state(self, state):
+    def set_buttons_state(self, state):
         self.qt_button_sim_one.setEnabled(state)
+        self.qt_button_sim_one.repaint()
         self.qt_button_sim_all.setEnabled(state)
+        self.qt_button_sim_all.repaint()
+        self.qt_button_queue_remove.setEnabled(state)
+        self.qt_button_queue_remove.repaint()
+        self.qt_button_queue_edit.setEnabled(state)
+        self.qt_button_queue_edit.repaint()
 
     def run_server_from_framework(self, mode):
         server = self.mainw.server  # .SimBatchServer(self.batch, force_local=True)
@@ -324,7 +338,7 @@ class QueueUI:
         server.loops_counter = 0
         server.timer_delay_seconds = 0
         server.reset_report()  # TODO
-        self.simulate_buttons_state(False)
+        self.set_buttons_state(False)
         server.run(mode)
         report = server.generate_report()  # TODO
         if report[0] > 0:
@@ -338,13 +352,19 @@ class QueueUI:
         else:
             if len(server.last_info) > 0:
                 self.top_ui.set_top_info(server.last_info, 1)
-        self.simulate_buttons_state(True)
-
+        self.set_buttons_state(True)
+        
     def on_click_sim_one(self):
+        self.top_ui.set_top_info("start single simulation")
+        self.set_buttons_state(False)
         self.run_server_from_framework("single")
+        self.set_buttons_state(True)
 
     def on_click_sim_all(self):
+        self.top_ui.set_top_info("start simulate all")
+        self.set_buttons_state(False)
         self.run_server_from_framework("all")
+        self.set_buttons_state(True)
 
     def on_click_edit(self):
         if self.edit_form_state == 0:
@@ -394,6 +414,13 @@ class QueueUI:
         self.batch.logger.db(("remove_queue_item", self.batch.que.current_queue_index,
                               self.current_list_item_index))
         self.remove_queue_item()
+        self.update_list_of_visible_ids()
+        
+    def on_click_confirmed_remove_queue_items_green(self):
+        self.batch.logger.db("remove_queue_items GREEN")
+        self.batch.que.remove_queue_items(only_done=True)
+        self.batch.que.save_queue()        
+        self.reset_list()
         self.update_list_of_visible_ids()
 
     def clear_list(self, with_freeze=True):

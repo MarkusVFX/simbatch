@@ -67,6 +67,7 @@ class QueueItem:
         print "\n QUEUE ITEM: {}".format(self.queue_item_name)
         print "   id: {}   [seq|sh|tk] : [{}|{}|{}] \n".format(self.id, self.sequence, self.shot, self.take)
         print "   ver:{}  evo_nr: {}   evo: {}    \n".format(self.version, self.evolution_nr, self.evolution)
+        print "   state:{}  state_id: {}    \n".format(self.state, self.state_id)
         print "   evolution_script:{}\n".format(self.evolution_script)
 
     """ marker ATQ 220   generate name   """
@@ -124,17 +125,11 @@ class Queue:
                                                                                             self.total_queue_items)
 
     def print_current(self):
-        print "       current queue index:{}, id:{}, total:{}".format(self.current_queue_index, self.current_queue_id,
-                                                                      self.total_queue_items)
+        print " QUEUE INFO:   items total:{}, current index:{}, current id:{}".format(self.total_queue_items, 
+                                                                                      self.current_queue_index,
+                                                                                      self.current_queue_id)
         if self.current_queue_index is not None:
-            self.print_queue_item(self.current_queue)
-
-    @staticmethod
-    def print_queue_item(qi):
-        print "      queue item: {}    {} {} {}     {} {} \n       script:{}".format(qi.queue_item_name,
-                                                                                     qi.sequence, qi.shot, qi.take,
-                                                                                     qi.frame_from, qi.frame_to,
-                                                                                     qi.get_evolution_script_with_nl())
+            self.current_queue.print_this()
 
     def print_all(self):
         if self.total_queue_items == 0:

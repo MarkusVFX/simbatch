@@ -121,7 +121,7 @@ class SimBatchAPI:
 
     def print_last_queue_item(self):
         if self.simbatch_core.que.total_queue_items > 0:
-            self.simbatch_core.que.print_queue_item(self.simbatch_core.que.queue_data[-1])
+            self.simbatch_core.que.queue_data[-1].print_this()
     #
     ##
     ###

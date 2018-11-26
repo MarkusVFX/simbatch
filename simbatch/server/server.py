@@ -253,7 +253,10 @@ class SimBatchServer:
             return False
             
         if self.force_local is False:
-            argv = argv[1]
+            if len(argv) > 1:
+                argv = argv[1]
+            else:
+                del argv[:]
             
         if len(argv) > 0:
             if argv == "1" or argv == "single":
@@ -360,9 +363,10 @@ class SimBatchServer:
                     if self.loops_counter == 1:
                         self.last_info = "there is nothing to compute"   # else last_info ->  last job id
 
-                    """  BREAK ! """
-                    self.loops_limit = self.loops_counter
-                    self.loops_counter += 1
+                    if self.force_local is True:  # run local
+                        """  BREAK ! """
+                        self.loops_limit = self.loops_counter
+                        self.loops_counter += 1
             else:
                 if self.current_simnode_state == 9:
                     self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
@@ -376,6 +380,7 @@ class SimBatchServer:
             check_breaker = self.batch.comfun.file_exists(external_breaker, info=False)
             if check_breaker:
                 self.batch.logger.inf(("breaking main loop", self.last_info))
+                self.batch.logger.deep(("breaking file exists: ", external_breaker))
                 if self.batch.comfun.file_exists(external_breaker_off):
                     os.remove(external_breaker_off)
                 os.rename(external_breaker, external_breaker_off)

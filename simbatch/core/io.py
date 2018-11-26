@@ -296,8 +296,6 @@ class StorageInOut:
             self.batch.logger.err("copy_tree  TypeError  from: {}     to: {}\n{}".format(src, dst, why))
         except:
             self.batch.logger.err("copy_tree {}".format(sys.exc_info()[0]))
-        else:
-            self.batch.logger.inf("copy_tree  from: {}     to: {}\n".format(src, dst))
 
     def copy_file(self, src_path, dst_path, file_name, sub_dir=None):
         if sub_dir is not None:

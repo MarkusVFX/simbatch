@@ -17,12 +17,12 @@ class Interactions:
         self.save_current_scene_as(param)
 
     # maya interactions
-    def maya_open_scene(self, file):
+    def maya_open_scene(self, target):
         import maya.cmds as cmd
         ret = cmd.file(target, o=True, force=True)
         return ret
 
-    def save_current_scene_as(self, file):
+    def save_current_scene_as(self, target):
         import maya.cmds as cmd
         ret1 = cmd.file(rename=target)
         ret2 = cmd.file(save=True, type="mayaBinary")

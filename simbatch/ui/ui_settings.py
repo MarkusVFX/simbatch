@@ -469,12 +469,10 @@ class SettingsUI:
             self.mainw.top_ui.qt_but_print_general.show()
             self.mainw.top_ui.qt_but_print_details.show()
             self.mainw.top_ui.qt_but_debug.show()
-            self.mainw.qt_tab_widget.addTab(self.mainw.dfn_ui.qt_widget_definitions, "Definitions")
         if level < 4 and prev_lvl >= 4:      # hide db UI elements
             self.mainw.top_ui.qt_but_print_general.hide()
             self.mainw.top_ui.qt_but_print_details.hide()
             self.mainw.top_ui.qt_but_debug.hide()
-            self.mainw.qt_tab_widget.removeTab(5)
 
     def on_changed_always_on_top(self, state):   # state values 0 or 2  !
         if state:

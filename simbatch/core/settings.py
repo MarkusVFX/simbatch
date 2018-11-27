@@ -332,6 +332,7 @@ class Settings:
                 ret = self.check_data_integration()
                 if ret:
                     self.debug_level = self.json_settings_data["debugLevel"]["current"]
+                    self.logger.console_level = self.debug_level
                     self.store_data_mode = self.json_settings_data["dataMode"]["current"]
                     self.ui_color_mode = self.json_settings_data["colorMode"]["current"]
 

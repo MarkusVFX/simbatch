@@ -47,8 +47,8 @@ class SimBatchServer:
             if self.batch.que.total_queue_items == 0:
                 self.batch.logger.inf("queue data is empty, nothing loaded")
                 self.batch.que.print_info()
-        # else:
-            # queue is already loaded !
+
+        ''' elif self.force_local is True: queue is already loaded ! (no need to load) '''
 
         self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
         self.test_server_dir()
@@ -61,24 +61,23 @@ class SimBatchServer:
             ret = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
             if ret[1] is not None:  # state file exists
                 self.current_simnode_state = ret[0]
-                self.server_name = ret[1] 
-                """  check is exist on database  """
-                
+                self.server_name = ret[1]
+
+                """  check existence in database  """
                 state_file = self.batch.nod.get_state_file(server_name=ret[1])
                 if state_file is False:
                     """  try to add simnode state file to database  """
-                    
+                    pass
                 # if state_file != simnode_state_file:
                     # TODO WIP
                     # self.batch.nod.create_node_state_file(simnode_state_file)
-                
             else:
-                self.batch.logger.err(("state file not exist or corupted :", simnode_state_file))
+                self.batch.logger.err(("state file not exist or corrupted :", simnode_state_file))
 
-        if self.current_simnode_state == -1:
-            simnode_state_data = "{};{};{}".format(2, self.server_name, self.comfun.get_current_time())
-            self.batch.comfun.save_to_file(simnode_state_file, simnode_state_data)
-            self.set_simnode_state(2)
+        # if self.current_simnode_state == -1:
+        #     simnode_state_data = "{};{};{}".format(2, self.server_name, self.comfun.get_current_time())
+        #     self.batch.comfun.save_to_file(simnode_state_file, simnode_state_data)
+        #     self.set_simnode_state(2)
         
         if self.force_local is True:
             print_server_name = batch.sts.runtime_env + " (local)"
@@ -124,7 +123,7 @@ class SimBatchServer:
         else:
             self.batch.logger.err("(update_sources_from_master) installation_directory_abs is not defined")
         
-    def add_to_log(self, info, log_file=None):  # TODO move to common
+    def add_to_log(self, info, log_file=None):
         date = self.comfun.get_current_time()
         if log_file is None:
             log_file = self.server_dir + self.log_file_name
@@ -140,8 +139,8 @@ class SimBatchServer:
     def generate_report(self):   # TODO
         return self.report_total_jobs, self.report_done_jobs
         
-    def set_node_database_state(self, queue_id, state, state_id, server_name, state_file):
-        return self.batch.nod.set_node_state(state_file, server_name, state_id)
+    # def set_database_node_state(self, queue_id, state, state_id, server_name, state_file):
+    #     return self.batch.nod.set_node_state(state_file, server_name, state_id)
             
     def set_simnode_state(self, stste):     # TODO clean up this !!!!
         print "\n WIP  set_simnode_state  : ", stste, self.batch.sts.dir_separator
@@ -152,13 +151,14 @@ class SimBatchServer:
 
     def set_queue_item_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False,
                              set_time=""):
-        self.batch.logger.db(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
+        self.batch.logger.deepdb(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
         self.batch.que.clear_all_queue_items()  # TODO  check is mode LOCAL ? !!!!
         self.batch.que.load_queue()
         ret = self.batch.que.update_current_from_id(queue_id)
         if ret is not False:
-            ret = self.batch.que.update_state_and_node(queue_id, state, state_id, server_name=server_name, server_id=1,
-                                                       set_time=set_time, add_current_time=add_current_time)
+            ret = self.batch.que.update_state_and_node_name(queue_id, state, state_id, server_name=server_name,
+                                                            server_id=1, set_time=set_time,
+                                                            add_current_time=add_current_time)
             state_length_10 = self.batch.comfun.str_with_spaces(state, length=10)
             if ret:
                 qin = self.batch.que.current_queue.queue_item_name

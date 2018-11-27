@@ -555,7 +555,7 @@ class SchemasUI:
                               "   to proj :", self.batch.prj.current_project_id))
 
         sch_dir = self.batch.prj.current_project.working_directory_absolute
-        sch_dir += new_schema_item.schema_name + self.sts.dir_separator
+        sch_dir += self.batch.sio.get_flat_name(new_schema_item.schema_name) + self.sts.dir_separator
 
         self.batch.sio.create_schema_directory(sch_dir)
 

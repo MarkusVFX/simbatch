@@ -56,6 +56,10 @@ simbatch_server = simbatch_server.SimBatchServer(simbatch, force_local=True)
 
 
 """   force reload core   """
+import simbatch.core.lib.logger as simbatch_logger
+reload(simbatch_logger)
+simbatch.logger = simbatch_logger.Logger()
+
 import simbatch.core.settings as simbatch_settings
 reload(simbatch_settings)
 simbatch.sts = simbatch_settings.Settings(simbatch.logger, "Maya", ini_file=simbatch_config_ini)
@@ -63,10 +67,6 @@ simbatch.sts = simbatch_settings.Settings(simbatch.logger, "Maya", ini_file=simb
 import simbatch.core.lib.common as simbatch_comfun
 reload(simbatch_comfun)
 simbatch.comfun = simbatch_comfun.CommonFunctions()
-
-import simbatch.core.lib.logger as simbatch_logger
-reload(simbatch_logger)
-simbatch.logger = simbatch_logger.Logger()
 
 import simbatch.core.projects as simbatch_projects
 reload(simbatch_projects)

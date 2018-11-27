@@ -288,6 +288,8 @@ class MainWindow(QMainWindow):
 
     def on_clicked_but_debug(self):
         self.batch.logger.inf("but_debug clicked")
+        self.batch.logger.inf(self.batch.logger.console_level)
+        self.batch.logger.inf(self.batch.sts.logger.console_level)
 
     def on_clicked_but_filter(self):
         self.batch.logger.inf("but_filter clicked")

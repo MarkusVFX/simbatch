@@ -86,9 +86,80 @@ class SimBatchServer:
             print_server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
         self.batch.logger.inf(("init server :", print_server_name, self.server_dir))
 
+    def do_all_tests(self):
+        self.batch.logger.raw("\n\n\n")
+        '''  simbatch load wtih settings  '''
+        if self.batch.sts.loading_state >= 4:
+            self.batch.logger.inf("Settings loaded", force_prefix="SRV")
+        else:
+            self.batch.logger.err("Settings NOT loaded")
+        
+        '''  data acces  '''
+        if self.batch.sts.store_data_mode == 1:
+            ret = self.batch.load_data()
+            if ret[0]:
+                self.batch.logger.inf("Data loaded with no errorsor warnings ", force_prefix="SRV")
+            elif ret[0] > 0:  
+                self.batch.logger.wrn("Data loaded with {} errors".format(ret[0]))
+            else:
+                self.batch.logger.err("Critical error during dataloading! ({})".format(ret))
+        else:
+            pass
+            # SQL with PRO version
+            
+        '''  local node status file  '''
+        if len(self.server_dir) == 0:
+            self.batch.logger.err("Variable  self.server_dir  is not defined!")
+            if len(self.state_file_name) == 0:
+                self.batch.logger.err("Variable  self.state_file_name  is undefined!")
+            
+                simnode_state_file = self.server_dir + self.state_file_name
+                if self.comfun.file_exists(simnode_state_file):
+                    ret = self.batch.nod.get_node_info_from_state_file()
+                    if ret[0] >= 0:
+                        self.batch.logger.inf("Found server name: {}    in file: {}  ".format(ret[1], simnode_state_file), force_prefix="SRV")
+                else:
+                    self.batch.logger.err("Local state file not exist!  ({})".format(simnode_state_file))
+                    
+                    
+        
+        '''  master sourcefor update  '''
+        master_source_path = self.get_existing_source_path()
+        if master_source_path is not None:
+            self.batch.logger.inf("Master source path exist: {}".format(master_source_path), force_prefix="SRV")
+            ret_R = os.access(master_source_path, os.R_OK)  # TODO test write acces ,   move to common
+            if ret_R:
+                self.batch.logger.inf("Read from master source test", force_prefix="OK ")
+                ret_W = os.access(master_source_path, os.W_OK)  # TODO test write acces ,   move to common
+                if ret_W:
+                    self.batch.logger.inf("Save to master source test", force_prefix="OK ")
+                else:
+                    self.batch.logger.wrn("could NOT save to master source path  {} ".format(master_source_path))
+            else:
+                self.batch.logger.err("could NOT read from master source path  {} ".format(master_source_path))
+        else:
+            self.batch.logger.err("Master source path NOT exist")
+       
+            
+        '''  queue status  '''
+        ret = self.is_something_to_do()
+        if ret[0] == 1:
+            self.batch.logger.inf(("Something to do: ", ret[1]), force_prefix="SRV")
+        else:
+            self.batch.logger.err("Nothing to do", force_prefix="SRV")
+            
+            
+        
     def test_server_dir(self):
         # TODO test write acces   create data dir
         pass
+        
+    def get_existing_source_path(self):
+        source_path = self.batch.sts.installation_directory_abs + "/"
+        if self.batch.comfun.path_exists(source_path):
+            return source_path
+        else:
+            None
 
     def update_sources_from_master(self):
         self.update_sources()
@@ -99,27 +170,34 @@ class SimBatchServer:
     def update_sources(self, reverse_to_master=False):
         if self.batch.sts.installation_directory_abs is not None:
             # TODO self.batch.sts.dir_separator  vs universal separator
-            source_path = self.batch.sts.installation_directory_abs + "/"
-            dst_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/"
-
-            if reverse_to_master:
-                source_path, dst_path = dst_path, source_path
+            source_path = self.get_existing_source_path()   #self.batch.sts.installation_directory_abs + "/"
+            if source_path is not None:
+                dst_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/"
             
-            if self.batch.sts.current_os == 2:
-                source_path = self.batch.comfun.convert_to_win_path(source_path)
-                dst_path = self.batch.comfun.convert_to_win_path(dst_path)
+                if reverse_to_master:
+                    source_path, dst_path = dst_path, source_path
             
-            if self.batch.comfun.path_exists(source_path) is True:
-                if self.batch.comfun.path_exists(dst_path) is True:
+                if self.batch.sts.current_os == 2:
+                    source_path = self.batch.comfun.convert_to_win_path(source_path)
+                    dst_path = self.batch.comfun.convert_to_win_path(dst_path)
+            
+                
+                
+                ret_R = os.access(source_path, os.R_OK)  # TODO test write acces ,   move to common
+                ret_W = os.access(dst_path, os.W_OK)  # TODO test write acces ,   move to common
+                if ret_R and ret_W:
                     #
                     self.batch.logger.inf(("update sources from  {}  ".format(source_path)), nl=True)
                     self.batch.sio.copy_file(source_path, dst_path, "server.py", sub_dir="server")
                     self.batch.sio.copy_tree(str(source_path), str(dst_path), sub_dir="core")
                     #
                 else:
-                    self.batch.logger.err("(update_sources_from_master) dest path  {}  not exist".format(dst_path))
+                    if ret_R is False:
+                        self.batch.logger.err("could NOT read from source path  {} ".format(src_path))
+                    if ret_W is False:
+                        self.batch.logger.err("could NOT save to dest path  {} ".format(dst_path))
             else:
-                self.batch.logger.err("(update_sources_from_master) source path  {}  not exist".format(source_path))
+                self.batch.logger.err("master source path  {}  not exist".format(source_path))
         else:
             self.batch.logger.err("(update_sources_from_master) installation_directory_abs is not defined")
         
@@ -264,17 +342,18 @@ class SimBatchServer:
             else:
                 if argv == "all":
                     mode = "all"
+                elif argv == "up" or argv == "update_form_master":
+                    self.update_sources_from_master()
+                    return True
+                elif argv == "upm" or argv == "update_to_master":
+                    self.update_sources_to_master()
+                    return True
+                elif argv == "test":
+                    self.do_all_tests()
+                    return True
                 else:
-                    if argv == "up":
-                        self.update_sources_from_master()
-                        return True
-                    else:
-                        if argv == "update_to_master":
-                            self.update_sources_to_master()
-                            return True
-                        else:
-                            self.batch.logger.inf(("unknown arg  : ", argv))
-                            return False
+                    self.batch.logger.inf(("unknown arg  : ", argv))
+                    return False
         else:
             mode = "all"
                 

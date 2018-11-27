@@ -14,7 +14,7 @@ class Logger:
         self.console_level = console_level
         self.log_file_level = log_level
 
-    def dispatch(self, level, message, force_print=False, raw=False, nl=False, nla=False):
+    def dispatch(self, level, message, force_print=False, raw=False, nl=False, nla=False, force_prefix=None):
         if self.console_level >= level or force_print:
             console_print = True
         else:
@@ -25,7 +25,10 @@ class Logger:
         else:
             log_append = False
 
-        if level == 1:
+        if force_prefix is not None:
+            indent = "    "
+            prefix = force_prefix
+        elif level == 1:
             indent = "    "
             prefix = "INF"
         elif level == 2:
@@ -66,8 +69,8 @@ class Logger:
         if self.buffering is not False:
             self.buffer += "\n"+message
 
-    def inf(self, message, force_print=False, nl=False, nl_after=False):
-        self.dispatch(1, message, force_print=force_print, nl=nl, nla=nl_after)
+    def inf(self, message, force_print=False, nl=False, nl_after=False, force_prefix=None):
+        self.dispatch(1, message, force_print=force_print, nl=nl, nla=nl_after, force_prefix=force_prefix)
 
     def wrn(self, message, force_print=False, nl=False, nl_after=False):
         self.dispatch(2, message, force_print=force_print, nl=nl, nla=nl_after)

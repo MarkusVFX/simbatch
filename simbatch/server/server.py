@@ -99,14 +99,43 @@ class SimBatchServer:
                 self.batch.logger.inf(info, force_prefix=" ! ", nl=True)
                 info = "Server local state: {}  {} ".format( ret[0], self.batch.sts.states_visible_names[ret[0]])
                 self.batch.logger.inf(info, force_prefix=" ! ", nl=True)
+                
+                node_index = self.batch.nod.get_node_index_by_name(ret[1])
+                if node_index is not False:
+                    if node_index >= 0:
+                        self.batch.nod.print_node(node_index)
+                    else:
+                        self.batch.logger.err("Found {} duplicates in database for name: {}".format(str(node_index*-1), ret[1]))
+                else:
+                    self.batch.logger.err("Server name {} not found in database".format(ret[1]))   #  TODO cleanup ret[1]
+                
             else:
                 self.batch.logger.err("Server state file not consistent or empty!")
         else:
             self.batch.logger.wrn("Server state file not exit!")
+      
+    def add_node_to_database(self, name):
+        if len(name) > 0:
+            node_index = self.batch.nod.get_node_index_by_name(ret[1])
+            if node_index is False:
+                simnode_state_file = self.server_dir + self.state_file_name
+                node_index = self.batch.nod.get_node_index_by_state_file(simnode_state_file)
+                if node_index is False:
+                    if self.comfun.file_exists(simnode_state_file):
+                        self.batch.logger.inf("Local server state file exist: {}".format(simnode_state_file), force_prefix=" > ")
+                    else:
+                        self.batch.logger.inf("Local server state file NOT exist: {}".format(simnode_state_file), force_prefix=" > ")
+                        # cretaenodefile
+                        ret = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
+                        # WIP...
+                else:
+                    self.batch.logger.wrn("Server state file exist on database! Skipped adding")
+            else:
+                self.batch.logger.wrn("Server name exist on database! Skipped adding")
+        else:
+            self.batch.logger.err("Server name is empty! Please set status file")
             
-         
-           
-
+      
     def do_all_tests(self):  # test server pure pyton (no unit tests)
         self.batch.logger.raw("\n\n\n")
         '''  simbatch load wtih settings  '''

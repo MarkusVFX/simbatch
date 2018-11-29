@@ -49,11 +49,18 @@ class SimNodes:
         self.nodes_data = []
 
     def print_current(self):
-        if self.current_node_index is not None and self.current_node_index >= 0:
-            n = self.nodes_data[self.current_node_index]
-            self.batch.logger.raw("\n current node: {}  {}  {}".format(n.node_name, n.state, n.description))
+        self.print_node(self.current_node_index, prefix="current ")
+            
+    def print_node(self, index, prefix=""):
+        if index is not None and index >= 0:
+            if index < self.total_nodes:
+                n = self.nodes_data[index]
+                self.batch.logger.raw("\n\n {} node: {}  {}  {}".format(prefix, n.node_name, n.state, n.description))
+            else:
+                self.batch.logger.raw("\n no {} node with index: {} ".format(prefix, index))
         else:
-            self.batch.logger.raw("\n no current node, index: {} ".format(self.current_node_index))
+            self.batch.logger.raw("\n no {} node, index: {} ".format(prefix, index))
+        
 
     def print_all(self):
         self.batch.logger.raw("\n Total nodes in database: {}".format(self.total_nodes))

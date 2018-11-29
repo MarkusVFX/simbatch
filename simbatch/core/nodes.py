@@ -67,7 +67,23 @@ class SimNodes:
                 return i
         self.batch.logger.wrn(("no node with ID: ", get_id))
         return None
-
+        
+    """ get node by name | return False if no node, index if one, -count if found > 0 """
+    def get_node_index_by_name(self, name):
+        nod_count = 0 
+        nod_last_index = None
+        for i, nodi in enumerate(self.nodes_data):
+            if nodi.node_name == name:
+                nod_count += 1
+                nod_last_index = i
+        
+        if nod_last_index is None:
+            return False
+        elif nod_count == 1:
+            return nod_last_index
+        else:
+            return nod_count*-1
+            
     #  update id, index and current for fast use by all modules
     def update_current_from_index(self, index):
         if 0 <= index < self.total_nodes:
@@ -198,7 +214,7 @@ class SimNodes:
             return self.save_nodes_to_json()
         if self.batch.sts.store_data_mode == 2:
             return self.save_nodes_to_myqsl()
-
+            
     def save_nodes_to_json(self, json_file=None):
         if json_file is None:
             json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SIMNODES_FILE_NAME
@@ -239,6 +255,16 @@ class SimNodes:
         if clear_stored_data:
             return self.save_nodes()
         return True
+        
+    """   
+    
+    """
+    
+    """
+    
+    operations on local state file   
+    
+    """
 
     def get_state_file(self, server_name=None):
         if server_name is not None:

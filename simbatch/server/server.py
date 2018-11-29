@@ -85,12 +85,33 @@ class SimBatchServer:
             simnode_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
             print_server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
         self.batch.logger.inf(("init server :", print_server_name, self.server_dir))
+        
+    def print_server_info(self):
+        self.batch.logger.raw("\n\n\n")
+        
+        simnode_state_file = self.server_dir + self.state_file_name
+        self.batch.logger.inf("Local server state file: {}".format(simnode_state_file), force_prefix=" > ")
+            
+        if self.comfun.file_exists(simnode_state_file):
+            ret = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
+            if ret[0] >= 0:
+                info = "Found server name: {} ".format(ret[1])
+                self.batch.logger.inf(info, force_prefix=" ! ", nl=True)
+                info = "Server local state: {}  {} ".format( ret[0], self.batch.sts.states_visible_names[ret[0]])
+                self.batch.logger.inf(info, force_prefix=" ! ", nl=True)
+            else:
+                self.batch.logger.err("Server state file not consistent or empty!")
+        else:
+            self.batch.logger.wrn("Server state file not exit!")
+            
+         
+           
 
-    def do_all_tests(self):
+    def do_all_tests(self):  # test server pure pyton (no unit tests)
         self.batch.logger.raw("\n\n\n")
         '''  simbatch load wtih settings  '''
         if self.batch.sts.loading_state >= 4:
-            self.batch.logger.inf("Settings loaded", force_prefix="SRV")
+            self.batch.logger.inf("Settings loaded", force_prefix=" > ")
         else:
             self.batch.logger.err("Settings NOT loaded")
         
@@ -98,9 +119,9 @@ class SimBatchServer:
         if self.batch.sts.store_data_mode == 1:
             ret = self.batch.load_data()
             if ret[0]:
-                self.batch.logger.inf("Data loaded with no errorsor warnings ", force_prefix="SRV")
+                self.batch.logger.inf("Simbatch data loaded with no errors or warnings ", force_prefix=" > ")
             elif ret[0] > 0:  
-                self.batch.logger.wrn("Data loaded with {} errors".format(ret[0]))
+                self.batch.logger.wrn("Simbatch data loaded with {} errors".format(ret[0]))
             else:
                 self.batch.logger.err("Critical error during dataloading! ({})".format(ret))
         else:
@@ -108,25 +129,38 @@ class SimBatchServer:
             # SQL with PRO version
             
         '''  local node status file  '''
-        if len(self.server_dir) == 0:
-            self.batch.logger.err("Variable  self.server_dir  is not defined!")
-            if len(self.state_file_name) == 0:
-                self.batch.logger.err("Variable  self.state_file_name  is undefined!")
+        if len(self.server_dir) > 0:
+            ret_R = os.access(self.server_dir, os.R_OK)  # TODO test write acces ,   move to common
+            if ret_R:
+                self.batch.logger.inf("Read from server directory test", force_prefix="OK ")
+                ret_W = os.access(self.server_dir, os.W_OK)  # TODO test write acces ,   move to common
+                if ret_W:
+                    self.batch.logger.inf("Save to server directory test", force_prefix="OK ")
+                else:
+                    self.batch.logger.err("could NOT save to server directory  {} ".format(self.server_dir))
             
+            if len(self.state_file_name) > 0:
                 simnode_state_file = self.server_dir + self.state_file_name
+                self.batch.logger.inf("Local server state file: {}".format(simnode_state_file), force_prefix=" > ")
+                    
                 if self.comfun.file_exists(simnode_state_file):
-                    ret = self.batch.nod.get_node_info_from_state_file()
+                    ret = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
                     if ret[0] >= 0:
-                        self.batch.logger.inf("Found server name: {}    in file: {}  ".format(ret[1], simnode_state_file), force_prefix="SRV")
+                        info = "Found server name: {}    server state: {}  {} ".format(ret[1], ret[0], self.batch.sts.states_visible_names[ret[0]])
+                        self.batch.logger.inf(info, force_prefix=" ! ")
+                        # self.batch.logger.inf("Found server name: {}    server state: {}  ".format(ret[1], ret[0]), force_prefix=" > ")
+                    else:
+                        self.batch.logger.err("Data not consistent in file: {} ({}) ".format(simnode_state_file, ret))
                 else:
                     self.batch.logger.err("Local state file not exist!  ({})".format(simnode_state_file))
-                    
-                    
-        
+            else:
+                self.batch.logger.err("Variable  self.state_file_name  is undefined!")
+        else:
+            self.batch.logger.err("Server dir not defined! Variable  self.server_dir  is not defined!")
         '''  master sourcefor update  '''
         master_source_path = self.get_existing_source_path()
         if master_source_path is not None:
-            self.batch.logger.inf("Master source path exist: {}".format(master_source_path), force_prefix="SRV")
+            self.batch.logger.inf("Master source path exist: {}".format(master_source_path), force_prefix=" > ")
             ret_R = os.access(master_source_path, os.R_OK)  # TODO test write acces ,   move to common
             if ret_R:
                 self.batch.logger.inf("Read from master source test", force_prefix="OK ")
@@ -144,9 +178,9 @@ class SimBatchServer:
         '''  queue status  '''
         ret = self.is_something_to_do()
         if ret[0] == 1:
-            self.batch.logger.inf(("Something to do: ", ret[1]), force_prefix="SRV")
+            self.batch.logger.inf(("Something to do: ", ret[1]), force_prefix=" > ")
         else:
-            self.batch.logger.err("Nothing to do", force_prefix="SRV")
+            self.batch.logger.err("Nothing to do", force_prefix=" > ")
             
             
         
@@ -347,6 +381,9 @@ class SimBatchServer:
                     return True
                 elif argv == "upm" or argv == "update_to_master":
                     self.update_sources_to_master()
+                    return True
+                elif argv == "info":
+                    self.print_server_info()
                     return True
                 elif argv == "test":
                     self.do_all_tests()

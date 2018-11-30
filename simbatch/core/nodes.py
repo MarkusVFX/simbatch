@@ -76,20 +76,33 @@ class SimNodes:
         return None
         
     """ get node by name | return False if no node, index if one, -count if found > 0 """
-    def get_node_index_by_name(self, name):
+    def get_node_index_by_name(self, name, force_db=False):
+        return self.get_node_index_by_param(name=name, force_db=force_db)
+    
+    def get_node_index_by_state_file(self, state_file, force_db=False):
+        return self.get_node_index_by_param(state_file=state_file, force_db=force_db)
+    
+    def get_node_index_by_param(self, name=None, state_file=None, force_db=False):
         nod_count = 0 
         nod_last_index = None
         for i, nodi in enumerate(self.nodes_data):
-            if nodi.node_name == name:
-                nod_count += 1
-                nod_last_index = i
-        
+            if name is not None:
+                if nodi.node_name == name:
+                    nod_count += 1
+                    nod_last_index = i
+            if state_file is not None:
+                if nodi.state_file == state_file:
+                    nod_count += 1
+                    nod_last_index = i
+        if force_db:
+            self.batch.logger.deepdb("(gnibp) found:{} count:{} by name:{}".format(str(nod_last_index), nod_count, name), force_print=force_db)
         if nod_last_index is None:
             return False
         elif nod_count == 1:
             return nod_last_index
         else:
             return nod_count*-1
+        
             
     #  update id, index and current for fast use by all modules
     def update_current_from_index(self, index):
@@ -104,6 +117,14 @@ class SimNodes:
             self.batch.logger.err(("(update_current_from_index) wrong index:", index))
             self.batch.logger.err(" total:{}  len:{}".format(self.total_nodes, len(self.nodes_data)))
             return False
+            
+    def set_node_state_in_database(self, index, state_id):
+        if index >= 0 and index < len(self.nodes_data):
+            self.nodes_data[index].state = self.batch.sts.states_visible_names[state_id]   # TODO test arr len and index
+            self.nodes_data[index].state_id = state_id 
+            return self.save_nodes()
+        else:
+            self.batch.logger.err("Wrong node index:{} ! State NOT updated!".format(index))
 
     @staticmethod
     def get_new_node(node_name, node_state, node_state_id, state_file, desc):

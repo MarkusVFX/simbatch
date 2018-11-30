@@ -116,7 +116,7 @@ class SimBatchServer:
       
     def add_node_to_database(self, name):
         if len(name) > 0:
-            node_index = self.batch.nod.get_node_index_by_name(ret[1])
+            node_index = self.batch.nod.get_node_index_by_name(name, force_db=True)
             if node_index is False:
                 simnode_state_file = self.server_dir + self.state_file_name
                 node_index = self.batch.nod.get_node_index_by_state_file(simnode_state_file)
@@ -126,15 +126,25 @@ class SimBatchServer:
                     else:
                         self.batch.logger.inf("Local server state file NOT exist: {}".format(simnode_state_file), force_prefix=" > ")
                         # cretaenodefile
-                        ret = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
-                        # WIP...
+                        create_ret = self.batch.nod.create_node_state_file(simnode_state_file, name, self.batch.sts.INDEX_STATE_WAITING)
+                        if create_ret:
+                            self.batch.logger.inf("Local server state file created: {}".format(simnode_state_file), force_prefix=" > ")
+                        
+                    node_data = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
+                    
+                    if node_data[0] >= 0 and node_data[0] < len(self.batch.sts.states_visible_names):
+                        new_node_entry = self.batch.nod.get_new_node(node_data[1], self.batch.sts.states_visible_names[node_data[0]], node_data[0], simnode_state_file, "")
+                        return self.batch.nod.add_simnode(new_node_entry, do_save = True)
+                    else:
+                        self.batch.logger.err("Wrong state id in state file")
                 else:
                     self.batch.logger.wrn("Server state file exist on database! Skipped adding")
             else:
                 self.batch.logger.wrn("Server name exist on database! Skipped adding")
         else:
             self.batch.logger.err("Server name is empty! Please set status file")
-            
+        
+        return False
       
     def do_all_tests(self):  # test server pure pyton (no unit tests)
         self.batch.logger.raw("\n\n\n")
@@ -211,7 +221,37 @@ class SimBatchServer:
         else:
             self.batch.logger.err("Nothing to do", force_prefix=" > ")
             
-            
+    def reset_status(self):        
+        simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file
+        if self.comfun.file_exists(simnode_state_file):
+            node_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
+            if len(node_name)> 0:
+                INDEX_WAITING = self.batch.sts.INDEX_STATE_WAITING
+                NAME_WAITING = self.batch.sts.states_visible_names[INDEX_WAITING]
+                ret = self.batch.nod.set_node_state(simnode_state_file, node_name, INDEX_WAITING)   # WIP  TODO
+                if ret:
+                    info = "Local server status updated  {} ".format(INDEX_WAITING)
+                    self.batch.logger.inf(info)
+                    node_index = self.batch.nod.get_node_index_by_name(node_name)
+                    if node_index is False:
+                        self.add_node_to_database(node_name)
+                    elif node_index >= 0:
+                        ret = self.batch.nod.set_node_state_in_database(node_index, INDEX_WAITING)
+                        if ret:
+                            self.batch.logger.inf("Simnode state updated in database to {}".format(NAME_WAITING) )
+                        else:
+                            self.batch.logger.err("Detected server name duplicaton in database, please cleanup simnodes data")
+                    else:
+                        self.batch.logger.err("Detected server name duplicaton in database, please cleanup simnodes data")
+                    # self.batch.logger.inf("Found server name: {}    server state: {}  ".format(ret[1], ret[0]), force_prefix=" > ")
+                else:
+                    self.batch.logger.err("Cant get server name from status file: {}".format(simnode_state_file))
+            else:
+                self.batch.logger.err("Data not consistent in file: {} ({}) ".format(simnode_state_file, ret))
+        else:
+            self.batch.logger.err("Local state file not exist!  ({})".format(simnode_state_file))
+        pass
+        # WIP
         
     def test_server_dir(self):
         # TODO test write acces   create data dir
@@ -402,24 +442,27 @@ class SimBatchServer:
         if len(argv) > 0:
             if argv == "1" or argv == "single":
                 mode = "single"
+            elif argv == "all":
+                mode = "all"
+            elif argv == "up" or argv == "update_form_master":
+                self.update_sources_from_master()
+                return True
+            elif argv == "upm" or argv == "update_to_master":
+                self.update_sources_to_master()
+                return True
+            elif argv == "info":
+                self.print_server_info()
+                return True
+            elif argv == "test":
+                self.do_all_tests()
+                return True
+            elif argv == "reset":
+                self.reset_status()
+                return True
             else:
-                if argv == "all":
-                    mode = "all"
-                elif argv == "up" or argv == "update_form_master":
-                    self.update_sources_from_master()
-                    return True
-                elif argv == "upm" or argv == "update_to_master":
-                    self.update_sources_to_master()
-                    return True
-                elif argv == "info":
-                    self.print_server_info()
-                    return True
-                elif argv == "test":
-                    self.do_all_tests()
-                    return True
-                else:
-                    self.batch.logger.inf(("unknown arg  : ", argv))
-                    return False
+                self.batch.logger.err(("unknown arg  : ", argv), nl=True)
+                self.batch.logger.raw("avabile options: single, 1, all, update_form_master, up, update_to_master, upm, info, test, reset")
+                return False
         else:
             mode = "all"
                 

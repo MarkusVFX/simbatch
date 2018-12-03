@@ -568,8 +568,8 @@ class SimBatchServer:
             check_breaker = self.batch.comfun.file_exists(external_breaker, info=False)
             if check_breaker:
                 self.batch.logger.inf(("breaking main loop", self.last_info))
-                self.batch.logger.deep(("breaking file exists: ", external_breaker))
-                if self.batch.comfun.file_exists(external_breaker_off):
+                self.batch.logger.deepdb(("breaking file exists: ", external_breaker))
+                if self.batch.comfun.file_exists(external_breaker_off, info=False):
                     os.remove(external_breaker_off)
                 os.rename(external_breaker, external_breaker_off)
             else:

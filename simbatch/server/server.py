@@ -24,6 +24,7 @@ class SimBatchServer:
 
     batch = None
     force_local = False
+    mode = None
     forceSoftware = 0
     server_name = None  # TODO  custom name on init
     server_dir = ""
@@ -86,6 +87,13 @@ class SimBatchServer:
             print_server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
         self.batch.logger.inf(("init server :", print_server_name, self.server_dir))
         
+    def print_is_something_to_do(self):
+        ret = self.is_something_to_do()
+        if ret[0] == 1:
+            self.batch.logger.inf(("Something to do: ", ret[1]), force_prefix=" > ")
+        else:
+            self.batch.logger.err("Nothing to do", force_prefix=" > ")
+        
     def print_server_info(self):
         self.batch.logger.raw("\n\n\n")
         
@@ -104,6 +112,8 @@ class SimBatchServer:
                 if node_index is not False:
                     if node_index >= 0:
                         self.batch.nod.print_node(node_index)
+                        
+                        self.print_is_something_to_do()
                     else:
                         self.batch.logger.err("Found {} duplicates in database for name: {}".format(str(node_index*-1), ret[1]))
                 else:
@@ -213,16 +223,10 @@ class SimBatchServer:
         else:
             self.batch.logger.err("Master source path NOT exist")
        
-            
-        '''  queue status  '''
-        ret = self.is_something_to_do()
-        if ret[0] == 1:
-            self.batch.logger.inf(("Something to do: ", ret[1]), force_prefix=" > ")
-        else:
-            self.batch.logger.err("Nothing to do", force_prefix=" > ")
+        self.print_is_something_to_do()
             
     def reset_status(self):        
-        simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file
+        simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file + global
         if self.comfun.file_exists(simnode_state_file):
             node_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
             if len(node_name)> 0:
@@ -322,10 +326,21 @@ class SimBatchServer:
         
     # def set_database_node_state(self, queue_id, state, state_id, server_name, state_file):
     #     return self.batch.nod.set_node_state(state_file, server_name, state_id)
-            
-    def set_simnode_state(self, stste):     # TODO clean up this !!!!
-        print "\n WIP  set_simnode_state  : ", stste, self.batch.sts.dir_separator
-
+ 
+    def set_simnode_state(self, state_id):     # TODO clean up this !!!!
+        
+        print "\n WIP  set_simnode_state  : ", state_id, self.batch.sts.dir_separator  # WIP TODO
+        
+        if self.server_name is not None:
+            simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file + global
+            ret = self.batch.nod.set_node_state(simnode_state_file, self.server_name, state_id)
+            # TODO  check ret
+            node_index = self.batch.nod.get_node_index_by_name(self.server_name)
+            if node_index is not None:
+                ret = self.batch.nod.set_node_state_in_database(node_index, state_id)
+                # TODO  check ret
+                
+                
         # if self.force_local==False:
         # file_and_path = self.server_dir + self.state_file_name
         # self.batch.nod.set_node_state(file_and_path, self.server_name, state)
@@ -475,6 +490,8 @@ class SimBatchServer:
             self.loops_limit = 0
             self.batch.logger.raw("\n\n") 
             self.batch.logger.inf("run sim all")
+            
+        self.mode = mode
         
         self.run_loop()
             
@@ -539,7 +556,7 @@ class SimBatchServer:
                         generated_script_file = self.server_dir + self.script_execute
                         
                         if self.current_simnode_state != 0:
-                            self.set_simnode_state(1)
+                            self.set_simnode_state(self.batch.sts.INDEX_STATE_WORKING)
                         self.generate_script_for_external_software(generated_script_file, job_script, job_description,
                                                                    job_id)
 
@@ -561,6 +578,9 @@ class SimBatchServer:
                 else:
                     state_str = self.batch.sts.states_visible_names[self.current_simnode_state]
                     self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, state_str))
+                if self.mode == "single":
+                    self.last_info = "Server is bussy, WORKING now" #  TODO jobid
+                    
             """    MAIN EXECUTION  FIN    """
 
             external_breaker = self.server_dir + "break.txt"
@@ -575,4 +595,4 @@ class SimBatchServer:
             else:
                 threading.Timer(self.timer_delay_seconds, lambda: self.run_loop()).start()
         else:
-            self.batch.logger.inf(("end main loop", self.last_info))
+            self.batch.logger.inf(("End main loop, ", self.last_info))

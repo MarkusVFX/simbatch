@@ -97,7 +97,7 @@ class Settings:
     states_visible_names[INDEX_STATE_CUSTOM] = "CUSTOM"
     states_visible_names[INDEX_STATE_OFFLINE] = "OFFLINE"
     states_visible_names[INDEX_STATE_INACTIVE] = "INACTIVE"
-    states_visible_names[INDEX_STATE_SUSPEND] = "SUSPEND"        # TODO decide SUSPEND or SUSPENDED ?
+    states_visible_names[INDEX_STATE_SUSPEND] = "SUSPENDED"
     states_visible_names[INDEX_STATE_ACTIVE] = "ACTIVE"
     states_visible_names[INDEX_STATE_DEFAULT] = "DEFAULT"
 
@@ -155,9 +155,7 @@ class Settings:
             self.dir_separator = "\\"
 
         """  STANDALONE """
-        # self.store_abs_dir = os.path.abspath("") + self.dir_separator  # os.path.dirname(os.path.realpath(__file__))
         self.store_abs_dir = (os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + self.dir_separator
-                              # + "data" + self.dir_separator
 
         """  MAYA win  C:\Program Files\Autodesk\Maya2014\ """
         # TODO check abs
@@ -180,7 +178,7 @@ class Settings:
             if self.WITH_GUI == 1:
                 self.update_ui_colors()
         else:
-            self.logger.err(("Settings not loaded !!!", self.loading_state))
+            self.logger.err("Data not loaded !!!  ({})".format(self.loading_state))
 
     def print_all(self):
         print " loading_state: ", self.loading_state
@@ -279,6 +277,7 @@ class Settings:
 
     def update_absolute_directories(self):
         data_path = self.store_data_json_directory
+        dir_sep = self.dir_separator
 
         if len(data_path) == 0:
             self.store_data_json_directory_abs = ""
@@ -286,21 +285,18 @@ class Settings:
             if self.comfun.is_absolute(data_path):
                 if data_path[-1:] == "\\" or data_path[-1:] == "/":
                     self.store_data_json_directory_abs = data_path
-                    self.store_data_backup_directory_abs = data_path + "backup" + self.dir_separator
+                    self.store_data_backup_directory_abs = data_path + "backup" + dir_sep
                 else:
-                    self.store_data_json_directory = data_path + self.dir_separator
-                    self.store_data_json_directory_abs = data_path + self.dir_separator
-                    self.store_data_backup_directory_abs = data_path + self.dir_separator + "backup" + \
-                                                           self.dir_separator
+                    self.store_data_json_directory = data_path + dir_sep
+                    self.store_data_json_directory_abs = data_path + dir_sep
+                    self.store_data_backup_directory_abs = data_path + dir_sep + "backup" + dir_sep
             else:
                 if data_path[-1:] == "\\" or data_path[-1:] == "/":
                     self.store_data_json_directory_abs = self.store_abs_dir + data_path
-                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup" + \
-                                                           self.dir_separator
+                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + "backup" + dir_sep
                 else:
-                    self.store_data_json_directory_abs = self.store_abs_dir + data_path + self.dir_separator
-                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + self.dir_separator + \
-                                                           "backup" + self.dir_separator
+                    self.store_data_json_directory_abs = self.store_abs_dir + data_path + dir_sep
+                    self.store_data_backup_directory_abs = self.store_abs_dir + data_path + dir_sep + "backup" + dir_sep
 
         definitions_path = self.store_definitions_directory
         if len(definitions_path) == 0:
@@ -310,14 +306,13 @@ class Settings:
                 if definitions_path[-1:] == "\\" or definitions_path[-1:] == "/":
                     self.store_definitions_directory_abs = definitions_path
                 else:
-                    self.store_definitions_directory = definitions_path + self.dir_separator
-                    self.store_definitions_directory_abs = definitions_path + self.dir_separator
+                    self.store_definitions_directory = definitions_path + dir_sep
+                    self.store_definitions_directory_abs = definitions_path + dir_sep
             else:
                 if definitions_path[-1:] == "\\" or definitions_path[-1:] == "/":
                     self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory
                 else:
-                    self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory + \
-                                                           self.dir_separator
+                    self.store_definitions_directory_abs = self.store_abs_dir + self.store_definitions_directory + dir_sep
 
     def load_settings(self):
         self.settings_err_info = ""
@@ -453,7 +448,7 @@ class Settings:
         if errors == 0:
             return True
         else:
-            self.logger.err("found {} errors in config file".format(errors ))
+            self.logger.err("found {} errors in config file".format(errors))
             return False
 
     def update_ui_colors(self):

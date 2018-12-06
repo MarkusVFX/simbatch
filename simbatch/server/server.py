@@ -44,10 +44,13 @@ class SimBatchServer:
         self.batch = batch
         self.comfun = batch.comfun
         if self.force_local is False:
-            self.batch.que.load_queue()            
-            if self.batch.que.total_queue_items == 0:
-                self.batch.logger.inf("queue data is empty, nothing loaded")
-                self.batch.que.print_info()
+            ret = self.batch.que.load_queue()
+            if ret:
+                if self.batch.que.total_queue_items == 0:
+                    self.batch.logger.inf("Queue data is empty, nothing loaded")
+                    self.batch.que.print_info()
+            else:
+                self.batch.logger.err("Queue data not loaded !")
 
         ''' elif self.force_local is True: queue is already loaded ! (no need to load) '''
 
@@ -78,7 +81,7 @@ class SimBatchServer:
         # if self.current_simnode_state == -1:
         #     simnode_state_data = "{};{};{}".format(2, self.server_name, self.comfun.get_current_time())
         #     self.batch.comfun.save_to_file(simnode_state_file, simnode_state_data)
-        #     self.set_simnode_state(2)
+        #     self.set_simnode_state(self.batch.sts.INDEX_STATE_WAITING)
         
         if self.force_local is True:
             print_server_name = batch.sts.runtime_env + " (local)"
@@ -157,7 +160,7 @@ class SimBatchServer:
       
     def do_all_tests(self):  # test server pure pyton (no unit tests)
         self.batch.logger.raw("\n\n\n")
-        '''  simbatch load wihh settings  '''
+        '''  test loading data  '''
         if self.batch.sts.loading_state >= 4:
             self.batch.logger.inf("Settings loaded", force_prefix=" > ")
         else:
@@ -210,11 +213,11 @@ class SimBatchServer:
         master_source_path = self.get_existing_source_path()
         if master_source_path is not None:
             self.batch.logger.inf("Master source path exist: {}".format(master_source_path), force_prefix=" > ")
-            ret_R = os.access(master_source_path, os.R_OK)  # TODO test write acces ,   move to common
-            if ret_R:
+            ret_r = os.access(master_source_path, os.R_OK)  # TODO test write acces ,   move to common
+            if ret_r:
                 self.batch.logger.inf("Read from master source test", force_prefix="OK ")
-                ret_W = os.access(master_source_path, os.W_OK)  # TODO test write acces ,   move to common
-                if ret_W:
+                ret_w = os.access(master_source_path, os.W_OK)  # TODO test write acces ,   move to common
+                if ret_w:
                     self.batch.logger.inf("Save to master source test", force_prefix="OK ")
                 else:
                     self.batch.logger.wrn("could NOT save to master source path  {} ".format(master_source_path))
@@ -496,9 +499,10 @@ class SimBatchServer:
                     self.batch.logger.err("file state not exist")
                     self.batch.logger.log(("file state not exist", self.server_dir, self.state_file_name))
 
-            if self.current_simnode_state <= 2:   # server waiting or in local mode   # TODO cnst 2WAIT 1INIT  0LOCAL
-                if self.current_simnode_state != 0:
-                    self.set_simnode_state(2)
+            '''  server INIT or WAITING  '''
+            if self.current_simnode_state <= self.batch.sts.INDEX_STATE_WAITING:
+                # if self.current_simnode_state == 1:
+                #     self.set_simnode_state(self.batch.sts.INDEX_STATE_WAITING)
                 self.batch.que.clear_all_queue_items()
                 self.batch.que.load_queue()
 
@@ -506,9 +510,9 @@ class SimBatchServer:
 
                 if is_something_to_compute[0] == 1:
                     self.report_total_jobs += 1
-                    self.batch.logger.inf((self.comfun.get_current_time(), "   there is_something_to_compute",
+                    self.batch.logger.inf((self.comfun.get_current_time(), "   there is something to compute:",
                                            is_something_to_compute[2]))
-                    execute_queue_id = is_something_to_compute[2]  # TODO   ret check and  del
+                    execute_queue_id = is_something_to_compute[2]
 
                     ret = self.batch.que.update_current_from_id(execute_queue_id)
                     if ret is False:

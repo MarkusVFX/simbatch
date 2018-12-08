@@ -291,6 +291,24 @@ class CommonFunctions:
             self.logger.wrn(("directory null name    ", directory))
             return False
 
+    def test_directory_access(self, directory, directory_info="directory", with_info=True):
+        ret_r = os.access(directory, os.R_OK)
+        ret_w = False
+        if ret_r:
+            if with_info:
+                self.logger.inf("Read from {} test".format(directory_info), force_prefix="OK ")
+            ret_w = os.access(directory, os.W_OK)
+            if ret_w:
+                if with_info:
+                    self.logger.inf("Save to {} test".format(directory_info), force_prefix="OK ")
+            else:
+                if with_info:
+                    self.logger.err("Could NOT save to {} :  {} ".format(directory_info, directory))
+        else:
+            if with_info:
+                self.logger.err("Could NOT read from {} :  {} ".format(directory_info, directory))
+        return ret_r, ret_w
+
     @staticmethod
     def is_absolute(check_path):
         if len(check_path) > 2:

@@ -181,14 +181,7 @@ class SimBatchServer:
             
         '''  test local node status file  '''
         if len(self.server_dir) > 0:
-            ret_r = os.access(self.server_dir, os.R_OK)  # TODO test write acces ,   move to common
-            if ret_r:
-                self.batch.logger.inf("Read from server directory test", force_prefix="OK ")
-                ret_w = os.access(self.server_dir, os.W_OK)  # TODO test write acces ,   move to common
-                if ret_w:
-                    self.batch.logger.inf("Save to server directory test", force_prefix="OK ")
-                else:
-                    self.batch.logger.err("could NOT save to server directory  {} ".format(self.server_dir))
+            self.batch.comfun.test_directory_access(self.server_dir)
             
             if len(self.state_file_name) > 0:
                 simnode_state_file = self.server_dir + self.state_file_name
@@ -213,16 +206,7 @@ class SimBatchServer:
         master_source_path = self.get_existing_source_path()
         if master_source_path is not None:
             self.batch.logger.inf("Master source path exist: {}".format(master_source_path), force_prefix=" > ")
-            ret_r = os.access(master_source_path, os.R_OK)  # TODO test write acces ,   move to common
-            if ret_r:
-                self.batch.logger.inf("Read from master source test", force_prefix="OK ")
-                ret_w = os.access(master_source_path, os.W_OK)  # TODO test write acces ,   move to common
-                if ret_w:
-                    self.batch.logger.inf("Save to master source test", force_prefix="OK ")
-                else:
-                    self.batch.logger.wrn("could NOT save to master source path  {} ".format(master_source_path))
-            else:
-                self.batch.logger.err("could NOT read from master source path  {} ".format(master_source_path))
+            self.batch.comfun.test_directory_access(master_source_path, "master source")
         else:
             self.batch.logger.err("Master source path NOT exist")
        
@@ -292,8 +276,8 @@ class SimBatchServer:
                     source_path = self.batch.comfun.convert_to_win_path(source_path)
                     dst_path = self.batch.comfun.convert_to_win_path(dst_path)
 
-                ret_r = os.access(source_path, os.R_OK)  # TODO test write access, move to common
-                ret_w = os.access(dst_path, os.W_OK)  # TODO test write access, move to common
+                ret_r = self.batch.comfun.test_directory_access(source_path, with_info=False)[0]
+                ret_w = self.batch.comfun.test_directory_access(dst_path, with_info=False)[1]
                 if ret_r and ret_w:
                     #
                     self.batch.logger.inf(("update sources from  {}  ".format(source_path)), nl=True)
@@ -304,7 +288,7 @@ class SimBatchServer:
                     if ret_r is False:
                         self.batch.logger.err("could NOT read from source path  {} ".format(source_path))
                     if ret_w is False:
-                        self.batch.logger.err("could NOT save to dest path  {} ".format(dst_path))
+                        self.batch.logger.err("could NOT save to destination path  {} ".format(dst_path))
             else:
                 self.batch.logger.err("master source path  {}  not exist".format(source_path))
         else:
@@ -566,7 +550,7 @@ class SimBatchServer:
                     state_str = self.batch.sts.states_visible_names[self.current_simnode_state]
                     self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, state_str))
                 if self.mode == "single":
-                    self.last_info = "Server is bussy, WORKING now"    # TODO add job_id
+                    self.last_info = "Server is busy, WORKING now"    # TODO add job_id
                     
             """    MAIN EXECUTION  FIN    """
 

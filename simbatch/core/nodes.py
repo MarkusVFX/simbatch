@@ -167,21 +167,24 @@ class SimNodes:
 
         for nod in self.nodes_data:
             node_info = self.get_node_info_from_state_file(nod.state_file)
-            real_node_state_id = node_info.state_id
-            if nod.state_id != real_node_state_id:
-                if real_node_state_id < 0:
-                    nod.state_id = self.batch.sts.INDEX_STATE_OFFLINE
-                    nod.state = self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_OFFLINE]
-                    changes_count += 1
-                else:
-                    nod.state_id = real_node_state_id
-                    nod.state = self.batch.sts.states_visible_names[real_node_state_id]
-                    changes_count += 1
+            if node_info is not None:
+                real_node_state_id = node_info.state_id
+                if nod.state_id != real_node_state_id:
+                    if real_node_state_id < 0:
+                        nod.state_id = self.batch.sts.INDEX_STATE_OFFLINE
+                        nod.state = self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_OFFLINE]
+                        changes_count += 1
+                    else:
+                        nod.state_id = real_node_state_id
+                        nod.state = self.batch.sts.states_visible_names[real_node_state_id]
+                        changes_count += 1
 
-            if node_info.node_name is not None:
-                if nod.node_name != node_info.node_name:
-                    nod.node_name = node_info.node_name
-                    changes_count += 1
+                if node_info.node_name is not None:
+                    if nod.node_name != node_info.node_name:
+                        nod.node_name = node_info.node_name
+                        changes_count += 1
+            else:
+                self.batch.logger.wrn(("No access to: ", nod.state_file))
 
         if with_save and changes_count > 0:
             return self.save_nodes(), changes_count
@@ -360,7 +363,7 @@ class SimNodes:
             self.batch.logger.err(("[ERR] state file NOT created, file exist: ", state_file))
             return False
 
-    def set_node_state(self, state_file, server_name, state):
+    def update_node_state_file(self, state_file, server_name, state):
         if self.comfun.file_exists(state_file, "set state file txt"):
             self.batch.logger.deepdb((" [db] set state : ", state))
             try:

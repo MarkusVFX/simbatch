@@ -237,7 +237,7 @@ class NodesUI:
     def set_state_in_node_state_file(self, state_id):
         """  set state in config file  """
         cur_nod = self.batch.nod.current_node
-        return self.batch.nod.set_node_state(cur_nod.state_file, cur_nod.node_name, state_id)
+        return self.batch.nod.update_node_state_file(cur_nod.state_file, cur_nod.node_name, state_id)
 
     def set_state_in_database(self, state_id):
         """  set state in database  """
@@ -357,7 +357,7 @@ class NodesUI:
                         ret = self.batch.nod.get_node_state(state_file)
                         if ret > 0:
                             node_state_id = ret
-                        self.batch.nod.set_node_state(state_file, node_name, node_state_id)  # rename according to EL
+                        self.batch.nod.update_node_state_file(state_file, node_name, node_state_id)
                     else:
                         self.batch.nod.create_node_state_file(state_file, node_name, node_state_id)
                         # TODO  server py files !!!
@@ -410,7 +410,7 @@ class NodesUI:
             else:
                 srv_name = current_node.node_name
                 self.batch.logger.db(("Set WAITING state to node:", srv_name))
-                self.nod.set_node_state(current_node.state_file, srv_name, default_state_id)
+                self.nod.update_node_state_file(current_node.state_file, srv_name, default_state_id)
                 self.top_ui.set_top_info("Simnode state file updated", 4)
             current_node.state_id = default_state_id
             current_node.state = self.batch.sts.states_visible_names[default_state_id]

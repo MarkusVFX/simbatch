@@ -215,7 +215,7 @@ class SimBatchServer:
             if len(node_name) > 0:
                 INDEX_WAITING = self.batch.sts.INDEX_STATE_WAITING
                 NAME_WAITING = self.batch.sts.states_visible_names[INDEX_WAITING]
-                ret = self.batch.nod.set_node_state(simnode_state_file, node_name, INDEX_WAITING)   # WIP  TODO
+                ret = self.batch.nod.update_node_state_file(simnode_state_file, node_name, INDEX_WAITING)
                 if ret:
                     info = "Local server status updated  {} ".format(INDEX_WAITING)
                     self.batch.logger.inf(info)
@@ -225,19 +225,19 @@ class SimBatchServer:
                     elif node_index >= 0:
                         ret = self.batch.nod.set_node_state_in_database(node_index, INDEX_WAITING)
                         if ret:
-                            self.batch.logger.inf("Simnode state updated in database to {}".format(NAME_WAITING) )
+                            self.batch.logger.inf("Simnode state updated in database to {}".format(NAME_WAITING))
                         else:
-                            self.batch.logger.err("Detected server name duplicaton in database, please cleanup simnodes data")
+                            self.batch.logger.err("Detected server name duplication in database, "
+                                                  "please cleanup simnodes data")
                     else:
-                        self.batch.logger.err("Detected server name duplicaton in database, please cleanup simnodes data")
+                        self.batch.logger.err("Detected server name duplication in database, "
+                                              "please cleanup simnodes data")
                 else:
                     self.batch.logger.err("Cant get server name from status file: {}".format(simnode_state_file))
             else:
                 self.batch.logger.err("Data not consistent in file: {} ".format(simnode_state_file))
         else:
             self.batch.logger.err("Local state file not exist!  ({})".format(simnode_state_file))
-        pass
-        # WIP
         
     def test_server_dir(self):
         # TODO test write acces create data dir
@@ -307,11 +307,11 @@ class SimBatchServer:
         return self.report_total_jobs, self.report_done_jobs
         
     # def set_database_node_state(self, queue_id, state, state_id, server_name, state_file):
-    #     return self.batch.nod.set_node_state(state_file, server_name, state_id)
+    #     return self.batch.nod.update_node_state_file(state_file, server_name, state_id)
  
     def set_simnode_state(self, state_id):
         if self.server_name is not None:
-            simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file            ret = self.batch.nod.set_node_state(simnode_state_file, self.server_name, state_id)
+            simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file    ret = self.batch.nod.set_node_state(simnode_state_file, self.server_name, state_id)
             # TODO  check ret
             node_index = self.batch.nod.get_node_index_by_name(self.server_name)
             if node_index is not None:
@@ -323,7 +323,7 @@ class SimBatchServer:
     def set_queue_item_state(self, queue_id, state, state_id, server_name, with_save=True, add_current_time=False,
                              set_time=""):
         self.batch.logger.deepdb(("try to set_state: ", state, state_id, server_name, add_current_time, set_time))
-        self.batch.que.clear_all_queue_items()  # TODO  check is mode LOCAL ? !!!!
+        self.batch.que.clear_all_queue_items()  # TODO  check is in framework_mode  ? !!!!
         self.batch.que.load_queue()
         ret = self.batch.que.update_current_from_id(queue_id)
         if ret is not False:
@@ -376,8 +376,11 @@ class SimBatchServer:
 
         script_out += "\nSiBe.finalizeQueueJob()\n"
 
-        self.batch.comfun.save_to_file(py_file, script_out)
-        return script_out
+        ret = self.batch.comfun.save_to_file(py_file, script_out)
+        if ret:
+            return script_out
+        else:
+            return None
 
     def is_something_to_do(self, force_software=0):
         ret = self.batch.que.get_first_with_state_id(self.batch.sts.INDEX_STATE_WAITING, soft=force_software)

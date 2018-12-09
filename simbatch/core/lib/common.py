@@ -374,14 +374,27 @@ class CommonFunctions:
             json.dump(content, f,  indent=2)
         return True   # TODO  Exception
 
-    @staticmethod
-    def save_to_file(file_name, content, nl_at_end=False):
-        with open(file_name, 'w') as f:
-            f.write(content)
-            if nl_at_end:
-                f.write("\n")
+    def save_to_file(self, file_name, content, nl_at_end=False):
+        try:
+            with open(file_name, 'w') as f:
+                f.write(content)
+                if nl_at_end:
+                    f.write("\n")
+            return True
+        except IOError:
+            self.logger.err("No data saved to file: {}".format(file_name))
+            return False
 
-    # widgets QT ...
+    """
+    
+    """
+
+    """ 
+    
+    widgets QT ... 
+    
+    """
+
     @staticmethod
     def add_wigdets(lay, arr):
         for ar in arr:
@@ -415,9 +428,7 @@ class CommonFunctions:
     def file_dialog_to_edit_line(self, qt_edit_line, qt_file_dialog, init_dir):
         file_dialog = qt_file_dialog.getOpenFileName(dir=init_dir)
         get_file = file_dialog[0]
-        # if self.settings.current_os == 1:
-        #    get_file = get_file.replace("/", "\\")
-        self.logger.inf(("selected file:", get_file))
+        self.logger.db(("selected file:", get_file))
         if len(get_file) > 0:
             qt_edit_line.setText(get_file)
             return get_file

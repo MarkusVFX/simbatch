@@ -166,9 +166,8 @@ class SimNodes:
         changes_count = 0
 
         for nod in self.nodes_data:
-            # real_node_state_id = self.get_node_state(nod.state_file)
-            ret = self.get_node_info_from_state_file(nod.state_file)
-            real_node_state_id = ret[0]
+            node_info = self.get_node_info_from_state_file(nod.state_file)
+            real_node_state_id = node_info.state_id
             if nod.state_id != real_node_state_id:
                 if real_node_state_id < 0:
                     nod.state_id = self.batch.sts.INDEX_STATE_OFFLINE
@@ -179,9 +178,9 @@ class SimNodes:
                     nod.state = self.batch.sts.states_visible_names[real_node_state_id]
                     changes_count += 1
 
-            if ret[1] is not None:  # offline server, status file not exist -> dont clear not confirmed name :)
-                if nod.node_name != ret[1]:
-                    nod.node_name = ret[1]
+            if node_info.node_name is not None:
+                if nod.node_name != node_info.node_name:
+                    nod.node_name = node_info.node_name
                     changes_count += 1
 
         if with_save and changes_count > 0:
@@ -241,7 +240,7 @@ class SimNodes:
         if self.batch.sts.store_data_mode == 1:
             return self.save_nodes_to_json()
         if self.batch.sts.store_data_mode == 2:
-            return self.save_nodes_to_myqsl()
+            return self.save_nodes_to_mysql()
             
     def save_nodes_to_json(self, json_file=None):
         if json_file is None:
@@ -255,22 +254,21 @@ class SimNodes:
         else:
             if json or backup:
                 tim = self.comfun.get_current_time()
-                formated_data = {"simnodes": {"meta": {"total": self.total_nodes,
-                                                       "timestamp": tim,
-                                                       "jsonFormat": "http://json-schema.org/"
-                                                       },
-                                              "data": {}}}
+                formatted_data = {"simnodes": {"meta": {"total": self.total_nodes,
+                                                        "timestamp": tim,
+                                                        "jsonFormat": "http://json-schema.org/"},
+                                               "data": {}}}
                 for i, td in enumerate(self.nodes_data):
                     nod = {}
                     for field in NODES_ITEM_FIELDS_NAMES:
                         nod[field[0]] = eval('td.'+field[1])
-                    formated_data["simnodes"]["data"][i] = nod
-                return formated_data
+                    formatted_data["simnodes"]["data"][i] = nod
+                return formatted_data
             else:
                 # PRO version with SQL
                 return False
 
-    def save_nodes_to_myqsl(self):
+    def save_nodes_to_mysql(self):
         # PRO VERSION
         self.batch.logger.inf("PRO version with SQL")
 
@@ -315,14 +313,20 @@ class SimNodes:
                 li = first_line.split(";")
             else:
                 li = [-1]
-                self.batch.logger.deepdb((" [db] len(first_line) : ", len(first_line), " ___ ", len(first_line)))
+                self.batch.logger.err("First line of state file is empty : {}".format(state_file))
 
             state_int = self.comfun.int_or_val(li[0], -1)
-            server_name = li[1]
-            self.batch.logger.deepdb((" [db] get state_int : ", state_int))
-            return state_int, server_name
+            if state_int > 0:
+                self.batch.logger.deepdb(("State from file : ", state_int))
+                server_name = li[1]
+                state_name = self.batch.sts.states_visible_names[state_int]
+                node_info = SingleNode(-1, server_name, state_name, state_int, state_file, "info from state file")
+                return node_info
+            else:
+                self.batch.logger.err("State file err, wrong status value : {}".format(li[0]))
+                return None
         else:
-            return -1, None
+            return None
 
     def get_node_state(self, state_file):     # TODO tryToCreateIfNotExist = False,
         if self.comfun.file_exists(state_file, "get state file txt"):

@@ -20,7 +20,7 @@ simnode_states:
         ...
         if self.current_simnode_state <= 1:   # server waiting or in local mode
             ...
-            is_something_to_compute = self.is_something_to_do(force_software=self.forces_software)
+            is_something_to_compute = self.is_something_to_do(force_software=self.force_software)
             
                 ...
                 que.update_current_from_id(execute_queue_id)
@@ -28,7 +28,7 @@ simnode_states:
                 
                 
                     """     RUN SINGLE JOB     """
-                    if self.force_local is True:  # run local
+                    if self.framework_mode is True:  # run local
                         TODO
                     else:
                         """ run as simnode """

@@ -46,7 +46,7 @@ maya_window = get_maya_window()
 
 simbatch = simbatch_core.SimBatch("Maya", ini_file=simbatch_config_ini)
 loading_data_state = simbatch.load_data()
-simbatch_server = simbatch_server.SimBatchServer(simbatch, force_local=True)
+simbatch_server = simbatch_server.SimBatchServer(simbatch, framework_mode=True)
 
 
 if simbatch.sts.WITH_GUI == 1:

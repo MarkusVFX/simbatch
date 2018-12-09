@@ -8,7 +8,7 @@ app = QApplication([])
 
 simbatch = core.SimBatch("Stand-alone")   # you can set startup config by changing argument: ini_file="your_config.json"
 loading_data_state = simbatch.load_data()
-server = simbatch_server.SimBatchServer(simbatch, force_local=True)
+server = simbatch_server.SimBatchServer(simbatch, framework_mode=True)
 
 
 if simbatch.sts.WITH_GUI == 1:

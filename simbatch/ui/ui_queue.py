@@ -333,8 +333,8 @@ class QueueUI:
         self.qt_button_queue_edit.repaint()
 
     def run_server_from_framework(self, mode):
-        server = self.mainw.server  # .SimBatchServer(self.batch, force_local=True)
-        server.force_local = True
+        server = self.mainw.server  # .SimBatchServer(self.batch, framework_mode=True)
+        server.framework_mode = True
         server.loops_counter = 0
         server.timer_delay_seconds = 0
         server.reset_report()  # TODO

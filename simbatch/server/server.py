@@ -561,18 +561,24 @@ class SimBatchServer:
                         """  BREAK ! """
                         self.loops_limit = self.loops_counter
                         self.loops_counter += 1
+                
+                self.batch.logger.raw("\n")
             else:
                 if self.current_simnode_state == self.batch.sts.INDEX_STATE_ERROR:
                     self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
                 else:
+                    busy_prefixes = " | ", " \\ ", "  |", " / ", "|  ", "\\  "
+                    busy_prefix_index = self.loops_counter
+                    while busy_prefix_index > 5:
+                        busy_prefix_index -= 5
+                    busy_prefix = busy_prefixes[busy_prefix_index]
                     state_str = self.batch.sts.states_visible_names[self.current_simnode_state]
-                    self.batch.logger.inf((self.comfun.get_current_time(), "   sim node", self.server_name, state_str))
+                    self.batch.logger.inf("{}       {}   is bussy now:{}".format(self.comfun.get_current_time(), self.server_name, state_str), force_prefix=busy_prefix)
                 if self.mode == "single":
                     self.last_info = "Server is busy, WORKING now"    # TODO add job_id
                     
             """    MAIN EXECUTION  FIN    """
 
-            self.batch.logger.raw("\n")
 
             external_breaker = self.server_dir + "break.txt"
             external_breaker_off = self.server_dir + "break__.txt"

@@ -42,6 +42,10 @@ class SimNodes:
 
     max_id = 0
 
+    """  vars used as server mode (not framework_mode)  """
+    state_file = None
+    server_name = None
+
     def __init__(self, batch):
         self.batch = batch
         self.sts = batch.sts
@@ -348,35 +352,62 @@ class SimNodes:
         else:
             return -1
 
-    def create_node_state_file(self, state_file, server_name, state):
-        if self.comfun.file_exists(state_file, "set state file txt") is False:
+    def create_node_state_file(self, state_file, server_name, state, update_mode=False):
+        if self.comfun.file_exists(state_file, "set state file txt") is False or update_mode:
             self.batch.logger.deepdb((" [db] set state : ", state))
             try:
                 f = open(state_file, 'w')
                 f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
                 f.close()
             except IOError:
-                self.batch.logger.err(("Creating state file error:", state_file))
+                if update_mode is False:
+                    self.batch.logger.err(("Creating state file error:", state_file))
+                else:
+                    self.batch.logger.err(("Update state file error:", state_file))
                 return False
             return True
         else:
-            self.batch.logger.err(("[ERR] state file NOT created, file exist: ", state_file))
+            if update_mode is False:
+                self.batch.logger.err(("[ERR] state file NOT created, file exist: ", state_file))
+            else:
+                self.batch.logger.err(("[ERR] state file NOT updated, file exist: ", state_file))
             return False
 
-    def update_node_state_file(self, state_file, server_name, state):
-        if self.comfun.file_exists(state_file, "set state file txt"):
-            self.batch.logger.deepdb((" [db] set state : ", state))
-            try:
-                f = open(state_file, 'w')
-                f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
-                f.close()
-            except IOError:
-                self.batch.logger.err(("[ERR] node state file NOT updated: ", state_file))
-                return False
-            return True
+    def check_node_as_server(self, must_also_check_database):
+        if self.state_file is not None:
+            if self.server_name is not None:
+                if must_also_check_database:
+                    # return self.batch.    #WIP TODO
+                    return True
+                else:
+                    return True
+            else:
+                self.logger.err("Server name NOT set!")
         else:
-            self.batch.logger.err(("[ERR] file set state not exist: ", state_file))
+            self.logger.err("Path to server state file NOT set!")
+        return False
+
+    def set_curent_node_state(self, state_id, must_also_set_database=True):
+        """ check variables and acces to database if needed """
+        ret = self.check_node_as_server(must_also_check_database=must_also_set_database)
+
+        if ret is False:
+            self.logger.err("State {} NOT set !".format(state_id))
             return False
+        else:
+            state_file = self.state_file
+            server_name = self.server_name
+
+            if self.comfun.file_exists(state_file, "set state file txt"):
+                up = False
+            else:
+                up = True
+
+            ret = self.create_node_state_file(state_file, server_name, state_id, update_mode=up)
+            if ret:
+                return True
+            else:
+                return False
 
     def get_server_name_from_file(self, server_state_file):
         if self.comfun.file_exists(server_state_file, "get_server_name_from_file"):

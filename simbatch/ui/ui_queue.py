@@ -337,10 +337,11 @@ class QueueUI:
         server.framework_mode = True
         server.loops_counter = 0
         server.timer_delay_seconds = 0
-        server.reset_report()  # TODO
-        self.set_buttons_state(False)
+        server.reset_report()
+        #
         server.run(mode)
-        report = server.generate_report()  # TODO
+        #
+        report = server.generate_report()  # TODO report as class
         if report[0] > 0:
             if report[0] == 1:
                 self.top_ui.set_top_info(server.last_info, 1)
@@ -352,7 +353,6 @@ class QueueUI:
         else:
             if len(server.last_info) > 0:
                 self.top_ui.set_top_info(server.last_info, 1)
-        self.set_buttons_state(True)
         
     def on_click_sim_one(self):
         self.top_ui.set_top_info("start single simulation")

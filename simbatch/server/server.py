@@ -45,7 +45,7 @@ class SimBatchServer:
 
         self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
         self.test_server_dir()
-        
+
         simnode_state_file = self.server_dir + self.state_file_name
 
         if framework_mode:
@@ -58,15 +58,21 @@ class SimBatchServer:
                 self.current_simnode_state = node_info.state_id
                 self.server_name = node_info.node_name
 
+                """  init batch.nod vars as server """
+                self.batch.nod.state_file = simnode_state_file
+                self.batch.nod.server_name = node_info.node_name
+
                 """  check existence in database  """
                 state_file = self.batch.nod.get_state_file(server_name=self.server_name)
                 if state_file is False:
                     """  try to add simnode state file to database  """
-                    pass
+                    pass  # TODO !!!
                 if state_file != simnode_state_file:
-                    self.batch.nod.create_node_state_file(simnode_state_file)
+                    """  try to fix simnode state file in database  """
+                    pass  # TODO !!!
             else:
-                self.batch.logger.err(("state file not exist or corrupted :", simnode_state_file))
+                self.batch.logger.err(("State file not exist or corrupted :", simnode_state_file))
+                self.batch.logger.err("Server NOT initiated properly!")
         
         if self.framework_mode is True:
             print_server_name = batch.sts.runtime_env + " (local)"
@@ -132,13 +138,13 @@ class SimBatchServer:
                         if create_ret:
                             self.batch.logger.inf("Local server state file created: {}".format(simnode_state_file),
                                                   force_prefix=" > ")
-                        
-                    node_data = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
+
+                    node_info = self.batch.nod.get_node_info_from_state_file(simnode_state_file)
                     
-                    if 0 <= node_data[0] < len(self.batch.sts.states_visible_names):
-                        new_node_entry = self.batch.nod.get_new_node(node_data[1],
-                                                                     self.batch.sts.states_visible_names[node_data[0]],
-                                                                     node_data[0], simnode_state_file, "")
+                    if 0 <= node_info.state_id < len(self.batch.sts.states_visible_names):
+                        state_name = self.batch.sts.states_visible_names[node_info.state_id]
+                        new_node_entry = self.batch.nod.get_new_node(node_info.node_name, state_name,
+                                                                     node_info.state_id, simnode_state_file, "")
                         return self.batch.nod.add_simnode(new_node_entry, do_save=True)
                     else:
                         self.batch.logger.err("Wrong state id in state file")
@@ -215,7 +221,8 @@ class SimBatchServer:
             if len(node_name) > 0:
                 INDEX_WAITING = self.batch.sts.INDEX_STATE_WAITING
                 NAME_WAITING = self.batch.sts.states_visible_names[INDEX_WAITING]
-                ret = self.batch.nod.update_node_state_file(simnode_state_file, node_name, INDEX_WAITING)
+                ret = self.batch.nod.create_node_state_file(simnode_state_file, node_name, INDEX_WAITING,
+                                                            update_mode=True)
                 if ret:
                     info = "Local server status updated  {} ".format(INDEX_WAITING)
                     self.batch.logger.inf(info)
@@ -426,6 +433,8 @@ class SimBatchServer:
                 mode = "single"
             elif argv == "all":
                 mode = "all"
+            elif self.comfun.can_get_int(argv):
+                mode = "limit"
             elif argv == "up" or argv == "update_form_master":
                 self.update_sources_from_master()
                 return True
@@ -448,17 +457,22 @@ class SimBatchServer:
                 return False
         else:
             mode = "all"
-                
+
+        self.batch.logger.raw("\n\n")
         if mode == "single":
             self.loops_limit = 1
-            self.batch.logger.raw("\n")
             self.batch.logger.inf("run single job")
-                
-        if mode == "all":
+        elif mode == "limit":
+            limit = int(argv)
+            if limit > 0:
+                self.loops_limit = limit
+                self.batch.logger.inf("run only {} queue items".format(limit))
+            else:
+                self.batch.logger.inf("wrong run parameter: {}".format(argv))
+        elif mode == "all":  # default option
             self.loops_limit = 0
-            self.batch.logger.raw("\n\n") 
             self.batch.logger.inf("run sim all")
-            
+
         self.mode = mode
         
         self.run_loop()
@@ -490,10 +504,15 @@ class SimBatchServer:
 
                 is_something_to_compute = self.is_something_to_do(force_software=self.force_software)
 
+                if self.loops_limit > 1:
+                    loop_prefix = self.comfun.str_with_spaces(str(self.loops_counter), 3, as_prefix=True)
+                else:
+                    loop_prefix = None
+
                 if is_something_to_compute[0] == 1:
                     self.report_total_jobs += 1
                     self.batch.logger.inf((self.comfun.get_current_time(), "   there is something to compute:",
-                                           is_something_to_compute[2]))
+                                           is_something_to_compute[2]), force_prefix=loop_prefix)
                     execute_queue_id = is_something_to_compute[2]
 
                     ret = self.batch.que.update_current_from_id(execute_queue_id)
@@ -533,7 +552,8 @@ class SimBatchServer:
                     """     END SINGLE JOB     """
 
                 else:  # nothing more to compute!
-                    self.batch.logger.inf((self.comfun.get_current_time(), "   there is nothing to compute"))
+                    info = "{}   there is nothing to compute ".format(self.comfun.get_current_time())
+                    self.batch.logger.inf(info, force_prefix=loop_prefix)
                     if self.loops_counter == 1:
                         self.last_info = "there is nothing to compute"   # else last_info ->  last job id
 
@@ -551,6 +571,8 @@ class SimBatchServer:
                     self.last_info = "Server is busy, WORKING now"    # TODO add job_id
                     
             """    MAIN EXECUTION  FIN    """
+
+            self.batch.logger.raw("\n")
 
             external_breaker = self.server_dir + "break.txt"
             external_breaker_off = self.server_dir + "break__.txt"

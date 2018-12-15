@@ -387,22 +387,22 @@ class SimNodes:
             self.logger.err("Path to server state file NOT set!")
         return False
 
-    def set_curent_node_state(self, state_id, must_also_set_database=True):
-        """ check variables and acces to database if needed """
-        ret = self.check_node_as_server(must_also_check_database=must_also_set_database)
+    def set_curent_node_state(self, state_id, must_set_in_database=True):
+        """ check class variables and test acces to database if needed """
+        ret = self.check_node_as_server(must_also_check_database=must_set_in_database)
 
         if ret is False:
-            self.logger.err("State {} NOT set !".format(state_id))
+            self.logger.err("State {} NOT set! Wrong server init".format(state_id))
             return False
         else:
             state_file = self.state_file
             server_name = self.server_name
 
             if self.comfun.file_exists(state_file, "set state file txt"):
-                up = False
-            else:
                 up = True
-
+            else:
+                up = False
+                
             ret = self.create_node_state_file(state_file, server_name, state_id, update_mode=up)
             if ret:
                 return True

@@ -5,10 +5,11 @@ import threading
 
 class SimBatchServer:
     timer_delay_seconds = 3  # delay for each loop execution
-    loops_limit = 0          # 0 -> infinite loop
     loops_counter = 0        # total loops executed
+    jobs_computed = 0        # count computed jobs (queue items) by this server'ssession
+    jobs_limit = 0           # if act as server 0:infinite loop, >0 limit jobs to compute
     mode = None              # "single" or "all"
-    framework_mode = False      # True: execution form framework,  False: execution from server
+    framework_mode = False   # True: execution form framework,  False: execution from server
 
     current_simnode_state = None
     server_name = None
@@ -25,9 +26,9 @@ class SimBatchServer:
     report_total_jobs = 0
     report_done_jobs = 0
 
-    def __init__(self, batch, force_software=0, loops_limit=0, framework_mode=False):
+    def __init__(self, batch, force_software=0, jobs_limit=0, framework_mode=False):
         self.force_software = force_software
-        self.loops_limit = loops_limit
+        self.jobs_limit = jobs_limit
         if framework_mode:
             self.framework_mode = True
         self.batch = batch
@@ -318,7 +319,9 @@ class SimBatchServer:
  
     def set_simnode_state(self, state_id):
         if self.server_name is not None:
-            simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file    ret = self.batch.nod.set_node_state(simnode_state_file, self.server_name, state_id)
+            # simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file    ret = self.batch.nod.set_node_state(simnode_state_file, self.server_name, state_id)
+            
+            self.batch.nod.set_curent_node_state(state_id)
             # TODO  check ret
             node_index = self.batch.nod.get_node_index_by_name(self.server_name)
             if node_index is not None:
@@ -460,17 +463,17 @@ class SimBatchServer:
 
         self.batch.logger.raw("\n\n")
         if mode == "single":
-            self.loops_limit = 1
+            self.jobs_limit = 1
             self.batch.logger.inf("run single job")
         elif mode == "limit":
             limit = int(argv)
             if limit > 0:
-                self.loops_limit = limit
+                self.jobs_limit = limit
                 self.batch.logger.inf("run only {} queue items".format(limit))
             else:
                 self.batch.logger.inf("wrong run parameter: {}".format(argv))
         elif mode == "all":  # default option
-            self.loops_limit = 0
+            self.jobs_limit = 0
             self.batch.logger.inf("run sim all")
 
         self.mode = mode
@@ -479,10 +482,10 @@ class SimBatchServer:
             
     def run_loop(self):
         self.loops_counter += 1
-        if self.loops_counter <= self.loops_limit or self.loops_limit < 1:
-            if self.loops_limit > 0:
+        if self.jobs_computed < self.jobs_limit or self.jobs_limit < 1:
+            if self.jobs_limit > 0:
                 self.batch.logger.db((self.comfun.get_current_time(), "loop:", self.loops_counter,
-                                      "  limit:", self.loops_limit))
+                                      "  limit:", self.jobs_limit, "   computed:", self.jobs_computed))
             else:
                 self.batch.logger.db((self.comfun.get_current_time(), "loop:", self.loops_counter))
 
@@ -504,8 +507,8 @@ class SimBatchServer:
 
                 is_something_to_compute = self.is_something_to_do(force_software=self.force_software)
 
-                if self.loops_limit > 1:
-                    loop_prefix = self.comfun.str_with_spaces(str(self.loops_counter), 3, as_prefix=True)
+                if self.jobs_limit > 1:
+                    loop_prefix = self.comfun.str_with_spaces(str(self.jobs_limit - self.jobs_computed), 3, as_prefix=True)
                 else:
                     loop_prefix = None
 
@@ -550,20 +553,28 @@ class SimBatchServer:
 
                         self.run_external_software(generated_script_file)
                     """     END SINGLE JOB     """
+                    
+                    self.jobs_computed += 1
 
                 else:  # nothing more to compute!
                     info = "{}   there is nothing to compute ".format(self.comfun.get_current_time())
                     self.batch.logger.inf(info, force_prefix=loop_prefix)
                     if self.loops_counter == 1:
                         self.last_info = "there is nothing to compute"   # else last_info ->  last job id
+                    
+                    if self.jobs_limit > 0:  # nothing to compute on mode with LIMIT ON
+                        """  BREAK ! """
+                        self.batch.logger.db("Breaking loop! Nothing to compute, limit:{}".format(self.jobs_limit))
+                        self.jobs_computed = self.jobs_limit
 
                     if self.framework_mode is True:  # run local
                         """  BREAK ! """
-                        self.loops_limit = self.loops_counter
-                        self.loops_counter += 1
+                        self.batch.logger.db("Breaking loop, framework mode. Nothing to compute, limit:{}".format(self.jobs_limit))
+                        self.jobs_computed = self.jobs_limit
                 
                 self.batch.logger.raw("\n")
             else:
+                '''  server is bussy:  WORKING   '''
                 if self.current_simnode_state == self.batch.sts.INDEX_STATE_ERROR:
                     self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
                 else:

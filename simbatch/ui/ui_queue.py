@@ -146,7 +146,7 @@ class QueueUI:
         qt_form_remove = QueueFormRemove(self.batch, self.mainw)
         self.qt_form_remove = qt_form_remove
 
-        self.comfun.add_wigdets(qt_lay_forms, [qt_form_edit, qt_form_remove])
+        self.comfun.add_widgets(qt_lay_forms, [qt_form_edit, qt_form_remove])
 
         self.hide_all_forms()
 
@@ -161,7 +161,7 @@ class QueueUI:
         self.qt_button_queue_edit.clicked.connect(self.on_click_edit)
 
         qt_lay_queue_list.addWidget(list_queue)
-        self.comfun.add_wigdets(qt_lay_queue_buttons, [self.qt_button_sim_one, self.qt_button_sim_all,
+        self.comfun.add_widgets(qt_lay_queue_buttons, [self.qt_button_sim_one, self.qt_button_sim_all,
                                                        self.qt_button_queue_remove, self.qt_button_queue_edit])
         self.comfun.add_layouts(qt_lay_queue_main, [qt_lay_queue_list, qt_lay_forms, qt_lay_queue_buttons])
 

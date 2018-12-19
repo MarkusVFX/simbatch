@@ -4,8 +4,38 @@ from logger import Logger
 
 
 class FileSystemOperations:
-    arr_dirs = []  # TODO optimize   id: 12
+    arr_files = []
+    arr_dirs = []
     max_dir_depth = 0
+
+    def __init__(self):
+        pass
+
+    def info(self, full=False, short=False):
+        print("\n\nFileSystemOperations")
+        print("max_dir_depth: {}".format(self.max_dir_depth))
+        print("dirs count: {}".format(len(self.arr_dirs)))
+        print("files count: {}".format(len(self.arr_files)))
+        if short is False:
+            for ad in self.arr_dirs:
+                print("{}".format(ad))
+            print("\n\n")
+            for i, fi in enumerate(self.arr_files):
+                if len(self.arr_files) > 20 and full is False:
+                    if i < 6 or i > len(self.arr_files)-8:
+                        print("[{}]  {}".format(i, fi))
+                    elif i == 6:
+                        print("[{}]  {}\n...\n...\n...".format(i, fi))
+                    else:
+                        pass
+                else:
+                    print("[{}]  {}".format(i, fi))
+        print "\n\n", len(self.arr_files)
+
+    def reset(self):
+        del self.arr_files[:]
+        del self.arr_dirs[:]
+        self.max_dir_depth = 0
 
     def get_dir_depth(self, directory, level=1):
         if os.path.isdir(directory):
@@ -14,8 +44,24 @@ class FileSystemOperations:
                     self.max_dir_depth = level
                 dir_name = os.path.join(directory, d)
                 if os.path.isdir(dir_name):
-                    self.arr_dirs.append([level, d, dir_name])
+                    # self.arr_dirs.append([level, d, dir_name])
+                    self.arr_dirs.append(dir_name)
                     self.get_dir_depth(dir_name, level + 1)
+
+    def collect_files_from_path(self, path, with_path=False, with_sufix=None):
+        for filename in os.listdir(path):
+            pathfilename = os.path.join(path, filename)
+            skip = 0
+            if with_sufix is not None:
+                if pathfilename.endswith(with_sufix):
+                    skip = 0
+                else:
+                    skip = 1
+            if skip == 0 and os.path.isfile(pathfilename):
+                if with_path:
+                    self.arr_files.append(pathfilename)
+                else:
+                    self.arr_files.append(filename)
 
 
 class Patterns:    # TODO  TESTS !!!!

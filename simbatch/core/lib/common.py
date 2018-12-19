@@ -396,7 +396,7 @@ class CommonFunctions:
     """
 
     @staticmethod
-    def add_wigdets(lay, arr):
+    def add_widgets(lay, arr):
         for ar in arr:
             lay.addWidget(ar)
 

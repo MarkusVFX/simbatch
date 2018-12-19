@@ -210,7 +210,7 @@ class SchemasUI:
         ###
         ######
         #########
-        self.comfun.add_wigdets(qt_lay_schema_forms, [schema_form_create, schema_form_copy, schema_form_edit,
+        self.comfun.add_widgets(qt_lay_schema_forms, [schema_form_create, schema_form_copy, schema_form_edit,
                                                       schema_form_remove])
 
         self.hide_all_forms()
@@ -227,7 +227,7 @@ class SchemasUI:
 
         qt_lay_schema_list.addWidget(list_schemas)
 
-        self.comfun.add_wigdets(qt_lay_schema_buttons, [qt_button_schema_create, qt_button_schema_edit,
+        self.comfun.add_widgets(qt_lay_schema_buttons, [qt_button_schema_create, qt_button_schema_edit,
                                                         qt_button_schema_remove, qt_button_schema_copy])
 
         self.comfun.add_layouts(qt_lay_schema_main, [qt_lay_schema_list, qt_lay_schema_forms, qt_lay_schema_buttons])

@@ -254,7 +254,7 @@ class ProjectsUI:
         qt_gb_remove.setLayout(qt_form_remove_layout)
         qt_form_remove_layout_ext.addWidget(qt_gb_remove)
 
-        self.comfun.add_wigdets(qt_lay_projects_forms, [qt_form_add, qt_form_edit, qt_form_remove])
+        self.comfun.add_widgets(qt_lay_projects_forms, [qt_form_add, qt_form_edit, qt_form_remove])
 
         self.hide_all_forms()
 
@@ -270,7 +270,7 @@ class ProjectsUI:
 
         qt_lay_projects_lists.addWidget(qt_list_projects)
 
-        self.comfun.add_wigdets(qt_lay_projects_buttons,
+        self.comfun.add_widgets(qt_lay_projects_buttons,
                                 [qt_but_add_form, qt_but_edit_form, qt_but_remove_form, qt_but_def_project])
         self.comfun.add_layouts(qt_project_main_layout,
                                 [qt_lay_projects_lists, qt_lay_projects_forms, qt_lay_projects_buttons])

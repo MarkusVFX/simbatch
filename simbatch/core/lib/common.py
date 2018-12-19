@@ -103,6 +103,14 @@ class CommonFunctions:
         return text
 
     @staticmethod
+    def str_get_decorative(txt, header=False):
+        if header:
+            txt = " _______/// {} \\\\\\_______ ".format(txt)
+        else:
+            txt = " _/|\\_ _/|\\_ _/|\\_ {} _/|\\_ _/|\\_ ".format(txt)
+        return txt
+
+    @staticmethod
     def list_as_string(get_list, only_first=False, start_from_item=0, separator=";"):
         ret_str = ""
         if len(get_list) == 1 or only_first:

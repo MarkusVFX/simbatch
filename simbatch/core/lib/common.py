@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 import json
 from os import path
 from collections import OrderedDict
@@ -109,6 +110,31 @@ class CommonFunctions:
         else:
             txt = " _/|\\_ _/|\\_ _/|\\_ {} _/|\\_ _/|\\_ ".format(txt)
         return txt
+
+    @staticmethod
+    def generate_sin_values(samples_total=100, amplitudes_count=4, amplitude_min=40, amplitude_max=120, period_min=20,
+                            period_max=120, period_grow=False, debug_mode=False):
+        sin_arr = []
+        for ci in range(samples_total / amplitudes_count):
+            for ai in range(amplitudes_count):
+                tmp_sin = []
+                if period_grow:
+                    period = period_min + ci * (period_max - period_min) / (samples_total / amplitudes_count - 1)
+                else:
+                    period = period_max - ci * (period_max - period_min) / (samples_total / amplitudes_count - 1)
+                amplitude = amplitude_min + ai * (amplitude_max - amplitude_min) / (amplitudes_count - 1)
+
+                for ti in range(period):
+                    tmp_sin.append(int(amplitude * math.sin(ti * math.pi / period * 2)))
+                sin_arr.append(tmp_sin)
+                if debug_mode > 0:
+                    print " [{}]   new sinus len:{}    per:{}   amp:{}".format(len(sin_arr), len(sin_arr[-1]), period,
+                                                                               amplitude)
+                    if debug_mode > 1:
+                        print sin_arr[-1]
+            if debug_mode > 0:
+                print "\n"
+        return sin_arr
 
     @staticmethod
     def list_as_string(get_list, only_first=False, start_from_item=0, separator=";"):

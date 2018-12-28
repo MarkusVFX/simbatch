@@ -213,6 +213,18 @@ class CommonFunctions:
         else:
             self.logger.err(("(path_exists) wrong parameter!", check_path, info))
             return False
+            
+    def get_dir_depth(self, dir, level=1):
+        max_dir_depth = 0
+        arr_dirs = []
+        if os.path.isdir(dir):
+            for d in os.listdir(dir):
+                if level > self.max_dir_depth:
+                    self.max_dir_depth = level
+                dir_name = os.path.join(dir, d)
+                if os.path.isdir(dir_name):
+                    self.arr_dirs.append([level, d, dir_name])
+                    self.get_dir_depth(dir_name, level + 1)
 
     @staticmethod
     def convert_to_win_path(path_to_convert):

@@ -1,0 +1,30 @@
+import sys
+
+simbatch_installation_root = "C:/mqs/simbatch"
+sys.path.append(simbatch_installation_root) 
+
+import simbatch.core.core as simbatch_core 
+no_gui_batch = simbatch_core.SimBatch("Server", ini_file="config.ini")
+  
+di = "C:\\mqs\\detect_shot_dir_pattern\\"
+
+no_gui_batch.pat.fso.get_dir_depth(di)
+
+
+s=""
+for ad in no_gui_batch.pat.fso.arr_dirs:
+    no_gui_batch.pat.fso.collect_files_from_path(ad, with_path=True)
+    # no_gui_batch.pat.fso.collect_files_from_path(ad, with_path=True, with_sufix=".json")
+    
+for fi in no_gui_batch.pat.fso.arr_files:
+    s += no_gui_batch.comfun.str_with_spaces(" ", length=10)
+    s += no_gui_batch.comfun.str_get_decorative(fi)
+
+no_gui_batch.pat.fso.info(full=True)
+
+sin_arr = no_gui_batch.comfun.generate_sin_values()
+print " sin_arr " , len(sin_arr)  # TODO
+    
+# TODO  print directory with decorative
+
+# WIP

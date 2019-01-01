@@ -188,7 +188,7 @@ class NodesUI:
 
         self.hide_all_forms()
 
-        self.comfun.add_wigdets(qt_lay_nodes_forms, [qt_form_add_node, qt_form_remove_node])
+        self.comfun.add_widgets(qt_lay_nodes_forms, [qt_form_add_node, qt_form_remove_node])
 
         self.comfun.add_layouts(qt_lay_nodes_main, [qt_lay_nodes_list, qt_lay_nodes_forms, qt_lay_nodes_buttons])
 

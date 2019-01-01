@@ -248,7 +248,7 @@ class SimBatchServer:
             self.batch.logger.err("Local state file not exist!  ({})".format(simnode_state_file))
         
     def test_server_dir(self):
-        # TODO test write acces create data dir
+        # TODO test write access create data dir
         pass
         
     def get_existing_source_path(self):
@@ -589,7 +589,6 @@ class SimBatchServer:
                     self.last_info = "Server is busy, WORKING now"    # TODO add job_id
                     
             """    MAIN EXECUTION  FIN    """
-
 
             external_breaker = self.server_dir + "break.txt"
             external_breaker_off = self.server_dir + "break__.txt"

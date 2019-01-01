@@ -217,7 +217,7 @@ class TasksUI:
         # TAB LAY
         # TAB LAY LAY
         # TAB LAY LAY LAY
-        self.comfun.add_wigdets(qt_lay_tasks_forms, [qt_form_create, qt_form_edit, qt_form_remove, qt_form_add])
+        self.comfun.add_widgets(qt_lay_tasks_forms, [qt_form_create, qt_form_edit, qt_form_remove, qt_form_add])
 
         self.hide_all_forms()
 
@@ -233,7 +233,7 @@ class TasksUI:
 
         qt_lay_tasks_list.addWidget(list_tasks)
 
-        self.comfun.add_wigdets(qt_lay_tasks_buttons,
+        self.comfun.add_widgets(qt_lay_tasks_buttons,
                                 [qt_button_create_task, qt_button_edit_task, qt_button_remove_task,
                                  qt_button_add_to_queue])
 

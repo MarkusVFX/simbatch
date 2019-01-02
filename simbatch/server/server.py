@@ -1,6 +1,7 @@
 import os
 import subprocess
 import threading
+import time
 
 
 class SimBatchServer:
@@ -307,6 +308,11 @@ class SimBatchServer:
         f.close()
         self.batch.logger.log(info)
 
+    def reset(self):
+        self.jobs_computed = 0
+        self.loops_counter = 0
+        self.reset_report()
+
     def reset_report(self):
         self.report_total_jobs = 0
         self.report_done_jobs = 0
@@ -422,7 +428,7 @@ class SimBatchServer:
     """ marker SIM 010   running   """
     def run(self, argv=None):
         if self.batch.sts.loading_state < 4:
-            print " [ERR] settings not loaded properly: ", self.batch.sts.loading_state
+            self.batch.logger.err(("settings not loaded properly: ", self.batch.sts.loading_state), nl=True)
             return False
             
         if self.framework_mode is False:
@@ -477,7 +483,7 @@ class SimBatchServer:
             self.batch.logger.inf("run sim all")
 
         self.mode = mode
-        
+
         self.run_loop()
             
     def run_loop(self):
@@ -534,6 +540,7 @@ class SimBatchServer:
                         self.set_queue_item_done(execute_queue_id, self.server_name)
                         self.last_info = "DONE id: {}".format(execute_queue_id)
                         self.report_done_jobs += 1
+                        self.jobs_computed += 1
                         #######
                         is_something_more_to_compute = self.is_something_to_do(force_software=self.force_software)
 
@@ -553,8 +560,6 @@ class SimBatchServer:
 
                         self.run_external_software(generated_script_file)
                     """     END SINGLE JOB     """
-                    
-                    self.jobs_computed += 1
 
                 else:  # nothing more to compute!
                     info = "{}   there is nothing to compute ".format(self.comfun.get_current_time())
@@ -570,7 +575,7 @@ class SimBatchServer:
                     if self.framework_mode is True:  # run local
                         """  BREAK ! """
                         self.batch.logger.db("Breaking loop, framework mode. Nothing to compute, limit:{}".format(self.jobs_limit))
-                        self.jobs_computed = self.jobs_limit
+                        self.jobs_computed = self.jobs_limit = 1
                 
                 self.batch.logger.raw("\n")
             else:
@@ -599,6 +604,7 @@ class SimBatchServer:
                 if self.batch.comfun.file_exists(external_breaker_off, info=False):
                     os.remove(external_breaker_off)
                 os.rename(external_breaker, external_breaker_off)
+                time.sleep(0.5)
             else:
                 threading.Timer(self.timer_delay_seconds, lambda: self.run_loop()).start()
         else:

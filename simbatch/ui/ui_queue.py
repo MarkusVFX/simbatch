@@ -337,7 +337,7 @@ class QueueUI:
         server.framework_mode = True
         server.loops_counter = 0
         server.timer_delay_seconds = 0
-        server.reset_report()
+        server.reset()
         #
         server.run(mode)
         #

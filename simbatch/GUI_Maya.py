@@ -1,6 +1,6 @@
-##################################
-# Tested with Maya 2016 and 2017 #
-##################################
+#######################################
+# Tested with Maya 2016 and 2017 2018 #
+#######################################
 #
 ##
 ###
@@ -23,6 +23,10 @@ try:  # Maya 2015 and 2016
 except ImportError:
     try:  # Maya 2017
         from PySide2.QtGui import *
+        try:  # Maya 2018
+            from PySide2.QtWidgets import *
+        except ImportError:
+            raise Exception('PySide import ERROR!')
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 

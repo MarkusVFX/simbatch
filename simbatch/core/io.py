@@ -559,7 +559,7 @@ class StorageInOut:
         else:
             return [0, 0, 0]
 
-    def generate_base_setup_file_name(self, schema_name="", ver=0):  # from existing TASK and SCHEMA data
+    def generate_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
         if len(self.prj.projects_data) < self.prj.current_project_index or self.prj.current_project_index < 0:
             self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index,
                                    len(self.prj.projects_data)))

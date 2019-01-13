@@ -119,7 +119,7 @@ class ProjectsUI:
         wfa_project_dir_label = SimpleLabel("Project directory: ")
         wfa_project_dir_edit = EditLineWithButtons(" ", text_on_button_1="Get", label_minimum_size=7)
         self.wfa_project_dir_edit = wfa_project_dir_edit
-        wfa_working_dir_label = SimpleLabel("Working directory: ")
+        wfa_working_dir_label = SimpleLabel("FX directory: ")
         wfa_working_dir_edit = EditLineWithButtons(" ", text_on_button_1="Get", label_minimum_size=7)
         self.wfa_working_dir_edit = wfa_working_dir_edit
         wfa_cam_dir_label = SimpleLabel("Cameras directory: ")
@@ -179,7 +179,7 @@ class ProjectsUI:
 
         wfe_project_dir_label = SimpleLabel("Project directory: ")
         wfe_project_dir_edit = EditLineWithButtons(" ", text_on_button_1="Get", label_minimum_size=7)
-        wfe_project_working_dir_label = SimpleLabel("Working directory: ")
+        wfe_project_working_dir_label = SimpleLabel("FX directory: ")
         wfe_project_working_dir_edit = EditLineWithButtons(" ", text_on_button_1="Get", label_minimum_size=7)
         wfe_project_cam_dir_label = SimpleLabel("Cameras directory: ")
         wfe_project_cam_dir_edit = EditLineWithButtons(" ", text_on_button_1="Get", label_minimum_size=7)

@@ -3,24 +3,6 @@ import json
 from random import randint
 from lib.common import CommonFunctions
 
-try:  # Maya 2016
-    from PySide.QtCore import *
-    from PySide.QtGui import *
-except ImportError:
-    try:  # Maya 2017
-        from PySide2.QtCore import *
-        from PySide2.QtGui import *
-        from PySide2.QtWidgets import *
-    except ImportError:
-        print "PySide not found"
-        class QBrush:
-            def __init__(self, q):
-                pass
-        class QColor:
-            @classmethod
-            def fromRgb(self, r, g, b, a=""):
-                pass
-
 
 class Settings:
     logger = None                   # logger prints errors, warnings, info and db to console and to log file
@@ -102,6 +84,7 @@ class Settings:
     states_visible_names[INDEX_STATE_DEFAULT] = "DEFAULT"
 
     # GUI settings
+    with_gui = 1                                # loading color schema # TODO auto detect
     runtime_env = ""        # runtime environment as software name display on frame and set active definition
     ui_edition_mode = 0     # 0 open source    1 Pro version (with Wizard tab as first)
     ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
@@ -114,7 +97,6 @@ class Settings:
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
     CHECK_SCREEN_RES_ON_START = 1
-    WITH_GUI = 1  # loading color schema # TODO auto detect
     COLORS_PASTEL_FILE_NAME = "colors_pastel.ini"
     COLORS_CUSTOM_FILE_NAME = "colors_custom.ini"
     COLORS_GRAY_FILE_NAME = "colors_gray.ini"
@@ -162,6 +144,8 @@ class Settings:
 
         self.comfun = CommonFunctions()
         self.runtime_env = runtime_env
+        if runtime_env == "Server":
+            self.with_gui = 0
         self.ini_file = self.get_ini_file_and_path(ini_path, ini_file)
 
         """ check and force DEV config """
@@ -170,12 +154,14 @@ class Settings:
             self.logger.inf(("force DEV config:", self.ini_file), nl=True)
 
         self.sql = [None, None, None, None]
-        self.clear_state_colors()
+        
+        if self.with_gui == 1:
+            self.clear_state_colors()
 
         self.load_settings()
 
         if self.loading_state >= 4:
-            if self.WITH_GUI == 1:
+            if self.with_gui == 1:
                 self.update_ui_colors()
         else:
             self.logger.err("Data not loaded !!!  ({})".format(self.loading_state))
@@ -392,7 +378,7 @@ class Settings:
             self.settings_err_info = " [ERR] config.ini file not exists: {}".format(self.ini_file)
             self.loading_state = -1
 
-        print self.settings_err_info
+        print "\n\n[ERR] ",self.settings_err_info
         return False
 
     def save_settings(self, settings_file=""):

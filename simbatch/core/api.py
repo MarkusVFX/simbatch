@@ -41,6 +41,8 @@ class SimBatchAPI:
                 task_options.set_task_value("description", "example api")
                 self.add_current_task_to_queue(task_options=task_options)
                 self.simbatch_core.logger.inf("Created API task example")
+            else:
+                api_task_id = 0
         else:
             self.simbatch_core.logger.err("Not created API task example")
             api_task_id = 0

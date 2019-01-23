@@ -376,7 +376,7 @@ class StorageInOut:
             api_simple_schema.schema_name = "API simple Schema"
             api_simple_schema.description = "api schema"
             api_simple_schema.project_id = api_project_id
-
+            
             as_def = self.batch.dfn.get_definition_by_name("Stand-alone")
             if as_def is None:
                 self.batch.logger.err("Stand-alone definition NOT found!")

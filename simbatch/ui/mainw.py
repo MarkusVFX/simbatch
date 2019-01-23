@@ -1,4 +1,4 @@
-import ctypes
+import ctypes, sys, errno
 
 try:
     from PySide.QtCore import *
@@ -9,8 +9,8 @@ except ImportError:
         from PySide2.QtGui import *
         from PySide2.QtWidgets import *
     except ImportError:
-        raise Exception('PySide import ERROR!  Please install PySide or PySide2')
-
+        print 'PySide import ERROR!  Please install PySide or PySide2'
+        sys.exit(errno.EACCES)
 
 from ui_wizard import WizardUI
 from ui_projects import ProjectsUI

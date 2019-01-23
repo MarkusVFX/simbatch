@@ -103,7 +103,7 @@ simbatch.sio = simbatch_ios.StorageInOut(simbatch)
 
 loading_data_state = simbatch.load_data()
 
-if simbatch.sts.WITH_GUI == 1:
+if simbatch.sts.with_gui == 1:
     """   force reload UI """
     import simbatch.ui.ui_settings as simbatch_ui_settings
     reload(simbatch_ui_settings)

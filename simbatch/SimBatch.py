@@ -1,4 +1,10 @@
-from PySide.QtGui import *
+import sys, errno
+
+try:
+	from PySide.QtGui import *
+except ImportError:
+    print "\n\n  PySide import ERROR!\n  Please install PySide or PySide2\n  It's easy run commands:\n    cd your_pip_directory\n    pip install -U PySide"
+    sys.exit(errno.EACCES)
 
 import core.core as core
 import ui.mainw as ui

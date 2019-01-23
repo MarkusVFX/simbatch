@@ -310,7 +310,7 @@ class TasksUI:
 
     def on_click_menu_sch_ver_from_schema(self):
         cur_sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
-        self.batch.tsk.current_task.schema_ver = cur_sch.schemaVersion
+        self.batch.tsk.current_task.schema_ver = cur_sch.schema_version
         self.batch.tsk.save_tasks()
         self.reset_list()
 

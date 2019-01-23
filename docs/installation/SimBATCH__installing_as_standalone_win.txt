@@ -1,15 +1,9 @@
 
-1 go to https://www.python.org/downloads/release/python-2713/
+1 Python 2.7
+	download and install  (https://www.python.org/ftp/python/2.7.13/python-2.7.13.amd64.msi)
+	during installation check "Add python.exe to Path"
 
-
-2 download Windows X86-64 MSI Installer  (https://www.python.org/ftp/python/2.7.13/python-2.7.13.amd64.msi)
-
-
-3 run installer: python-2.7.13.amd64.msi
-	recomended: during installation check "Add python.exe to Path"
-
-
-4 Install PySide with PIP*
+2 Install PySide with PIP*
 	c:\Python27\Scripts\pip install -U PySide
 
 	

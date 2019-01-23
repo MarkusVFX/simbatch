@@ -329,7 +329,7 @@ class SchemaFormCreateOrEdit(QWidget):
         self.local_schema_item.description = txt
 
     def on_edit_schema_version(self, txt):
-        self.local_schema_item.schemaVersion = int(txt)
+        self.local_schema_item.schema_version = int(txt)
 
     def on_changed_save_as_base_setup(self, state):
         if state:

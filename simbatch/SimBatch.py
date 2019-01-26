@@ -12,12 +12,12 @@ import server.server as simbatch_server
 
 app = QApplication([])
 
-simbatch = core.SimBatch("Stand-alone")   # you can set startup config by changing argument: ini_file="your_config.json"
+simbatch = core.SimBatch("Stand-alone")   # you can set startup config by adding optional argument: ini_file="your_config.json"
 loading_data_state = simbatch.load_data()
 server = simbatch_server.SimBatchServer(simbatch, framework_mode=True)
 
 
-if simbatch.sts.WITH_GUI == 1:
+if simbatch.sts.with_gui == 1:
     main_window = ui.MainWindow(server)
     main_window.show()
     main_window.post_run(loading_data_state)

@@ -154,16 +154,10 @@ class Settings:
             self.logger.inf(("force DEV config:", self.ini_file), nl=True)
 
         self.sql = [None, None, None, None]
-        
-        if self.with_gui == 1:
-            self.clear_state_colors()
 
         self.load_settings()
 
-        if self.loading_state >= 4:
-            if self.with_gui == 1:
-                self.update_ui_colors()
-        else:
+        if self.loading_state < 4:
             self.logger.err("Data not loaded !!!  ({})".format(self.loading_state))
 
     def print_all(self):
@@ -211,13 +205,18 @@ class Settings:
         messages = ("Welcome", "Have a nice sim!", "Sim, Forrest, sim!")
         rand = randint(0, len(messages)-1)
         return messages[rand]
+    
+    """  trigered from mainw, used only with GUI """
+    def init_colors(self, rbg_to_brush):
+        self.clear_state_colors()
+        self.rbg_to_brush = rbg_to_brush
 
     def clear_state_colors(self):
         self.state_colors = []
         self.state_colors_up = []
         for i in range(0, 40):
-            self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
-            self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
+            self.state_colors.append(self.default_gray_brush)
+            self.state_colors_up.append(self.default_light_gray_brush)
 
     """  get absolute path config file using relative or empty path/file  """
     def get_ini_file_and_path(self, ini_path="", ini_file="", check_is_exists=True):
@@ -459,13 +458,14 @@ class Settings:
                 f = open(color_file, 'r')
                 for li_counter, line in enumerate(f.readlines()):
                     li = line.split(";")
-                    if len(li) > 7:
-                        self.state_colors[li_counter] = QBrush(
-                            QColor.fromRgb(self.comfun.int_or_val(li[2], 40), self.comfun.int_or_val(li[3], 40),
-                                           self.comfun.int_or_val(li[4], 40), a=255))
-                        self.state_colors_up[li_counter] = QBrush(
-                            QColor.fromRgb(self.comfun.int_or_val(li[6], 140), self.comfun.int_or_val(li[7], 140),
-                                           self.comfun.int_or_val(li[8], 140), a=255))
+                    if len(li) > 7: 
+                        self.state_colors[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[2], 40), 
+                                                                            self.comfun.int_or_val(li[3], 40),
+                                                                            self.comfun.int_or_val(li[4], 40))
+                                                                            
+                        self.state_colors_up[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[6], 140), 
+                                                                             self.comfun.int_or_val(li[7], 140),
+                                                                             self.comfun.int_or_val(li[8], 140))
                 f.close()
 
                 if self.debug_level >= 3:
@@ -473,8 +473,8 @@ class Settings:
                 return True
             else:
                 for i in range(0, 40):
-                    self.state_colors.append(QBrush(QColor.fromRgb(40, 40, 40, a=255)))
-                    self.state_colors_up.append(QBrush(QColor.fromRgb(140, 140, 140, a=255)))
+                    self.state_colors.append(self.default_gray_brush)
+                    self.state_colors_up.append(self.default_light_gray_brush)
 
                 if self.debug_level >= 3:
                     self.logger.wrn(("NOT loaded colors: ", color_file))

@@ -155,6 +155,7 @@ class MainWindow(QMainWindow):
         self.comfun = server.batch.comfun
         self.sts = server.batch.sts
         self.debug_level = server.batch.sts.debug_level
+        self.init_sts_colors()
         self.init_ui(server.batch)
 
     def init_ui(self, batch):
@@ -265,6 +266,15 @@ class MainWindow(QMainWindow):
         else:
             self.batch.logger.inf("Settings and data loaded\n\n")
 
+    def rbg_to_brush(self, r, g, b):
+        return QBrush(QColor.fromRgb(r, g, b, a=255))
+        
+    def init_sts_colors(self):
+        self.sts.default_gray_brush = self.rbg_to_brush(40, 40, 40)
+        self.sts.default_light_gray_brush = self.rbg_to_brush(140, 140, 140)
+        self.sts.init_colors(self.rbg_to_brush)
+        self.sts.update_ui_colors()
+    
     def post_run(self, loading_data_state):  # show welcome message or error info
         if loading_data_state[0] is True:
             self.top_ui.set_top_info(self.batch.sts.random_welcome_message())

@@ -91,6 +91,8 @@ class Settings:
     ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors
     state_colors_up = []    # selected item list colors
+    default_gray_brush = None
+    default_light_gray_brush = None
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
     force_start_tab = 0     # if > 0 show tab with this index after run
@@ -436,6 +438,9 @@ class Settings:
             self.logger.err("found {} errors in config file".format(errors))
             return False
 
+    def rbg_to_brush(self, r, g, b):
+        return ""
+    
     def update_ui_colors(self):
         if self.store_definitions_directory_abs is not None:
             palette_id = self.ui_color_mode

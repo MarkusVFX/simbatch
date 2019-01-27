@@ -6,33 +6,23 @@
 2 Install PySide with PIP*
 	c:\Python27\Scripts\pip install -U PySide
 
-	
-5a install SimBATCH with PIP*
+3 Install SimBatch	
+ a with PIP*
   c:\Python27\Scripts\pip install -U PySide
   
-5b install SimBATCH  manual installation
-	go to https://github.com/MarkusVFX/simbatch
-	find clone or download button
-	download zip
+ b install SimBATCH  manual installation
+	go to https://github.com/MarkusVFX/simbatch find "Clone or download" button and download zip 
+    ...or get by direct link: https://codeload.github.com/MarkusVFX/simbatch/zip/master
 	
-	or
+	unpack content of directory  simbatch-master\simbatch  to   your_simbatch_dir	
 	
-	download directly: https://codeload.github.com/MarkusVFX/simbatch/zip/master
-	
-	
-	unpack directory  simbatch  to   your_dir	
-	
-	run command:  your_dir\SimBatch.py
+	run command:  your_simbatch_dir\SimBatch.py
 	
 	
-5c installation for developement
-	for information about installing PyTest, Git please read:
-	https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/installing_development_environment_win.txt
+4 installation for developement: PyTest and Git:
+  please read https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/installing_development_environment_win.txt
 
 	
-	
-	
-
 
 ###################################################
 #############    Adnotations     ##################

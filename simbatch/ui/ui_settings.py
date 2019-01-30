@@ -34,7 +34,6 @@ class SettingsUI:
 
         qt_widget_settings = QWidget()
         self.qt_widget_settings = qt_widget_settings
-        # qt_widget_settings.setBackgroundRole( QPalette.Mid ) # QPalette.Dark    # TODO  colors schema
         qt_scroll_area = QScrollArea()
         qt_lay_scroll_and_buttons = QVBoxLayout()  # layout for  scroll   and   bottom buttons
         qt_lay_scroll_and_buttons.addWidget(qt_scroll_area)
@@ -51,17 +50,16 @@ class SettingsUI:
             qt_scroll_widget.setMinimumWidth(400)
 
         if self.settings.runtime_env == "Maya":
-            qt_scroll_widget.setMinimumHeight(460)
+            qt_scroll_widget.setMinimumHeight(560)
         else:
-            qt_scroll_widget.setMinimumHeight(400)
+            qt_scroll_widget.setMinimumHeight(550)
 
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
 
-        ''' CONFIG INI '''
+        ''' CONFIG FILE '''
         qt_lay_config_ini = QVBoxLayout()
         qt_group_config_ini = QGroupBox()
-        qt_group_config_ini.setMaximumHeight(70)
         qt_group_config_ini.setTitle("Config file:")
         if self.settings.current_os == 1:
             show_ini_file = settings.ini_file
@@ -79,36 +77,30 @@ class SettingsUI:
         qt_lay_config_ini.addLayout(err_info_config_ini.qt_widget_layout)
         qt_group_config_ini.setLayout(qt_lay_config_ini)
 
-        ''' MODE '''
-        qt_button_group_data = QButtonGroup()
-        qt_radio_group_data = QGroupBox()
-        qt_radio_group_data.setMinimumHeight(130)
-        qt_radio_group_data.setTitle("Data options")
+        ''' DATA OPTIONS  '''
+        qt_group_data_options = QGroupBox()
+        qt_group_data_options.setTitle("Data options")
         qt_lay_settings_mode = QHBoxLayout()
         qt_label_mode = QLabel("Data store mode: ")
-        qt_lay_settings_mode.addWidget(qt_label_mode)
-        qt_button_group_data.setExclusive(True)
-        # qt_radio_mode1 = QRadioButton("text")
-        # if settings.store_data_mode == 1:
-        # qt_radio_mode1.setChecked(True)
-        # qt_button_group_data.addButton(qt_radio_mode1)
-        # qt_lay_settings_mode.addWidget(qt_radio_mode1)
-        qt_radio_mode2 = QRadioButton("json")
+        qt_lay_settings_mode.addWidget(qt_label_mode) 
+        
+        qt_radio_mode1 = QRadioButton("json")
         if settings.store_data_mode == 1:
-            qt_radio_mode2.setChecked(True)
-        qt_button_group_data.addButton(qt_radio_mode2)
-        qt_lay_settings_mode.addWidget(qt_radio_mode2)
-        qt_radio_mode3 = QRadioButton("MySQL")
+            qt_radio_mode1.setChecked(True) 
+        qt_lay_settings_mode.addWidget(qt_radio_mode1)
+        qt_radio_mode1.clicked.connect(lambda: self.on_click_radio_data(1))
+        
+        qt_radio_mode2 = QRadioButton("MySQL")
         if settings.store_data_mode == 2:
-            qt_radio_mode3.setChecked(True)
-        qt_button_group_data.addButton(qt_radio_mode3)
-        qt_lay_settings_mode.addWidget(qt_radio_mode3)
-
-        # qt_radio_mode1.clicked.connect(lambda: self.on_click_radio_data(1))
-        qt_radio_mode2.clicked.connect(lambda: self.on_click_radio_data(1))
-        qt_radio_mode3.clicked.connect(lambda: self.on_click_radio_data(2))
-
-        ''' DATA '''
+            qt_radio_mode2.setChecked(True) 
+        qt_lay_settings_mode.addWidget(qt_radio_mode2) 
+        qt_radio_mode2.clicked.connect(lambda: self.on_click_radio_data(2))
+        
+        qt_group_data_options.setLayout(qt_lay_settings_mode)
+        
+        
+        ''' DATA DIRECTORY '''
+        qt_group_data_directory = QGroupBox() 
         qt_lay_settings_data = QHBoxLayout()
         # qt_lay_settings_data.setMaximumHeight(155) # mmm
         qt_settings_data_directory_label = QLabel("Data directory : ")
@@ -127,7 +119,12 @@ class SettingsUI:
         qt_lay_settings_data.addWidget(qt_settings_data_directory_label)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_edit)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_button)
-
+        
+        qt_group_data_directory.setLayout(qt_lay_settings_data)
+        
+        
+        ''' DEFINITIONS DIRECTORY ''' 
+        qt_group_definitions_directory = QGroupBox() 
         qt_lay_settings_definitions = QHBoxLayout()
         qt_settings_definitions_directory_label = QLabel("Definitions directory : ")
 
@@ -145,7 +142,12 @@ class SettingsUI:
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_label)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_edit)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_button)
-
+        
+        qt_group_definitions_directory.setLayout(qt_lay_settings_definitions)
+        
+        
+        ''' EXAMPLE DATA '''  
+        qt_group_example_data = QGroupBox() 
         qt_lay_settings_buttons_data = QHBoxLayout()
         qt_settings_create_example_data_button = QPushButton("Create example data")
         qt_settings_clear_all_data_button = QPushButton("Clear all data")
@@ -153,38 +155,13 @@ class SettingsUI:
         qt_lay_settings_buttons_data.addWidget(qt_settings_clear_all_data_button)
         qt_settings_create_example_data_button.clicked.connect(self.on_click_create_example_data)
         qt_settings_clear_all_data_button.clicked.connect(self.on_click_clear_all_data)
+        
+        qt_group_example_data.setLayout(qt_lay_settings_buttons_data)
 
-
-        qt_lay_settings_mode_data = QVBoxLayout()
-        qt_lay_settings_mode_data.addLayout(qt_lay_settings_mode)
-        qt_lay_settings_mode_data.addLayout(qt_lay_settings_data)
-        qt_lay_settings_mode_data.addLayout(qt_lay_settings_definitions)
-        qt_lay_settings_mode_data.addLayout(qt_lay_settings_buttons_data) 
-        '''
-        tmp_widgeta = QWidget()
-        qt_lay_settings_mode.setSpacing(0)
-        tmp_widgeta.setLayout(qt_lay_settings_mode)
-        tmp_widgetb = QWidget()
-        qt_lay_settings_data.setSpacing(0)
-        tmp_widgetb.setLayout(qt_lay_settings_data)
-        tmp_widgetc = QWidget()
-        qt_lay_settings_definitions.setSpacing(0)
-        tmp_widgetc.setLayout(qt_lay_settings_definitions)
-        tmp_widgetd = QWidget()
-        qt_lay_settings_buttons_data.setSpacing(0)
-        tmp_widgetd.setLayout(qt_lay_settings_buttons_data)
-        qt_lay_settings_mode_data = QVBoxLayout()
-        qt_lay_settings_mode_data.addWidget(tmp_widgeta)
-        qt_lay_settings_mode_data.addWidget(tmp_widgetb)
-        qt_lay_settings_mode_data.addWidget(tmp_widgetc)
-        qt_lay_settings_mode_data.addWidget(tmp_widgetd)
-        '''
-        qt_radio_group_data.setLayout(qt_lay_settings_mode_data)
 
         ''' MySQL '''
         qt_lay_settings_sql = QFormLayout()
         qt_radio_group_sql = QGroupBox()
-        qt_radio_group_sql.setMaximumHeight(130)
         qt_radio_group_sql.setTitle("MySQL settings (available in the Pro version)")
         qt_radio_group_sql.setEnabled(False)
 
@@ -233,42 +210,34 @@ class SettingsUI:
         qt_lay_settings_user.addRow(qt_sett_ser_1a, qt_sett_ser_1b)   # PRO version
         qt_lay_settings_user.addRow(qt_sett_ser_2a, qt_sett_ser_2b)   # PRO version
         qt_lay_settings_user.addRow(qt_sett_ser_3a, qt_sett_ser_3b)   # PRO version
-        qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)   # PRO version
-        qt_radio_group_user.setMaximumHeight(130)   # PRO version
+        qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)   # PRO version 
 
         qt_radio_group_user.setLayout(qt_lay_settings_user)   # PRO version
 
         ''' Colors '''
-        qt_button_group_colors = QButtonGroup()
+        #qt_button_group_colors = QButtonGroup()
         qt_radio_group_colors = QGroupBox()
-        qt_radio_group_colors.setMaximumHeight(55)
         qt_radio_group_colors.setTitle("Colors")
         qt_lay_settings_colors = QHBoxLayout()
 
         qt_radio_mode_1 = QRadioButton("grayscale")
         if settings.ui_color_mode == 1:
             qt_radio_mode_1.setChecked(True)
-            qt_button_group_colors.addButton(qt_radio_mode_1)
         qt_lay_settings_colors.addWidget(qt_radio_mode_1)
         qt_radio_mode_2 = QRadioButton("pastel")
         if settings.ui_color_mode == 2:
             qt_radio_mode_2.setChecked(True)
-            qt_button_group_colors.addButton(qt_radio_mode_2)
         qt_lay_settings_colors.addWidget(qt_radio_mode_2)
         qt_radio_mode_3 = QRadioButton("dark")
         if settings.ui_color_mode == 3:
             qt_radio_mode_3.setChecked(True)
-            qt_button_group_colors.addButton(qt_radio_mode_3)
         qt_lay_settings_colors.addWidget(qt_radio_mode_3)
         qt_radio_mode_4 = QRadioButton("custom")
         if settings.ui_color_mode == 4:
             qt_radio_mode_4.setChecked(True)
-            qt_button_group_colors.addButton(qt_radio_mode_4)
         qt_lay_settings_colors.addWidget(qt_radio_mode_4)
 
         qt_radio_group_colors.setLayout(qt_lay_settings_colors)
-
-        qt_button_group_colors.setExclusive(True)
 
         qt_radio_mode_1.clicked.connect(lambda: self.on_clicked_radio_colors(1))
         qt_radio_mode_2.clicked.connect(lambda: self.on_clicked_radio_colors(2))
@@ -278,7 +247,6 @@ class SettingsUI:
         ''' Debug level '''
         qt_button_group_debug_level = QButtonGroup()
         qt_radio_group_debug_level = QGroupBox()
-        qt_radio_group_debug_level.setMaximumHeight(55)
         qt_radio_group_debug_level.setTitle("Debug level")
         qt_lay_settings_debug_level = QHBoxLayout()
 
@@ -330,7 +298,6 @@ class SettingsUI:
         qt_radio_group_info.setTitle("Support and updates")
         qt_label_info = QLabel("              www.simbatch.com ")
         qt_lay_settings_info.addWidget(qt_label_info)
-        qt_radio_group_info.setMaximumHeight(130)
         qt_radio_group_info.setLayout(qt_lay_settings_info)
 
         ''' Settings bottom buttons '''
@@ -349,9 +316,13 @@ class SettingsUI:
 
         ''' Add all QGroupBoxes to  qt_scroll_widget  '''
         qt_lay_settings_main.addWidget(qt_group_config_ini)
-        qt_lay_settings_main.addWidget(qt_radio_group_data)  # widget size linux fix
-        qt_lay_settings_main.addItem(QSpacerItem(1, 40))
-        qt_lay_settings_main.addWidget(qt_radio_group_colors)  # widget size linux fix
+        qt_lay_settings_main.addItem(QSpacerItem(1, 4))
+        qt_lay_settings_main.addWidget(qt_group_data_options)  
+        qt_lay_settings_main.addWidget(qt_group_data_directory)   
+        qt_lay_settings_main.addWidget(qt_group_definitions_directory)  
+        qt_lay_settings_main.addWidget(qt_group_example_data)    
+        qt_lay_settings_main.addItem(QSpacerItem(1, 4))
+        qt_lay_settings_main.addWidget(qt_radio_group_colors)  
         qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         # qt_lay_settings_main.addWidget(qt_radio_group_sql)   # PRO version
         # qt_lay_settings_main.addWidget(qt_radio_group_user)   # PRO version

@@ -1,4 +1,8 @@
-# simbatch_no_gui_exampple
+"""
+simbatch no gui example
+"""
+
+import core.api as simbatchapi
 
 show_info = False
 
@@ -8,18 +12,7 @@ add_to_queue_with_param = False
 
 clear_queue = True
 
-#
-##
-###
-#####
-########
-################
-########################
-
-import core.api as simbatchapi
-
 """ init SimBATCH """
-
 api = simbatchapi.SimBatchAPI(ini_file="config.ini")
 
 
@@ -88,4 +81,3 @@ if add_to_queue_with_param is True:
 if show_info is True:
     api.print_queue_info()
     api.print_last_queue_item()
-

@@ -1,0 +1,65 @@
+{
+  "projects": {
+    "meta": {
+      "timestamp": "2019-02-03 20:34:17", 
+      "total": 3, 
+      "jsonFormat": "http://json-schema.org/"
+    }, 
+    "data": {
+      "0": {
+        "dirProj": "C:\\exampleProj\\", 
+        "name": "Sample Proj 1", 
+        "stateId": 22, 
+        "pattern": "<seq##>\\<seq##>_<sh###>", 
+        "dirCust": "custom\\", 
+        "state": "ACTIVE", 
+        "dirCach": "cache\\", 
+        "dirScr": "scripts\\", 
+        "dirEnv": "env\\", 
+        "dirProp": "props\\", 
+        "zerosInVersion": 3, 
+        "dirWrk": "exampleWokingDir\\", 
+        "dirCam": "cam\\", 
+        "id": 1, 
+        "isDefault": 0, 
+        "desc": "sample project 1"
+      }, 
+      "1": {
+        "dirProj": "D:\\proj\\", 
+        "name": "Sample Proj 2", 
+        "stateId": 22, 
+        "pattern": "<seq##>\\<sh###>", 
+        "dirCust": "custom\\", 
+        "state": "ACTIVE", 
+        "dirCach": "cache\\", 
+        "dirScr": "scripts\\", 
+        "dirEnv": "env\\", 
+        "dirProp": "props\\", 
+        "zerosInVersion": 3, 
+        "dirWrk": "fx\\", 
+        "dirCam": "cam\\", 
+        "id": 2, 
+        "isDefault": 0, 
+        "desc": "sample project 2"
+      }, 
+      "2": {
+        "dirProj": "E:\\exampleProj\\", 
+        "name": "Sample Proj 3", 
+        "stateId": 22, 
+        "pattern": "s_<sh##>", 
+        "dirCust": "custom\\", 
+        "state": "ACTIVE", 
+        "dirCach": "cache\\", 
+        "dirScr": "scripts\\", 
+        "dirEnv": "env\\", 
+        "dirProp": "props\\", 
+        "zerosInVersion": 3, 
+        "dirWrk": "exampleWokingDir\\", 
+        "dirCam": "cam\\", 
+        "id": 3, 
+        "isDefault": 1, 
+        "desc": "sample project 3"
+      }
+    }
+  }
+}

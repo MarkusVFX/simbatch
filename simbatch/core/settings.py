@@ -349,10 +349,9 @@ class Settings:
                         if self.store_data_mode == 1:
                             if self.comfun.path_exists(self.store_data_json_directory_abs) is False:
                                 if len(self.store_data_json_directory_abs) == 0:
-                                    self.settings_err_info = "Data directory not defined!"
+                                    self.settings_err_info = "Database directory not defined!"
                                 else:
-                                    self.settings_err_info = "Data directory not exists!   (" + \
-                                                             self.store_data_json_directory_abs + ")"
+                                    self.settings_err_info = "Database directory not exists!"
                             elif self.comfun.path_exists(self.store_definitions_directory_abs) is False:
                                 if len(self.store_definitions_directory_abs) == 0:
                                     self.settings_err_info = "Definitions directory not defined!"
@@ -379,7 +378,7 @@ class Settings:
             self.settings_err_info = " [ERR] config.ini file not exists: {}".format(self.ini_file)
             self.loading_state = -1
 
-        print "\n\n[ERR] ",self.settings_err_info
+        print "\n\n[ERR] ", self.settings_err_info
         return False
 
     def save_settings(self, settings_file=""):
@@ -438,6 +437,7 @@ class Settings:
             self.logger.err("found {} errors in config file".format(errors))
             return False
 
+    @staticmethod
     def rbg_to_brush(self, r, g, b):
         return ""
     

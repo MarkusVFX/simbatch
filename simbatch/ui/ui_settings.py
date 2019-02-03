@@ -102,7 +102,6 @@ class SettingsUI:
         ''' DATA DIRECTORY '''
         qt_group_data_directory = QGroupBox() 
         qt_lay_settings_data = QHBoxLayout()
-        # qt_lay_settings_data.setMaximumHeight(155) # mmm
         qt_settings_data_directory_label = QLabel("Data directory : ")
 
         if self.settings.current_os == 1:

@@ -3,7 +3,7 @@
 
 simbatch/config_dev.ini
 !simbatch/data/
-simbatch/data/*
+data/*
 /prv
 /data_test
 /definitions_test

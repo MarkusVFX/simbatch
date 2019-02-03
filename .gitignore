@@ -4,6 +4,7 @@
 simbatch/config_dev.ini
 !simbatch/data/
 simbatch/data/*
+simbatch/data/data*
 data/
 **/data/*
 /prv
@@ -27,6 +28,7 @@ eggs/
 *.egg-info/
 *.egg
 *.pyc
+*.json
 __pycache__/
 .pytest_cache/
 

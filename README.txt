@@ -6,15 +6,15 @@ Good news is: it's almost done!
 
 Roadmap:
 
-SimBATCH Framework (beta release date) : November 25
+SimBATCH Framework (beta release date) : current version
 
 SimBATCH Definitions
-Maya : December 2
-Houdini : December 9
-3dsMAX : December 16
-RealFlow : December 23
+Maya : February
+Houdini : April
+3dsMAX : May
+RealFlow : May
 
-SimBATCH PRO VERSION: January 15
+SimBATCH PRO VERSION: May/June
 
 
 more info about this tool :  http://www.simbatch.com/

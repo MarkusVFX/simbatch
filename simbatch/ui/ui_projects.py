@@ -114,8 +114,10 @@ class ProjectsUI:
 
         # wfa :  element belongs to widget form add
         wfa_proj_name_label = SimpleLabel("New project name: ")
-        wfa_project_name_edit = EditLineWithButtons(" ", label_minimum_size=7)
+        wfa_project_name_edit = EditLineWithButtons(" ", label_minimum_size=7)  # if proj name exist: "!"
+        wfa_project_name_edit.label.setStyleSheet("""color:#FF0000;font-weight: bold;""")
         self.wfa_project_name_edit = wfa_project_name_edit
+        wfa_project_name_edit.qt_edit_line.textChanged.connect(self.on_change_proj_name)
         wfa_project_dir_label = SimpleLabel("Project directory: ")
         wfa_project_dir_edit = EditLineWithButtons(" ", text_on_button_1="Get", label_minimum_size=7)
         self.wfa_project_dir_edit = wfa_project_dir_edit
@@ -431,9 +433,17 @@ class ProjectsUI:
             self.qt_form_add.hide()
             self.add_form_state = 0
 
+    def on_change_proj_name(self, name):
+        for p in self.prj.projects_data:
+            if name == p.project_name:
+                self.wfa_project_name_edit.label.setText("!")
+                return True
+        self.wfa_project_name_edit.label.setText(" ")
+
+
     def on_click_add_project(self, new_project_name, project_directory, working_directory, cameras_directory,
                              cache_directory, description, pin_checked, as_default_checked):
-        if len(new_project_name) > 0 and len(project_directory) > 0:
+        if len(new_project_name) > 0 and len(project_directory) > 0 and self.comfun.is_absolute(project_directory):
             cb_state = False   # TODO  get cb_state
             if cb_state:
                 set_default = 1
@@ -481,8 +491,10 @@ class ProjectsUI:
         else:
             if len(new_project_name) == 0:
                 self.top_ui.set_top_info(" Fill project name !", 8)
-            else:
+            elif len(project_directory) == 0:
                 self.top_ui.set_top_info(" Pick project directory !", 8)
+            else:
+                self.top_ui.set_top_info(" Project directory is not absolute !", 8)
 
     #  Edit
     #  Edit  Edit

@@ -1,10 +1,173 @@
 {
   "schemas": {
     "meta": {
-      "timestamp": "2019-02-03 21:08:08", 
-      "total": 0, 
+      "timestamp": "2019-02-04 22:32:33", 
+      "total": 5, 
       "jsonFormat": "http://json-schema.org/"
     }, 
-    "data": {}
+    "data": {
+      "0": {
+        "definition": "virtual_definition", 
+        "name": "schema 1", 
+        "stateId": 22, 
+        "projId": 1, 
+        "actions": {
+          "0": {
+            "actual": "", 
+            "name": "virtual action", 
+            "mode": null, 
+            "template": [
+              "template ", 
+              "<f>"
+            ], 
+            "evos": false, 
+            "desc": "virt descr"
+          }
+        }, 
+        "state": "ACTIVE", 
+        "version": 1, 
+        "id": 1, 
+        "desc": "first schema"
+      }, 
+      "1": {
+        "definition": "virtual_definition", 
+        "name": "schema 2", 
+        "stateId": 22, 
+        "projId": 1, 
+        "actions": {
+          "0": {
+            "actual": "", 
+            "name": "virtual action", 
+            "mode": null, 
+            "template": [
+              "template ", 
+              "<f>"
+            ], 
+            "evos": false, 
+            "desc": "virt descr"
+          }
+        }, 
+        "state": "ACTIVE", 
+        "version": 3, 
+        "id": 2, 
+        "desc": "fire by FumeFx"
+      }, 
+      "2": {
+        "definition": "virtual_definition", 
+        "name": "schema 3", 
+        "stateId": 22, 
+        "projId": 2, 
+        "actions": {
+          "0": {
+            "actual": "", 
+            "name": "virtual action", 
+            "mode": null, 
+            "template": [
+              "template ", 
+              "<f>"
+            ], 
+            "evos": false, 
+            "desc": "virt descr"
+          }
+        }, 
+        "state": "ACTIVE", 
+        "version": 5, 
+        "id": 3, 
+        "desc": "fire with smoke"
+      }, 
+      "3": {
+        "definition": "virtual_definition", 
+        "name": "schema 4", 
+        "stateId": 22, 
+        "projId": 3, 
+        "actions": {
+          "0": {
+            "actual": "", 
+            "name": "virtual action", 
+            "mode": null, 
+            "template": [
+              "template ", 
+              "<f>"
+            ], 
+            "evos": false, 
+            "desc": "virt descr"
+          }
+        }, 
+        "state": "ACTIVE", 
+        "version": 4, 
+        "id": 4, 
+        "desc": "cloth with fire"
+      }, 
+      "4": {
+        "definition": "example_definition", 
+        "name": "unit tests schema", 
+        "stateId": 22, 
+        "projId": 4, 
+        "actions": {
+          "0": {
+            "actual": "", 
+            "name": "Open", 
+            "mode": null, 
+            "template": [
+              "interactions.maya_open_scene(", 
+              "<ui>", 
+              ")"
+            ], 
+            "evos": false, 
+            "desc": "Open Maya scene"
+          }, 
+          "1": {
+            "actual": "", 
+            "name": "Simulate", 
+            "mode": "nCloth", 
+            "template": [
+              "interactions.maya_simulate_ncloth(", 
+              "<sim_time_start>", 
+              ", ", 
+              "<sim_time_end>", 
+              ", ", 
+              "<ui>", 
+              ", ", 
+              "<shot_cache_out_dir>", 
+              ")"
+            ], 
+            "evos": true, 
+            "desc": "nCloth sim"
+          }, 
+          "2": {
+            "actual": "", 
+            "name": "Render", 
+            "mode": "BLAST", 
+            "template": [
+              "interactions.maya_render_blast(", 
+              "<prev_time_start>", 
+              ", ", 
+              "<prev_time_end>", 
+              ", ", 
+              "<ui>", 
+              ")"
+            ], 
+            "evos": false, 
+            "desc": "grab viewport"
+          }, 
+          "3": {
+            "actual": "", 
+            "name": "Save", 
+            "mode": null, 
+            "template": [
+              "interactions.maya_save_scene(", 
+              "<ui>", 
+              ")"
+            ], 
+            "evos": false, 
+            "desc": "Save Maya Scene"
+          }
+        }, 
+        "state": "ACTIVE", 
+        "version": 1, 
+        "id": 5, 
+        "desc": "schema example"
+      }
+    }
   }
 }

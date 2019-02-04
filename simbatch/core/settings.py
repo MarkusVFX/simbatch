@@ -437,8 +437,8 @@ class Settings:
             self.logger.err("found {} errors in config file".format(errors))
             return False
 
-    @staticmethod
     def rbg_to_brush(self, r, g, b):
+        self.logger.wrn("This function should be never used")
         return ""
     
     def update_ui_colors(self):

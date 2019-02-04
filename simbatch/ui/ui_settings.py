@@ -108,16 +108,21 @@ class SettingsUI:
             show_store_data_json_directory = settings.store_data_json_directory
         else:
             show_store_data_json_directory = self.comfun.convert_to_win_path(settings.store_data_json_directory)
-        qt_settings_data_directory_edit = QLineEdit(show_store_data_json_directory)
-        qt_settings_data_directory_button = QPushButton("Get")
+        qt_settings_data_directory_edit = QLineEdit(show_store_data_json_directory)  # TODO   EditLineWithButtons
+        qt_settings_data_directory_button = QPushButton("Get")  # TODO   EditLineWithButtons
+        qt_settings_data_directory_test_button = QPushButton("Test")  # TODO   EditLineWithButtons
+        qt_settings_data_directory_button.setFixedWidth(40)  # TODO   EditLineWithButtons
+        qt_settings_data_directory_test_button.setFixedWidth(50)  # TODO   EditLineWithButtons
         qt_settings_data_directory_button.setToolTip('Select directory for store data')
         qt_settings_data_directory_button.clicked.connect(self.on_click_get_data_dir)
+        qt_settings_data_directory_test_button.clicked.connect(self.on_click_test_data_dir)
 
         self.qt_settings_data_directory_edit = qt_settings_data_directory_edit
         qt_settings_data_directory_edit.textChanged.connect(self.on_change_data_dir)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_label)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_edit)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_button)
+        qt_lay_settings_data.addWidget(qt_settings_data_directory_test_button)
         
         qt_group_data_directory.setLayout(qt_lay_settings_data)
         
@@ -132,15 +137,20 @@ class SettingsUI:
         else:
             show_store_definitions_directory = self.comfun.convert_to_win_path(settings.store_definitions_directory)
         qt_settings_definitions_directory_edit = QLineEdit(show_store_definitions_directory)
-        qt_settings_definitions_directory_button = QPushButton("Get")
+        qt_settings_definitions_directory_button = QPushButton("Get")  # TODO   EditLineWithButtons
+        qt_settings_definitions_directory_test_button = QPushButton("Test")  # TODO   EditLineWithButtons
+        qt_settings_definitions_directory_button.setFixedWidth(40)  # TODO   EditLineWithButtons
+        qt_settings_definitions_directory_test_button.setFixedWidth(50)  # TODO   EditLineWithButtons
         qt_settings_definitions_directory_button.setToolTip('Select definitions directory')
         qt_settings_definitions_directory_button.clicked.connect(self.on_click_get_definitions_dir)
+        qt_settings_definitions_directory_test_button.clicked.connect(self.on_click_test_definitions_dir)
 
         self.qt_settings_definitions_directory_edit = qt_settings_definitions_directory_edit
         qt_settings_definitions_directory_edit.textChanged.connect(self.on_change_definitions_dir)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_label)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_edit)
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_button)
+        qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_test_button)
         
         qt_group_definitions_directory.setLayout(qt_lay_settings_definitions)
         
@@ -377,7 +387,6 @@ class SettingsUI:
                     self.batch.logger.inf("No access to config.ini")
 
     def test_exist_config_ini(self):
-
         ret_d = self.comfun.path_exists(self.comfun.get_path_from_full(self.settings.ini_file), info="config.ini dir")
         if ret_d:
             ret_f = self.comfun.file_exists(self.settings.ini_file, info="config.ini")
@@ -399,6 +408,28 @@ class SettingsUI:
                                    self.comfun.get_path_from_full(self.settings.ini_file)))
             self.err_info_config_ini.show("Please initialize SimBatch with proper startup config file")
             return False
+
+    def on_click_test_data_dir(self):
+        if self.comfun.path_exists(self.batch.sts.store_data_json_directory_abs):
+            acces_test = self.comfun.test_directory_access(self.batch.sts.store_data_json_directory_abs, "Database")
+            if acces_test[1]:
+                self.top_ui.set_top_info("Database dir is writable !", 1)
+            else:
+                self.top_ui.set_top_info("Database dir is not writable !", 9)
+        else:
+            self.top_ui.set_top_info("Database directory not exist !", 9)
+            self.batch.logger.wrn(("Database dir not exist! ({})".format(self.batch.sts.store_data_json_directory_abs)))
+
+    def on_click_test_definitions_dir(self):
+        test_dir = self.batch.sts.store_definitions_directory_abs
+        if self.comfun.path_exists(test_dir):
+            if self.comfun.test_directory_access(test_dir, "Definitons" )[1]:
+                self.top_ui.set_top_info("Definitons is writable !", 1)
+            else:
+                self.top_ui.set_top_info("Definitons is not writable !", 9)
+        else:
+            self.top_ui.set_top_info("Definitons directory not exist !", 9)
+            self.batch.logger.wrn(("Definitons dir not exist! ({})".format(test_dir)))
 
     def on_click_radio_data(self, index):
         #  PRO version sql

@@ -16,7 +16,7 @@ import sys
 sys.path.append(simbatch_instalation_dir)
 
 import core.core as simbatch_core
-import simbatch.server.server as simbatch_server
+import server.server as simbatch_server
 import ui.mainw as simbatch_ui
 
 from PySide2 import QtCore, QtUiTools, QtWidgets

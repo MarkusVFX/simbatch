@@ -102,7 +102,7 @@ class SettingsUI:
         ''' DATA DIRECTORY '''
         qt_group_data_directory = QGroupBox() 
         qt_lay_settings_data = QHBoxLayout()
-        qt_settings_data_directory_label = QLabel("Data directory : ")
+        qt_settings_data_directory_label = QLabel("Database directory : ")
 
         if self.settings.current_os == 1:
             show_store_data_json_directory = settings.store_data_json_directory
@@ -376,7 +376,7 @@ class SettingsUI:
             if ret_W:
                 info = "{} is writable ".format(os.path.basename(self.settings.ini_file))
                 self.top_ui.set_top_info(info, 4)
-                self.batch.logger.inf(info)
+                self.batch.logger.inf(info+self.settings.ini_file)
             else:
                 ret_R = os.access(self.settings.ini_file, os.R_OK)
                 if ret_R:
@@ -583,7 +583,10 @@ class SettingsUI:
                 # self.settings.store_data_json_directory = data_path
                 # self.settings.store_definitions_directory = definitions_path
                 # self.batch.sts.update_absolute_directories()
-                self.settings.save_settings()
+                ret = self.settings.save_settings()
+                if ret is False:
+                    self.top_ui.set_top_info("Settings NOT saved!", 9)
+                    self.batch.logger.err(("Settings NOT saved ! ".format(self.settings.ini_file)))
             else:
                 self.batch.logger.err(("Wrong definitions path, directory not exist  :", definitions_path))
         else:

@@ -382,6 +382,8 @@ class Settings:
         return False
 
     def save_settings(self, settings_file=""):
+        if len(settings_file) == 0:
+            settings_file = self.ini_file  # JSON format
         comfun = self.comfun
         data_path = self.store_data_json_directory_abs
 
@@ -401,11 +403,6 @@ class Settings:
         self.default_settings["window"]["sizeY"] = self.window[3]
         self.default_settings["window"]["alwaysOnTop"] = self.always_on_top
 
-        if len(settings_file) == 0:
-            settings_file = self.ini_file  # JSON format
-        comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True), nl_at_end=True)
-        self.logger.inf(("settings saved to: ", settings_file))
-
         if self.store_data_mode == 1:
             if comfun.file_exists(data_path + self.JSON_PROJECTS_FILE_NAME) is False:
                 comfun.create_empty_file(data_path + self.JSON_PROJECTS_FILE_NAME)
@@ -417,6 +414,14 @@ class Settings:
                 comfun.create_empty_file(data_path + self.JSON_QUEUE_FILE_NAME)
             if comfun.file_exists(data_path + self.JSON_SIMNODES_FILE_NAME) is False:
                 comfun.create_empty_file(data_path + self.JSON_SIMNODES_FILE_NAME)
+
+        ret = comfun.save_to_file(settings_file, json.dumps(self.default_settings, indent=2, sort_keys=True),
+                                  nl_at_end=True)
+        if ret:
+            self.logger.inf((" Settings saved to: ", settings_file))
+        else:
+            self.logger.err((" Settings NOT saved to: ", settings_file))
+            return ret
 
     def check_data_integration(self):
         #  out = json.dumps(self.json_settings_data, indent=2)  TODO cleanup

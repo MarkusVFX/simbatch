@@ -459,7 +459,8 @@ class CommonFunctions:
             if len(qt_edit_line.text()) > 0:
                 start_dir = qt_edit_line.text()
 
-        get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="hymmmm...."
+        get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="dir ...."
+
         self.logger.inf(("selected directory:", get_directory))
         if len(get_directory) > 0:
             qt_edit_line.setText(get_directory + dir_separator)

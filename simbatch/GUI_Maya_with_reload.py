@@ -70,7 +70,7 @@ simbatch.sts = simbatch_settings.Settings(simbatch.logger, "Maya", ini_file=simb
 
 import simbatch.core.lib.common as simbatch_comfun
 reload(simbatch_comfun)
-simbatch.comfun = simbatch_comfun.CommonFunctions()
+simbatch.comfun = simbatch_comfun.CommonFunctions(simbatch.logger)
 
 import simbatch.core.projects as simbatch_projects
 reload(simbatch_projects)

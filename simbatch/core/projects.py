@@ -1,4 +1,3 @@
-from lib.common import CommonFunctions
 from io import *
 
 # JSON Name Format, PEP8 Name Format
@@ -26,10 +25,10 @@ class SingleProject:
     DEF_STATE_ID_FOR_NEW_PROJ = 22
     comfun = None
 
-    def __init__(self, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
+    def __init__(self, comfun, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
                  cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
                  custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
-        self.comfun = CommonFunctions()
+        self.comfun = comfun
 
         self.id = project_id
         self.project_name = project_name
@@ -185,10 +184,9 @@ class Projects:
         else:
             return True
 
-    @staticmethod
-    def get_example_single_project():
-        return SingleProject(0, "Blank Proj", 1, 0, "defState", "proj_dir", "woking_dir", "cam", "cache", "env",
-                             "props", "scripts", "custom", "s_<sh##>", "description")
+    def get_example_single_project(self):
+        return SingleProject(self.comfun, 0, "Blank Proj", 1, 0, "defState", "proj_dir", "woking_dir", "cam", "cache",
+                             "env", "props", "scripts", "custom", "s_<sh##>", "description")
     
     #  update id, index and current for fast use by all modules
     def update_current_from_id(self, proj_id):
@@ -241,11 +239,10 @@ class Projects:
                 self.batch.logger.inf("PRO version with SQL")
                 return False
 
-    @staticmethod
-    def create_project(project_id, project_name, is_default, state_id, state, project_directory, working_directory,
+    def create_project(self, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
                        cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
                        custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
-        return SingleProject(project_id, project_name, is_default, state_id, state, project_directory,
+        return SingleProject(self.comfun, project_id, project_name, is_default, state_id, state, project_directory,
                              working_directory, cameras_directory, cache_directory, env_directory, props_directory,
                              scripts_directory, custom_directory, seq_shot_take_pattern, description,
                              zeros_in_version=zeros_in_version)
@@ -355,14 +352,14 @@ class Projects:
     #  example data for beginner users and for tests
     def create_example_project_data(self, do_save=True):
         collect_ids = 0
-        sample_project_1 = SingleProject(0, "Sample Proj 1", 1, 0, "defState", "C:\\exampleProj\\", "exampleWokingDir",
-                                         "cam", "cache", "env", "props", "scripts", "custom",
+        sample_project_1 = SingleProject(self.comfun, 0, "Sample Proj 1", 1, 0, "defState", "C:\\exampleProj\\",
+                                         "exampleWokingDir", "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\<seq##>_<sh###>", "sample project 1")
-        sample_project_2 = SingleProject(0, "Sample Proj 2", 1, 0, "defState", "D:\\proj\\", "fx",
+        sample_project_2 = SingleProject(self.comfun, 0, "Sample Proj 2", 1, 0, "defState", "D:\\proj\\", "fx",
                                          "cam", "cache", "env", "props", "scripts", "custom",
                                          "<seq##>\\<sh###>", "sample project 2")
-        sample_project_3 = SingleProject(0, "Sample Proj 3", 1, 0, "defState", "E:\\exampleProj\\", "exampleWokingDir",
-                                         "cam", "cache", "env", "props", "scripts", "custom",
+        sample_project_3 = SingleProject(self.comfun, 0, "Sample Proj 3", 1, 0, "defState", "E:\\exampleProj\\",
+                                         "exampleWokingDir", "cam", "cache", "env", "props", "scripts", "custom",
                                          "s_<sh##>", "sample project 3")
         collect_ids += self.add_project(sample_project_1)
         collect_ids += self.add_project(sample_project_2)
@@ -389,7 +386,7 @@ class Projects:
                 if json_projects['projects']['meta']['total'] > 0:
                     for li in json_projects['projects']['data'].values():
                         if len(li) == len(PROJECT_ITEM_FIELDS_NAMES):
-                            new_project = SingleProject(int(li['id']), li['name'], int(li['isDefault']),
+                            new_project = SingleProject(self.comfun, int(li['id']), li['name'], int(li['isDefault']),
                                                         int(li['stateId']), li['state'], li['dirProj'], li['dirWrk'],
                                                         li['dirCam'], li['dirCach'], li['dirEnv'], li['dirProp'],
                                                         li['dirScr'], li['dirCust'], li['pattern'], li['desc'],

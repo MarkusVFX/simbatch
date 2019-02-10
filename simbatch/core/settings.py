@@ -144,7 +144,7 @@ class Settings:
         """  MAYA win  C:\Program Files\Autodesk\Maya2014\ """
         # TODO check abs
 
-        self.comfun = CommonFunctions()
+        self.comfun = CommonFunctions(self.logger)
         self.runtime_env = runtime_env
         if runtime_env == "Server":
             self.with_gui = 0

@@ -20,7 +20,7 @@ class CommonFunctions:
         if logger is not None:
             self.logger = logger
         else:
-            self.logger = Logger(log_level=0, console_level=3)
+            self.logger = Logger(log_level=0, console_level=2)
         if separator is None:
             self.sep = os.sep
 
@@ -453,16 +453,20 @@ class CommonFunctions:
 
     def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir="", dir_separator="/"):
         start_dir = ""
+        self.logger.deepdb(("force_start_dir:", force_start_dir ))
         if len(force_start_dir) > 0:
             start_dir = force_start_dir
         else:
             if len(qt_edit_line.text()) > 0:
                 start_dir = qt_edit_line.text()
 
+        '''  getExistingDirectory always return UNIX format /  '''
         get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="dir ...."
-
+        self.logger.deepdb(("dir_separator:", dir_separator, "start_dir:", start_dir))
         self.logger.inf(("selected directory:", get_directory))
         if len(get_directory) > 0:
+            if dir_separator == "\\":  # OS MARKER
+                get_directory = self.convert_to_win_path(get_directory)
             qt_edit_line.setText(get_directory + dir_separator)
             return get_directory + dir_separator
         return ""

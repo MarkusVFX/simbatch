@@ -383,8 +383,11 @@ class ProjectsUI:
         force_start_dir = ""
         if self.batch.prj.current_project_index >= 0:
             force_start_dir = self.batch.prj.projects_data[self.batch.prj.current_project_index].project_directory
+            if self.batch.sts.current_os == 2:  # OS MARKER
+                force_start_dir = self.batch.comfun.convert_to_win_path(force_start_dir)
 
         sep = self.sts.dir_separator
+        self.batch.logger.deepdb(("dir separator:", sep, "force_start_dir:", force_start_dir))
         ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir, dir_separator=sep)
         if len(ret) > 0:
             self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, ret + "FX" + sep)  # TODO user cfg FX
@@ -439,7 +442,6 @@ class ProjectsUI:
                 self.wfa_project_name_edit.label.setText("!")
                 return True
         self.wfa_project_name_edit.label.setText(" ")
-
 
     def on_click_add_project(self, new_project_name, project_directory, working_directory, cameras_directory,
                              cache_directory, description, pin_checked, as_default_checked):

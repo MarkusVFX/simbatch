@@ -328,7 +328,7 @@ class TasksUI:
 
     def on_click_menu_open_base_setup(self):
         sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
-        self.batch.schemasUI.loadSchemaFile(sch.schema_name, self.batch.tsk.current_task.schema_ver)
+        self.mainw.sch_ui.load_base_setup(sch.schema_name, self.batch.tsk.current_task.schema_ver)
 
     def on_click_menu_open_computed(self):
         tsk_id = self.batch.tsk.current_task.id

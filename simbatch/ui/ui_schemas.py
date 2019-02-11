@@ -619,10 +619,12 @@ class SchemasUI:
             self.edit_form_state = 0
 
     def load_base_setup(self, schema_name, version=1):
-        file_to_load = self.batch.dfn.generate_tuple_base_setup_file_name(schema_name, ver=version)
+        file_to_load = self.batch.sio.generate_base_setup_file_name(schema_name, ver=version)
         if file_to_load[0] == 1:
             self.batch.logger.inf(("loadFile: ", file_to_load[1]))
-            self.batch.dfn.current_interactions.load_scene(file_to_load[1])
+            # self.batch.dfn.current_interactions.load_scene(file_to_load[1])
+            # self.batch.sio.soft_conn.load_scene(file_to_load[1])
+            self.on_menu_open()
         else:
             self.batch.logger.err(("loadFile: ", file_to_load))
 

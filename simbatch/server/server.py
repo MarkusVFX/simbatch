@@ -88,7 +88,7 @@ class SimBatchServer:
         if ret[0] == 1:
             self.batch.logger.inf(("Something to do: ", ret[1]), force_prefix=" > ")
         else:
-            self.batch.logger.err("Nothing to do", force_prefix=" > ")
+            self.batch.logger.inf("Nothing to do", force_prefix=" > ")
         
     def print_server_info(self):
         self.batch.logger.raw("\n\n\n")
@@ -380,22 +380,32 @@ class SimBatchServer:
         return self.set_queue_item_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
     def generate_script_for_external_software(self, py_file, job_script, job_description, job_id):
-        script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n\n"
-        script_out += "\n# sys append script dir    " + self.server_dir  # TODO sys append script dir
-        script_out += "\nfrom SimBatch_executor import * \nSiBe = SimBatchExecutor(1, " + str(job_id) + ")"  # TODO 1:id
-        script_out += "\nSiBe.addToLogWithNewLine( \"Soft START:" + job_description + "\")\n"  # TODO Soft+format+PEP
+        script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n"
 
-        script_lines = job_script.split("|")
+        append_dir = os.path.dirname(os.path.dirname(os.path.dirname(self.server_dir)))
+        append_dir = append_dir.replace("\\", "/")  # OS MARKER
+
+        script_out += "\nimport sys\nsys.path.append(\"" + append_dir + "\")"
+        script_out += "\nimport simbatch.core.core as simbatch_core\nimport simbatch.server.executor as executor"
+        script_out += '\n\nsimbatch = simbatch_core.SimBatch("executor")'
+
+        script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ")"  # TODO 1:id
+        script_out += "\ninteractions = sibe.batch.dfn.current_interactions"
+
+        script_out += "\nsibe.addToLogWithNewLine( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP
+
+        script_lines = job_script.split(";")
         for li in script_lines:
-            li_slash = li.replace('\\', '\\\\')
+            li_slash = li.replace('\\', '\\\\').lstrip()
             script_out += li_slash + "\n"
 
-        script_out += "\nSiBe.finalizeQueueJob()\n"
+        script_out += "\nsibe.finalizeQueueJob()\n"
 
         ret = self.batch.comfun.save_to_file(py_file, script_out)
         if ret:
             return script_out
         else:
+            self.comfun.logger.err(" script_for_external_software NOT saved !")
             return None
 
     def is_something_to_do(self, force_software=0):
@@ -416,13 +426,20 @@ class SimBatchServer:
             comm = "kate " + script  # TODO universal info/text/message
             subprocess.Popen(comm, shell=True)
         if self.batch.sts.current_os == 2:
-            comm = "maya.exe -script " + script  # mayabatch   self.mayaExeFilePath +
+            script = script[:-2] + "mel"
+
+            # comm = "maya.exe -command python(\"execfile('" + self.comfun.convert_to_unix_path(script) + "')\")"
+            comm = "maya.exe -script " + self.comfun.convert_to_unix_path(script)
+            self.batch.logger.db(("run_external_software comm", comm))
             try:
                 subprocess.Popen(comm, shell=True)
             except:
                 self.batch.logger.err(("Command not recognized/invalid: ", comm))
                 self.batch.logger.err(("run_external_software script:", script))
                 pass
+
+            self.jobs_computed += 1
+
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
     """ marker SIM 010   running   """
@@ -569,8 +586,13 @@ class SimBatchServer:
                     
                     if self.jobs_limit > 0:  # nothing to compute on mode with LIMIT ON
                         """  BREAK ! """
-                        self.batch.logger.db("Breaking loop! Nothing to compute, limit:{}".format(self.jobs_limit))
+                        if self.jobs_computed == self.jobs_limit:
+                            self.batch.logger.db("Breaking loop! The limit has been reached :{}".format(self.jobs_limit))
+                        else:
+                            self.batch.logger.wrn("Breaking loop! The limit was not reached :{}/{}".format(self.jobs_computed, self.jobs_limit))
                         self.jobs_computed = self.jobs_limit
+                    else:
+                        pass  # job_limit == 0   ->   NO LIMIT  -> INFINITE LOOP
 
                     if self.framework_mode is True:  # run local
                         """  BREAK ! """

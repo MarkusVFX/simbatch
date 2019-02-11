@@ -13,14 +13,21 @@ class Interactions:
     def schema_item_double_click(self, param):
         self.maya_open_scene(param)
 
+    # framework interactions
+    def task_item_double_click(self, param):
+        self.maya_open_scene(param)
+
     def save_as_next_version(self, param):
         self.save_current_scene_as(param)
 
     # maya interactions
     def maya_open_scene(self, target):
-        import maya.cmds as cmd
-        ret = cmd.file(target, o=True, force=True)
-        return ret
+        try:
+            import maya.cmds as cmd
+            ret = cmd.file(target, o=True, force=True)
+            return ret
+        except IOError as e:
+            print "I/O error({0}): {1}".format(e.errno, e.strerror)
 
     def save_current_scene_as(self, target):
         import maya.cmds as cmd
@@ -56,8 +63,8 @@ class Interactions:
         sel = cmd.ls(selection=True)
         return sel
         
-    def maya_import_ani(self, objects, dir):
-        pass
+    def maya_import_ani(self, objects, dir=""):
+        print " [DEF] maya_import_ani"
         
     def maya_import_cam(self, objects, file_or_dir):
         pass
@@ -69,7 +76,7 @@ class Interactions:
         pass
         
     def maya_simulate_ncloth(self, ts, te, objects_names, cache_dir):
-        pass
+        print " [DEF] maya_simulate_ncloth"
         
     def maya_simulate_nhair(self, ts, te, objects_names, cache_dir):
         pass

@@ -267,6 +267,13 @@ class CommonFunctions:
         else:
             return None
 
+    @staticmethod
+    def convert_to_unix_path(path_to_convert):
+        if path_to_convert is not None:
+            return path_to_convert.replace("\\", "/")
+        else:
+            return None
+
     def get_proper_path(self, get_path, info=""):
         if len(get_path) > 0:
             if get_path.find("/") >= 0:

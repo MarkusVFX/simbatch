@@ -392,20 +392,20 @@ class SimBatchServer:
         script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ")"  # TODO 1:id
         script_out += "\ninteractions = sibe.batch.dfn.current_interactions"
 
-        script_out += "\nsibe.addToLogWithNewLine( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP
+        script_out += "\nsibe.add_to_log_with_new_line( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP
 
         script_lines = job_script.split(";")
         for li in script_lines:
             li_slash = li.replace('\\', '\\\\').lstrip()
             script_out += li_slash + "\n"
 
-        script_out += "\nsibe.finalizeQueueJob()\n"
+        script_out += "\nsibe.finalize_queue_job()\n"
 
         ret = self.batch.comfun.save_to_file(py_file, script_out)
         if ret:
             return script_out
         else:
-            self.comfun.logger.err(" script_for_external_software NOT saved !")
+            self.comfun.logger.err("script_for_external_software NOT saved !")
             return None
 
     def is_something_to_do(self, force_software=0):

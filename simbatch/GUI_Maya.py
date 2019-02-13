@@ -40,6 +40,11 @@ except ImportError:
     except ImportError:
         print "shiboken import ERROR"
 
+try:
+    simbatch_window.close()
+except:
+    pass
+
 
 def get_maya_window():
     pointer = mui.MQtUtil.mainWindow()
@@ -55,6 +60,6 @@ simbatch_server = simbatch_server.SimBatchServer(simbatch, framework_mode=True)
 
 
 if simbatch.sts.with_gui == 1:
-    main_window = simbatch_ui.MainWindow(simbatch_server, parent=maya_window)
-    main_window.show()
-    main_window.post_run(loading_data_state)
+    simbatch_window = simbatch_ui.MainWindow(simbatch_server, parent=maya_window)
+    simbatch_window.show()
+    simbatch_window.post_run(loading_data_state)

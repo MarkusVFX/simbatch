@@ -310,7 +310,7 @@ class Definitions:
             if InteractionClass is None:
                 return None
             else:
-                loaded_interaction = InteractionClass(self.sts.current_os, self.batch.logger)
+                loaded_interaction = InteractionClass(self.sts.current_os, self.batch.logger, self.comfun)
             return loaded_interaction
         else:
             return None

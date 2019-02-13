@@ -1,10 +1,16 @@
 class Interactions:
     current_os = -1
     logger = None
+    comfun = None
 
-    def __init__(self, current_os, logger):
+    def __init__(self, current_os, logger, comfun):
         self.current_os = current_os
         self.logger = logger
+        self.comfun = comfun
+        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
+        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
+        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
+        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
 
     def print_info(self):
         self.logger.raw("This is interaction with Maya")
@@ -60,6 +66,7 @@ class Interactions:
         return playback_min, playback_max
     
     def maya_get_selection(self):
+        import maya.cmds as cmd
         sel = cmd.ls(selection=True)
         return sel
         
@@ -77,6 +84,16 @@ class Interactions:
         
     def maya_simulate_ncloth(self, ts, te, objects_names, cache_dir):
         print " [DEF] maya_simulate_ncloth"
+        import maya.cmds as cmd
+        fr_start = self.comfun.int_or_val(ts, 0)
+        fr_end = self.comfun.int_or_val(te, 0)
+        print "\n\n\n"
+        print "  SIM : ", objects_names, fr_start, fr_end
+        print "\n\n\n"
+        for fr in range(int(ts), int(te)):
+            cmd.currentTime(fr)
+            cmd.refresh()
+
         
     def maya_simulate_nhair(self, ts, te, objects_names, cache_dir):
         pass

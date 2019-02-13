@@ -3,9 +3,10 @@ class Interactions:
     current_os = -1
     logger = None
 
-    def __init__(self, current_os, logger):
+    def __init__(self, current_os, logger, comfun):
         self.current_os = current_os
         self.logger = logger
+        self.comfun = comfun
 
     def print_info(self):
         self.logger.raw("This is interaction with Houdini")

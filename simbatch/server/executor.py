@@ -14,7 +14,7 @@ except ImportError:
 
 
 class SimBatchExecutor():
-    server_dir = ""
+    server_dir = "server"
     log_file_name = "server_log.txt"
     job_start_time = None
     hack_sim_node_name = "SimNode_01"
@@ -53,8 +53,8 @@ class SimBatchExecutor():
         else:
             return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    def set_state_and_add_to_log(self, state_name, state_id, server_name, with_save=True, add_current_time=False,
-                                 set_time=""):
+    def set_queue_state_and_add_to_log(self, state_name, state_id, server_name, with_save=True, add_current_time=False,
+                                       set_time=""):
 
         self.batch.que.clear_all_queue_items()
         self.batch.que.load_queue()
@@ -71,21 +71,21 @@ class SimBatchExecutor():
         if with_save is True:
             self.batch.que.save_queue()
 
-    def set_queue_job_working(self, id, server_name, server_id, with_save=True):  # setStatus
-        self.set_state_and_add_to_log("WORKING", 4, server_name, with_save=with_save, add_current_time=True)
+    def set_queue_job_working(self, server_name, with_save=True):
+        self.set_queue_state_and_add_to_log("WORKING", 4, server_name, with_save=with_save, add_current_time=True)
 
-    def set_queue_job_done(self, id, server_name, server_id, with_save=True, set_time=""):  # setStatus
-        self.set_state_and_add_to_log("DONE", 11, server_name, with_save=with_save, set_time=set_time)
+    def set_queue_job_done(self, server_name, with_save=True, set_time=""):
+        self.set_queue_state_and_add_to_log("DONE", 11, server_name, with_save=with_save, set_time=set_time)
 
-    def set_queue_job_error(self, id, server_name, server_id, with_save=True):  # setStatus
-        self.set_state_and_add_to_log("ERR", 9, server_name, with_save=with_save, add_current_time=True)
+    def set_queue_job_error(self, server_name, with_save=True):
+        self.set_queue_state_and_add_to_log("ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
     def finalize_queue_job(self):
         time.sleep(1)
         job_time = str(0.1 * int((time.time() - self.job_start_time) * 10))
         print " [INF] job time   ", job_time
 
-        self.set_queue_job_done(self.executor_queue_id, self.hack_sim_node_name, 123456, set_time=job_time)
+        self.set_queue_job_done(self.hack_sim_node_name, set_time=job_time)
 
         idx = self.batch.nod.get_node_index_by_name(self.hack_sim_node_name)
         # print " idx  ", idx, self.hack_sim_node_name
@@ -100,13 +100,16 @@ class SimBatchExecutor():
             self.add_to_log_with_new_line("HOU Exiting")
             print " [INF] HOU Exit  "
             self.exit_houdini()
-        else:  ###  maya !!
+        else:  # maya !!!
             self.add_to_log_with_new_line("Maya Exiting")
             print " [INF] Maya Exit  "
             self.exit_maya()
 
+    def exit_houdini(self):
+        import hou
+        hou.exit(suppress_save_prompt=True)
+
     def exit_maya(self):
-        # sys.exit()
         import maya.cmds as cmds
         cmds.quit(force=True)
         self.add_to_log_with_new_line("Maya Exited")

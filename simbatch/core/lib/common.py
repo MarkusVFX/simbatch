@@ -201,15 +201,18 @@ class CommonFunctions:
                 return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     def format_seconds_to_string(self, seconds):
-        if self.is_int(seconds):
-            if seconds < 60:
-                return str(int(seconds)) + "s"
-            elif seconds < 3600:
-                return "{:.1f}m".format(1.0 * seconds / 60)
+        if self.is_float(seconds) is False:
+            if self.can_get_float(seconds):
+                seconds = float(seconds)
             else:
-                return "{:.1f}h".format(1.0 * seconds / 3600)
+                return "NaN:{}".format(seconds)
+
+        if seconds < 60:
+            return str(int(seconds)) + "s"
+        elif seconds < 3600:
+            return "{:.1f}m".format(1.0 * seconds / 60)
         else:
-            return "NaN[{}]".format(seconds)
+            return "{:.1f}h".format(1.0 * seconds / 3600)
 
     # files and directories ...
     def current_scripts_path(self):

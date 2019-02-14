@@ -13,7 +13,8 @@ simbatch_config_ini = "S:/simbatch/config.ini"
 import hou
 import sys
 
-sys.path.append(simbatch_instalation_dir)
+if simbatch_instalation_dir in sys.path is False:
+    sys.path.append(simbatch_instalation_dir)
 
 import core.core as simbatch_core
 import server.server as simbatch_server

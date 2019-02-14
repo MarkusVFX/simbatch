@@ -32,7 +32,7 @@ simnode_states:
                         TODO
                     else:
                         """ run as simnode """
-                        self.generate_script_for_external_software(generated_script_file, job_script, job_description, job_id)
+                        self.generate_script_from_queue_item(generated_script_file, job_script, job_description, job_id)
                         self.run_external_software(generated_script_file)
                     """     END SINGLE JOB     """
             

@@ -17,6 +17,7 @@ class TasksFormCreateOrEdit(QWidget):
     form_task_item = None  # store new or edited data as TaskItem
 
     batch = None
+    comfun = None
     mainw = None
 
     schemas_id_array = []
@@ -50,6 +51,7 @@ class TasksFormCreateOrEdit(QWidget):
         QWidget.__init__(self)
 
         self.batch = batch
+        self.comfun = batch.comfun
         self.mainw = mainw
         self.top_ui = mainw.top_ui
         self.sts = batch.sts
@@ -252,15 +254,25 @@ class TasksFormCreateOrEdit(QWidget):
         #  TODO get frame range from cache or framerange file.
 
     def get_frame_range_from_scene(self):
-        # ret = self.batch.o.soft_conn.get_curent_frame_range()
-        ret = None  # TODO   .o.  softwares -> definitions
-        self.batch.logger.db(("get_frame_range_from_scene", ret))
-        if ret is not None:
-            self.qt_edit_line_sim_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
-            self.qt_edit_line_sim_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
-            self.qt_edit_line_prev_frame_start.setText(str(self.comfun.int_or_val(ret[0], 0)))
-            self.qt_edit_line_prev_frame_end.setText(str(self.comfun.int_or_val(ret[1], 0)))
-            self.top_ui.set_top_info(" Set frame range:  [" + str(ret[0]) + ":" + str(ret[1]) + "]")
+        try:
+            frame_range = self.batch.dfn.current_interactions.get_curent_frame_range()
+        except Exception as e:
+            if self.batch.dfn.current_definition is None:
+                self.batch.logger.err("Current definition is None, could NOT get current frame range")
+            else:
+                cdfn = self.batch.dfn.current_definition.name
+                self.batch.logger.err(("Could NOT get current frame range. Please check interactions:", cdfn))
+                self.batch.logger.err((e))
+            self.top_ui.set_top_info(" Can't detect frame range ", 8)
+            return False
+
+        self.batch.logger.db(("get_frame_range_from_scene: ", frame_range))
+        if frame_range is not None:
+            self.qt_edit_line_sim_frame_start.setText(str(self.comfun.int_or_val(frame_range[0], 0)))
+            self.qt_edit_line_sim_frame_end.setText(str(self.comfun.int_or_val(frame_range[1], 0)))
+            self.qt_edit_line_prev_frame_start.setText(str(self.comfun.int_or_val(frame_range[0], 0)))
+            self.qt_edit_line_prev_frame_end.setText(str(self.comfun.int_or_val(frame_range[1], 0)))
+            self.top_ui.set_top_info(" Set frame range:  [" + str(frame_range[0]) + ":" + str(frame_range[1]) + "]")
         else:
             self.top_ui.set_top_info(" Can't detect frame range ", 7)
 

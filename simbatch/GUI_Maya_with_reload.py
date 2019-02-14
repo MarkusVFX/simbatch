@@ -10,7 +10,7 @@ simbatch_config_ini = "S:/simbatch/config.ini"
 ##
 #
 import sys
-if simbatch_instalation_dir in sys.path is False:
+if not simbatch_instalation_dir in sys.path:
     sys.path.append(simbatch_instalation_dir)
 
 import simbatch.core.core as simbatch_core

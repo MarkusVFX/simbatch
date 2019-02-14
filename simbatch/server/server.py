@@ -17,6 +17,7 @@ class SimBatchServer:
 
     batch = None
     force_software = 0
+    break_loop =False
 
     server_dir = ""
     state_file_name = "state.txt"
@@ -379,7 +380,7 @@ class SimBatchServer:
     def set_queue_item_error(self, queue_id, server_name, with_save=True):  # setStatus
         return self.set_queue_item_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
-    def generate_script_for_external_software(self, py_file, job_script, job_description, job_id):
+    def generate_script_from_queue_item(self, py_file, job_script, job_description, job_id):
         script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n"
 
         append_dir = os.path.dirname(os.path.dirname(os.path.dirname(self.server_dir)))
@@ -505,12 +506,14 @@ class SimBatchServer:
             
     def run_loop(self):
         self.loops_counter += 1
-        if self.jobs_computed < self.jobs_limit or self.jobs_limit < 1:
-            if self.jobs_limit > 0:
+        if self.break_loop is False and (self.jobs_limit == 0 or self.jobs_computed < self.jobs_limit):
+            if self.jobs_limit == 0:
+                '''  infinite loop  '''
+                self.batch.logger.db((self.comfun.get_current_time(), "loop:", self.loops_counter))
+            else:
+                '''  limited loop  '''
                 self.batch.logger.db((self.comfun.get_current_time(), "loop:", self.loops_counter,
                                       "  limit:", self.jobs_limit, "   computed:", self.jobs_computed))
-            else:
-                self.batch.logger.db((self.comfun.get_current_time(), "loop:", self.loops_counter))
 
             """    MAIN EXECUTION LOOP    """
 
@@ -572,13 +575,14 @@ class SimBatchServer:
                         
                         if self.current_simnode_state != 0:
                             self.set_simnode_state(self.batch.sts.INDEX_STATE_WORKING)
-                        self.generate_script_for_external_software(generated_script_file, job_script, job_description,
-                                                                   job_id)
+                        self.generate_script_from_queue_item(generated_script_file, job_script, job_description, job_id)
 
                         self.run_external_software(generated_script_file)
+                        self.last_info = "run external software for job id:{}, {}".format(job_id, job_description)
                     """     END SINGLE JOB     """
 
-                else:  # nothing more to compute!
+                else:
+                    '''   nothing more to compute!   '''
                     info = "{}   there is nothing to compute ".format(self.comfun.get_current_time())
                     self.batch.logger.inf(info, force_prefix=loop_prefix)
                     if self.loops_counter == 1:
@@ -587,21 +591,26 @@ class SimBatchServer:
                     if self.jobs_limit > 0:  # nothing to compute on mode with LIMIT ON
                         """  BREAK ! """
                         if self.jobs_computed == self.jobs_limit:
-                            self.batch.logger.db("Breaking loop! The limit has been reached :{}".format(self.jobs_limit))
+                            self.batch.logger.db("Breaking loop! The limit has been reached:{}".format(self.jobs_limit))
+                            self.break_loop = True
+                            self.last_info = "The limit has been reached."
                         else:
-                            self.batch.logger.wrn("Breaking loop! The limit was not reached :{}/{}".format(self.jobs_computed, self.jobs_limit))
-                        self.jobs_computed = self.jobs_limit
+                            self.batch.logger.wrn("Nothing to do! The limit was not reached :{}/{}".format(
+                                                  self.jobs_computed, self.jobs_limit))
                     else:
-                        pass  # job_limit == 0   ->   NO LIMIT  -> INFINITE LOOP
+                        '''   job_limit == 0   ->   NO LIMIT  -> INFINITE LOOP   '''
+                        pass
 
                     if self.framework_mode is True:  # run local
                         """  BREAK ! """
-                        self.batch.logger.db("Breaking loop, framework mode. Nothing to compute, limit:{}".format(self.jobs_limit))
-                        self.jobs_computed = self.jobs_limit = 1
+                        self.batch.logger.db("Nothing to compute, exiting.  Limit:{}".format(self.jobs_limit))
+                        # self.jobs_computed = self.jobs_limit = 1
+                        self.break_loop = True
+                        self.last_info = "Nothing to compute, exiting."
                 
                 self.batch.logger.raw("\n")
             else:
-                '''  server is bussy:  WORKING   '''
+                '''  server is busy:  WORKING   '''
                 if self.current_simnode_state == self.batch.sts.INDEX_STATE_ERROR:
                     self.batch.logger.err((self.comfun.get_current_time(), "   sim node ERROR ", self.server_name))
                 else:
@@ -630,4 +639,4 @@ class SimBatchServer:
             else:
                 threading.Timer(self.timer_delay_seconds, lambda: self.run_loop()).start()
         else:
-            self.batch.logger.inf(("End main loop, ", self.last_info))
+            self.batch.logger.inf(("End main loop. ", self.last_info))

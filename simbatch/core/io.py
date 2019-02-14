@@ -28,7 +28,7 @@ class PredefinedVariables:
         "sim_time_end": {"type": "t", "function": "get_sim_time_end"},
         "prev_time_start": {"type": "t", "function": "get_prev_time_start"},
         "prev_time_end": {"type": "t", "function": "get_prev_time_end"},
-
+        "cloth_objects": {"type": "o", "function": "get_cloth_objects"}
     }
     defaults = {
         "d": "get_working_directory",
@@ -235,6 +235,26 @@ class PredefinedVariables:
 
     def get_default_value(self, evo):
         return "[default_value]"
+
+    def get_cloth_objects(self, evo):
+        if self.batch.dfn.current_definition is None:
+            self.batch.logger.wrn("(get_cloth_objects) current_definition is None !")
+            return ""
+        else:
+            # TODO interactions   exists   and    get_objects_by_type    exists
+            if self.batch.dfn.current_interactions is not None:
+                cloths = self.batch.dfn.current_interactions.get_objects_by_type('nCloth')
+                self.batch.logger.inf(("Detected nCloth objects:", cloths))
+                cloths_str = ""
+                for clt in cloths:
+                    cloths_str += clt + ";"
+                if len(cloths_str) > 0:
+                    cloths_str = cloths_str[:-1]
+                return cloths_str
+            else:
+                self.batch.logger.inf(("(get_cloth_objects) current_definition:", self.batch.dfn.current_definition))
+                self.batch.logger.wrn("(get_cloth_objects) current_interactions is None !")
+                return ""
 
 
 class StorageInOut:
@@ -559,7 +579,7 @@ class StorageInOut:
         else:
             return [0, 0, 0]
 
-    def generate_base_setup_file_name(self, schema_name="", ver=1):  # from existing TASK and SCHEMA data
+    def generate_base_setup_file_name(self, schema_name="", ver=None):  # from existing TASK and SCHEMA data
         if len(self.prj.projects_data) < self.prj.current_project_index or self.prj.current_project_index < 0:
             self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index,
                                    len(self.prj.projects_data)))
@@ -568,11 +588,15 @@ class StorageInOut:
             if len(schema_name) == 0:
                 if self.batch.sch.current_schema is not None:
                     schema_name = self.batch.sch.current_schema.schema_name
-                    if ver == 0:
-                        ver = self.batch.sch.current_schema.schema_version
-                else:
-                    self.batch.logger.err("generate_base_setup_file_name from schema: None")
-                    return -1, ""
+                    # if ver == 0:
+                    ver = self.batch.sch.current_schema.schema_version
+                if self.batch.tsk.current_task is not None:
+                    ver = self.batch.tsk.current_task.schema_ver
+                if ver is None:
+                    ver = 1
+            else:
+                self.batch.logger.err("generate_base_setup_file_name from schema: None")
+                return -1, ""
 
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
@@ -724,6 +748,7 @@ class StorageInOut:
     def generate_default_camera_name(self):
         # TODO "<default_camera>"
         return 1, ""
+
 
 
 

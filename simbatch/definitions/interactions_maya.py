@@ -7,10 +7,6 @@ class Interactions:
         self.current_os = current_os
         self.logger = logger
         self.comfun = comfun
-        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
-        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
-        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
-        print " \n\n\n NIITNTINTINTITNTIN   NIINEIRNIE NIENR N"
 
     def print_info(self):
         self.logger.raw("This is interaction with Maya")
@@ -49,7 +45,7 @@ class Interactions:
         print "TODO: maya_get_camera"
         pass
     
-    def get_curent_scenefile(self):
+    def get_curent_scene_file(self):
         import maya.cmds as cmd
         fi = cmd.file(query=True, sceneName=True)
         if self.current_os == 2:
@@ -60,7 +56,8 @@ class Interactions:
         out_file_ext = basename.split(".")[1]
         return [out_dir, basename, out_file_header]
     
-    def get_curent_framerange(self):
+    def get_curent_frame_range(self):
+        import maya.cmds as cmd
         playback_min = cmd.playbackOptions(query=True, minTime=True)
         playback_max = cmd.playbackOptions(query=True, maxTime=True)
         return playback_min, playback_max
@@ -127,8 +124,13 @@ class Interactions:
 
     """   DEFAULTS   """
 
+    def get_objects_by_type(self, type):
+        if type == 'nCloth':
+            return self.get_cloth_objects()
+
     def get_cloth_objects(self):
-        return "clt"
+        import maya.cmds as cmd
+        return cmd.ls(type='nCloth')
 
     def get_hair_objects(self):
         return "hair"

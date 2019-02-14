@@ -1,5 +1,6 @@
 import datetime
 import time
+import os
 
 try:
     import hou
@@ -14,8 +15,8 @@ except ImportError:
 
 
 class SimBatchExecutor():
-    server_dir = "server"
-    log_file_name = "server_log.txt"
+    server_dir = ""
+    log_file_name = "executor_log.txt"
     job_start_time = None
     hack_sim_node_name = "SimNode_01"
 
@@ -29,21 +30,25 @@ class SimBatchExecutor():
         self.batch = batch
         self.batch.load_data()
         self.batch.dfn.update_current_definition_by_name("Maya")
+
+        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
         self.add_to_log_with_new_line("")
         time.sleep(0.5)
         self.add_to_log_with_new_line("")
 
-    def add_to_log_with_new_line(self, logStr):
-        self.add_to_log(logStr, with_new_line=True)
+    def add_to_log_with_new_line(self, log_txt):
+        self.add_to_log(log_txt, with_new_line=True)
 
     def add_to_log(self, log_txt, with_new_line=False):
         log_file = self.server_dir + self.log_file_name
 
-        if with_new_line:
-            log_txt += "\n"
-
         text_file = open(log_file, "a")
-        text_file.write(self.get_current_time() + "   " + log_txt)
+        if len(log_txt) == 0:
+            text_file.write("\n")
+        else:
+            if with_new_line:
+                log_txt += "\n"
+            text_file.write(self.get_current_time() + "   " + log_txt)
         text_file.close()
 
     @staticmethod
@@ -55,7 +60,6 @@ class SimBatchExecutor():
 
     def set_queue_state_and_add_to_log(self, state_name, state_id, server_name, with_save=True, add_current_time=False,
                                        set_time=""):
-
         self.batch.que.clear_all_queue_items()
         self.batch.que.load_queue()
         self.batch.que.update_state_and_node_name(self.executor_queue_id, state_name, state_id, server_name=server_name,

@@ -181,7 +181,7 @@ class Queue:
         return -1, -1
 
     def update_state_and_node_name(self, queue_id, state, state_id, server_name="", server_id=-1, set_time=None,
-                              add_current_time=False):
+                                   add_current_time=False):
         for i, q in enumerate(self.queue_data):
             if q.id == queue_id:
                 self.queue_data[i].state = state

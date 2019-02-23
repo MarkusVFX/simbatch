@@ -17,7 +17,7 @@ class PredefinedVariables:
         "shot_camera_file": {"type": "f", "function": "get_shot_camera_file"},
         "shot_prev_file": {"type": "f", "function": "get_shot_prev_file"},
         "shot_prev_seq": {"type": "f", "function": "get_shot_prev_seq"},
-        "computed_scene": {"type": "f", "function": "get_shot_computed_setup"},
+        "shot_setup": {"type": "f", "function": "get_shot_setup"},
         "scripts_dir": {"type": "d", "function": "get_scripts_dir"},
         "shot_dir": {"type": "d", "function": "get_shot_dir"},
         "working_dir": {"type": "d", "function": "get_working_dir"},
@@ -585,18 +585,20 @@ class StorageInOut:
                                    len(self.prj.projects_data)))
             return -1, ""
         else:
+            if ver is None:
+                if self.batch.sch.current_schema is not None:
+                    schema_name = self.batch.sch.current_schema.schema_name
+                    ver = self.batch.sch.current_schema.schema_version
+                if ver is None:
+                    ver = 1
+                    self.batch.logger.deepdb("(load_base_setup) set default setup version 1 ")
+
             if len(schema_name) == 0:
                 if self.batch.sch.current_schema is not None:
                     schema_name = self.batch.sch.current_schema.schema_name
-                    # if ver == 0:
-                    ver = self.batch.sch.current_schema.schema_version
-                if self.batch.tsk.current_task is not None:
-                    ver = self.batch.tsk.current_task.schema_ver
-                if ver is None:
-                    ver = 1
-            else:
-                self.batch.logger.err("generate_base_setup_file_name from schema: None")
-                return -1, ""
+                else:
+                    self.batch.logger.err("(generate_base_setup...) schema_name is empty and current_schema is None")
+                    return -1, ""
 
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
@@ -604,6 +606,9 @@ class StorageInOut:
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_setup_ext()
             return 1, directory + schema_flat_name + file_version + "." + file_ext
+
+    def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None):
+        pass
 
     def generate_shot_name(self):
         if self.prj.current_project is None or \

@@ -77,7 +77,7 @@ class TasksFormCreateOrEdit(QWidget):
         qt_combo_state = ComboLabel("", ["NULL", "INIT", "WAITING", "HOLD", "QUEUED", "DONE"])
         self.qt_combo_state_names = qt_combo_state.combo
 
-        qt_edit_buton_sequence = EditLineWithButtons("Sequence") #, label_minimum_size=70)
+        qt_edit_buton_sequence = EditLineWithButtons("Seq") #, label_minimum_size=70)
         self.qt_edit_line_sequence = qt_edit_buton_sequence.qt_edit_line
         qt_edit_buton_shot = EditLineWithButtons("Shot") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_shot = qt_edit_buton_shot.qt_edit_line
@@ -88,14 +88,14 @@ class TasksFormCreateOrEdit(QWidget):
         qt_edit_buton_version = EditLineWithButtons("Ver") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_version = qt_edit_buton_version.qt_edit_line
 
-        qt_edit_buton_sim_start = EditLineWithButtons("Start") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_sim_start = EditLineWithButtons("Sim Range") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_sim_frame_start = qt_edit_buton_sim_start.qt_edit_line
-        qt_edit_buton_sim_end = EditLineWithButtons("End") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_sim_end = EditLineWithButtons("") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_sim_frame_end = qt_edit_buton_sim_end.qt_edit_line
 
-        qt_edit_buton_prev_start = EditLineWithButtons("Start") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_prev_start = EditLineWithButtons("Prev Range") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_prev_frame_start = qt_edit_buton_prev_start.qt_edit_line
-        qt_edit_buton_prev_end = EditLineWithButtons("End") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_prev_end = EditLineWithButtons("") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_prev_frame_end = qt_edit_buton_prev_end.qt_edit_line
 
         qt_button_lay_detect_framerange = ButtonOnLayout("From cache", width=70)    # TODO
@@ -335,13 +335,13 @@ class AddToQueueForm(QWidget):
         qt_gb_actions.setLayout(qt_lay_actions)
         qt_form_add_layout.addWidget(qt_gb_actions)
 
-        qt_edit_button_sim_from = EditLineWithButtons("sim from")
-        qt_edit_button_sim_to = EditLineWithButtons("sim to")
-        qt_edit_button_frame_from = EditLineWithButtons("start")
-        qt_edit_button_frame_to = EditLineWithButtons("end")
-        qt_edit_button_prior = EditLineWithButtons("prior")
+        qt_edit_button_sim_from = EditLineWithButtons("Sim Range")
+        qt_edit_button_sim_to = EditLineWithButtons("")
+        qt_edit_button_frame_from = EditLineWithButtons("Prev Range")
+        qt_edit_button_frame_to = EditLineWithButtons("")
+        qt_edit_button_prior = EditLineWithButtons("Prior")
 
-        qt_edit_button_description = EditLineWithButtons("desc", label_minimum_size=60)
+        qt_edit_button_description = EditLineWithButtons("Desc", label_minimum_size=60)
         qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_desc)
 
         qt_widget_group_frame_range = WidgetGroup([qt_edit_button_sim_from, qt_edit_button_sim_to,

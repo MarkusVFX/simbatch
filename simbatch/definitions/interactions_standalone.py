@@ -10,9 +10,12 @@ class Interactions:
     def print_info(self):
         self.logger.raw("This is stand-alone's interactions")
 
-    # framework interactions
+    # common interactions
     def schema_item_double_click(self, param):
         self.logger.raw("[INF interactions] Double clicked on stand-alone schema item (defined in interactions file)")
+
+    def task_item_double_click(self, param):
+        self.logger.raw("[INF interactions] Double clicked on stand-alone task item (defined in interactions file)")
         
     def sa_loop_over_files(self, file):
         return ret2

@@ -11,15 +11,20 @@ class Interactions:
     def print_info(self):
         self.logger.raw("This is interaction with Maya")
 
-    # framework interactions
+    # common interactions
     def schema_item_double_click(self, param):
         self.maya_open_scene(param)
 
-    # framework interactions
     def task_item_double_click(self, param):
         self.maya_open_scene(param)
 
-    def save_as_next_version(self, param):
+    def open_setup(self, param):
+        self.maya_open_scene(param)
+
+    def save_setup(self, param):
+        self.save_current_scene_as(param)
+
+    def save_setup_as_next_version(self, param):
         self.save_current_scene_as(param)
 
     # maya interactions

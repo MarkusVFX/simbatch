@@ -103,17 +103,38 @@ class SingleDefinition:
         self.total_actions += 1
         self.action_names.append(element.name)
 
+    def get_multiaction_by_name(self, name):
+        for mac in self.multi_actions_array:
+            if mac.name == name:
+                return mac
+        return None
+
     def get_base_setup_ext(self):
         return self.setup_ext
 
     def get_prev_ext(self):
         return self.prev_ext
 
-    def get_multiaction_by_name(self, name):
-        for mac in self.multi_actions_array:
-            if mac.name == name:
-                return mac
-        return None
+    def project_item_double_click(self, param):
+        self.logger.wrn("definition not loaded, default project_item_double_click()")
+
+    def schema_item_double_click(self, param):
+        self.logger.wrn("definition not loaded, default schema_item_double_click()")
+
+    def task_item_double_click(self, param):
+        self.logger.wrn("definition not loaded, default task_item_double_click()")
+
+    def queue_item_double_click(self, param):
+        self.logger.wrn("definition not loaded, default queue_item_double_click()")
+
+    def node_item_double_click(self, param):
+        self.logger.wrn("definition not loaded, default queue_item_double_click()")
+
+    def open_setup(self, param):
+        self.logger.wrn("definition not loaded, default open_setup()")
+
+    def save_setup(self, param):
+        self.logger.wrn("definition not loaded, default save_setup()")
 
 
 class Definitions:

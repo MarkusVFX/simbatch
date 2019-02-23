@@ -262,14 +262,14 @@ class QueueUI:
             else:
                 subprocess.Popen('explorer "' + prev_dir + '"')
 
-    def on_menu_open_computed_scene(self):
+    def on_menu_open_shot_scene(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         # proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
 
-        file_to_load = self.batch.dfn.get_computed_setup_file(task_id, version, evo_nr)
+        file_to_load = self.batch.dfn.get_shot_setup_file(task_id, version, evo_nr)
         if file_to_load[0] == 1:
             self.batch.logger.inf(("file_to_load ", file_to_load[1]))
             self.batch.o.soft_conn.load_scene(file_to_load[1])
@@ -296,7 +296,7 @@ class QueueUI:
         qt_right_menu.addAction("Set HOLD", self.on_click_menu_set_hold)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Locate prev", self.on_menu_locate_prev)
-        qt_right_menu.addAction("Open computed scene", self.on_menu_open_computed_scene)
+        qt_right_menu.addAction("Open shot scene", self.on_click_menu_open_shot_setup)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Remove All Green", self.on_click_menu_queue_item_remove_all_green)
         qt_right_menu.addAction("Remove", self.on_click_menu_queue_item_remove)

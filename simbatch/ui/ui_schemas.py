@@ -315,14 +315,7 @@ class SchemasUI:
         self.update_visible_schemas_ids()
 
     def on_menu_open(self):
-        current_schema_id = self.sch.current_schema_id
-        base_setup = self.batch.sio.generate_base_setup_file_name(self.sch.current_schema.schema_name,
-                                                                  ver=self.sch.current_schema.schema_version)
-        self.batch.logger.db(("double clicked  schema id :", current_schema_id, base_setup))
-        if base_setup[0] == 1:
-            self.batch.dfn.current_interactions.schema_item_double_click(base_setup[1])
-        else:
-            self.batch.logger.err((" schema double click error :", base_setup))
+        self.load_base_setup()
 
     def on_menu_save_as_next_version(self):
         cur_sch_index = self.batch.sch.current_schema_index
@@ -618,15 +611,16 @@ class SchemasUI:
             self.schema_form_edit.hide()
             self.edit_form_state = 0
 
-    def load_base_setup(self, schema_name, version=1):
+    def load_base_setup(self, schema_name="", version=None):
         file_to_load = self.batch.sio.generate_base_setup_file_name(schema_name, ver=version)
         if file_to_load[0] == 1:
-            self.batch.logger.inf(("loadFile: ", file_to_load[1]))
+            self.batch.logger.inf(("loading file: ", file_to_load[1]))
             # self.batch.dfn.current_interactions.load_scene(file_to_load[1])
             # self.batch.sio.soft_conn.load_scene(file_to_load[1])
-            self.on_menu_open()
+
+            self.batch.dfn.current_interactions.open_setup(file_to_load[1])   # TODO ret
         else:
-            self.batch.logger.err(("loadFile: ", file_to_load))
+            self.batch.logger.err(("load_base_setup: ", file_to_load))
 
     def on_list_schemas_double_clicked(self, item):
         self.batch.logger.db(("list_schemas_double_clicked: ", self.sch.current_schema_id, item))

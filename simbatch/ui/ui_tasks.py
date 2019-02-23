@@ -293,6 +293,10 @@ class TasksUI:
         self.batch.tsk.save_tasks()
         self.reset_list()
 
+    def on_list_tasks_double_clicked(self, item):   # list_schemas.itemDoubleClicked.connect(self.on_list_tasks_double_clicked)
+        self.batch.logger.db(("on_list_tasks_double_clicked: ", self.tsk.current_task_id, item))
+        self.on_menu_open()
+
     def on_click_menu_set_init(self):
         self._change_current_task_state_and_reset_list(self.sts.INDEX_STATE_INIT)
 
@@ -328,16 +332,21 @@ class TasksUI:
 
     def on_click_menu_open_base_setup(self):
         sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
+        # self.mainw.sch_ui.load_base_setup(sch.schema_name, self.batch.tsk.current_task.schema_ver)
         self.mainw.sch_ui.load_base_setup(sch.schema_name, self.batch.tsk.current_task.schema_ver)
+        # self.batch.sio.generate_base_setup_file_name(sch.schema_name, ver=sch.schema_version)
 
-    def on_click_menu_open_computed(self):
+    def on_click_menu_open_shot_setup(self):
         tsk_id = self.batch.tsk.current_task.id
         version = self.batch.tsk.current_task.queue_ver
         evo_nr = -1
-        file_to_load = self.batch.dfn.getComputedSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
+        # file_to_load = self.batch.dfn.getShotSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
+        file_to_load = self.batch.sio.generate_shot_setup_file_name()   # tsk_id, ver=version, evo_nr
         if file_to_load[0] == 1:
             self.batch.logger.inf(("file_to_load:", file_to_load[1]))
-            self.batch.o.soft_conn.load_scene(file_to_load[1])
+            # self.batch.o.soft_conn.load_scene(file_to_load[1])
+            if self.batch.dfn.current_interactions is not None:
+                self.batch.dfn.current_interactions.open_setup(file_to_load[1])    # TODO  check is open_setup exist!
         else:
             self.batch.logger.wrn(("file_to_load not exist:", file_to_load[1]))
 
@@ -349,7 +358,7 @@ class TasksUI:
         global_cursor_pos = self.list_tasks.mapToGlobal(pos)
         qt_right_menu = QMenu()
         qt_right_menu.addAction("Open Base Setup ", self.on_click_menu_open_base_setup)
-        qt_right_menu.addAction("Open Computed Setup ", self.on_click_menu_open_computed)
+        qt_right_menu.addAction("Open Shot Setup ", self.on_click_menu_open_shot_setup)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Sch Ver Form Schema", self.on_click_menu_sch_ver_from_schema)
         qt_right_menu.addAction("Sch Ver +1", self.on_click_menu_schema_version_p1)

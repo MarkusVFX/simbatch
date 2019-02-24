@@ -161,11 +161,14 @@ class SchemasUI:
         # wfa -  widget form add
         # fa  -  form add
         wfa_copy_schema = EditLineWithButtons("Copy schema as ... ")
-        wfa_target_proj = EditLineWithButtons("Target Proj  (id or name) ... ", text_on_button_1="check")
+        wfa_target_proj = EditLineWithButtons("Target Proj  (id or name) ... ", text_on_button_1="check",
+                                              text_on_button_2="current")
         wfa_buttons = ButtonWithCheckBoxes("Copy schema", pin_text="pin")
 
         wfa_target_proj.button_1.clicked.connect(
             lambda: self.on_check_project_target(wfa_target_proj.qt_edit_line))
+        wfa_target_proj.button_2.clicked.connect(
+            lambda: self.on_current_project_target(wfa_target_proj.qt_edit_line))
         wfa_buttons.button.clicked.connect(self.on_clicked_copy_as)
         wfa_copy_schema.qt_edit_line.textChanged.connect(self.on_changed_copy_name)
 
@@ -330,8 +333,7 @@ class SchemasUI:
         ret = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name, ver=cur_schema.schema_version)
         if ret[0] == 1:
             self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
-            self.batch.dfn.current_interactions.save_as_next_version(ret[1])
-            self.batch.dfn.current_interactions.save_current_scene_as(ret[1])
+            self.batch.dfn.current_interactions.save_setup_as_next_version(ret[1])
         else:
             self.batch.logger.err((" Error on generating increment setup version :", ret))
 
@@ -369,7 +371,7 @@ class SchemasUI:
         global_pos = self.list_schemas.mapToGlobal(pos)
         qt_menu_right = QMenu()
         qt_menu_right.addAction("Open base schema", self.on_menu_open)
-        qt_menu_right.addAction("Save current scene as next version", self.on_menu_save_as_next_version)
+        qt_menu_right.addAction("Save current scene as next schema version", self.on_menu_save_as_next_version)
         qt_menu_right.addSeparator()
         qt_menu_right.addAction("Locate base setup", self.on_menu_locate_base_setup)
         qt_menu_right.addSeparator()
@@ -481,6 +483,12 @@ class SchemasUI:
                 qt_edit_line.setText("No project matches : " + el_txt)
                 self.new_project_id_on_copy = None
         self.batch.logger.db(("qt_edit_line.text() : ", el_txt))
+
+    def on_current_project_target(self, qt_edit_line):
+        cur_proj = self.batch.prj.current_project
+        if cur_proj is not None:
+            qt_edit_line.setText(cur_proj.project_name)
+            self.new_project_id_on_copy = cur_proj.id
 
     def on_clicked_copy_as(self):
         if self.batch.sch.current_schema_index >= 0:

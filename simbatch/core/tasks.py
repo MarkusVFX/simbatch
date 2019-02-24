@@ -213,6 +213,11 @@ class Tasks:
         curr_task = self.tasks_data[self.current_task_index]
         return[self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]
 
+    def get_schema_name_from_task_id(self, task_id):
+        get_tsk = self.get_task_by_id(task_id)
+        get_sch = self.batch.sch.get_schema_by_id(get_tsk.schema_id)
+        return get_sch.schema_name
+
     def create_example_tasks_data(self, do_save=True):
         collect_ids = 0
         sample_task_1 = TaskItem(0, "tsk 1", 1, "INIT", 1, 1,  "01", "001", "", 10, 20, 10, 20, 1, 1, 1, "", 1, 50, "")

@@ -159,9 +159,9 @@ class PredefinedVariables:
             return ""
 
     def get_shot_setup(self, evo):
-        ret = self.batch.sio.generate_shot_setup(evo_inject=evo)
-        if ret[0] > 0:
-            return ret[1]
+        ret = self.batch.sio.generate_shot_setup_file_name(evo_inject=evo)
+        if ret is not False:
+            return ret
         else:
             return ""
 
@@ -607,8 +607,40 @@ class StorageInOut:
             file_ext = self.batch.dfn.get_current_setup_ext()
             return 1, directory + schema_flat_name + file_version + "." + file_ext
 
-    def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None):
-        pass
+    def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None, evo_inject="", simed=False):
+        if self.prj.current_project_index < 0:
+            self.batch.logger.err(("Wrong current proj ID  ",self.prj.current_project_index))
+            return False
+        else:
+            if tsk_id is None:
+                if self.batch.tsk.current_task is None:
+                    self.batch.logger.err("Current task is undefined!")
+                    return False
+                else:
+                    tsk_id = self.batch.tsk.current_task.id
+
+            if ver is None:
+                    # TODO MEGA !  custom ver
+                pass
+
+            abs_shot_working_dir = self.generate_shot_working_dir()
+            if abs_shot_working_dir[0] == 0:  # TODO ret FALSE or "str"
+                self.batch.logger.err("abs_shot_working_dir is not generated properly")
+                return False
+
+            else:
+                schema_name = self.batch.tsk.get_schema_name_from_task_id(tsk_id)
+                schema_flat_name = self.get_flat_name(schema_name)
+                directory = abs_shot_working_dir[1] + "shot_setup" + self.dir_separator
+                if ver is None:
+                    ver = self.batch.tsk.current_task.queue_ver + 1
+                file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
+                file_ext = self.batch.dfn.get_current_setup_ext()
+                if simed is True:
+                    simed_inject = "__simed__v"
+                else:
+                    simed_inject = "__v"
+                return directory + schema_flat_name + simed_inject + file_version + evo_inject + "." + file_ext
 
     def generate_shot_name(self):
         if self.prj.current_project is None or \
@@ -675,21 +707,6 @@ class StorageInOut:
                 shot_dir += cur_tsk.take + self.dir_separator
 
             return 1, shot_dir
-
-    def generate_shot_setup(self, ver=0, evo_inject=""):
-        ret = self.generate_shot_working_dir()
-        if ret[0] == 1:
-            ret_file_and_path = ret[1]
-            schema_name = self.batch.sch.current_schema.schema_name
-            schema_flat_name = self.get_flat_name(schema_name)
-            ret_file_and_path += "simed_setup" + self.dir_separator
-            if ver == 0:
-                ver = self.batch.tsk.current_task.queue_ver + 1
-            file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
-            file_ext = self.batch.dfn.get_current_setup_ext()
-            ret_file_and_path += schema_flat_name + "__simed__v" + file_version + evo_inject + "." + file_ext
-            return ret[0], ret_file_and_path
-        return ret
 
     def get_project_data_dir(self):
         return 1, self.batch.prj.current_project.project_directory

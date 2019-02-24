@@ -342,13 +342,19 @@ class TasksUI:
         evo_nr = -1
         # file_to_load = self.batch.dfn.getShotSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
         file_to_load = self.batch.sio.generate_shot_setup_file_name()   # tsk_id, ver=version, evo_nr
-        if file_to_load[0] == 1:
+        if file_to_load is not False:
             self.batch.logger.inf(("file_to_load:", file_to_load[1]))
-            # self.batch.o.soft_conn.load_scene(file_to_load[1])
-            if self.batch.dfn.current_interactions is not None:
-                self.batch.dfn.current_interactions.open_setup(file_to_load[1])    # TODO  check is open_setup exist!
+
+            if self.comfun.file_exists(file_to_load):
+                if self.batch.dfn.current_interactions is not None:
+                    self.batch.dfn.current_interactions.open_setup(file_to_load)    # TODO  check is open_setup exist!
+                else:
+                    pass   # TODO
+            else:
+                self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
+                self.top_ui.set_top_info("Shot setup not exist! ({})".format(file_to_load), 7)
         else:
-            self.batch.logger.wrn(("file_to_load not exist:", file_to_load[1]))
+            self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
 
     @staticmethod
     def on_click_menu_spacer():

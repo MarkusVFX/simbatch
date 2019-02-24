@@ -158,8 +158,8 @@ class PredefinedVariables:
         else:
             return ""
 
-    def get_shot_computed_setup(self, evo):
-        ret = self.batch.sio.generate_shot_computed_setup(evo_inject=evo)
+    def get_shot_setup(self, evo):
+        ret = self.batch.sio.generate_shot_setup(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
@@ -364,7 +364,7 @@ class StorageInOut:
 
     def create_schema_directory(self, directory):
         self.comfun.create_directory(directory + "base_setup" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "computed_setups" + self.sts.dir_separator)
+        self.comfun.create_directory(directory + "shot_setup" + self.sts.dir_separator)
         self.comfun.create_directory(directory + "prevs" + self.sts.dir_separator)
         self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
 
@@ -676,7 +676,7 @@ class StorageInOut:
 
             return 1, shot_dir
 
-    def generate_shot_computed_setup(self, ver=0, evo_inject=""):
+    def generate_shot_setup(self, ver=0, evo_inject=""):
         ret = self.generate_shot_working_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1]

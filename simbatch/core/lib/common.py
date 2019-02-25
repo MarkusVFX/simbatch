@@ -298,12 +298,9 @@ class CommonFunctions:
         return get_path
     
     def get_path_from_full(self, full):
-        path_out = os.path.dirname(full)
+        path_out = self.dirname(full)
         path_out = self.get_proper_path(path_out)   # win 7 vs 10 fix
         return path_out
-
-    def get_dir_from_file(self, filename_and_path):
-        return os.path.dirname(filename_and_path)
 
     def create_directory_if_not_exists(self, path):
         if self.path_exists(path) is False:

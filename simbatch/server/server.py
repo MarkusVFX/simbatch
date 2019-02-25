@@ -558,10 +558,17 @@ class SimBatchServer:
                     if self.framework_mode is True:  # run local
                         """     RUN SINGLE JOB AS LOCAL     """
 
-                        print "\n\n            [FOO] run_script(generate_script_file)" , job_script
-                        print "\n\n            [FOO] run_script(generate_script_file)"  # TODO
-
-
+                        interactions = self.batch.dfn.current_interactions   # used in eval
+                        for job_line in  job_script.split(";"):
+                            clean_job_line = job_line.replace('\\', '\\\\').lstrip()
+                            self.logger.deepdb((" eval:", clean_job_line))
+                            if len(clean_job_line) > 0:
+                                try:
+                                    ret = eval(clean_job_line)
+                                    self.logger.deepdb(" q job line ret", ret)
+                                except ValueError:
+                                    self.logger.err(("eval q job", clean_job_line))
+                            self.logger.deepdb(" empty q job line")
 
                         self.set_queue_item_done(job_id, self.server_name)
                         self.last_info = "DONE id: {}".format(job_id)

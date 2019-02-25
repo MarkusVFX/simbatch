@@ -52,19 +52,17 @@ class Logger:
             indent = "'"
             prefix = "_"
 
-        if raw:
-            if force_prefix is None:
-                print message
-            else:
-                print force_prefix, message
-        elif console_print:
+        if console_print:
             if nl:
                 print "\n"
-            if type(message) is tuple:
-                out = "  ".join([str(el) for el in message])
-                print "{}[{}]  {}".format(indent, prefix, out)
+            if raw:
+                print message
             else:
-                print "{}[{}]  {}".format(indent, prefix, message)
+                if type(message) is tuple:
+                    out = "  ".join([str(el) for el in message])
+                    print "{}[{}]  {}".format(indent, prefix, out)
+                else:
+                    print "{}[{}]  {}".format(indent, prefix, message)
             if nla:
                 print "\n"
 

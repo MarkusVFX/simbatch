@@ -559,21 +559,25 @@ class SimBatchServer:
                         """     RUN SINGLE JOB AS LOCAL     """
 
                         interactions = self.batch.dfn.current_interactions   # used in eval
-                        for job_line in  job_script.split(";"):
-                            clean_job_line = job_line.replace('\\', '\\\\').lstrip()
-                            self.logger.deepdb((" eval:", clean_job_line))
-                            if len(clean_job_line) > 0:
-                                try:
-                                    ret = eval(clean_job_line)
-                                    self.logger.deepdb(" q job line ret", ret)
-                                except ValueError:
-                                    self.logger.err(("eval q job", clean_job_line))
-                            self.logger.deepdb(" empty q job line")
+                        if interactions is not None:
+                            for job_line in job_script.split(";"):
+                                clean_job_line = job_line.replace('\\', '\\\\').lstrip()
+                                if len(clean_job_line) > 0:
+                                    self.logger.db((" eval:", clean_job_line))
+                                    try:
+                                        ret = eval(clean_job_line)
+                                        self.logger.deepdb((" q job line ret:", ret))
+                                    except ValueError:
+                                        self.logger.err(("eval q job", clean_job_line))
+                                else:
+                                    self.logger.deepdb(" empty q job line")
 
-                        self.set_queue_item_done(job_id, self.server_name)
-                        self.last_info = "DONE id: {}".format(job_id)
-                        self.report_done_jobs += 1
-                        self.jobs_computed += 1
+                            self.set_queue_item_done(job_id, self.server_name)
+                            self.last_info = "DONE id: {}".format(job_id)
+                            self.report_done_jobs += 1
+                            self.jobs_computed += 1
+                        else:
+                            self.logger.err("interactions yyy  not loaded!")
                         #######
                         is_something_more_to_compute = self.is_something_to_do(force_software=self.force_software)
 

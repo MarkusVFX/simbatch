@@ -262,7 +262,7 @@ class QueueUI:
             else:
                 subprocess.Popen('explorer "' + prev_dir + '"')
 
-    def on_menu_open_shot_scene(self):
+    def on_click_menu_open_shot_setup(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         # proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id

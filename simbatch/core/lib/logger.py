@@ -6,7 +6,8 @@ class Logger:
     log_file_path = ""
     force_add_to_log = False
     buffering = False
-    buffer = ""
+    buffer = []
+    err_buffer = []
 
     def __init__(self, log_level=0, console_level=3):
         if console_level is None or console_level > 4:
@@ -26,17 +27,18 @@ class Logger:
             log_append = False
 
         if force_prefix is not None:
-            indent = "    "
+            indent = "       "
             prefix = force_prefix
         elif level == 1:
-            indent = "    "
-            prefix = "INF"
+            indent = ""
+            prefix = "ERR"
+            self.err_buffer.append(message)
         elif level == 2:
             indent = "  "
             prefix = "WRN"
         elif level == 3:
-            indent = ""
-            prefix = "ERR"
+            indent = "    "
+            prefix = "INF"
         elif level == 4:
             indent = "     "
             prefix = "DB"
@@ -51,7 +53,10 @@ class Logger:
             prefix = "_"
 
         if raw:
-            print message
+            if force_prefix is None:
+                print message
+            else:
+                print force_prefix, message
         elif console_print:
             if nl:
                 print "\n"
@@ -66,17 +71,17 @@ class Logger:
         if self.force_add_to_log or log_append:
             self.add_to_log(prefix, message)
 
-        if self.buffering is not False:
-            self.buffer += "\n"+message
+        if self.buffering is True:
+            self.buffer.append(message)
 
-    def inf(self, message, force_print=False, nl=False, nl_after=False, force_prefix=None):
-        self.dispatch(1, message, force_print=force_print, nl=nl, nla=nl_after, force_prefix=force_prefix)
+    def err(self, message, force_print=False, nl=False, nl_after=False):
+        self.dispatch(1, message, force_print=force_print, nl=nl, nla=nl_after)
 
     def wrn(self, message, force_print=False, nl=False, nl_after=False):
         self.dispatch(2, message, force_print=force_print, nl=nl, nla=nl_after)
 
-    def err(self, message, force_print=False, nl=False, nl_after=False):
-        self.dispatch(3, message, force_print=force_print, nl=nl, nla=nl_after)
+    def inf(self, message, force_print=False, nl=False, nl_after=False, force_prefix=None):
+        self.dispatch(3, message, force_print=force_print, nl=nl, nla=nl_after, force_prefix=force_prefix)
 
     def db(self, message, force_print=False, nl=False, nl_after=False):
         self.dispatch(4, message, force_print=force_print, nl=nl, nla=nl_after)
@@ -88,14 +93,27 @@ class Logger:
         self.dispatch(6, message, force_print=force_print, nl=nl, nla=nl_after)
         self.add_to_log("TODO")  # TODO
 
-    def raw(self, message):
-        self.dispatch(7, message, raw=True)
+    def raw(self, message, force_print=False, nl=False, nl_after=False, raw=True, force_prefix=None):
+        self.dispatch(3, message, force_print=force_print, nl=nl, nla=nl_after, raw=raw, force_prefix=force_prefix)
+
+    def int(self, message, force_print=False, nl=False, nl_after=False):        # interaction info
+        self.dispatch(3, message, force_print=force_print, nl=nl, nla=nl_after, force_prefix="INT")
 
     def clear_buffer(self):
-        self.buffer = ""
+        del self.buffer[:]
+
+    def clear_err_buffer(self):
+        del self.err_buffer[:]
 
     def get_buffer(self):
         return self.buffer
+
+    def get_err_buffer(self):
+        return self.err_buffer
+
+    def print_err_buffer(self):
+        for err in self.err_buffer:
+            self.raw(err, force_print=True, force_prefix="//")
 
     def buffering_on(self):
         self.buffering = True

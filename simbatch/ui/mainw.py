@@ -287,6 +287,11 @@ class MainWindow(QMainWindow):
             else:
                 self.top_ui.set_top_info("Loading error. {}".format(loading_data_state[1]), 7)
 
+        if len(self.batch.logger.err_buffer) > 0:
+            self.batch.logger.raw("///////  List of all ERRORS during loading  :", nl=True, force_print=True)
+            self.batch.logger.print_err_buffer()
+            self.batch.logger.clear_err_buffer()
+
     def on_tab_change(self, tab):
         self.batch.logger.inf(("tab change: ", tab))
 

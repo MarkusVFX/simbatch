@@ -264,6 +264,14 @@ class CommonFunctions:
                     self.get_dir_depth(dir_name, level + 1)
 
     @staticmethod
+    def basename(target_file):
+        return os.path.basename(target_file)
+
+    @staticmethod
+    def dirname(target_file):
+        return os.path.dirname(target_file)
+
+    @staticmethod
     def convert_to_win_path(path_to_convert):
         if path_to_convert is not None:
             return path_to_convert.replace("/", "\\")
@@ -292,8 +300,14 @@ class CommonFunctions:
     def get_path_from_full(self, full):
         path_out = os.path.dirname(full)
         path_out = self.get_proper_path(path_out)   # win 7 vs 10 fix
-        
         return path_out
+
+    def get_dir_from_file(self, filename_and_path):
+        return os.path.dirname(filename_and_path)
+
+    def create_directory_if_not_exists(self, path):
+        if self.path_exists(path) is False:
+            self.create_directory(path)
 
     def create_directory(self, directory):
         if len(directory) > 0:

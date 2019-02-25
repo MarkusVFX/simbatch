@@ -318,7 +318,7 @@ class Definitions:
             exec content
             return eval("Interactions")
         except SyntaxError:
-            self.batch.logger.err(("syntax error definition file:", filename))
+            self.batch.logger.err(("syntax error definition file:", filename), nl=True, nl_after=True)
             return None
     # TODO move to common !!!!
 
@@ -371,7 +371,7 @@ class Definitions:
                                 new_definition.interactions = self.load_interaction_file(inters_f)
                                 if new_definition.interactions is None:
                                     loading_errors += 1
-                                    self.batch.logger.err(("interaction file not loaded: ", inters_f))
+                                    self.batch.logger.err(("interaction file not loaded: ", inters_f), nl_after=True)
 
                             if "actions" in json_definition['definition']:
                                 for li in json_definition['definition']['actions'].values():

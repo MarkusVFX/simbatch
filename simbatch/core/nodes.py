@@ -318,20 +318,19 @@ class SimNodes:
             f.close()
             if len(first_line) > 0:
                 li = first_line.split(";")
+                state_int = self.comfun.int_or_val(li[0], -1)
+                if state_int > 0:
+                    self.batch.logger.deepdb(("State from file : ", state_int))
+                    server_name = li[1]
+                    state_name = self.batch.sts.states_visible_names[state_int]
+                    node_info = SingleNode(-1, server_name, state_name, state_int, state_file, "info from state file")
+                    return node_info
+                else:
+                    self.batch.logger.err("State file err, wrong status value : {}".format(li[0]))
+                    return False
             else:
-                li = [-1]
                 self.batch.logger.err("First line of state file is empty : {}".format(state_file))
-
-            state_int = self.comfun.int_or_val(li[0], -1)
-            if state_int > 0:
-                self.batch.logger.deepdb(("State from file : ", state_int))
-                server_name = li[1]
-                state_name = self.batch.sts.states_visible_names[state_int]
-                node_info = SingleNode(-1, server_name, state_name, state_int, state_file, "info from state file")
-                return node_info
-            else:
-                self.batch.logger.err("State file err, wrong status value : {}".format(li[0]))
-                return None
+                return False
         else:
             return None
 

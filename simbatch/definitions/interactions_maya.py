@@ -171,16 +171,16 @@ class Interactions:
                            percent=100, wh=[1280, 720])
         else:
             self.logger.err("var out_file is empty ")
-
-
-
-
         
     def maya_render_software(self, ts, te, out_file=""):
         self.logger.int(("maya_render_software", ts, te, out_file))
         
     def maya_script_py(self, file):
         self.logger.int(("maya_script_py", file))
+        if self.comfun.file_exists(file):
+            execfile(file)
+        else:
+            self.logger.wrn(("Script file not exist", file))
         
     def maya_script_mel(self, file):
         self.logger.int(("maya_script_mel", file))

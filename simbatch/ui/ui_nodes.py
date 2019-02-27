@@ -279,6 +279,23 @@ class NodesUI:
         self.batch.logger.db("on menu: Reset")
         self.on_reset_node()
 
+    def on_menu_break(self):
+        file = self.comfun.get_path_from_full(self.nod.get_state_file()) + "break.txt"
+        if self.comfun.file_exists(file, info=False):
+            self.batch.logger.wrn(("Break file exist: ", file))
+        else:
+            info = "If this file name is break.txt, it will break main server's loop. It's nice way to stop server"
+            info += "\nIf this file is named break__.txt it means loop was successful broken and break.txt was renamed"
+            ret = self.comfun.save_to_file(file, info)
+            if ret:
+                self.batch.logger.inf(("Break file created: ", file))
+            else:
+                self.batch.logger.err(("Break file NOT created: ", file))
+
+    @staticmethod
+    def on_click_menu_spacer():
+        pass
+
     def show_right_click_menu(self, pos):
         global_pos = self.qt_list_nodes.mapToGlobal(pos)
         qt_right_menu = QMenu()
@@ -286,7 +303,11 @@ class NodesUI:
         qt_right_menu.addAction("Set WAITING", self.on_menu_set_waiting)
         qt_right_menu.addAction("Set WORKING", self.on_menu_set_working)
         qt_right_menu.addAction("Set OFFLINE", self.on_menu_set_offline)
+        qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Remove Node", self.on_menu_remove)
+        qt_right_menu.addAction("________", self.on_click_menu_spacer)
+        qt_right_menu.addAction("Break server's main loop", self.on_menu_break)
+
         qt_right_menu.exec_(global_pos)
 
     def clear_list(self, with_freeze=False):  # TODO with freeze

@@ -523,6 +523,7 @@ class AddToQueueForm(QWidget):
         # del self.actions_options[:]
         self.schema_options = self.collect_options_from_action_widgets()
         self.task_options = self.collect_options_from_task_widgets()
+        self.batch.tsk.proxy_task = self.task_options.proxy_task
 
     def collect_options_from_action_widgets(self):
         so = self.batch.sch.create_schema_options_object()
@@ -531,14 +532,16 @@ class AddToQueueForm(QWidget):
             evo = ""
             if wa.qt_combo_param is not None:
                 evo = wa.qt_evo_edit_line_widget.qt_edit_line.text()
-
+            '''
             if len(evo) > 4:   # TODO check is it evo or random string !
                 #self.actions_options.append([opt, evo])
-                so.proxy_schema.actions_array[i].actual_value = evo
+                so.proxy_schema.actions_array[i].actual_value = opt+""+evo
                 # TODO lose opt !!!!
             else:
                 #self.actions_options.append([opt])
-                so.proxy_schema.actions_array[i].actual_value = opt
+                so.proxy_schema.actions_array[i].actual_value = opt+""+evo
+            '''
+            so.proxy_schema.actions_array[i].actual_value = opt+"^"+evo
         return so
 
     def collect_options_from_task_widgets(self):

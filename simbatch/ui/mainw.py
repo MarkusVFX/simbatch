@@ -158,6 +158,9 @@ class MainWindow(QMainWindow):
         self.init_sts_colors()
         self.init_ui(server.batch)
 
+        self.connect(QShortcut(QKeySequence(Qt.Key_R), self), SIGNAL('activated()'), self.on_clicked_but_refresh)
+        self.connect(QShortcut(QKeySequence(Qt.Key_D), self), SIGNAL('activated()'), self.on_shortcut_delete)
+
     def init_ui(self, batch):
         current_screen_width = 800
         current_screen_height = 600
@@ -320,6 +323,12 @@ class MainWindow(QMainWindow):
         else:
             self.top_ui.set_top_info("Refreshed with errors: ({})".format(ret), 7)
         # TODO update debug level
+
+    def on_shortcut_delete(self):
+        if self.qt_tab_widget.currentIndex() == 3: # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut D) delete active queue item")
+            self.que_ui.on_click_remove()
+
 
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)

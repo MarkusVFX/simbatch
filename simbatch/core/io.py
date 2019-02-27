@@ -206,16 +206,44 @@ class PredefinedVariables:
     #
 
     def get_sim_time_start(self, evo):
-        return self.batch.tsk.current_task.sim_frame_start
+        if self.batch.tsk.proxy_task is not None:
+            sim_fr_st = self.batch.tsk.proxy_task.sim_frame_start
+            if self.batch.comfun.can_get_int(sim_fr_st):
+                return int(sim_fr_st)
+            else:
+                self.batch.logger.wrn("(get_sim_time_start) can not get int from:", str(sim_fr_st))
+        else:
+            return self.batch.tsk.current_task.sim_frame_start
 
     def get_sim_time_end(self, evo):
-        return self.batch.tsk.current_task.sim_frame_end
+        if self.batch.tsk.proxy_task is not None:
+            sim_fr_end = self.batch.tsk.proxy_task.sim_frame_end
+            if self.batch.comfun.can_get_int(sim_fr_end):
+                return int(sim_fr_end)
+            else:
+                self.batch.logger.wrn("(get_sim_time_end) can not get int from:", str(sim_fr_end))
+        else:
+            return self.batch.tsk.current_task.sim_frame_end
 
     def get_prev_time_start(self, evo):
-        return self.batch.tsk.current_task.prev_frame_start
+        if self.batch.tsk.proxy_task is not None:
+            prv_fr_st = self.batch.tsk.proxy_task.prev_frame_start
+            if self.batch.comfun.can_get_int(prv_fr_st):
+                return int(prv_fr_st)
+            else:
+                self.batch.logger.wrn("(get_prev_time_start) can not get int from:", str(prv_fr_st))
+        else:
+            return self.batch.tsk.current_task.prev_frame_start
 
     def get_prev_time_end(self, evo):
-        return self.batch.tsk.current_task.prev_frame_end
+        if self.batch.tsk.proxy_task is not None:
+            prv_fr_end = self.batch.tsk.proxy_task.prev_frame_end
+            if self.batch.comfun.can_get_int(prv_fr_end):
+                return int(prv_fr_end)
+            else:
+                self.batch.logger.wrn("(get_prev_time_end) can not get int from:", str(prv_fr_end))
+        else:
+            return self.batch.tsk.current_task.prev_frame_end
 
     def get_working_directory(self, evo):
         ret = self.batch.prj.current_project.working_directory_absolute
@@ -236,6 +264,10 @@ class PredefinedVariables:
     def get_default_value(self, evo):
         return "[default_value]"
 
+    '''
+    PREDEFINED INTERACTIONS
+    '''
+
     def get_cloth_objects(self, evo):
         if self.batch.dfn.current_definition is None:
             self.batch.logger.wrn("(get_cloth_objects) current_definition is None !")
@@ -244,13 +276,7 @@ class PredefinedVariables:
             # TODO interactions   exists   and    get_objects_by_type    exists
             if self.batch.dfn.current_interactions is not None:
                 cloths = self.batch.dfn.current_interactions.get_objects_by_type('nCloth')
-                self.batch.logger.inf(("Detected nCloth objects:", cloths))
-                cloths_str = ""
-                for clt in cloths:
-                    cloths_str += clt + ";"
-                if len(cloths_str) > 0:
-                    cloths_str = cloths_str[:-1]
-                return cloths_str
+                return cloths
             else:
                 self.batch.logger.inf(("(get_cloth_objects) current_definition:", self.batch.dfn.current_definition))
                 self.batch.logger.wrn("(get_cloth_objects) current_interactions is None !")

@@ -49,10 +49,15 @@ class ActionParameters:
 
     def print_params(self):
         for p in self.param_list:
-            print "  {}   {}      {}".format(p.abbrev, p.name, p.description)
+            print "  {}  _  {}   __   {}    ___  {}".format(p.abbrev, p.name, p.description, p.execution_name)
 
     def add_param_to_list(self, abbrev, name, execution_name, def_val, description):
         self.param_list.append(SingleParameter(abbrev, name, execution_name, def_val, description))
+
+    def get_execution_name_by_abbrev(self, abbr):
+        for p in self.param_list:
+            if p.abbrev == abbr:
+                return p.execution_name
 
 
 class SingleAction:
@@ -138,13 +143,15 @@ class SingleAction:
     """ marker ATQ 235   generate script from temlpate   """
     def generate_script_from_action_template(self, batch, option, with_new_line=False, evo=""):
         # TODO optimize + mixed var     <dir>\custom_file.bin
-
         template_with_values = copy.deepcopy(self.template)
         for i, twv in enumerate(template_with_values):
             if twv[0] == "<":
                 if twv == "<ui>":
                     if len(option) > 0:
-                        template_with_values[i] = option
+                        if "^" in option:
+                            template_with_values[i] = option.split("^")[0]
+                        else:
+                            template_with_values[i] = option
                     else:
                         template_with_values[i] = "empty_option"
                 else:

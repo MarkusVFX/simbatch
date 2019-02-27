@@ -447,19 +447,22 @@ class Queue:
             return ""
         for i, act in enumerate(schema.actions_array):
             if act.evos_possible:
-                scr += "[evo_scr]  ; "
+                scr += "[evo_scr];"
+            # marker ATQ 235
             scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]") + "; "
         return scr
 
     @staticmethod
     def fill_evos_in_script_template(templ, evo=None, evo_scr=""):
         if evo is None:
-            evo = "zzz_evo_www"   # TODO  ATQ prrocess
+            # evo = "zzz_evo_www"   # TODO  ATQ prrocess
+            evo = ""
         templ = templ.replace("[evo]", evo)
         templ = templ.replace("[evo_scr]", evo_scr)
         return templ
 
     """ marker ATQ 202   generate all evos arr with scripts   """
+    '''
     def get_evos_from_action_inputs(self, action_inputs):   # depreciated!
         all_evos = []
         found_evos = 0
@@ -471,12 +474,13 @@ class Queue:
                 if ret[0] > 0:
                     found_evos += ret[0]
 
-                    for ie in ret[1]:    # TODO optimize !!!
+                    for ie in ret[1]:    # TODO optimize !!!     (evos_var)  ret[1][0] == ['BND', '7.0', '14.5']
                         for c, subie in enumerate(ie):
                             if c > 0:
                                 all_evos.append([ie[0]+":"+subie, "interactions.set_param(\""+ie[0]+"\","+subie+")"])
 
         return all_evos
+    '''
 
     """ marker ATQ 302   generate all evos arr (scripts for evolving parameters)   """
     def get_array_of_scripts_params_val_from_schema_actions(self, schema):
@@ -486,14 +490,32 @@ class Queue:
 
         for i, ai in enumerate(schema.actions_array):
             if ai.evos_possible:
-                ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
+                if "^" in ai.actual_value:
+                    '''  evos!!!     option^evo    nClothShape4^STR 40 55  '''
+                    splited_actual_value = ai.actual_value.split("^")
+                    ret = self.batch.pat.get_params_val_arr_from_string(splited_actual_value[1])
+                else:
+                    ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
                 if ret[0] > 0:   # ret[0] count evos
                     for ie in ret[1]:  # ['STR', '4.0', '5.0', '6.0']  # TODO optimize, create EVOS class
                         param_arr = []
                         for c, subie in enumerate(ie):
                             if c > 0:
                                 descr = ie[0] + ":" + subie
-                                scr = "interactions.set_param(\"" + ie[0] + "\"," + subie + ")"
+                                multi_act = self.batch.dfn.current_definition.get_multiaction_by_name(ai.name)
+                                mode_index = multi_act.get_action_index_by_mode(ai.mode)
+                                act = multi_act.actions[mode_index]
+                                execution_name = act.parameters.get_execution_name_by_abbrev(ie[0])
+
+                                '''
+                                if ai.parameters is not None:
+                                    full_name_param = ai.parameters.get_execution_name_by_abbrev(ie[0])
+                                else:
+                                    full_name_param = ie[0]
+                                    self.batch.logger.wrn(("(et_array_of_scripts...) ai.parameters is not None! ", ie[0]) )
+                                '''
+                                scr = 'interactions.set_param("{}","{}",{})'.format(splited_actual_value[0],
+                                                                                    execution_name, subie)
                                 param_arr.append([descr, scr])
                         all_evos.append(param_arr)
         return all_evos
@@ -511,6 +533,10 @@ class Queue:
             based_on_task = task_options.proxy_task
             self.batch.logger.db("generate_queue_items with user's task_options", nl=True)
 
+        # set proxy for global use by: act.generate_script_from_action_template
+        self.batch.tsk
+
+
         if schema_options is None:
             schema_index = sch.get_index_by_id(based_on_task.schema_id)
             based_on_schema = sch.schemas_data[schema_index]
@@ -527,7 +553,7 @@ class Queue:
         # marker ATQ 210
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
 
-        # marker ATQ 211
+        # marker ATQ 211 !!!
         template_script = self.generate_template_evo_script(based_on_schema)
 
         if template_queue_item is not None:

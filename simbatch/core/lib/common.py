@@ -5,6 +5,7 @@ import json
 from os import path
 from collections import OrderedDict
 from datetime import datetime
+from glob import glob
 
 from logger import Logger
 
@@ -301,6 +302,9 @@ class CommonFunctions:
         path_out = self.dirname(full)
         path_out = self.get_proper_path(path_out)   # win 7 vs 10 fix
         return path_out
+
+    def get_files_from_path_with_pattern(self, path_with_pattern):
+        return glob(path_with_pattern)
 
     def create_directory_if_not_exists(self, path):
         if self.path_exists(path) is False:

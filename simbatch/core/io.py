@@ -28,7 +28,8 @@ class PredefinedVariables:
         "sim_time_end": {"type": "t", "function": "get_sim_time_end"},
         "prev_time_start": {"type": "t", "function": "get_prev_time_start"},
         "prev_time_end": {"type": "t", "function": "get_prev_time_end"},
-        "cloth_objects": {"type": "o", "function": "get_cloth_objects"}
+        "cloth_objects": {"type": "o", "function": "get_cloth_objects"},
+        "max": {"type": "v", "function": "get_maximum"}
     }
     defaults = {
         "d": "get_working_directory",
@@ -195,6 +196,30 @@ class PredefinedVariables:
             return ret[1]
         else:
             return ""
+
+    def get_maximum(self, param):  # get max version from path
+        param_split = param.split("<max>")
+        if len(param_split) == 2:
+            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1])
+            if len(files) == 0:
+                self.batch.logger.err("Could not get max version from:", param)
+                return False
+            else:
+                max_ver = -1
+                len_pre = len(param_split[0])
+                len_post = len(param_split[1])
+                for f in files:
+                    ver_str = f[len_pre:-len_post]
+                    new_val = self.batch.comfun.int_or_val(ver_str, -1)
+                    if new_val > max_ver:
+                        max_ver = new_val
+                if max_ver > 0:
+                    return self.batch.comfun.str_with_zeros(max_ver, self.batch.prj.current_project.zeros_in_version)
+                else:
+                    return False
+        else:
+            self.batch.logger.err("I have no idea what TODO with more than one <max>")
+            return False
 
     #
     #

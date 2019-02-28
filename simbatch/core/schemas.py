@@ -411,6 +411,17 @@ class Schemas:
         else:
             self.batch.logger.err("(increase_current_schema_version) current schema undefined")
 
+    def get_base_setup_from_current_schema(self):
+        for act in self.current_schema.actions_array:
+            if act.name == "Open":
+                if act.actual_value == "<schema_base_setup>":
+                    return None
+                else:
+                    if "<" in act.actual_value:
+                        return self.batch.sio.predefined.convert_predefined_variables_to_values(act.actual_value, param=act.actual_value)
+                    else:
+                        return act.actual_value
+
     def remove_single_schema(self, index=None, sch_id=None, do_save=False):
         if index is None and sch_id is None:
             return False

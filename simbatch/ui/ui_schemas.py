@@ -348,6 +348,17 @@ class SchemasUI:
     def on_menu_remove(self):
         self.on_click_confirm_remove_schema()
 
+    def on_menu_info(self):
+        cur_schema = self.sch.current_schema
+        if cur_schema is not None:
+            ret = self.sch.get_base_setup_from_current_schema()
+            if ret is not False and ret is not None:
+                cur_sch_base_setup = ret
+            else:
+                cur_sch_base_setup = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name, ver=cur_schema.schema_version)
+            self.top_ui.set_top_info(cur_sch_base_setup, 4)
+            self.batch.logger.inf(("Current schema base file:", cur_sch_base_setup))
+
     @staticmethod
     def on_menu_spacer():
         pass
@@ -380,6 +391,8 @@ class SchemasUI:
         qt_menu_right.addAction("Set HOLD", self.on_menu_set_hold)
         qt_menu_right.addSeparator()
         qt_menu_right.addAction("Remove", self.on_menu_remove)
+        qt_menu_right.addSeparator()
+        qt_menu_right.addAction("Info", self.on_menu_info)
         qt_menu_right.exec_(global_pos)
 
     def hide_all_forms(self):

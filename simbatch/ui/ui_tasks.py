@@ -546,6 +546,7 @@ class TasksUI:
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         form_atq = self.qt_form_add
         # self.actions_options.append(self.form_task_item.description)
+        # marker ATQ 100
         form_atq.collect_options_from_widgets()
         # current_task_id = self.batch.tsk.current_task_id
         current_task = self.batch.tsk.current_task
@@ -557,7 +558,7 @@ class TasksUI:
                 self.batch.tsk.increase_queue_ver()
 
                 self.batch.tsk.proxy_task.queue_ver = self.batch.tsk.current_task.queue_ver
-
+                # marker ATQ 200
                 form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id,
                                                                        schema_options=form_atq.schema_options,
                                                                        task_options=form_atq.task_options)

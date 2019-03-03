@@ -26,7 +26,7 @@
     def on_click_add_to_queue(self):    # event from: ui_tasks_form (Add to queue now)
         ...
         # marker ATQ 100
-        self.collect_options_from_widgets()
+        form_atq.collect_options_from_widgets()
         ...
         # marker ATQ 200
         form_queue_items = self.batch.que.generate_queue_items(self.batch.tsk.current_task.id, schema_options=schema_options, task_options=task_options)
@@ -78,13 +78,21 @@
 
         ...
 
+        return queue_items
 
 
-
-
-
+#queue 
+    """ marker ATQ 302   generate all evos arr (scripts for evolving parameters)   """
+    def get_array_of_scripts_params_val_from_schema_actions(self, schema):
+        ...
+                ret =self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
+                ...
+                    for ie in ret[1]:  # ['STR', '4.0', '5.0', '6.0']  # TODO optimize, create EVOS class
+                        ...
+                                scr = "interactions.set_param(<o>,\"" + ie[0] + "\"," + subie + ")"
+                    
        
-#queue     
+#queue 
     """ marker ATQ 202   generate all evos arr with scripts   """
     def get_evos_from_action_inputs(self, action_inputs):    # depreciated!
         ...
@@ -102,6 +110,13 @@
         ...
             if act.evos_possible:
                 scr += "[evo_scr]  ; "
+                
+            # marker ATQ 235
+            scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]") + "; "
+            
+            
+            
+            
         ...
         return scr
 
@@ -113,8 +128,6 @@
 #queue
     """ marker ATQ 220   generate name   """
     def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
-
-
 #queue
     """ marker X ATQ X 230   generate script from actions  """
     def generate_script_from_Xactions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
@@ -122,8 +135,21 @@
 	scr += act.generate_script_from_action_template(batch, with_new_line=False) + "; "
 
 #actions
-    """ marker ATQ 235   generate script from temlpate   """
-    def generate_script_from_action_template(self, batch, with_new_line=False):
+    """ marker ATQ 235   generate script from temlpate   """  
+    def generate_script_from_action_template(self, batch, with_new_line=False):    # ONLY FOR ACTION WITH NO EVOS POSSIBLE !!! 
+        for i, twv in enumerate(template_with_values):                             # "template": ["interactions.maya_simulate_ncloth(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"],
+            if twv[0] == "<":
+                if twv == "<ui>":
+                    if len(option) > 0:
+                        template_with_values[i] = option
+                    else:
+                        template_with_values[i] = "empty_option"
+                else:
+                    template_with_values[i] = batch.sio.predefined.convert_predefined_variables_to_values(twv, param=evo)
+            ...
+        scr = "".join(template_with_values)
+        ...
+        return scr  
 
 
 #io

@@ -85,7 +85,8 @@ class SchemaFormCreateOrEdit(QWidget):
         # fae   form add/edit
         qt_fae_schema_name = EditLineWithButtons("Name: ", label_minimum_size=60)
         self.qt_fae_schema_name_edit = qt_fae_schema_name    # if sch name exist -> color RED
-        self.qt_fae_schema_name_edit.qt_edit_line.textChanged.connect(self.on_change_sch_name)
+        self.qt_fae_schema_name_edit.qt_edit_line.textChanged.connect(lambda: self.on_change_sch_name(
+            self.qt_fae_schema_name_edit.get_txt(), self.form_mode))
         qt_fae_schema_description = EditLineWithButtons("Description:  ", label_minimum_size=60)
         self.qt_fae_schema_description_edit = qt_fae_schema_description.qt_edit_line
         qt_fae_schema_version = EditLineWithButtons("Version:  ", label_minimum_size=55)
@@ -326,12 +327,21 @@ class SchemaFormCreateOrEdit(QWidget):
         else:
             self.qt_bg_schema_top.setTitle("Edit Schema : " + txt)
 
-    def on_change_sch_name(self, name):
+    def on_change_sch_name(self, name, mode):
         for s in self.batch.sch.schemas_data:
-            if name == s.schema_name:
+            show_red = False
+            if mode == 1:    # mode create
+                if name == s.schema_name:
+                    show_red = True
+            else:            # mode edit
+                if name == s.schema_name and self.batch.sch.current_schema.id != s.id:
+                    show_red = True
+
+            if show_red:
                 self.qt_fae_schema_name_edit.label.setText("Name !")
                 self.qt_fae_schema_name_edit.label.setStyleSheet("""color:#FF0000;font-weight: bold;""")
                 return True
+
         self.qt_fae_schema_name_edit.label.setText("Name")
         self.qt_fae_schema_name_edit.label.setStyleSheet("""color:#000000""")
 

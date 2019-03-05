@@ -51,8 +51,10 @@ class PredefinedVariables:
                 # print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
                 try:
                     eval_ret = str(eval(function_to_eval))
-                    check_str = check_str.replace(key_plus, eval_ret)
-                    # "<" + predefined_item["type"] + ">"
+                    if eval_ret is False or eval_ret == "False":
+                        self.batch.logger.err(("Could not convert_predefined_variables_to_values:", param))
+                    else:
+                        check_str = check_str.replace(key_plus, eval_ret)
                 except ValueError:
                     pass
                     # TODO ex
@@ -202,7 +204,31 @@ class PredefinedVariables:
         if len(param_split) == 2:
             files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1])
             if len(files) == 0:
-                self.batch.logger.err("Could not get max version from:", param)
+                self.batch.logger.err(("(get_maximum) Could not get max version from:", param))
+                return False
+            else:
+                max_ver = -1
+                len_pre = len(param_split[0])
+                len_post = len(param_split[1])
+                for f in files:
+                    ver_str = f[len_pre:-len_post]
+                    new_val = self.batch.comfun.int_or_val(ver_str, -1)
+                    if new_val > max_ver:
+                        max_ver = new_val
+                if max_ver > 0:
+                    return self.batch.comfun.str_with_zeros(max_ver, self.batch.prj.current_project.zeros_in_version)
+                else:
+                    return False
+        else:
+            self.batch.logger.err("I have no idea what TODO with more than one <max>")
+            return False
+
+    def get_shot(self, param):  # get max version from path
+        param_split = param.split("<shot>")
+        if len(param_split) == 2:
+            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1])
+            if len(files) == 0:
+                self.batch.logger.err(("(get_shot) Could not get max version from:", param))
                 return False
             else:
                 max_ver = -1

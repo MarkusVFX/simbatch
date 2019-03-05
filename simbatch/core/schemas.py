@@ -421,6 +421,7 @@ class Schemas:
                         return self.batch.sio.predefined.convert_predefined_variables_to_values(act.actual_value, param=act.actual_value)
                     else:
                         return act.actual_value
+        return None
 
     def remove_single_schema(self, index=None, sch_id=None, do_save=False):
         if index is None and sch_id is None:

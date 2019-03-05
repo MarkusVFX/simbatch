@@ -348,16 +348,25 @@ class SchemasUI:
     def on_menu_remove(self):
         self.on_click_confirm_remove_schema()
 
-    def on_menu_info(self):
+    def on_menu_info(self): 
         cur_schema = self.sch.current_schema
         if cur_schema is not None:
             ret = self.sch.get_base_setup_from_current_schema()
-            if ret is not False and ret is not None:
-                cur_sch_base_setup = ret
+            self.batch.logger.inf(("get_base_setup_from_current_schema", ret))
+            if ret is None:
+                cur_sch_base_setup = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name,
+                                                                                  ver=cur_schema.schema_version)
+                self.top_ui.set_top_info(cur_sch_base_setup, 4)
+                self.batch.logger.inf(("Current schema base file:", cur_sch_base_setup))
+            elif ret is False:
+                self.top_ui.set_top_info("Could not get base_setup", 8)
+                self.batch.logger.err("Could not get base_setup")
             else:
-                cur_sch_base_setup = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name, ver=cur_schema.schema_version)
-            self.top_ui.set_top_info(cur_sch_base_setup, 4)
-            self.batch.logger.inf(("Current schema base file:", cur_sch_base_setup))
+                self.top_ui.set_top_info(ret, 4)
+                self.batch.logger.inf(("Current schema base file:", ret))
+        else:
+            self.top_ui.set_top_info("Current schema is None!", 6)
+            self.batch.logger.err("Current schema is None!")
 
     @staticmethod
     def on_menu_spacer():

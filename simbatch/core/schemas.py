@@ -411,6 +411,26 @@ class Schemas:
         else:
             self.batch.logger.err("(increase_current_schema_version) current schema undefined")
 
+    def get_base_setup(self, useTask=None, db=False):
+        cur_schema = self.current_schema
+        if cur_schema is not None:
+            ret = self.get_base_setup_from_current_schema(useTask=useTask)
+            self.batch.logger.deepdb(("get_base_setup_from_current_schema", ret), force_print=db)
+            if ret is None:
+                cur_sch_base_setup = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name,
+                                                                                  ver=cur_schema.schema_version)
+                self.batch.logger.db(("Current schema base file:", cur_sch_base_setup), force_print=db)
+                return cur_sch_base_setup
+            elif ret is False:
+                self.batch.logger.err("Could not get base_setup", force_print=db)
+                return False
+            else:
+                self.batch.logger.db(("Current schema base file:", ret), force_print=db)
+                return ret
+        else:
+            self.batch.logger.err("Current schema is None!")
+            return False
+
     def get_base_setup_from_current_schema(self):
         for act in self.current_schema.actions_array:
             if act.name == "Open":

@@ -348,19 +348,13 @@ class SchemasUI:
     def on_menu_remove(self):
         self.on_click_confirm_remove_schema()
 
-    def on_menu_info(self): 
+    def on_menu_info(self):
         cur_schema = self.sch.current_schema
         if cur_schema is not None:
-            ret = self.sch.get_base_setup_from_current_schema()
-            self.batch.logger.inf(("get_base_setup_from_current_schema", ret))
-            if ret is None:
-                cur_sch_base_setup = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name,
-                                                                                  ver=cur_schema.schema_version)
-                self.top_ui.set_top_info(cur_sch_base_setup, 4)
-                self.batch.logger.inf(("Current schema base file:", cur_sch_base_setup))
-            elif ret is False:
+            ret = self.sch.get_base_setup()
+            if ret is False:
                 self.top_ui.set_top_info("Could not get base_setup", 8)
-                self.batch.logger.err("Could not get base_setup")
+                self.sch.get_base_setup(db=True)   # repeat only for db info
             else:
                 self.top_ui.set_top_info(ret, 4)
                 self.batch.logger.inf(("Current schema base file:", ret))
@@ -642,15 +636,12 @@ class SchemasUI:
             self.edit_form_state = 0
 
     def load_base_setup(self, schema_name="", version=None):
-        file_to_load = self.batch.sio.generate_base_setup_file_name(schema_name, ver=version)
-        if file_to_load[0] == 1:
-            self.batch.logger.inf(("loading file: ", file_to_load[1]))
-            # self.batch.dfn.current_interactions.load_scene(file_to_load[1])
-            # self.batch.sio.soft_conn.load_scene(file_to_load[1])
-
-            self.batch.dfn.current_interactions.open_setup(file_to_load[1])   # TODO ret
+        file_to_load = self.sch.get_base_setup()
+        if file_to_load is not False:
+            self.batch.logger.inf(("loading file: ", file_to_load))
+            self.batch.dfn.current_interactions.open_setup(file_to_load)   # TODO ret
         else:
-            self.batch.logger.err(("load_base_setup: ", file_to_load))
+            self.batch.logger.err("Could NOT load base setup!")
 
     def on_list_schemas_double_clicked(self, item):
         self.batch.logger.db(("list_schemas_double_clicked: ", self.sch.current_schema_id, item))

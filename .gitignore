@@ -13,6 +13,7 @@ simbatch/definitions/interaction_example.json
 
 simbatch/server/break.txt
 simbatch/server/break__.txt
+simbatch/server/state.txt
 simbatch/server/log.txt
 simbatch/server/server_log.txt
 simbatch/server/script_execute.py

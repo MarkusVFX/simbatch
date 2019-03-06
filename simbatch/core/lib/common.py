@@ -303,7 +303,9 @@ class CommonFunctions:
         path_out = self.get_proper_path(path_out)   # win 7 vs 10 fix
         return path_out
 
-    def get_files_from_path_with_pattern(self, path_with_pattern):
+    def get_files_from_path_with_pattern(self, path_with_pattern, db=False):
+        self.logger.db(path_with_pattern, force_print=db)
+        self.logger.db((" files count : ", len(glob(path_with_pattern))), force_print=db)
         return glob(path_with_pattern)
 
     def create_directory_if_not_exists(self, path):

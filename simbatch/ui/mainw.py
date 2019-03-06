@@ -168,8 +168,8 @@ class MainWindow(QMainWindow):
             try:
                 app = QApplication.instance()
                 screen_resolution = app.desktop().screenGeometry()
-                current_screen_width = screen_resolution.width()
-                current_screen_height = screen_resolution.height()
+                current_screen_width = screen_resolution.width() + screen_resolution.left()
+                current_screen_height = screen_resolution.height() + screen_resolution.top()
             except RuntimeError:
                 pass   # TODO multi screen
         if self.sts.current_os == 2:
@@ -183,8 +183,7 @@ class MainWindow(QMainWindow):
             y_wnd_pos = wnd[1]
             if self.sts.CHECK_SCREEN_RES_ON_START == 1:
                 if wnd[0] > current_screen_width - 130:
-                    x_wnd_pos = 40
-                    self.batch.logger.inf("reset window position X")
+                    x_wnd_pos = 40#
                     self.batch.logger.inf(("reset window position X [", current_screen_width, "]"))
                 if wnd[1] > current_screen_height - 130:
                     y_wnd_pos = 40

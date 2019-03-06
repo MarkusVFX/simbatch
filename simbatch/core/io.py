@@ -84,125 +84,152 @@ class PredefinedVariables:
                         pass
         return template
 
-    def get_default_camera_name(self, evo):
+    def get_default_camera_name(self, evo, option=""):
         ret = self.batch.sio.generate_default_camera_name()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_schema_base_setup(self, evo):
+    def get_schema_base_setup(self, evo, option=""):
         ret = self.batch.sio.generate_base_setup_file_name()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_ani_cache_dir(self, evo):
+    def get_shot_ani_cache_dir(self, evo, option=""):
         ret = self.batch.sio.generate_shot_ani_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_cache_dir(self, evo):
+    def get_project_cache_dir(self, evo, option=""):
         ret = self.batch.sio.generate_project_cache_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_props_dir(self, evo):
+    def get_project_props_dir(self, evo, option=""):
         ret = self.batch.sio.generate_project_props_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_cache_out_dir(self, evo):
+    def get_shot_cache_out_dir(self, evo, option=""):
         ret = self.batch.sio.generate_shot_cache_out_path(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_cam_dir(self, evo):
+    def get_shot_cam_dir(self, evo, option=""):
         ret = self.batch.sio.generate_shot_cam_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_camera_file(self, evo):
+    def get_shot_camera_file(self, evo, option=""):
         ret = self.batch.sio.generate_shot_camera_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_prev_file(self, evo):
+    def get_shot_prev_file(self, evo, option=""):
         ret = self.batch.sio.generate_shot_prev_file(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_prev_seq(self, evo):
+    def get_shot_prev_seq(self, evo, option=""):
         ret = self.batch.sio.generate_shot_prev_seq(evo_inject=evo)
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_project_props_path(self, evo):
+    def get_project_props_path(self, evo, option=""):
         ret = self.batch.sio.generate_project_props_path()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_setup(self, evo):
+    def get_shot_setup(self, evo, option=""):
         ret = self.batch.sio.generate_shot_setup_file_name(evo_inject=evo)
         if ret is not False:
             return ret
         else:
             return ""
 
-    def get_scripts_dir(self, evo):
+    def get_scripts_dir(self, evo, option=""):
         ret = self.batch.sio.generate_scripts_dir()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_shot_dir(self, evo):
+    def get_shot_dir(self, evo, option=""):
         ret = self.batch.sio.generate_shot_working_dir()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_working_dir(self, evo):
+    def get_working_dir(self, evo, option=""):
         if self.batch.prj.current_project is not None:
             return self.batch.prj.current_project.working_directory_absolute
         else:
             return ""
 
-    def get_schema_name(self, evo):
+    def get_schema_name(self, evo, option=""):
         schema_name = self.batch.sch.current_schema.schema_name
         return self.batch.sio.get_flat_name(schema_name)
 
-    def get_shot_name(self, evo):
+    def get_shot_name(self, evo, option=""):
         ret = self.batch.sio.generate_shot_name()
         if ret[0] > 0:
             return ret[1]
         else:
             return ""
 
-    def get_maximum(self, param):  # get max version from path
+    def get_sequence(self, param, option=""):     # <seq>
+        self.batch.logger.deepdb(("option: task id -> ", option))
+        if self.batch.comfun.can_get_int(option):
+            tsk = self.batch.tsk.get_task_by_id(int(option))
+            return param.replace("<seq>", tsk.sequence)
+        else:
+            self.batch.logger.err(("Can NOT convert option to int: ", option))
+            return False
+
+    def get_shot(self, param, option=""):     # <sh>
+        self.batch.logger.deepdb(("option: task id -> ", option))
+        if self.batch.comfun.can_get_int(option):
+            tsk = self.batch.tsk.get_task_by_id(int(option))
+            return param.replace("<sh>", tsk.shot)
+        else:
+            self.batch.logger.err(("Can NOT convert option to int: ", option))
+            return False
+
+    def get_take(self, param, option=""):    # <take>
+        self.batch.logger.deepdb(("option: task id -> ", option))
+        if self.batch.comfun.can_get_int(option):
+            tsk = self.batch.tsk.get_task_by_id(int(option))
+            return param.replace("<take>", tsk.take)
+        else:
+            self.batch.logger.err(("Can NOT convert option to int: ", option))
+            return False
+
+    def get_maximum(self, param, option=""):  # get max version from path
         param_split = param.split("<max>")
         if len(param_split) == 2:
-            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1])
+            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1], db=False)
             if len(files) == 0:
                 self.batch.logger.err(("(get_maximum) Could not get max version from:", param))
                 return False
@@ -223,29 +250,29 @@ class PredefinedVariables:
             self.batch.logger.err("I have no idea what TODO with more than one <max>")
             return False
 
-    def get_shot(self, param):  # get max version from path
-        param_split = param.split("<shot>")
-        if len(param_split) == 2:
-            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1])
-            if len(files) == 0:
-                self.batch.logger.err(("(get_shot) Could not get max version from:", param))
-                return False
-            else:
-                max_ver = -1
-                len_pre = len(param_split[0])
-                len_post = len(param_split[1])
-                for f in files:
-                    ver_str = f[len_pre:-len_post]
-                    new_val = self.batch.comfun.int_or_val(ver_str, -1)
-                    if new_val > max_ver:
-                        max_ver = new_val
-                if max_ver > 0:
-                    return self.batch.comfun.str_with_zeros(max_ver, self.batch.prj.current_project.zeros_in_version)
-                else:
-                    return False
-        else:
-            self.batch.logger.err("I have no idea what TODO with more than one <max>")
-            return False
+    # def get_shot(self, param, option=""):  # get max version from path
+    #     param_split = param.split("<shot>")
+    #     if len(param_split) == 2:
+    #         files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1])
+    #         if len(files) == 0:
+    #             self.batch.logger.err(("(get_shot) Could not get max version from:", param))
+    #             return False
+    #         else:
+    #             max_ver = -1
+    #             len_pre = len(param_split[0])
+    #             len_post = len(param_split[1])
+    #             for f in files:
+    #                 ver_str = f[len_pre:-len_post]
+    #                 new_val = self.batch.comfun.int_or_val(ver_str, -1)
+    #                 if new_val > max_ver:
+    #                     max_ver = new_val
+    #             if max_ver > 0:
+    #                 return self.batch.comfun.str_with_zeros(max_ver, self.batch.prj.current_project.zeros_in_version)
+    #             else:
+    #                 return False
+    #     else:
+    #         self.batch.logger.err("I have no idea what TODO with more than one <max>")
+    #         return False
 
     #
     #
@@ -256,7 +283,7 @@ class PredefinedVariables:
     #
     #
 
-    def get_sim_time_start(self, evo):
+    def get_sim_time_start(self, evo, option=""):
         if self.batch.tsk.proxy_task is not None:
             sim_fr_st = self.batch.tsk.proxy_task.sim_frame_start
             if self.batch.comfun.can_get_int(sim_fr_st):
@@ -266,7 +293,7 @@ class PredefinedVariables:
         else:
             return self.batch.tsk.current_task.sim_frame_start
 
-    def get_sim_time_end(self, evo):
+    def get_sim_time_end(self, evo, option=""):
         if self.batch.tsk.proxy_task is not None:
             sim_fr_end = self.batch.tsk.proxy_task.sim_frame_end
             if self.batch.comfun.can_get_int(sim_fr_end):
@@ -276,7 +303,7 @@ class PredefinedVariables:
         else:
             return self.batch.tsk.current_task.sim_frame_end
 
-    def get_prev_time_start(self, evo):
+    def get_prev_time_start(self, evo, option=""):
         if self.batch.tsk.proxy_task is not None:
             prv_fr_st = self.batch.tsk.proxy_task.prev_frame_start
             if self.batch.comfun.can_get_int(prv_fr_st):
@@ -286,7 +313,7 @@ class PredefinedVariables:
         else:
             return self.batch.tsk.current_task.prev_frame_start
 
-    def get_prev_time_end(self, evo):
+    def get_prev_time_end(self, evo, option=""):
         if self.batch.tsk.proxy_task is not None:
             prv_fr_end = self.batch.tsk.proxy_task.prev_frame_end
             if self.batch.comfun.can_get_int(prv_fr_end):
@@ -296,30 +323,30 @@ class PredefinedVariables:
         else:
             return self.batch.tsk.current_task.prev_frame_end
 
-    def get_working_directory(self, evo):
+    def get_working_directory(self, evo, option=""):
         ret = self.batch.prj.current_project.working_directory_absolute
         if ret is not None:
             return ret
         else:
             return ""
 
-    def get_default_file(self, evo):
+    def get_default_file(self, evo, option=""):
         return "[default_file]"
 
-    def get_default_object(self, evo):
+    def get_default_object(self, evo, option=""):
         return "[default_object]"
 
-    def get_default_param(self, evo):
+    def get_default_param(self, evo, option=""):
         return "[default_param]"
 
-    def get_default_value(self, evo):
+    def get_default_value(self, evo, option=""):
         return "[default_value]"
 
     '''
     PREDEFINED INTERACTIONS
     '''
 
-    def get_cloth_objects(self, evo):
+    def get_cloth_objects(self, evo, option=""):
         if self.batch.dfn.current_definition is None:
             self.batch.logger.wrn("(get_cloth_objects) current_definition is None !")
             return ""
@@ -660,7 +687,7 @@ class StorageInOut:
         if len(self.prj.projects_data) < self.prj.current_project_index or self.prj.current_project_index < 0:
             self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index,
                                    len(self.prj.projects_data)))
-            return -1, ""
+            return False
         else:
             if ver is None:
                 if self.batch.sch.current_schema is not None:
@@ -675,14 +702,14 @@ class StorageInOut:
                     schema_name = self.batch.sch.current_schema.schema_name
                 else:
                     self.batch.logger.err("(generate_base_setup...) schema_name is empty and current_schema is None")
-                    return -1, ""
+                    return False
 
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
             directory = proj_working_dir+schema_flat_name+self.dir_separator+"base_setup"+self.dir_separator
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_setup_ext()
-            return 1, directory + schema_flat_name + file_version + "." + file_ext
+            return directory + schema_flat_name + file_version + "." + file_ext
 
     def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None, evo_inject="", simed=False):
         if self.prj.current_project_index < 0:

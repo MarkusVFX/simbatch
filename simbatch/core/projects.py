@@ -27,7 +27,7 @@ class SingleProject:
 
     def __init__(self, comfun, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
                  cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
-                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3):
+                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3, zeros_in_shot=4)
         self.comfun = comfun
 
         self.id = project_id
@@ -66,6 +66,7 @@ class SingleProject:
         self.state = state
         self.seq_shot_take_pattern = seq_shot_take_pattern
         self.zeros_in_version = zeros_in_version
+        self.zeros_in_shot = zeros_in_shot
         self.description = description
         self.update_absolute_directories()
 
@@ -162,6 +163,13 @@ class Projects:
         for i, p in enumerate(self.projects_data):
             if p.id == proj_id:
                 return i
+        return None
+
+    def get_project_by_id(self, get_id):
+        for prj in self.projects_data:
+            if prj.id == get_id:
+                return prj
+        self.batch.logger.wrn(("no project with ID: ", get_id))
         return None
 
     #  get index from name for form copy schema

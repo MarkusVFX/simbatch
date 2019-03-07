@@ -875,7 +875,12 @@ class StorageInOut:
         # TODO "<default_camera>"
         return 1, ""
 
-
+    def generate_scripts_dir(self):
+        ret = self.generate_shot_working_dir()
+        if ret[0] == 1:
+            return ret[1] + "scripts" + self.dir_separator
+        else:
+            return False
 
 
 

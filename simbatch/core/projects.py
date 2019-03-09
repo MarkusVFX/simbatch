@@ -27,7 +27,7 @@ class SingleProject:
 
     def __init__(self, comfun, project_id, project_name, is_default, state_id, state, project_directory, working_directory,
                  cameras_directory, cache_directory, env_directory, props_directory, scripts_directory,
-                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3, zeros_in_shot=4)
+                 custom_directory, seq_shot_take_pattern, description, zeros_in_version=3, zeros_in_shot=4):
         self.comfun = comfun
 
         self.id = project_id

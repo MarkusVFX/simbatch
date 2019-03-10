@@ -331,30 +331,40 @@ class TasksUI:
         self.reset_list()
 
     def on_click_menu_open_base_setup(self):
-        sch = self.batch.sch.get_schema_by_id(self.batch.tsk.current_task.schema_id)
-        # self.mainw.sch_ui.load_base_setup(sch.schema_name, self.batch.tsk.current_task.schema_ver)
-        self.mainw.sch_ui.load_base_setup(sch.schema_name, self.batch.tsk.current_task.schema_ver)
-        # self.batch.sio.generate_base_setup_file_name(sch.schema_name, ver=sch.schema_version)
-
-    def on_click_menu_open_shot_setup(self):
-        tsk_id = self.batch.tsk.current_task.id
-        version = self.batch.tsk.current_task.queue_ver
-        evo_nr = -1
-        # file_to_load = self.batch.dfn.getShotSetupFile(tsk_id, version, evo_nr)  # getSchemaBaseSetupFile()
-        file_to_load = self.batch.sio.generate_shot_setup_file_name()   # tsk_id, ver=version, evo_nr
+        file_to_load = self.batch.sch.get_base_setup()
         if file_to_load is not False:
-            self.batch.logger.inf(("file_to_load:", file_to_load[1]))
+            self.batch.logger.inf(("loading file: ", file_to_load))
 
             if self.comfun.file_exists(file_to_load):
                 if self.batch.dfn.current_interactions is not None:
-                    self.batch.dfn.current_interactions.open_setup(file_to_load)    # TODO  check is open_setup exist!
+                    self.batch.dfn.current_interactions.open_setup(file_to_load)  # TODO ret and check is open_setup exist!
                 else:
-                    pass   # TODO
+                    self.batch.logger.err(("Current interactions are not loaded"))
+                    self.top_ui.set_top_info("Current interactions are not loaded", 8)
             else:
                 self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
-                self.top_ui.set_top_info("Shot setup not exist! ({})".format(file_to_load), 7)
+                self.top_ui.set_top_info("Base setup not exist! ({})".format(file_to_load), 7)
         else:
             self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
+
+    def on_click_menu_open_shot_setup(self):
+        if self.batch.tsk.current_task is not None:
+            # file_to_load = self.batch.sio.generate_shot_setup_file_name()   # tsk_id, ver=version, evo_nr
+            file_to_load = self.batch.sch.get_base_setup(use_task_id=self.batch.tsk.current_task_id)
+            if file_to_load is not False:
+                self.batch.logger.inf(("loading file: ", file_to_load))
+
+                if self.comfun.file_exists(file_to_load):
+                    if self.batch.dfn.current_interactions is not None:
+                        self.batch.dfn.current_interactions.open_setup(file_to_load)   # TODO ret and check is open_setup exist!
+                    else:
+                        self.batch.logger.err(("Current interactions are not loaded"))
+                        self.top_ui.set_top_info("Current interactions are not loaded", 8)
+                else:
+                    self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
+                    self.top_ui.set_top_info("Shot setup not exist! ({})".format(file_to_load), 7)
+            else:
+                self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
 
     @staticmethod
     def on_click_menu_spacer():

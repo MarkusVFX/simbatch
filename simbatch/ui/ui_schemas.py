@@ -331,9 +331,9 @@ class SchemasUI:
 
         cur_schema = self.sch.current_schema
         ret = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name, ver=cur_schema.schema_version)
-        if ret[0] == 1:
-            self.batch.logger.db(("save as :", cur_schema.schema_name, cur_schema.id))
-            self.batch.dfn.current_interactions.save_setup_as_next_version(ret[1])
+        if ret is not False:
+            self.batch.logger.db(("sch:", cur_schema.schema_name, cur_schema.id, " save as :", ret))
+            self.batch.dfn.current_interactions.save_setup_as_next_version(ret)
         else:
             self.batch.logger.err((" Error on generating increment setup version :", ret))
 
@@ -593,11 +593,13 @@ class SchemasUI:
             if save_as_base == 1:  # save as base setup
                 save_as = self.batch.sio.generate_base_setup_file_name(new_schema_item.schema_name)
                 self.batch.logger.deepdb(("with saveAs:  ", save_as))
-                if save_as[0] == 1:
+                if save_as is not False:
                     if self.batch.dfn.current_interactions is not None:
-                        self.batch.dfn.current_interactions.save_current_scene_as(save_as[1])
+                        self.batch.dfn.current_interactions.save_current_scene_as(save_as)
+                    else:
+                        self.batch.logger.err("(on_click_add_schema) current_interactions is None")
                 else:
-                    self.batch.logger.err(("Setup NOT SAVED as default!   on_click_add_schema saveAs error:", save_as))
+                    self.batch.logger.err("Setup NOT SAVED as default!   on_click_add_schema saveAs error")
             else:
                 self.batch.logger.deepdb(("without save_as_base_state:", save_as_base))
 

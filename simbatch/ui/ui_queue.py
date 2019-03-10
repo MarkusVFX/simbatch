@@ -249,18 +249,35 @@ class QueueUI:
         task_id = cur_queue_item.task_id
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
-        prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
-                                                    forceQueueVersion=version)
+        # prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
+        #                                             forceQueueVersion=version)
 
-        self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
+        # prev_dir = self.batch.sio.generate_shot_prev_seq()   # TODO   cleanup def generate_shot_prev_seq
+        ret = self.batch.sio.generate_shot_prev_seq()
 
-        prev_dir = prev_dir + self.sts.dir_separator
-        if self.comfun.path_exists(prev_dir, " prev open "):
-            if self.sts.current_os == 1:
-                pass
-                # TODO linux
+        if ret[0] == 1:
+            prev_dir = ret[1]
+            self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
+
+            prev_dir = prev_dir + self.sts.dir_separator
+            if self.comfun.path_exists(prev_dir, " prev open "):
+                if self.sts.current_os == 1:
+                    pass
+                    # TODO linux
+                else:
+                    subprocess.Popen('explorer "' + prev_dir + '"')
+        else:
+            ret = self.batch.sio.generate_shot_working_dir()
+            if ret[0] == 1:
+                self.batch.logger.wrn(("can not generate prev dir" ))
             else:
-                subprocess.Popen('explorer "' + prev_dir + '"')
+                self.batch.logger.wrn("can not generate shot_working_dir")
+                if self.batch.prj.current_project is None:
+                    self.batch.logger.wrn(" self.prj.current_project in None")
+                if self.batch.sch.current_schema is None:
+                    self.batch.logger.wrn(" self.batch.sch.current_schema in None")
+                if self.batch.tsk.current_task is None:
+                    self.batch.logger.wrn(" self.batch.tsk.current_task in None")
 
     def on_click_menu_open_shot_setup(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
@@ -269,12 +286,23 @@ class QueueUI:
         evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
 
-        file_to_load = self.batch.dfn.get_shot_setup_file(task_id, version, evo_nr)
-        if file_to_load[0] == 1:
-            self.batch.logger.inf(("file_to_load ", file_to_load[1]))
-            self.batch.o.soft_conn.load_scene(file_to_load[1])
+        # file_to_load = self.batch.dfn.get_shot_setup_file(task_id, version, evo_nr)
+        file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version)
+
+        if file_to_load is not False:
+            if self.comfun.file_exists(file_to_load):
+                self.batch.logger.inf(("file_to_load ", file_to_load))
+                # self.batch.o.soft_conn.load_scene(file_to_load)
+                if self.batch.dfn.current_interactions is not None:
+                    self.batch.dfn.current_interactions.open_setup(file_to_load)  # TODO check ret
+                else:
+                    self.batch.logger.err(("Current interactions are not loaded"))
+                    self.top_ui.set_top_info("Current interactions are not loaded", 8)
+            else:
+                self.batch.logger.wrn(("file_to_load not exist: ", file_to_load))
+                self.top_ui.set_top_info("file_to_load not exist", 8)
         else:
-            self.batch.logger.wrn(("file_to_load not exist: ", file_to_load[1]))
+            self.batch.logger.wrn(("can not get file_to_load   from : task_id, version : ", task_id, version))
 
     def on_click_menu_queue_item_remove(self):
         self.on_click_confirmed_remove_queue_item()

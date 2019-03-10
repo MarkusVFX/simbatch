@@ -323,6 +323,8 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
         if function_to_eval is not None:
             try:
                 eval_ret = eval(function_to_eval)
+                if type(eval_ret) == list:
+                    eval_ret = ",".join(eval_ret)
                 edit.setText(eval_ret)
             except ValueError:
                 pass

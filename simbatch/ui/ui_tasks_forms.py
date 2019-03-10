@@ -459,7 +459,7 @@ class AddToQueueForm(QWidget):
                     act_name_sufix = ""
 
                 check_str = str(act.actual_value)
-                val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str, param="[evo]")
+                val_str = self.batch.sio.predefined.convert_predefined_variables_to_values(check_str, param="[evo]", option=str(current_task.id))
 
                 if val_str is None:
                     val_str = "None"

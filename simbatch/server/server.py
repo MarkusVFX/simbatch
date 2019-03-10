@@ -438,7 +438,8 @@ class SimBatchServer:
     def run_external_software(self, script):
         self.logger.db(("run_external_software", script))
         if self.batch.sts.current_os == 1:
-            comm = "kate " + script  # TODO universal info/text/message
+            script = script[:-2] + "mel"
+            comm = "maya -script " + script  # TODO universal info/text/message
             subprocess.Popen(comm, shell=True)
         if self.batch.sts.current_os == 2:
             script = script[:-2] + "mel"
@@ -624,7 +625,7 @@ class SimBatchServer:
                             self.break_loop = True
                             self.last_info = "The limit has been reached."
                         else:
-                            self.logger.wrn("Nothing to do! The limit was not reached :{}/{}".format(
+                            self.logger.inf("Nothing to do! The limit was not reached :{}/{}".format(
                                                   self.jobs_computed, self.jobs_limit))
                     else:
                         '''   job_limit == 0   ->   NO LIMIT  -> INFINITE LOOP   '''

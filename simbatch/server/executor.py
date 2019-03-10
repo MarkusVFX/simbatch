@@ -89,7 +89,10 @@ class SimBatchExecutor():
         job_time = str(0.1 * int((time.time() - self.job_start_time) * 10))
         print " [INF] job time   ", job_time
 
-        self.set_queue_job_done(self.hack_sim_node_name, set_time=job_time)
+        ret = self.set_queue_job_done(self.hack_sim_node_name, set_time=job_time)
+
+        print " [INF] set_queue_job_done   ", ret
+
 
         idx = self.batch.nod.get_node_index_by_name(self.hack_sim_node_name)
         # print " idx  ", idx, self.hack_sim_node_name
@@ -99,6 +102,8 @@ class SimBatchExecutor():
         cur_nod = self.batch.nod.current_node
         state_id = self.batch.sts.INDEX_STATE_WAITING
         self.batch.nod.create_node_state_file(cur_nod.state_file, cur_nod.node_name, state_id, update_mode=True)
+
+        time.sleep(1)
 
         if self.softID == 1:
             self.add_to_log_with_new_line("HOU Exiting")
@@ -115,6 +120,5 @@ class SimBatchExecutor():
 
     def exit_maya(self):
         import maya.cmds as cmds
-        cmds.quit(force=True)
-        self.add_to_log_with_new_line("Maya Exited")
+        cmds.evalDeferred("cmds.quit(force=True)")
 

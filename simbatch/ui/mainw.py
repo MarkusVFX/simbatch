@@ -170,6 +170,15 @@ class MainWindow(QMainWindow):
                 screen_resolution = app.desktop().screenGeometry()
                 current_screen_width = screen_resolution.width() + screen_resolution.left()
                 current_screen_height = screen_resolution.height() + screen_resolution.top()
+                if app.desktop().numScreens() >= 2:
+                    self.batch.logger.inf(("numScreens detected: ", app.desktop().numScreens()))
+                    screen_0 = app.desktop().availableGeometry(screen=0)
+                    screen_1 = app.desktop().availableGeometry(screen=1)
+                    screen_0_w = screen_0.width() + screen_0.left()
+                    screen_1_w = screen_1.width() + screen_1.left()
+                    current_screen_width = max(screen_0_w,  screen_1_w)
+                    self.batch.logger.inf(("current width: ", screen_resolution.width(), screen_resolution.left()))
+                    current_screen_height = screen_resolution.height() + screen_resolution.top()
             except RuntimeError:
                 pass   # TODO multi screen
         if self.sts.current_os == 2:
@@ -183,11 +192,11 @@ class MainWindow(QMainWindow):
             y_wnd_pos = wnd[1]
             if self.sts.CHECK_SCREEN_RES_ON_START == 1:
                 if wnd[0] > current_screen_width - 130:
-                    x_wnd_pos = 40#
-                    self.batch.logger.inf(("reset window position X [", current_screen_width, "]"))
+                    x_wnd_pos = 220
+                    self.batch.logger.inf("reset window position X ({}) ({})".format(wnd[0], current_screen_width))
                 if wnd[1] > current_screen_height - 130:
-                    y_wnd_pos = 40
-                    self.batch.logger.inf("reset window position Y")
+                    y_wnd_pos = 70
+                    self.batch.logger.inf("reset window position Y ({}) ({})".format(wnd[1], current_screen_height))
             else:
                 x_wnd_pos = wnd[0]
                 y_wnd_pos = wnd[1]

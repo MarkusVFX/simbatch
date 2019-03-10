@@ -21,6 +21,14 @@
 			},
 			"2":{
 				"id": 2,
+				"type": "single",
+				"name": "Select",
+				"desc": "Select objects in scene",
+				"ui" : ["", ["Get current selection","interactions.maya_get_selection"]],
+				"template": ["interactions.maya_select_objects(", "<ui>", ")"]
+			},
+			"3":{
+				"id": 3,
 				"type": "multi",
 				"name": "Import",
 				"subActions":{
@@ -47,16 +55,16 @@
 					}
 				}
 			},
-			"3":{
-				"id": 3,
+			"4":{
+				"id": 4,
 				"type": "single",
 				"name": "Set Value",
 				"desc": "Set value for object property",
  				"ui" : ["<object>.<param>=<value>", ["Get selection","interactions.maya_get_selection"],["Info","[show_info|format: object.param=value]"]],
                 "template": ["interactions.maya_set_param(", "<ui>", ")"]
 			},
-			"4":{
-				"id": 4,
+			"5":{
+				"id": 5,
 				"type": "multi",
 				"name": "Simulate", 
 				"subActions":{
@@ -117,8 +125,8 @@
 					}
 				}
 			},
-			"5":{
-				"id": 5,
+			"6":{
+				"id": 6,
 				"type": "multi",
 				"name": "Render", 
 				"subActions":{
@@ -138,16 +146,16 @@
 					}
 				}
 			},
-			"6":{
-				"id": 6,
+			"7":{
+				"id": 7,
 				"type": "single",
 				"name": "Save",
 				"desc": "Save Maya Scene",
 				"ui" : ["<shot_setup>", ["Get dir","[get_directory]"]],
 				"template": ["interactions.maya_save_scene(", "<ui>", ")"]
 			},
-			"7":{
-				"id": 7,
+			"8":{
+				"id": 8,
 				"type": "multi",
 				"name": "Script", 
 				"subActions":{

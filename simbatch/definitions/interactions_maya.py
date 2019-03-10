@@ -1,3 +1,5 @@
+import sys
+
 class Interactions:
     current_os = -1
     logger = None
@@ -55,9 +57,16 @@ class Interactions:
         ret = cmd.file(save=True, type="mayaBinary")
         return ret
 
+    def maya_select_objects(self, objs):
+        import maya.cmds as cmds
+        cmds.select(cl=True)
+        for obj in objs.split(","):
+            if cmds.objExists(obj):
+                cmds.select(obj, tgl=True)
+
     def maya_get_selection(self):
-        import maya.cmds as cmd
-        sel = cmd.ls(selection=True)
+        import maya.cmds as cmds
+        sel = cmds.ls(selection=True)
         return sel
         
     def maya_get_camera(self):
@@ -66,8 +75,8 @@ class Interactions:
     
     def get_curent_scene_file(self):
         self.logger.int("get_curent_scene_file")
-        import maya.cmds as cmd
-        fi = cmd.file(query=True, sceneName=True)
+        import maya.cmds as cmds
+        fi = cmds.file(query=True, sceneName=True)
         if self.current_os == 2:
             fi = fi.replace('/', '\\')
         basename = os.path.basename(fi)
@@ -77,9 +86,9 @@ class Interactions:
         return out_dir, basename, out_file_header, out_file_ext
     
     def get_curent_frame_range(self):
-        import maya.cmds as cmd
-        playback_min = cmd.playbackOptions(query=True, minTime=True)
-        playback_max = cmd.playbackOptions(query=True, maxTime=True)
+        import maya.cmds as cmds
+        playback_min = cmds.playbackOptions(query=True, minTime=True)
+        playback_max = cmds.playbackOptions(query=True, maxTime=True)
         return playback_min, playback_max
         
     def maya_import_ani(self, objects, dir=""):
@@ -92,20 +101,26 @@ class Interactions:
         self.logger.int(("maya_import_obj", objects, file_or_dir))
         
     def maya_set_param(self, objects, abbrev_param, value):
-        import maya.cmds as cmd
+        import maya.cmds as cmds
         for obj in objects.split(","):
             param_full_name = abbrev_param
-            cmd.setAttr(obj+"."+param_full_name, value)
+            cmds.setAttr(obj+"."+param_full_name, value)
         self.logger.db(("maya_set_param", object, property, value), nl=True)
         
     def maya_simulate_ncloth(self, ts, te, objects_names, cache_dir, cache_mode=1, cache_subsamples=1):
+        import maya.cmds as cmds
+        import maya.mel as ml
+
+        if ts == "0" and te == "0":
+            ts = cmds.playbackOptions(query=True, minTime=True)
+            te = cmds.playbackOptions(query=True, maxTime=True)
+            self.logger.int(("force simulate range from scene", ts, te))
+
         self.logger.int(("maya_simulate_ncloth", ts, te, objects_names, cache_dir))
 
         if self.comfun.path_exists(cache_dir) is False:
             self.comfun.create_directory(cache_dir)
 
-        import maya.cmds as cmds
-        import maya.mel as ml
 
         if cache_mode == 1:
             pc_mode = "OneFile"
@@ -158,10 +173,15 @@ class Interactions:
         pass
         
     def maya_render_blast(self, ts, te, out_file=""):
-        self.logger.int(("maya_render_blast", ts, te, out_file))
-
         import maya.cmds as cmds
         import maya.mel as ml
+        if ts == "0" and te == "0":
+            ts = cmds.playbackOptions(query=True, minTime=True)
+            te = cmds.playbackOptions(query=True, maxTime=True)
+            self.logger.int(("force playblast range from scene", ts, te))
+
+        self.logger.int(("maya_render_blast", ts, te, out_file))
+
 
         fr_start = self.comfun.int_or_val(ts, 0)
         fr_end = self.comfun.int_or_val(te, 0)
@@ -179,7 +199,7 @@ class Interactions:
             self.logger.db((" render out file: ",  out_file))
             # cmds.playblast(f=outFile, st=int(ts), et=int(te), format='qt', compression='H.264', framePadding=4, percent=100, wh=[1920, 1080])
             cmds.playblast(f=out_file, st=int(ts), et=int(te), format='image', compression='jpg', framePadding=4,
-                           percent=100, wh=[1280, 720])
+                           percent=100, wh=[1280, 720], v=False)
         else:
             self.logger.err("var out_file is empty ")
         
@@ -187,11 +207,18 @@ class Interactions:
         self.logger.int(("maya_render_software", ts, te, out_file))
         
     def maya_script_py(self, file):
-        self.logger.int(("maya_script_py", file))
+        self.logger.int(("maya_script_py file:", file))
+        filearr = file.split(" ")
+        file = filearr.pop(0)
         if self.comfun.file_exists(file):
+
+            """   exec file  not importing sys"""
+            import sys
+            if len(filearr) > 0:
+                sys.argv = filearr
             execfile(file)
         else:
-            self.logger.wrn(("Script file not exist", file))
+            self.logger.err(("Script file not exist", file))
         
     def maya_script_mel(self, file):
         self.logger.int(("maya_script_mel", file))

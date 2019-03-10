@@ -64,10 +64,11 @@ class SimNodes:
                 self.batch.logger.raw("\n no {} node with index: {} ".format(prefix, index))
         else:
             self.batch.logger.raw("\n no {} node, index: {} ".format(prefix, index))
-        
 
     def print_all(self):
         self.batch.logger.raw("\n Total nodes in database: {}".format(self.total_nodes))
+        if self.batch.sts.installation_directory_abs is not None:
+            self.batch.logger.raw("\n Source dir: {}".format(self.batch.sts.installation_directory_abs))
         for n in self.nodes_data:
             self.batch.logger.raw("\n {} {}    {} ({})  {} \n  {}".format(n.id, n.node_name, n.state, n.state_id,
                                                                           n.description, n.state_file))

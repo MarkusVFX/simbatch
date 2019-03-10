@@ -141,7 +141,7 @@ class SingleAction:
     """
 
     """ marker ATQ 235   generate script from temlpate   """
-    def generate_script_from_action_template(self, batch, option, with_new_line=False, evo=""):
+    def generate_script_from_action_template(self, batch, option, with_new_line=False, evo="", task_id=""):
         # TODO optimize + mixed var     <dir>\custom_file.bin
         template_with_values = copy.deepcopy(self.template)
         for i, twv in enumerate(template_with_values):
@@ -155,7 +155,7 @@ class SingleAction:
                     else:
                         template_with_values[i] = "empty_option"
                 else:
-                    template_with_values[i] = batch.sio.predefined.convert_predefined_variables_to_values(twv, param=evo)
+                    template_with_values[i] = batch.sio.predefined.convert_predefined_variables_to_values(twv, param=evo, option=task_id)
                 template_with_values[i] = "\"" + template_with_values[i] + "\""
         scr = "".join(template_with_values)
         if with_new_line:

@@ -395,18 +395,18 @@ class Queue:
     #
 
     """ marker X ATQ X 230   generate script from actions  """
-    def generate_script_from_Xactions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
-        scr = ""
-        engines_counter = 0
-        for act in based_on_schema.actions_array:
-            if act.evos_possible is True:
-                if engines_counter == engine_index:
-                    scr += evo_scr
-                engines_counter += 1
-            scr += act.generate_script_from_action_template(batch, "", with_new_line=False) + "; "
-            #                               TODO check    option   ""   !!!
-
-        return scr
+    # def generate_script_from_Xactions(self, batch, based_on_schema, evo_scr=None, engine_index=None):
+    #     scr = ""
+    #     engines_counter = 0
+    #     for act in based_on_schema.actions_array:
+    #         if act.evos_possible is True:
+    #             if engines_counter == engine_index:
+    #                 scr += evo_scr
+    #             engines_counter += 1
+    #         scr += act.generate_script_from_action_template(batch, "", with_new_line=False) + "; "
+    #         #                               TODO check    option   ""   !!!
+    #
+    #     return scr
 
     """ marker ATQ 210   generate queue item template   """
     def generate_template_queue_item(self, task, schema):
@@ -441,7 +441,7 @@ class Queue:
     #     return scr
 
     """ marker ATQ 211   generate template script   """
-    def generate_template_evo_script(self, schema):
+    def generate_template_evo_script(self, schema, task_id=""):
         scr = ""
         if schema is None:
             return ""
@@ -449,7 +449,7 @@ class Queue:
             if act.evos_possible:
                 scr += "[evo_scr];"
             # marker ATQ 235
-            scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]") + "; "
+            scr += act.generate_script_from_action_template(self.batch, act.actual_value, evo="[evo]", task_id=task_id) + "; "
         return scr
 
     @staticmethod
@@ -534,8 +534,6 @@ class Queue:
             self.batch.logger.db("generate_queue_items with user's task_options", nl=True)
 
         # set proxy for global use by: act.generate_script_from_action_template
-        self.batch.tsk
-
 
         if schema_options is None:
             schema_index = sch.get_index_by_id(based_on_task.schema_id)
@@ -554,7 +552,7 @@ class Queue:
         template_queue_item = self.generate_template_queue_item(based_on_task, based_on_schema)
 
         # marker ATQ 211 !!!
-        template_script = self.generate_template_evo_script(based_on_schema)
+        template_script = self.generate_template_evo_script(based_on_schema, task_id=str(task_id))
 
         if template_queue_item is not None:
             # template_queue_item.print_this()

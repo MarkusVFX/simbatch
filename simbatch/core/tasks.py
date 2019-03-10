@@ -118,6 +118,8 @@ class Tasks:
         print "       state:{}   state_id:{} ".format(task.state, task.state_id)
         print "       options ", task.options
         print "       description ", task.description
+        base_setup_name = self.batch.sch.get_base_setup(use_task_id=str(self.current_task_id))
+        print "       base setup: ", base_setup_name
 
     def print_current(self):
         self.print_task()

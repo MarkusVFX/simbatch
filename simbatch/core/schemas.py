@@ -411,10 +411,10 @@ class Schemas:
         else:
             self.batch.logger.err("(increase_current_schema_version) current schema undefined")
 
-    def get_base_setup(self, useTask=None, db=False):
+    def get_base_setup(self, use_task_id="", db=False):
         cur_schema = self.current_schema
         if cur_schema is not None:
-            ret = self.get_base_setup_from_current_schema(useTask=useTask)
+            ret = self.get_base_setup_from_current_schema(use_task_id=use_task_id)
             self.batch.logger.deepdb(("get_base_setup_from_current_schema", ret), force_print=db)
             if ret is None:
                 cur_sch_base_setup = self.batch.sio.generate_base_setup_file_name(cur_schema.schema_name,
@@ -431,14 +431,16 @@ class Schemas:
             self.batch.logger.err("Current schema is None!")
             return False
 
-    def get_base_setup_from_current_schema(self):
+    def get_base_setup_from_current_schema(self, use_task_id=""):
         for act in self.current_schema.actions_array:
             if act.name == "Open":
                 if act.actual_value == "<schema_base_setup>":
                     return None
                 else:
                     if "<" in act.actual_value:
-                        return self.batch.sio.predefined.convert_predefined_variables_to_values(act.actual_value, param=act.actual_value)
+                        return self.batch.sio.predefined.convert_predefined_variables_to_values(act.actual_value,
+                                                                                                param=act.actual_value,
+                                                                                                option=use_task_id)
                     else:
                         return act.actual_value
         return None

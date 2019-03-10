@@ -29,6 +29,9 @@ class PredefinedVariables:
         "prev_time_start": {"type": "t", "function": "get_prev_time_start"},
         "prev_time_end": {"type": "t", "function": "get_prev_time_end"},
         "cloth_objects": {"type": "o", "function": "get_cloth_objects"},
+        "seq": {"type": "v", "function": "get_sequence"},
+        "sh": {"type": "v", "function": "get_shot"},
+        "take": {"type": "v", "function": "get_take"},
         "max": {"type": "v", "function": "get_maximum"}
     }
     defaults = {
@@ -42,25 +45,37 @@ class PredefinedVariables:
     def __init__(self, batch):
         self.batch = batch
 
+    def convert_single_variable_to_values(self, check_str, key, predefined_item, param="", option=""):
+        key_plus = "<" + key + ">"
+        if check_str.find(key_plus) >= 0:
+            if key == "max":
+                param = check_str
+            function_to_eval = 'self.{}("{}", option="{}")'.format(predefined_item["function"], param, option)
+            # print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
+            try:
+                eval_ret = str(eval(function_to_eval))
+                # print "___eval ", function_to_eval
+                if eval_ret is False or eval_ret == "False":
+                    self.batch.logger.err(("Could NOT convert_single_variable_to_values:", param, option))
+                    return check_str
+                else:
+                    return check_str.replace(key_plus, eval_ret)
+            except ValueError:
+                return check_str
+        else:
+            return check_str
+
     """ marker ATQ 001   on show form, on update form and on generate_script_from_action_template   """
-    def convert_predefined_variables_to_values(self, check_str, param=""):
+
+    def convert_predefined_variables_to_values(self, check_str, param="", option=""):
         for key, predefined_item in self.predefined.items():
-            key_plus = "<" + key + ">"
-            if check_str.find(key_plus) >= 0:
-                function_to_eval = "self.{}(\"{}\")".format(predefined_item["function"], param)
-                # print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
-                try:
-                    eval_ret = str(eval(function_to_eval))
-                    if eval_ret is False or eval_ret == "False":
-                        self.batch.logger.err(("Could not convert_predefined_variables_to_values:", param))
-                    else:
-                        check_str = check_str.replace(key_plus, eval_ret)
-                except ValueError:
-                    pass
-                    # TODO ex
+            check_str = self.convert_single_variable_to_values(check_str, key, predefined_item, param, option)
+        check_str = self.convert_single_variable_to_values(check_str, "max", self.predefined["max"], param, option)
+        # print "\ncheck_str:", check_str
         return check_str
 
     """ marker ATQ 250   convert undefined to default   """
+
     def convert_undefined_to_default(self, template, evo_inject=None):
         # TODO optimize !
         # for de in self.defaults:
@@ -71,7 +86,7 @@ class PredefinedVariables:
 
         if template is not None:
             for key, get_default in self.defaults.items():
-                check = "<"+key+">"
+                check = "<" + key + ">"
                 if template.find(check) > 0:
                     # print "check", check ,  "   get_default: " , get_default
                     try:
@@ -93,8 +108,8 @@ class PredefinedVariables:
 
     def get_schema_base_setup(self, evo, option=""):
         ret = self.batch.sio.generate_base_setup_file_name()
-        if ret[0] > 0:
-            return ret[1]
+        if ret is not False:
+            return ret
         else:
             return ""
 
@@ -170,8 +185,8 @@ class PredefinedVariables:
 
     def get_scripts_dir(self, evo, option=""):
         ret = self.batch.sio.generate_scripts_dir()
-        if ret[0] > 0:
-            return ret[1]
+        if ret is not False:
+            return ret
         else:
             return ""
 
@@ -199,37 +214,37 @@ class PredefinedVariables:
         else:
             return ""
 
-    def get_sequence(self, param, option=""):     # <seq>
+    def get_sequence(self, param, option=""):  # <seq>
         self.batch.logger.deepdb(("option: task id -> ", option))
         if self.batch.comfun.can_get_int(option):
             tsk = self.batch.tsk.get_task_by_id(int(option))
-            return param.replace("<seq>", tsk.sequence)
+            return str(tsk.sequence)
         else:
             self.batch.logger.err(("Can NOT convert option to int: ", option))
             return False
 
-    def get_shot(self, param, option=""):     # <sh>
+    def get_shot(self, param, option=""):  # <sh>
         self.batch.logger.deepdb(("option: task id -> ", option))
         if self.batch.comfun.can_get_int(option):
             tsk = self.batch.tsk.get_task_by_id(int(option))
-            return param.replace("<sh>", tsk.shot)
+            return self.batch.comfun.str_with_zeros(tsk.shot, self.batch.prj.current_project.zeros_in_shot)
         else:
             self.batch.logger.err(("Can NOT convert option to int: ", option))
             return False
 
-    def get_take(self, param, option=""):    # <take>
+    def get_take(self, param, option=""):  # <take>
         self.batch.logger.deepdb(("option: task id -> ", option))
         if self.batch.comfun.can_get_int(option):
             tsk = self.batch.tsk.get_task_by_id(int(option))
-            return param.replace("<take>", tsk.take)
+            return str(tsk.take)
         else:
             self.batch.logger.err(("Can NOT convert option to int: ", option))
             return False
 
-    def get_maximum(self, param, option=""):  # get max version from path
+    def get_maximum(self, param, option=""):  # get max version from path  <max>
         param_split = param.split("<max>")
         if len(param_split) == 2:
-            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1], db=False)
+            files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1], db=True)
             if len(files) == 0:
                 self.batch.logger.err(("(get_maximum) Could not get max version from:", param))
                 return False
@@ -445,7 +460,7 @@ class StorageInOut:
             self.batch.logger.err("copy_file {}".format(sys.exc_info()[0]))
         else:
             self.batch.logger.inf("copy_file  from: {}     to: {}\n".format(src_file, dst_file))
-        
+
     @staticmethod
     def get_flat_name(name):
         return re.sub('\s', '_', name)
@@ -462,7 +477,7 @@ class StorageInOut:
             else:
                 self.batch.logger.err(("Data directory NOT created: ", dir_path))
                 return False
-        
+
     def create_project_working_directory(self, dir_path):
         self.comfun.create_directory(dir_path)
 
@@ -500,7 +515,7 @@ class StorageInOut:
             api_simple_schema.schema_name = "API simple Schema"
             api_simple_schema.description = "api schema"
             api_simple_schema.project_id = api_project_id
-            
+
             as_def = self.batch.dfn.get_definition_by_name("Stand-alone")
             if as_def is None:
                 self.batch.logger.err("Stand-alone definition NOT found!")
@@ -568,7 +583,7 @@ class StorageInOut:
                 self.batch.logger.wrn("NOT created API task example")
                 return False
         else:
-            return 0   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
+            return 0  # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
 
     def create_unit_tests_example_data(self, do_save=False):
         if self.batch.prj.is_project_exists("pytest proj", msg=False) is False:
@@ -624,20 +639,20 @@ class StorageInOut:
                 self.batch.logger.wrn("NOT created unit tests task example")
                 return False
         else:
-            return True   # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
+            return True  # api_task_id = self.batch.tsk.get_id_by_name("API tsk 1")
 
     def check_any_data_to_load_exist(self):
         if self.sts.store_data_mode == 1:
             return self.get_files_from_dir(self.sts.store_data_json_directory_abs, types="json")
         else:
-            return True   # TODO POR VERSION
+            return True  # TODO POR VERSION
 
     def get_files_from_dir_by_object_names(self, directory, obj_list, file_type="", crowd_mode=False,
-                                           crowd_mode_data=("pre", "post", 2, 10)):   # TODO  crowd_mode_data  as class
+                                           crowd_mode_data=("pre", "post", 2, 10)):  # TODO  crowd_mode_data  as class
         files = []
         crowd = []
         zeros = []
-        dir_path = directory   # TODO  check dir_path = self.get_path_from_full(dir)
+        dir_path = directory  # TODO  check dir_path = self.get_path_from_full(dir)
         if os.path.isdir(dir_path):
             for fi in os.listdir(dir_path):
                 if len(file_type) == 0:
@@ -667,7 +682,7 @@ class StorageInOut:
                                 zeros.append(nr_z)
         return [files, crowd, zeros]
 
-    def get_frame_range_from_dir(self, directory):    # TODO improve   for fi in os.listdir(dir):
+    def get_frame_range_from_dir(self, directory):  # TODO improve   for fi in os.listdir(dir):
         start = 0
         end = 0
         if os.path.isdir(directory):
@@ -706,14 +721,14 @@ class StorageInOut:
 
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
-            directory = proj_working_dir+schema_flat_name+self.dir_separator+"base_setup"+self.dir_separator
+            directory = proj_working_dir + schema_flat_name + self.dir_separator + "base_setup" + self.dir_separator
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_setup_ext()
             return directory + schema_flat_name + file_version + "." + file_ext
 
     def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None, evo_inject="", simed=False):
         if self.prj.current_project_index < 0:
-            self.batch.logger.err(("Wrong current proj ID  ",self.prj.current_project_index))
+            self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index))
             return False
         else:
             if tsk_id is None:
@@ -724,11 +739,15 @@ class StorageInOut:
                     tsk_id = self.batch.tsk.current_task.id
 
             if ver is None:
-                    # TODO MEGA !  custom ver
+                # TODO MEGA !  custom ver
                 pass
 
-            abs_shot_working_dir = self.generate_shot_working_dir()
-            if abs_shot_working_dir[0] == 0:  # TODO ret FALSE or "str"
+            tsk = self.batch.tsk.get_task_by_id(tsk_id)
+            sch = self.batch.sch.get_schema_by_id(tsk.schema_id)
+            prj = self.batch.prj.get_project_by_id(sch.project_id)  # TODO optimalize this !
+
+            abs_shot_working_dir = self.generate_shot_working_dir(prj=prj, sch=sch, tsk=tsk)
+            if abs_shot_working_dir[0] == -1:  # TODO ret FALSE or "str"
                 self.batch.logger.err("abs_shot_working_dir is not generated properly")
                 return False
 
@@ -793,24 +812,36 @@ class StorageInOut:
 
             return 1, shot_dir
 
-    def generate_shot_working_dir(self):
-        if self.prj.current_project is None or \
-                self.batch.sch.current_schema is None or \
-                self.batch.tsk.current_task is None:
+    def generate_shot_working_dir(self, prj=None, sch=None, tsk=None):
+        if self.prj.current_project is None and prj is None:
             return -1, ""
-        else:
-            shot_dir = self.prj.current_project.working_directory_absolute
-            schema_name = self.batch.sch.current_schema.schema_name
-            shot_dir += self.get_flat_name(schema_name) + self.dir_separator
-            cur_tsk = self.batch.tsk.current_task
-            if len(cur_tsk.sequence) > 0:
-                shot_dir += cur_tsk.sequence + self.dir_separator
-            if len(cur_tsk.shot) > 0:
-                shot_dir += cur_tsk.shot + self.dir_separator
-            if len(cur_tsk.take) > 0:
-                shot_dir += cur_tsk.take + self.dir_separator
 
-            return 1, shot_dir
+        if self.batch.sch.current_schema is None and sch is None:
+            return -1, ""
+
+        if self.batch.tsk.current_task is None and tsk is None:
+            return -1, ""
+
+        if prj is None:
+            prj = self.prj.current_project
+
+        if sch is None:
+            sch = self.batch.sch.current_schema
+
+        if tsk is None:
+            tsk = self.batch.tsk.current_task
+
+        shot_dir = prj.working_directory_absolute
+        schema_name = sch.schema_name
+        shot_dir += self.get_flat_name(schema_name) + self.dir_separator
+        if len(tsk.sequence) > 0:
+            shot_dir += tsk.sequence + self.dir_separator
+        if len(tsk.shot) > 0:
+            shot_dir += tsk.shot + self.dir_separator
+        if len(tsk.take) > 0:
+            shot_dir += tsk.take + self.dir_separator
+
+        return 1, shot_dir
 
     def get_project_data_dir(self):
         return 1, self.batch.prj.current_project.project_directory
@@ -829,7 +860,7 @@ class StorageInOut:
             ver = self.batch.tsk.current_task.queue_ver + 1
             version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
         else:
-            version = "00000"   # TODO
+            version = "00000"  # TODO
 
         return ret[0], ret[1] + "cache" + self.dir_separator + "cache_v" + version + evo_inject
 
@@ -842,7 +873,7 @@ class StorageInOut:
         ret = self.generate_shot_working_dir()
         return ret[0], ret[1] + "props" + self.dir_separator
 
-    def generate_shot_prev_file(self, evo_inject="", seq=""):
+    def generate_shot_prev_file(self, evo_inject="", seq=""):  # get_shot_prev_seq
         ret = self.generate_shot_working_dir()
         if ret[0] == 1:
             ret_file_and_path = ret[1] + "prev" + self.dir_separator
@@ -860,8 +891,11 @@ class StorageInOut:
         return self.generate_shot_prev_file(evo_inject=evo_inject, seq="__####")
 
     def generate_scripts_dir(self):
-        ret = self.generate_shot_working_dir()
-        return ret[0], ret[1] + "scripts" + self.dir_separator
+        ret = self.get_project_data_dir()
+        if ret[0] == 1:
+            return ret[1] + "scripts" + self.dir_separator
+        else:
+            return False
 
     #  get directory pattern for current project
     #  pattern is generated basis on directories structure on storage
@@ -874,13 +908,3 @@ class StorageInOut:
     def generate_default_camera_name(self):
         # TODO "<default_camera>"
         return 1, ""
-
-    def generate_scripts_dir(self):
-        ret = self.generate_shot_working_dir()
-        if ret[0] == 1:
-            return ret[1] + "scripts" + self.dir_separator
-        else:
-            return False
-
-
-

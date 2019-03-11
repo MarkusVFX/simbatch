@@ -268,7 +268,7 @@ class QueueUI:
         else:
             ret = self.batch.sio.generate_shot_working_dir()
             if ret[0] == 1:
-                self.batch.logger.wrn(("can not generate prev dir" ))
+                self.batch.logger.wrn("can not generate prev dir")
             else:
                 self.batch.logger.wrn("can not generate shot_working_dir")
                 if self.batch.prj.current_project is None:
@@ -306,11 +306,11 @@ class QueueUI:
 
             prev_dir = prev_dir + self.sts.dir_separator
             if self.comfun.path_exists(prev_dir, " prev open "):
+                import subprocess
                 if self.sts.current_os == 1:
                     # TODO hardcode
-                    import subprocess
                     print "HK rv:",  ret
-                    subprocess.Popen(['/corky/projects/STH_953254/bin/centos-6_x86-64/rv', 'rvlink://'+ret])
+                    subprocess.Popen(['rv', 'rvlink://'+ret])
                     # TODO hardcode
                 else:
                     subprocess.Popen('explorer "' + prev_dir + '"')
@@ -326,22 +326,18 @@ class QueueUI:
 
     def open_shot_setup(self, simed=False):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
-        # proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
-        evo_nr = cur_queue_item.evolution_nr
         version = cur_queue_item.version
 
-        # file_to_load = self.batch.dfn.get_shot_setup_file(task_id, version, evo_nr)
         file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version, simed=simed)
 
         if file_to_load is not False:
             if self.comfun.file_exists(file_to_load):
                 self.batch.logger.inf(("file_to_load ", file_to_load))
-                # self.batch.o.soft_conn.load_scene(file_to_load)
                 if self.batch.dfn.current_interactions is not None:
                     self.batch.dfn.current_interactions.open_setup(file_to_load)  # TODO check ret
                 else:
-                    self.batch.logger.err(("Current interactions are not loaded"))
+                    self.batch.logger.err("Current interactions are not loaded")
                     self.top_ui.set_top_info("Current interactions are not loaded", 8)
             else:
                 self.batch.logger.wrn(("file_to_load not exist: ", file_to_load))

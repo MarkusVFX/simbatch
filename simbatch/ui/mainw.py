@@ -85,11 +85,17 @@ class TopMenuUI:
             qt_but_debug.hide()
         self.qt_but_debug = qt_but_debug
 
-        qt_but_filter = QPushButton("F")
-        qt_but_filter.setMinimumSize(22, 22)
-        qt_but_filter.setMaximumSize(22, 22)
-        qt_lay_top_menu.addWidget(qt_but_filter)
-        self.qt_but_filter = qt_but_filter
+        qt_but_filter_1 = QPushButton("F1")
+        qt_but_filter_1.setMinimumSize(22, 22)
+        qt_but_filter_1.setMaximumSize(22, 22)
+        qt_lay_top_menu.addWidget(qt_but_filter_1)
+        self.qt_but_filter_1 = qt_but_filter_1
+
+        qt_but_filter_2 = QPushButton("F2")
+        qt_but_filter_2.setMinimumSize(22, 22)
+        qt_but_filter_2.setMaximumSize(22, 22)
+        qt_lay_top_menu.addWidget(qt_but_filter_2)
+        self.qt_but_filter_2 = qt_but_filter_2
 
         qt_but_refresh = QPushButton("R")
         qt_but_refresh.setMinimumSize(22, 22)
@@ -147,6 +153,10 @@ class MainWindow(QMainWindow):
     dfn_ui = None
 
     qt_tab_widget = None
+
+    filter_state_1 = False
+    filter_state_2 = False
+    current_filters = None
 
     def __init__(self, server, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -218,7 +228,8 @@ class MainWindow(QMainWindow):
         top.qt_but_print_general.clicked.connect(self.on_clicked_but_print_general)
         top.qt_but_print_details.clicked.connect(self.on_clicked_but_print_details)
         top.qt_but_debug.clicked.connect(self.on_clicked_but_debug)
-        top.qt_but_filter.clicked.connect(self.on_clicked_but_filter)
+        top.qt_but_filter_1.clicked.connect(self.on_clicked_but_filter_1)
+        top.qt_but_filter_2.clicked.connect(self.on_clicked_but_filter_2)
         top.qt_but_refresh.clicked.connect(self.on_clicked_but_refresh)
 
         self.top_ui = top
@@ -317,8 +328,43 @@ class MainWindow(QMainWindow):
         self.batch.logger.inf(self.batch.logger.console_level)
         self.batch.logger.inf(self.batch.sts.logger.console_level)
 
-    def on_clicked_but_filter(self):
+    def on_clicked_but_filter_1(self):
         self.batch.logger.inf("but_filter clicked")
+        if self.filter_state_1:
+            self.filter_state_1 = False
+            filters = None
+        else:
+            if self.batch.tsk.current_task is None:
+                self.batch.logger.wrn("no task selected")
+                self.top_ui.set_top_info("no task selected", 7)
+            else:
+                self.filter_state_1 = True
+                filters = [[1, self.batch.tsk.current_task.schema_id],[0]]       # TODO  filters class
+                if self.filter_state_2:
+                    self.filter_state_2 = False
+
+        self.current_filters = filters
+
+        self.tsk_ui.reset_list(filters=filters)
+
+    def on_clicked_but_filter_2(self):
+        self.batch.logger.inf("but_filter clicked")
+        if self.filter_state_2:
+            self.filter_state_2 = False
+            filters = None
+        else:
+            if self.batch.tsk.current_task is None:
+                self.batch.logger.wrn("no task selected")
+                self.top_ui.set_top_info("no task selected", 7)
+            else:
+                self.filter_state_2 = True
+                filters = [[0],[1, self.batch.tsk.current_task.sequence, self.batch.tsk.current_task.shot, self.batch.tsk.current_task.take]]
+                if self.filter_state_1:
+                    self.filter_state_1 = False
+
+        self.current_filters = filters
+
+        self.tsk_ui.reset_list(filters=filters)
 
     def on_clicked_but_refresh(self):
         self.batch.logger.inf("but_refresh clicked")
@@ -336,7 +382,6 @@ class MainWindow(QMainWindow):
         if self.qt_tab_widget.currentIndex() == 3: # valid for: P C T Q N D S
             self.batch.logger.inf("(shotcut D) delete active queue item")
             self.que_ui.on_click_remove()
-
 
     def resizeEvent(self, event):            # PySide  resizeEvent
         self.on_resize_window(event)

@@ -396,14 +396,25 @@ class ActionWidgetATQ(QWidget):  # QWidget
     evos_array = None
     evos_count = None
 
-    def __init__(self, batch, text_label, text_edit, combo_label=None, combo_items=None):
+    get_button = False
+
+    def __init__(self, batch, text_label, text_edit, combo_label=None, combo_items=None, get_button=False):
         super(ActionWidgetATQ, self).__init__()
         # QWidget.__init__(self)
         self.batch = batch
         self.qt_widget_layout = QVBoxLayout()
 
-        self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit, text_on_button_1="",
+        self.get_button = get_button
+        if get_button:
+            but = "Get"
+        else:
+            but = ""
+
+        self.qt_edit_line_widget = EditLineWithButtons(text_label, text_edit, text_on_button_1=but,
                                                        button_width=70)
+        if self.qt_edit_line_widget.button_1 is not None:
+            self.qt_edit_line_widget.button_1.clicked.connect(self.on_button_get_click)
+
         self.qt_widget_layout.addLayout(self.qt_edit_line_widget.qt_widget_layout)
 
         if combo_label is not None:
@@ -420,6 +431,10 @@ class ActionWidgetATQ(QWidget):  # QWidget
 
     def __str__(self):
         return "ActionWidgetATQ   evos_count:" + str(self.evos_count)
+
+    def on_button_get_click(self):
+        ret = self.batch.dfn.current_interactions.maya_get_selection()
+        self.qt_edit_line_widget.qt_edit_line.setText(",".join(ret))
 
     def add_evo_to_line(self):
         evo_abbreviation = self.qt_combo_param.combo.currentText()[:3]

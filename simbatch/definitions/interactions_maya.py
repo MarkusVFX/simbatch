@@ -99,13 +99,28 @@ class Interactions:
         
     def maya_import_obj(self, objects, file_or_dir):
         self.logger.int(("maya_import_obj", objects, file_or_dir))
-        
-    def maya_set_param(self, objects, abbrev_param, value):
-        import maya.cmds as cmds
-        for obj in objects.split(","):
-            param_full_name = abbrev_param
-            cmds.setAttr(obj+"."+param_full_name, value)
-        self.logger.db(("maya_set_param", object, property, value), nl=True)
+
+    #def maya_set_param(self, objects, abbrev_param, value):
+    def maya_set_param(self, str_expression):
+
+        a1 = str_expression.split(".")
+        a2 = a1[1].split("=")
+        str_obj = a1[0].strip()
+        str_attrib = a2[0].strip()
+        str_val = a2[1].strip()
+
+        try:
+            import maya.cmds as cmds
+            cmds.setAttr(str_obj + "." + str_attrib, float(str_val))   # TODO check vals !!!
+        except:
+            self.logger.err(("maya_set_param: ", str_obj,  str_attrib,  str_val, "   ___   ", str_expression))  # TODO !
+            pass
+
+        # import maya.cmds as cmds
+        # for obj in objects.split(","):
+        #     param_full_name = abbrev_param
+        #     cmds.setAttr(obj+"."+param_full_name, value)
+        # self.logger.db(("maya_set_param", object, property, value), nl=True)
         
     def maya_simulate_ncloth(self, ts, te, objects_names, cache_dir, cache_mode=1, cache_subsamples=1):
         import maya.cmds as cmds

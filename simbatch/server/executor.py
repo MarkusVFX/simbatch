@@ -36,6 +36,9 @@ class SimBatchExecutor():
         time.sleep(0.5)
         self.add_to_log_with_new_line("")
 
+    def set_server_name(self, name):
+        self.hack_sim_node_name = name  # TODO
+
     def add_to_log_with_new_line(self, log_txt):
         self.add_to_log(log_txt, with_new_line=True)
 
@@ -93,7 +96,7 @@ class SimBatchExecutor():
 
         print " [INF] set_queue_job_done   ", ret
 
-
+        self.batch.nod.reload_nodes()
         idx = self.batch.nod.get_node_index_by_name(self.hack_sim_node_name)
         # print " idx  ", idx, self.hack_sim_node_name
         self.batch.nod.set_node_state_in_database(idx, 2)

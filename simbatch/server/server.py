@@ -245,6 +245,7 @@ class SimBatchServer:
                 if ret:
                     info = "Local server status updated  {} ".format(INDEX_WAITING)
                     self.logger.inf(info)
+                    self.batch.nod.reload_nodes()
                     node_index = self.batch.nod.get_node_index_by_name(node_name)
                     if node_index is False:
                         self.add_node_to_database(node_name)
@@ -300,8 +301,9 @@ class SimBatchServer:
                 ret_w = self.batch.comfun.test_directory_access(dst_path, with_info=False)[1]
                 if ret_r and ret_w:
                     #
-                    self.logger.inf(("update sources from  {}  ".format(source_path)), nl=True)
+                    self.logger.inf(("update sources from  {}\n".format(source_path)), nl=True)
                     self.batch.sio.copy_file(source_path, dst_path, "server.py", sub_dir="server")
+                    self.batch.sio.copy_file(source_path, dst_path, "executor.py", sub_dir="server")
                     self.batch.sio.copy_tree(str(source_path), str(dst_path), sub_dir="core")
                     #
                 else:
@@ -341,7 +343,7 @@ class SimBatchServer:
     def set_simnode_state(self, state_id):
         if self.server_name is not None:
             # simnode_state_file = self.server_dir + self.state_file_name   # TODO create  def check simnode state file    ret = self.batch.nod.set_node_state(simnode_state_file, self.server_name, state_id)
-            
+            self.batch.nod.reload_nodes()
             self.batch.nod.set_curent_node_state(state_id)
             # TODO  check ret
             node_index = self.batch.nod.get_node_index_by_name(self.server_name)
@@ -405,6 +407,7 @@ class SimBatchServer:
         script_out += '\n\nsimbatch = simbatch_core.SimBatch("executor")'
 
         script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ")"  # TODO 1:id
+        script_out += "\nsibe.set_server_name(\"" + self.server_name + "\")"  # TODO 1:id
         script_out += "\ninteractions = sibe.batch.dfn.current_interactions"
 
         script_out += "\nsibe.add_to_log_with_new_line( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP
@@ -600,7 +603,7 @@ class SimBatchServer:
                             self.run_loop()
                     else:
                         """     RUN SINGLE JOB AS SIMNODE     """
-
+                        self.current_job = str(job_id)
                         generated_script_file = self.server_dir + self.script_execute
                         
                         if self.current_simnode_state != 0:
@@ -650,7 +653,7 @@ class SimBatchServer:
                     busy_prefix = busy_prefixes[busy_prefix_index]
                     state_str = self.batch.sts.states_visible_names[self.current_simnode_state]
                     self.logger.inf("{}       {}   is bussy now:{}".format(self.comfun.get_current_time(),
-                                                                           str(self.server_name), state_str),
+                                                                           str(self.server_name), self.current_job),
                                     force_prefix=busy_prefix)
                 if self.mode == "single":
                     self.last_info = "Server is busy, WORKING now"    # TODO add job_id

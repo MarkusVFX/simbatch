@@ -243,7 +243,7 @@ class QueueUI:
     def on_click_menu_set_hold(self):
         self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
 
-    def on_menu_locate_prev(self):
+    def get_prev_dir_from_queue_item(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
@@ -251,21 +251,20 @@ class QueueUI:
         version = cur_queue_item.version
         # prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
         #                                             forceQueueVersion=version)
-
         # prev_dir = self.batch.sio.generate_shot_prev_seq()   # TODO   cleanup def generate_shot_prev_seq
-        ret = self.batch.sio.generate_shot_prev_seq()
+
+        prj = self.batch.prj.get_project_by_id(proj_id)
+        tsk = self.batch.tsk.get_task_by_id(task_id)
+        sch = self.batch.sch.get_schema_by_id(tsk.schema_id)
+        if evo_nr > 0:
+            evo = "evoBx" + str(evo_nr)
+        else:
+            evo = None
+
+        ret = self.batch.sio.generate_shot_prev_seq(prj=prj, sch=sch, tsk=tsk, ver=version, evo=evo)  # TODO cleanup)
 
         if ret[0] == 1:
-            prev_dir = ret[1]
-            self.batch.logger.inf(("Task:", task_id, " prev dir: ", prev_dir))
-
-            prev_dir = prev_dir + self.sts.dir_separator
-            if self.comfun.path_exists(prev_dir, " prev open "):
-                if self.sts.current_os == 1:
-                    pass
-                    # TODO linux
-                else:
-                    subprocess.Popen('explorer "' + prev_dir + '"')
+            return ret[1]
         else:
             ret = self.batch.sio.generate_shot_working_dir()
             if ret[0] == 1:
@@ -278,8 +277,54 @@ class QueueUI:
                     self.batch.logger.wrn(" self.batch.sch.current_schema in None")
                 if self.batch.tsk.current_task is None:
                     self.batch.logger.wrn(" self.batch.tsk.current_task in None")
+            return False
+
+    def on_menu_locate_prev(self):
+        ret = self.get_prev_dir_from_queue_item()
+
+        if ret is not False:
+            prev_dir = self.comfun.dirname(ret)
+            self.batch.logger.inf(("Prev dir: ", prev_dir))
+
+            prev_dir = prev_dir + self.sts.dir_separator
+            if self.comfun.path_exists(prev_dir, " prev open "):
+                if self.sts.current_os == 1:
+                    pass
+                    # TODO linux
+                else:
+                    subprocess.Popen('explorer "' + prev_dir + '"')
+        else:
+            self.batch.logger.wrn("prev dir not exist ")
+            self.top_ui.set_top_info("prev dir not exist", 8)
+
+    def on_menu_open_prev(self):
+        ret = self.get_prev_dir_from_queue_item()
+
+        if ret is not False:
+            prev_dir = self.comfun.dirname(ret)
+            self.batch.logger.inf(("Prev dir: ", prev_dir))
+
+            prev_dir = prev_dir + self.sts.dir_separator
+            if self.comfun.path_exists(prev_dir, " prev open "):
+                if self.sts.current_os == 1:
+                    # TODO hardcode
+                    import subprocess
+                    print "HK rv:",  ret
+                    subprocess.Popen(['/corky/projects/STH_953254/bin/centos-6_x86-64/rv', 'rvlink://'+ret])
+                    # TODO hardcode
+                else:
+                    subprocess.Popen('explorer "' + prev_dir + '"')
+        else:
+            self.batch.logger.wrn("prev dir not exist ")
+            self.top_ui.set_top_info("prev dir not exist", 8)
 
     def on_click_menu_open_shot_setup(self):
+        self.open_shot_setup()   # TODO ret
+
+    def on_click_menu_open_simed_shot_setup(self):
+        self.open_shot_setup(simed=True)
+
+    def open_shot_setup(self, simed=False):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         # proj_id = cur_queue_item.proj_id
         task_id = cur_queue_item.task_id
@@ -287,7 +332,7 @@ class QueueUI:
         version = cur_queue_item.version
 
         # file_to_load = self.batch.dfn.get_shot_setup_file(task_id, version, evo_nr)
-        file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version)
+        file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version, simed=simed)
 
         if file_to_load is not False:
             if self.comfun.file_exists(file_to_load):
@@ -324,7 +369,9 @@ class QueueUI:
         qt_right_menu.addAction("Set HOLD", self.on_click_menu_set_hold)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Locate prev", self.on_menu_locate_prev)
+        qt_right_menu.addAction("Open prev", self.on_menu_open_prev)
         qt_right_menu.addAction("Open shot scene", self.on_click_menu_open_shot_setup)
+        qt_right_menu.addAction("Open simed shot scene", self.on_click_menu_open_simed_shot_setup)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Remove All Green", self.on_click_menu_queue_item_remove_all_green)
         qt_right_menu.addAction("Remove", self.on_click_menu_queue_item_remove)

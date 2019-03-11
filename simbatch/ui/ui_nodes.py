@@ -143,6 +143,8 @@ class NodesUI:
         self.qt_form_add_node_el_name = wfa_name.qt_edit_line
 
         wfr_button_src = ButtonWithCheckBoxes("Copy/Update source files", button_width=155, label_text=" ")
+        wfr_button_src.button.setEnabled(False)
+        wfr_button_src.button.clicked.connect(self.on_click_update_src)
         wfr_button_add = ButtonWithCheckBoxes("Add Path To Database", button_width=155, label_text=" ")
         wfr_button_add.button.clicked.connect(self.on_click_add_node)
 
@@ -362,6 +364,10 @@ class NodesUI:
         else:
             self.top_ui.set_top_info("Directory not exist ", 7)
 
+    def on_click_update_src(self): # TODO
+        # self.batch.update_sources_from_master()
+        return False
+
     def on_click_add_node(self):
         self.batch.logger.db(("add_node",  "add"))
         desc = self.batch.comfun.get_current_time()
@@ -386,6 +392,7 @@ class NodesUI:
                     node_state = self.batch.sts.states_visible_names[node_state_id]
 
                     new_node = self.batch.nod.get_new_node(node_name, node_state, node_state_id, state_file, desc)
+                    self.batch.nod.reload_nodes()
                     ret = self.batch.nod.add_simnode(new_node, do_save=True)
                     if ret:
                         self.top_ui.set_top_info("Added simnode: {}".format(node_name), 1)
@@ -420,8 +427,9 @@ class NodesUI:
             self.top_ui.set_top_info(" Select item first ", 7)
 
     def on_reset_node(self):
-        if self.nod.current_node_index >= 0:
-            current_node = self.nod.nodes_data[self.nod.current_node_index]
+        current_node = self.batch.nod.current_node
+        if current_node is not None:
+            self.batch.nod.reload_nodes()
 
             default_state_id = self.batch.sts.INDEX_STATE_WAITING
 
@@ -430,11 +438,12 @@ class NodesUI:
                 self.top_ui.set_top_info("Simnode state file created", 4)
             else:
                 srv_name = current_node.node_name
-                self.batch.logger.db(("Set WAITING state to node:", srv_name))
+                self.batch.logger.db(("Set WAITING state to node:", srv_name, default_state_id))
                 self.nod.create_node_state_file(current_node.state_file, srv_name, default_state_id, update_mode=True)
                 self.top_ui.set_top_info("Simnode state file updated", 4)
             current_node.state_id = default_state_id
             current_node.state = self.batch.sts.states_visible_names[default_state_id]
+            self.batch.nod.set_node_state_in_database(self.batch.nod.current_node_index, default_state_id)
             self.batch.nod.save_nodes()
             self.reset_list()
         else:
@@ -464,7 +473,7 @@ class NodesUI:
             self.reset_list()
         return True
 
-    def on_list_nodes_current_changed(self, x):
+    def on_list_nodes_current_changed(self, x):  # update_current_from_index
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("simnodes change freeze_list_on_changed", self.qt_list_nodes.currentRow()))
         else:

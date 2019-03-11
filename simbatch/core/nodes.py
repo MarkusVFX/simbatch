@@ -169,7 +169,7 @@ class SimNodes:
     def update_from_nodes(self, with_save=False):
         """  update current nodes_data from simnodes  """
         changes_count = 0
-
+        self.reload_nodes()
         for nod in self.nodes_data:
             node_info = self.get_node_info_from_state_file(nod.state_file)
             if node_info is not None:
@@ -197,6 +197,7 @@ class SimNodes:
             return True, changes_count
 
     def remove_node(self, node_id, do_save=False):
+        self.reload_nodes()
         for i, node in enumerate(self.nodes_data):
             if node.id == node_id:
                 del self.nodes_data[i]
@@ -207,6 +208,14 @@ class SimNodes:
             return self.save_nodes()
         else:
             return True
+
+    def reload_nodes(self):
+        current_id = self.current_node_id
+        self.clear_all_nodes_data()
+        self.load_nodes()
+        if current_id is not None:
+            idx = self.get_index_by_id(current_id)
+            self.update_current_from_index(idx)
 
     def load_nodes(self):
         if self.batch.sts.store_data_mode == 1:

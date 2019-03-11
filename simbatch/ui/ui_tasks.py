@@ -241,7 +241,25 @@ class TasksUI:
 
         self.init_tasks()
 
-    def init_tasks(self):
+    def should_filter_task_pass(self, task, filters):   # TODO filters class !
+        if filters[0][0] == 1:
+            if task.schema_id == filters[0][1]:
+                return True
+            else:
+                return False
+        elif filters[1][0] == 1:
+            if task.sequence == filters[1][1]:
+                if task.shot == filters[1][2]:
+                    if task.take == filters[1][3]:
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+            else:
+                return False
+
+    def init_tasks(self, filters=None):
         widget_list = self.list_tasks
         qt_list_item = QListWidgetItem(widget_list)
         qt_list_item.setBackground(QBrush(QColor("#ddd")))
@@ -259,33 +277,39 @@ class TasksUI:
             qt_list_item.setBackground(self.sts.state_colors_up[0])
 
         for tsk in self.batch.tsk.tasks_data:
+            filter_pass = True
             if tsk.project_id == self.batch.prj.current_project_id:
-                qt_list_item = QListWidgetItem(widget_list)
-                cur_color = self.sts.state_colors[tsk.state_id].color()
-                qt_list_item.setBackground(cur_color)
-                list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
-                                                tsk.sequence, tsk.shot, tsk.take, tsk.state,
-                                                str(tsk.schema_ver), str(tsk.queue_ver),
-                                                tsk.options, tsk.description)
+                if filters is not None:
+                    filter_pass = self.should_filter_task_pass(tsk, filters)
 
-                widget_list.addItem(qt_list_item)
-                widget_list.setItemWidget(qt_list_item, list_item_widget)
-                qt_list_item.setSizeHint(QSize(130, 26))
-                qt_list_item.setBackground(self.sts.state_colors[tsk.state_id])
+                if filter_pass:
+                    qt_list_item = QListWidgetItem(widget_list)
+                    cur_color = self.sts.state_colors[tsk.state_id].color()
+                    qt_list_item.setBackground(cur_color)
+                    list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
+                                                    tsk.sequence, tsk.shot, tsk.take, tsk.state,
+                                                    str(tsk.schema_ver), str(tsk.queue_ver),
+                                                    tsk.options, tsk.description)
 
-    def reset_list(self):
+                    widget_list.addItem(qt_list_item)
+                    widget_list.setItemWidget(qt_list_item, list_item_widget)
+                    qt_list_item.setSizeHint(QSize(130, 26))
+                    qt_list_item.setBackground(self.sts.state_colors[tsk.state_id])
+
+    def reset_list(self, filters=None):
         self.freeze_list_on_changed = 1
         index = self.batch.tsk.current_task_index
         self.clear_list(with_freeze=False)
-        self.init_tasks()
+        self.init_tasks(filters)
+        self.update_list_of_visible_ids(filters)
         self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
 
-    def reload_tasks_data_and_refresh_list(self):
+    def reload_tasks_data_and_refresh_list(self, filters=None):
         self.batch.tsk.clear_all_tasks_data()
         self.batch.tsk.load_tasks()
         self.reset_list()
-        self.update_list_of_visible_ids()
+        self.update_list_of_visible_ids(filters)
 
     def _change_current_task_state_and_reset_list(self, state_id):
         self.batch.tsk.current_task.state = self.sts.states_visible_names[state_id]
@@ -584,7 +608,9 @@ class TasksUI:
 
                 self.freeze_list_on_changed = 1
                 self.last_task_list_index = -1
-                self.reset_list()
+
+                filters = self.mainw.current_filters
+                self.reset_list(filters=filters)
 
                 self.freeze_list_on_changed = 0
                 # self.qt_form_add.update_form()
@@ -610,16 +636,20 @@ class TasksUI:
         if with_freeze:
             self.freeze_list_on_changed = 0
 
-    def update_all_tasks(self):
+    def update_all_tasks(self, filters=None):
         self.clear_list()
-        self.init_tasks()
-        self.update_list_of_visible_ids()
+        self.init_tasks(filters)
+        self.update_list_of_visible_ids(filters)
 
-    def update_list_of_visible_ids(self):
+    def update_list_of_visible_ids(self, filters=None):
         array_visible_tasks_ids = []
         for task in self.batch.tsk.tasks_data:
+            filter_pass = True
             if task.project_id == self.batch.prj.current_project_id:
-                array_visible_tasks_ids.append(task.id)
+                if filters is not None:
+                    filter_pass = self.should_filter_task_pass(task, filters)
+                if filter_pass:
+                    array_visible_tasks_ids.append(task.id)
         self.array_visible_tasks_ids = array_visible_tasks_ids
 
     def on_current_item_changed(self, current_task_item):

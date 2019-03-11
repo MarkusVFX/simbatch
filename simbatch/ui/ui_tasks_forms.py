@@ -439,7 +439,11 @@ class AddToQueueForm(QWidget):
             self.batch.logger.wrn("(on update form) current definition is undefined")
             for act in current_sch.actions_array:
                 # gen_script  = action.generate_script(action.scriptActionTemplates, vals, sub_type)
-                self.add_action_widget_to_form(act.name, act.actual_value)
+                if act.name == "Select":
+                    get_button = True
+                else:
+                    get_button = False
+                self.add_action_widget_to_form(act.name, act.actual_value, get_button=get_button)
         else:
             for act in current_sch.actions_array:
                 evolution = None
@@ -464,19 +468,24 @@ class AddToQueueForm(QWidget):
                 if val_str is None:
                     val_str = "None"
 
-                self.add_action_widget_to_form(act.name+act_name_sufix, edit_txt=val_str, evo=evolution)
+                if act.name == "Select":
+                    get_button = True
+                else:
+                    get_button = False
 
-    def add_action_widget_to_form(self, info, edit_txt=None, evo=None):
+                self.add_action_widget_to_form(act.name+act_name_sufix, edit_txt=val_str, evo=evolution, get_button=get_button)
+
+    def add_action_widget_to_form(self, info, edit_txt=None, evo=None, get_button=False):
         if edit_txt is None and evo is None:
             wi = SimpleLabel(info)
         else:
             if evo is not None:
                 if len(evo) <= 1:
-                    wi = ActionWidgetATQ(self.batch, info, edit_txt)
+                    wi = ActionWidgetATQ(self.batch, info, edit_txt, get_button=get_button)
                 else:
-                    wi = ActionWidgetATQ(self.batch, info, edit_txt,  combo_label="    with evolutions:", combo_items=evo)
+                    wi = ActionWidgetATQ(self.batch, info, edit_txt,  combo_label="    with evolutions:", combo_items=evo, get_button=get_button)
             else:
-                wi = ActionWidgetATQ(self.batch, info, edit_txt)
+                wi = ActionWidgetATQ(self.batch, info, edit_txt, get_button=get_button)
 
         qt_widget = QWidget()
         qt_widget.setLayout(wi.qt_widget_layout)

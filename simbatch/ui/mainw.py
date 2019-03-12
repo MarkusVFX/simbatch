@@ -380,9 +380,24 @@ class MainWindow(QMainWindow):
         # TODO update debug level
 
     def on_shortcut_delete(self):
+        if self.qt_tab_widget.currentIndex() == 2:   # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut D) delete active task")
+            self.tsk_ui.on_click_show_remove_form()
         if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S
             self.batch.logger.inf("(shotcut D) delete active queue item")
             self.que_ui.on_click_remove()
+
+    def on_shortcut_yes(self):
+        if self.qt_tab_widget.currentIndex() == 2:  # valid for: P C T Q N D S
+            if self.tsk_ui.remove_form_state == 1:
+                self.tsk_ui.qt_form_remove.hide()
+                self.tsk_ui.remove_form_state = 0
+                self.tsk_ui.on_click_confirmed_remove_task()
+        if self.qt_tab_widget.currentIndex() == 3:  # valid for: P C T Q N D S
+            if self.que_ui.remove_form_state == 1:
+                self.que_ui.qt_form_remove.hide()
+                self.que_ui.remove_form_state = 0
+                self.que_ui.on_click_confirmed_remove_queue_item()
 
     def on_shortcut_yes(self):
         if self.qt_tab_widget.currentIndex() == 3:  # valid for: P C T Q N D S

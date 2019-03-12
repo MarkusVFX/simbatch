@@ -617,8 +617,20 @@ class TasksUI:
                 # self.batch.tsk.update_proxy_task_form_current()
 
                 if form_queue_items is not None:
-                    self.batch.logger.db(" add to queue !!!")
+                    self.batch.logger.db(" added to queue !!!")
                     self.top_ui.set_top_info(" added to queue ", 2)
+                    # self.qt_form_create.update_create_ui(self.batch.tsk.current_task.schema_id)
+                    v_zeros = self.batch.prj.current_project.zeros_in_version
+                    curr_ver = self.batch.tsk.current_task.queue_ver
+                    curr_ver_str = self.comfun.str_with_zeros(curr_ver, v_zeros)
+                    next_ver = self.batch.tsk.current_task.queue_ver + 1
+                    next_ver_str = self.comfun.str_with_zeros(next_ver, v_zeros)
+                    for a in form_atq.actions_widgets_array:
+                        atxt = a.qt_edit_line_widget.qt_edit_line.text()
+                        if "_v"+curr_ver_str in atxt:
+                            updated_atxt = atxt.replace("_v"+curr_ver_str, "_v"+next_ver_str)
+                            a.qt_edit_line_widget.qt_edit_line.setText(updated_atxt)
+                            print updated_atxt
                 else:
                     self.top_ui.set_top_info("Items not added to queue !", 9)
             else:

@@ -256,8 +256,12 @@ class Interactions:
         return objs_str
 
     def get_cloth_objects(self):
-        import maya.cmds as cmd
-        return cmd.ls(type='nCloth')
+        try:
+            import maya.cmds as cmd
+            return cmd.ls(type='nCloth')
+        except Exception as e:
+            self.logger.err(e)
+            return []
 
     def get_hair_objects(self):
         return "hair"

@@ -111,11 +111,12 @@ class Tasks:
                 return False
 
         print "       {}task name:{}".format(prefix, task.task_name)
-        print "       schemaID:{}        projID:{}".format(task.schema_id, task.project_id)
+        print "       projectID:{}    schemaID:{}".format(task.project_id, task.schema_id)
         print "       seq/shot/take: {} {} {}".format(task.sequence, task.shot, task.take)
         print "       sim frame range {} {} ".format(task.sim_frame_start, task.sim_frame_end)
         print "       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end)
-        print "       state:{}   state_id:{} ".format(task.state, task.state_id)
+        print "       state:{}    state_id:{} ".format(task.state, task.state_id)
+        print "       sch v:{}    tsk v:{}    que v:{} ".format(task.schema_ver, task.task_ver, task.queue_ver)
         print "       options ", task.options
         print "       description ", task.description
         base_setup_name = self.batch.sch.get_base_setup(use_task_id=str(self.current_task_id))

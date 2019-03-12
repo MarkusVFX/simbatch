@@ -116,7 +116,7 @@ class SimBatchServer:
                     node_index = self.batch.nod.get_node_index_by_name(node_info.node_name)
                     if node_index is not False:
                         if node_index >= 0:
-                            self.batch.nod.print_node(node_index)
+                            self.batch.nod.print_node(node_index, prefix="      [ db] ")
                             self.print_is_something_to_do()
                         else:
                             self.logger.err("Found {} duplicates in database for name:{}".format(str(node_index*-1),
@@ -397,17 +397,16 @@ class SimBatchServer:
         return self.set_queue_item_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
     def generate_script_from_queue_item(self, py_file, job_script, job_description, job_id):
-        script_out = "'''   created by: " + str(self.server_name) + "   [" + self.comfun.get_current_time() + "]   '''\n"
+        script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n"
 
-        append_dir = os.path.dirname(os.path.dirname(os.path.dirname(self.server_dir)))
+        append_dir = os.path.dirname(os.path.dirname(self.server_dir))
         append_dir = append_dir.replace("\\", "/")  # OS MARKER
 
         script_out += "\nimport sys\nsys.path.append(\"" + append_dir + "\")"
-        script_out += "\nimport simbatch.core.core as simbatch_core\nimport simbatch.server.executor as executor"
+        script_out += "\nimport core.core as simbatch_core\nimport server.executor as executor"
         script_out += '\n\nsimbatch = simbatch_core.SimBatch("executor")'
 
-        script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ")"  # TODO 1:id
-        script_out += "\nsibe.set_server_name(\"" + self.server_name + "\")"  # TODO 1:id
+        script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ", \"" + self.server_name + "\")"
         script_out += "\ninteractions = sibe.batch.dfn.current_interactions"
 
         script_out += "\nsibe.add_to_log_with_new_line( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP
@@ -421,6 +420,10 @@ class SimBatchServer:
 
         ret = self.batch.comfun.save_to_file(py_file, script_out)
         if ret:
+            create_mel = True
+            if create_mel:
+                mel_out = "python(\"execfile('" + py_file.replace("\\", "\\\\") + "')\");"
+                self.batch.comfun.save_to_file(py_file[:-2]+"mel", mel_out)
             return script_out
         else:
             self.comfun.logger.err("script_for_external_software NOT saved !")

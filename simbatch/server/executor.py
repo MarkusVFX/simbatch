@@ -18,9 +18,10 @@ class SimBatchExecutor():
     server_dir = ""
     log_file_name = "executor_log.txt"
     job_start_time = None
-    hack_sim_node_name = "SimNode_01"
+    node_name = "NoName"
 
-    def __init__(self, batch, soft_id, queue_id, force_local=False):
+    def __init__(self, batch, soft_id, queue_id, node_name, force_local=False):
+        self.node_name = node_name
         self.softID = soft_id
         self.force_local = force_local
         self.executor_queue_id = queue_id
@@ -37,7 +38,7 @@ class SimBatchExecutor():
         self.add_to_log_with_new_line("")
 
     def set_server_name(self, name):
-        self.hack_sim_node_name = name  # TODO
+        self.node_name = name
 
     def add_to_log_with_new_line(self, log_txt):
         self.add_to_log(log_txt, with_new_line=True)
@@ -92,13 +93,13 @@ class SimBatchExecutor():
         job_time = str(0.1 * int((time.time() - self.job_start_time) * 10))
         print " [INF] job time   ", job_time
 
-        ret = self.set_queue_job_done(self.hack_sim_node_name, set_time=job_time)
+        ret = self.set_queue_job_done(self.node_name, set_time=job_time)
 
         print " [INF] set_queue_job_done   ", ret
 
         self.batch.nod.reload_nodes()
-        idx = self.batch.nod.get_node_index_by_name(self.hack_sim_node_name)
-        # print " idx  ", idx, self.hack_sim_node_name
+        idx = self.batch.nod.get_node_index_by_name(self.node_name)
+        # print " idx  ", idx, self.node_name
         self.batch.nod.set_node_state_in_database(idx, 2)
 
         self.batch.nod.update_current_from_index(idx)
@@ -123,5 +124,5 @@ class SimBatchExecutor():
 
     def exit_maya(self):
         import maya.cmds as cmds
-        cmds.evalDeferred("cmds.quit(force=True)")
+        cmds.evalDeferred("import maya.cmds as cmds; cmds.quit(force=True)")
 

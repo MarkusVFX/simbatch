@@ -28,6 +28,7 @@ class SimBatchServer:
     last_info = ""
     report_total_jobs = 0
     report_done_jobs = 0
+    current_job = None
 
     def __init__(self, batch, force_software=0, jobs_limit=0, framework_mode=False):
         self.force_software = force_software

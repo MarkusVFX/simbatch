@@ -228,6 +228,8 @@ class PredefinedVariables:
         for to in task_options:
             clean_task_options.append(to.strip())
 
+        return "_".join(clean_task_options)
+
     def get_shot_name(self, evo, option=""):
         ret = self.batch.sio.generate_shot_name()
         if ret[0] > 0:

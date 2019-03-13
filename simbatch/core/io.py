@@ -23,6 +23,9 @@ class PredefinedVariables:
         "shot_dir": {"type": "d", "function": "get_shot_dir"},
         "working_dir": {"type": "d", "function": "get_working_dir"},
         "schema_name": {"type": "s", "function": "get_schema_name"},
+        "sch_n": {"type": "s", "function": "get_schema_name"},
+        "sch_v": {"type": "s", "function": "get_schema_version"},
+        "opts": {"type": "s", "function": "get_task_options"},
         "shot_name": {"type": "s", "function": "get_shot_name"},
         "default_camera": {"type": "s", "function": "get_default_camera_name"},
         "sim_time_start": {"type": "t", "function": "get_sim_time_start"},
@@ -213,6 +216,17 @@ class PredefinedVariables:
     def get_schema_name(self, evo, option=""):
         schema_name = self.batch.sch.current_schema.schema_name
         return self.batch.sio.get_flat_name(schema_name)
+
+    def get_schema_version(self, evo, option=""):
+        schema_version = self.batch.sch.current_schema.schema_version
+        return str(schema_version)
+
+    def get_task_options(self, evo, option=""):
+        task_options = self.batch.tsk.current_task.options
+        task_options = task_options.split(",")
+        clean_task_options = []
+        for to in task_options:
+            clean_task_options.append(to.strip())
 
     def get_shot_name(self, evo, option=""):
         ret = self.batch.sio.generate_shot_name()

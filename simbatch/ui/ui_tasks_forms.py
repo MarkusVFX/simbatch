@@ -23,6 +23,7 @@ class TasksFormCreateOrEdit(QWidget):
     schemas_id_array = []
 
     # GUI QT elements
+    qt_fae_schema_options_edit = None
     qt_fae_schema_description_edit = None
     qt_schema_name_combo = None
     qt_combo_state_names = None
@@ -32,6 +33,7 @@ class TasksFormCreateOrEdit(QWidget):
     qt_edit_line_take = None
     qt_edit_line_priority = None
     qt_edit_line_version = None
+    qt_edit_line_que_version = None
 
     qt_edit_line_sim_frame_start = None
     qt_edit_line_sim_frame_end = None
@@ -81,12 +83,14 @@ class TasksFormCreateOrEdit(QWidget):
         self.qt_edit_line_sequence = qt_edit_buton_sequence.qt_edit_line
         qt_edit_buton_shot = EditLineWithButtons("Shot") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_shot = qt_edit_buton_shot.qt_edit_line
-        qt_edit_buton_take = EditLineWithButtons("Take") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_take = EditLineWithButtons("Take", edit_minimum_size=40, edit_maximum_size=70)
         self.qt_edit_line_take = qt_edit_buton_take.qt_edit_line
-        qt_edit_buton_prior = EditLineWithButtons("Prior") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_prior = EditLineWithButtons("Prior", edit_minimum_size=33, edit_maximum_size=40)
         self.qt_edit_line_priority = qt_edit_buton_prior.qt_edit_line
-        qt_edit_buton_version = EditLineWithButtons("Ver") #, label_minimum_size=50, align_right=1)
+        qt_edit_buton_version = EditLineWithButtons("Sch V", edit_minimum_size=33, edit_maximum_size=40)
         self.qt_edit_line_version = qt_edit_buton_version.qt_edit_line
+        qt_edit_buton_que_version = EditLineWithButtons("Que V", edit_minimum_size=33, edit_maximum_size=40)
+        self.qt_edit_line_que_version = qt_edit_buton_que_version.qt_edit_line
 
         qt_edit_buton_sim_start = EditLineWithButtons("Sim Range") #, label_minimum_size=50, align_right=1)
         self.qt_edit_line_sim_frame_start = qt_edit_buton_sim_start.qt_edit_line
@@ -105,13 +109,16 @@ class TasksFormCreateOrEdit(QWidget):
         qt_button_lay_get_framerange.button.clicked.connect(self.get_frame_range_from_scene)
 
         qt_widget_group_shot = WidgetGroup([qt_edit_buton_sequence, qt_edit_buton_shot,
-                                            qt_edit_buton_take, qt_edit_buton_prior, qt_edit_buton_version])
+                                            qt_edit_buton_take, qt_edit_buton_prior,
+                                            qt_edit_buton_version, qt_edit_buton_que_version])
         qt_widget_group_time_range = WidgetGroup([qt_edit_buton_sim_start, qt_edit_buton_sim_end,
                                                   qt_edit_buton_prev_start, qt_edit_buton_prev_end,
                                                   # qt_button_lay_detect_framerange,
                                                   qt_button_lay_get_framerange])
 
-        qt_edit_buton_description = EditLineWithButtons("Description ")
+        qt_edit_button_options = EditLineWithButtons("Options ", label_minimum_size=60)
+        qt_edit_buton_description = EditLineWithButtons("Description ", label_minimum_size=60)
+        self.qt_fae_schema_options_edit = qt_edit_button_options.qt_edit_line
         self.qt_fae_schema_description_edit = qt_edit_buton_description.qt_edit_line
 
         if self.form_mode == 1:
@@ -127,6 +134,7 @@ class TasksFormCreateOrEdit(QWidget):
         qt_layout_form_create.addLayout(qt_widget_group_shot.qt_widget_layout)
         qt_layout_form_create.addLayout(qt_widget_group_time_range.qt_widget_layout)
 
+        qt_layout_form_create.addLayout(qt_edit_button_options.qt_widget_layout)
         qt_layout_form_create.addLayout(qt_edit_buton_description.qt_widget_layout)
         qt_layout_form_create.addLayout(qt_button_cb_create_save_task.qt_widget_layout)
 
@@ -177,7 +185,9 @@ class TasksFormCreateOrEdit(QWidget):
 
         self.qt_edit_line_priority.setText(str(cur_task.priority))
         self.qt_edit_line_version.setText(str(cur_task.schema_ver))
+        self.qt_edit_line_que_version.setText(str(cur_task.queue_ver))
 
+        self.qt_fae_schema_options_edit.setText(cur_task.options)
         self.qt_fae_schema_description_edit.setText(cur_task.description)
 
     def update_schemas_id_arr(self, schemas_id_array):  # TODO check is it necessary / remove
@@ -242,7 +252,9 @@ class TasksFormCreateOrEdit(QWidget):
         self.form_task_item.priority = self.batch.comfun.int_or_val(self.qt_edit_line_priority.text(), 50)
 
         self.form_task_item.schema_ver = self.batch.comfun.int_or_val(self.qt_edit_line_version.text(), 1)
+        self.form_task_item.queue_ver = self.batch.comfun.int_or_val(self.qt_edit_line_que_version.text(), 1)
 
+        self.form_task_item.options = self.qt_fae_schema_options_edit.text()
         self.form_task_item.description = self.qt_fae_schema_description_edit.text()
 
     def get_frame_range_from_cache(self):
@@ -341,14 +353,18 @@ class AddToQueueForm(QWidget):
         qt_edit_button_frame_to = EditLineWithButtons("")
         qt_edit_button_prior = EditLineWithButtons("Prior")
 
-        qt_edit_button_description = EditLineWithButtons("Desc", label_minimum_size=60)
-        qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_desc)
+        qt_edit_button_description = EditLineWithButtons("Options", label_minimum_size=60)
+        qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_options)
+
+        qt_edit_button_options = EditLineWithButtons("Desc", label_minimum_size=60)
+        qt_edit_button_options.qt_edit_line.textChanged.connect(self.on_edit_desc)
 
         qt_widget_group_frame_range = WidgetGroup([qt_edit_button_sim_from, qt_edit_button_sim_to,
                                                    qt_edit_button_frame_from, qt_edit_button_frame_to,
                                                    qt_edit_button_prior])
         qt_lay_task_options = QVBoxLayout()
         qt_lay_task_options.addLayout(qt_widget_group_frame_range.qt_widget_layout)
+        qt_lay_task_options.addLayout(qt_edit_button_options.qt_widget_layout)
         qt_lay_task_options.addLayout(qt_edit_button_description.qt_widget_layout)
 
         qt_gb_atq = QGroupBox()
@@ -521,6 +537,10 @@ class AddToQueueForm(QWidget):
     #             el.setText( el.text()+ "; "+ evoAbbreviation + "  " )
     #
     #     self.checkEvos()
+
+    def on_edit_options(self, txt):
+        if self.batch.tsk.proxy_task is not None:
+            self.batch.tsk.proxy_task.options = txt
 
     def on_edit_desc(self, txt):
         if self.batch.tsk.proxy_task is not None:

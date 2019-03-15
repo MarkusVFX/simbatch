@@ -355,26 +355,26 @@ class TasksUI:
         self.reset_list()
 
     def on_click_menu_open_base_setup(self):
-        file_to_load = self.batch.sch.get_base_setup()
-        if file_to_load is not False:
-            self.batch.logger.inf(("loading file: ", file_to_load))
+        if self.batch.tsk.current_task is not None:
+            file_to_load = self.batch.sch.get_base_setup(use_task_id=self.batch.tsk.current_task_id)
+            if file_to_load is not False:
+                self.batch.logger.inf(("loading file: ", file_to_load))
 
-            if self.comfun.file_exists(file_to_load):
-                if self.batch.dfn.current_interactions is not None:
-                    self.batch.dfn.current_interactions.open_setup(file_to_load)  # TODO ret and check is open_setup exist!
+                if self.comfun.file_exists(file_to_load):
+                    if self.batch.dfn.current_interactions is not None:
+                        self.batch.dfn.current_interactions.open_setup(file_to_load)   # TODO ret and check is open_setup exist!
+                    else:
+                        self.batch.logger.err(("Current interactions are not loaded"))
+                        self.top_ui.set_top_info("Current interactions are not loaded", 8)
                 else:
-                    self.batch.logger.err(("Current interactions are not loaded"))
-                    self.top_ui.set_top_info("Current interactions are not loaded", 8)
+                    self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
+                    self.top_ui.set_top_info("Shot setup not exist! ({})".format(file_to_load), 7)
             else:
                 self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
-                self.top_ui.set_top_info("Base setup not exist! ({})".format(file_to_load), 7)
-        else:
-            self.batch.logger.wrn(("file_to_load not exist:", file_to_load))
 
     def on_click_menu_open_shot_setup(self):
         if self.batch.tsk.current_task is not None:
-            # file_to_load = self.batch.sio.generate_shot_setup_file_name()   # tsk_id, ver=version, evo_nr
-            file_to_load = self.batch.sch.get_base_setup(use_task_id=self.batch.tsk.current_task_id)
+            file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=self.batch.tsk.current_task_id)
             if file_to_load is not False:
                 self.batch.logger.inf(("loading file: ", file_to_load))
 
@@ -598,6 +598,8 @@ class TasksUI:
                                                                        task_options=form_atq.task_options)
                 if form_queue_items is not None and len(form_queue_items) > 0:
                     self.batch.logger.db("{} items generated !".format(len(form_queue_items)))
+                    self.batch.que.clear_all_queue_items()
+                    self.batch.que.load_queue()
                     self.batch.que.add_to_queue(form_queue_items, do_save=True)
                     self.mainw.que_ui.update_all_queue()
                 else:

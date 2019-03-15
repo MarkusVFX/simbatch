@@ -55,7 +55,10 @@ class PredefinedVariables:
             if key == "max":
                 param = check_str
             function_to_eval = 'self.{}("{}", option="{}")'.format(predefined_item["function"], param, option)
-            # print "\n  found var to val ", key_plus, function_to_eval, "___  in ___", check_str
+            #  TODO !!!
+            if predefined_item["type"] == "o":  # SCENE OBJECT !, do not update on ATQ, update on renderfarm   # TODO !
+                return check_str
+            #  TODO !!!
             try:
                 eval_ret = str(eval(function_to_eval))
                 # print "___eval ", function_to_eval
@@ -180,14 +183,14 @@ class PredefinedVariables:
             return ""
 
     def get_shot_setup(self, evo, option=""):
-        ret = self.batch.sio.generate_shot_setup_file_name(evo_inject=evo)
+        ret = self.batch.sio.generate_shot_setup_file_name(evo_nr=evo)
         if ret is not False:
             return ret
         else:
             return ""
 
     def get_simed_shot_setup(self, evo, option=""):
-        ret = self.batch.sio.generate_shot_setup_file_name(evo_inject=evo, simed=True)
+        ret = self.batch.sio.generate_shot_setup_file_name(evo_nr=evo, simed=True)
         if ret is not False:
             return ret
         else:

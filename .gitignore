@@ -28,6 +28,7 @@ eggs/
 .eggs/
 *.egg-info/
 *.egg
+*.bak
 *.pyc
 *.json
 __pycache__/

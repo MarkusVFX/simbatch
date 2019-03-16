@@ -72,7 +72,7 @@ class QueueItem:
 
     """ marker ATQ 220   generate name   """
     def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
-        name = task.task_name + " "
+        name = task.task_name + " ^ "
         if len(task.sequence) > 0:
             name += task.sequence + "_"
         if len(task.shot) > 0:
@@ -82,7 +82,7 @@ class QueueItem:
 
         if name[-1] == "_":
             name = name[:-1]
-        name += "  v:"+str(task.queue_ver)
+        name += " ^  v:"+str(task.queue_ver)
         if with_sufix is not None:
             name += with_sufix
         if with_update:

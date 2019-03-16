@@ -28,7 +28,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.87"   # current version
+    SIMBATCH_VERSION = "v0.2.88"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -161,6 +161,9 @@ class Settings:
 
         if self.loading_state < 4:
             self.logger.err("Data not loaded !!!  ({})".format(self.loading_state))
+
+    def get_version(self):
+        return self.SIMBATCH_VERSION
 
     def print_all(self):
         print " loading_state: ", self.loading_state

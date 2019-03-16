@@ -169,7 +169,10 @@ class MainWindow(QMainWindow):
         self.init_ui(server.batch)
 
         self.connect(QShortcut(QKeySequence(Qt.Key_R), self), SIGNAL('activated()'), self.on_clicked_but_refresh)
-        self.connect(QShortcut(QKeySequence(Qt.Key_D), self), SIGNAL('activated()'), self.on_shortcut_delete)
+        self.connect(QShortcut(QKeySequence(Qt.Key_W), self), SIGNAL('activated()'), self.on_shortcut_set_waiting)
+        self.connect(QShortcut(QKeySequence(Qt.Key_D), self), SIGNAL('activated()'), self.on_shortcut_set_done)
+        self.connect(QShortcut(QKeySequence(Qt.Key_H), self), SIGNAL('activated()'), self.on_shortcut_set_hold)
+        self.connect(QShortcut(QKeySequence(Qt.Key_X), self), SIGNAL('activated()'), self.on_shortcut_delete)
         self.connect(QShortcut(QKeySequence(Qt.Key_Y), self), SIGNAL('activated()'), self.on_shortcut_yes)
 
     def init_ui(self, batch):
@@ -338,6 +341,7 @@ class MainWindow(QMainWindow):
             if self.batch.tsk.current_task is None:
                 self.batch.logger.wrn("no task selected")
                 self.top_ui.set_top_info("no task selected", 7)
+                filters = None
             else:
                 self.filter_state_1 = True
                 filters = [[1, self.batch.tsk.current_task.schema_id],[0]]       # TODO  filters class
@@ -357,6 +361,7 @@ class MainWindow(QMainWindow):
             if self.batch.tsk.current_task is None:
                 self.batch.logger.wrn("no task selected")
                 self.top_ui.set_top_info("no task selected", 7)
+                filters = None
             else:
                 self.filter_state_2 = True
                 filters = [[0],[1, self.batch.tsk.current_task.sequence, self.batch.tsk.current_task.shot, self.batch.tsk.current_task.take]]
@@ -381,11 +386,32 @@ class MainWindow(QMainWindow):
 
     def on_shortcut_delete(self):
         if self.qt_tab_widget.currentIndex() == 2:   # valid for: P C T Q N D S
-            self.batch.logger.inf("(shotcut D) delete active task")
+            self.batch.logger.inf("(shotcut R) delete active task")
             self.tsk_ui.on_click_show_remove_form()
         if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S
-            self.batch.logger.inf("(shotcut D) delete active queue item")
+            self.batch.logger.inf("(shotcut R) delete active queue item")
             self.que_ui.on_click_remove()
+
+    def on_shortcut_set_done(self):
+        if self.qt_tab_widget.currentIndex() == 2:   # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut H) set DONE state")
+            self.tsk_ui.on_click_menu_set_done()
+        if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut H) set DONE state")
+            self.que_ui.on_click_menu_set_done()
+
+    def on_shortcut_set_waiting(self):
+        if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut W) set WAITING state")
+            self.que_ui.on_click_menu_set_waiting()
+
+    def on_shortcut_set_hold(self):
+        if self.qt_tab_widget.currentIndex() == 2:   # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut H) set HOLD state")
+            self.tsk_ui.on_click_menu_set_hold()
+        if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S
+            self.batch.logger.inf("(shotcut H) set HOLD state")
+            self.que_ui.on_click_menu_set_hold()
 
     def on_shortcut_yes(self):
         if self.qt_tab_widget.currentIndex() == 2:  # valid for: P C T Q N D S
@@ -393,13 +419,6 @@ class MainWindow(QMainWindow):
                 self.tsk_ui.qt_form_remove.hide()
                 self.tsk_ui.remove_form_state = 0
                 self.tsk_ui.on_click_confirmed_remove_task()
-        if self.qt_tab_widget.currentIndex() == 3:  # valid for: P C T Q N D S
-            if self.que_ui.remove_form_state == 1:
-                self.que_ui.qt_form_remove.hide()
-                self.que_ui.remove_form_state = 0
-                self.que_ui.on_click_confirmed_remove_queue_item()
-
-    def on_shortcut_yes(self):
         if self.qt_tab_widget.currentIndex() == 3:  # valid for: P C T Q N D S
             if self.que_ui.remove_form_state == 1:
                 self.que_ui.qt_form_remove.hide()
@@ -441,7 +460,7 @@ class MainWindow(QMainWindow):
         self.sch_ui.hide_all_forms()
 
         self.batch.logger.inf("reload TASKS")
-        self.tsk_ui.reload_tasks_data_and_refresh_list()
+        self.tsk_ui.reload_tasks_data_and_refresh_list(filters=self.current_filters)
         self.tsk_ui.hide_all_forms()
 
         self.batch.logger.inf("reload QUEUE")

@@ -445,6 +445,23 @@ class SimNodes:
         self.add_simnode(example_node, do_save=do_save)
         return True
 
+    def print_node_log(self, executor=False):
+        if self.current_node is None:
+            self.batch.logger.wrn("No node selected")
+        else:
+            log_dir = self.comfun.dirname(self.current_node.state_file)
+            if executor:
+                executor_inject = "executor_"
+            else:
+                executor_inject = ""
+            log_file = log_dir + self.batch.sts.dir_separator + executor_inject + "log.txt"
+            content = self.comfun.load_from_file(log_file)
+            self.batch.logger.raw(content)
+
+    def print_node_executor_log(self):
+        self.print_node_log(executor=True)
+
+
 #
 # For network and multi node implementation
 # please ask about PRO version

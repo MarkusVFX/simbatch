@@ -37,7 +37,8 @@ class Interactions:
         self.logger.int(("maya_open_scene", target))
         try:
             import maya.cmds as cmd
-            ret = cmd.file(target, o=True, force=True)
+            if self.comfun.file_exists(target, info="(interactions maya_open_scene)"):
+                ret = cmd.file(target, o=True, force=True)
             return ret
         except IOError as e:
             print "I/O error({0}): {1}".format(e.errno, e.strerror)
@@ -101,6 +102,7 @@ class Interactions:
         self.logger.int(("maya_import_obj", objects, file_or_dir))
 
     def maya_set_param(self, val, abbrev_param=None, value=None):
+
         if abbrev_param is None:
             str_expression = val             # first input as expresiion string  # TODO
             a1 = str_expression.split(".")
@@ -116,13 +118,13 @@ class Interactions:
                 self.logger.err(("maya_set_param e: ", e))
                 pass
         else:
-            objects = val                    # first input as objects string  # TODO
+            objects = val       # first input as objects string  # TODO
 
             if len(objects) == 0:
                 ret = self.get_cloth_objects()
                 if len(ret) > 0:
                     objects = ",".join(ret)
-                    
+
             import maya.cmds as cmds
             for obj in objects.split(","):
                 param_full_name = abbrev_param
@@ -143,7 +145,7 @@ class Interactions:
         if self.comfun.path_exists(cache_dir) is False:
             self.comfun.create_directory(cache_dir)
 
-        if len(objects_names) == 0:
+        if len(objects_names) == 0 or objects_names == "<cloth_objects>":
             ret = self.get_cloth_objects()
             if len(ret) > 0:
                 objects_names = ",".join(ret)
@@ -161,16 +163,22 @@ class Interactions:
             cmd = 'select -r ' + objects_names.replace(",", " ")    #  TODO ' ; viewFit;'
             self.logger.inf(cmd, nl=True, nl_after=True)
             ml.eval(cmd)
+            self.logger.int(("selected:", len(cmds.ls(sl=True))), nl=True)
 
             cache_dir = cache_dir.replace("\\", "/")
 
+            self.logger.int(("cache_dir:", cache_dir), nl=True)
+
+            refresh_view = "1"    # TODO 0 for batch mode !!!
+            cache_per_geo = "1"    # TODO do user option !!!
+
             # maya 2015  # TODO !!!
-            cmd = 'doCreateNclothCache 4 {"2", "1", "10", "' + pc_mode + '", "1", "' + cache_dir + '",'
-            cmd += ' "1", "", "0", "add", "1", "' + str(cache_subsamples) + '", "1","0","1" } ;'
+            cmd = 'doCreateNclothCache 4 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'
+            cmd += ' "'+cache_per_geo+'", "", "0", "replace", "1", "' + str(cache_subsamples) + '", "1","0","1" } ;'
 
             # maya 2018
-            cmd = 'doCreateNclothCache 5 {"2", "1", "10", "' + pc_mode + '", "1", "' + cache_dir + '",'
-            cmd += ' "0", "", "0", "add", "0", "' + str(cache_subsamples) + '", "1", "0", "1", "mcx"};'
+            cmd = 'doCreateNclothCache 5 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'
+            cmd += ' "'+cache_per_geo+'", "", "0", "replace", "1", "' + str(cache_subsamples) + '", "1", "0", "1", "mcx"};'
 
             self.logger.inf(cmd, nl=True, nl_after=True)
             ml.eval(cmd)

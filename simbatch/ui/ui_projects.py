@@ -601,7 +601,7 @@ class ProjectsUI:
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("proj chngd freeze_list_on_changed", self.qt_list_projects.currentRow()))
         else:
-            self.batch.logger.inf(("on_list_current_changed", self.qt_list_projects.currentRow()))
+            self.batch.logger.db(("on_list_current_changed", self.qt_list_projects.currentRow()))
 
             self.last_project_list_index = self.batch.prj.current_project_index
             current_list_index = self.qt_list_projects.currentRow() - 1

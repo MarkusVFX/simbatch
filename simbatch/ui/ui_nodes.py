@@ -277,6 +277,12 @@ class NodesUI:
     def on_menu_remove(self):
         self.on_click_confirmed_remove_node()
 
+    def on_menu_print_log(self):
+        self.nod.print_node_log()
+
+    def on_menu_print_executor_log(self):
+        self.nod.print_node_executor_log()
+
     def on_menu_reset(self):
         self.batch.logger.db("on menu: Reset")
         self.on_reset_node()
@@ -305,6 +311,9 @@ class NodesUI:
         qt_right_menu.addAction("Set WAITING", self.on_menu_set_waiting)
         qt_right_menu.addAction("Set WORKING", self.on_menu_set_working)
         qt_right_menu.addAction("Set OFFLINE", self.on_menu_set_offline)
+        qt_right_menu.addAction("________", self.on_click_menu_spacer)
+        qt_right_menu.addAction("Print Node Log", self.on_menu_print_log)
+        qt_right_menu.addAction("Print Node Exec Log", self.on_menu_print_executor_log)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Remove Node", self.on_menu_remove)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
@@ -450,10 +459,6 @@ class NodesUI:
             self.batch.logger.wrn("(on reset node) PLEASE SELECT ITEM FIRST")
             self.top_ui.set_top_info(" Select item first ", 7)
 
-    def on_menu_reset(self):
-        self.batch.logger.db("on menu: Reset")
-        self.on_reset_node()
-
     def on_update_nodes(self):
         if self.nod.total_nodes == 0:
             self.top_ui.set_top_info("No Simnodes in database! If node exists, please add it first")
@@ -477,7 +482,7 @@ class NodesUI:
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("simnodes change freeze_list_on_changed", self.qt_list_nodes.currentRow()))
         else:
-            self.batch.logger.inf(("on_list_current_changed", self.qt_list_nodes.currentRow()))
+            self.batch.logger.db(("on_list_current_changed", self.qt_list_nodes.currentRow()))
             self.last_list_item_index = self.current_list_item_index
             current_list_index = self.qt_list_nodes.currentRow() - 1
             self.current_list_item_index = current_list_index

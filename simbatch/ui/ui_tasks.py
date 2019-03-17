@@ -308,14 +308,18 @@ class TasksUI:
     def reload_tasks_data_and_refresh_list(self, filters=None):
         self.batch.tsk.clear_all_tasks_data()
         self.batch.tsk.load_tasks()
-        self.reset_list()
+        if filters is None:
+            filters = self.mainw.current_filters
+        self.reset_list(filters=filters)
         self.update_list_of_visible_ids(filters)
 
-    def _change_current_task_state_and_reset_list(self, state_id):
+    def _change_current_task_state_and_reset_list(self, state_id, filters=None):
         self.batch.tsk.current_task.state = self.sts.states_visible_names[state_id]
         self.batch.tsk.current_task.state_id = state_id
         self.batch.tsk.save_tasks()
-        self.reset_list()
+        if filters is None:
+            filters = self.mainw.current_filters
+        self.reset_list(filters=filters)
 
     def on_list_tasks_double_clicked(self, item):   # list_schemas.itemDoubleClicked.connect(self.on_list_tasks_double_clicked)
         self.batch.logger.db(("on_list_tasks_double_clicked: ", self.tsk.current_task_id, item))
@@ -374,7 +378,8 @@ class TasksUI:
 
     def on_click_menu_open_shot_setup(self):
         if self.batch.tsk.current_task is not None:
-            file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=self.batch.tsk.current_task_id)
+            ver = self.batch.tsk.current_task.queue_ver # task_ver
+            file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=self.batch.tsk.current_task_id, ver=ver)
             if file_to_load is not False:
                 self.batch.logger.inf(("loading file: ", file_to_load))
 
@@ -585,7 +590,7 @@ class TasksUI:
         # current_task_id = self.batch.tsk.current_task_id
         current_task = self.batch.tsk.current_task
         if current_task is not None:
-            ret = form_atq.create_directories()
+            ret = form_atq.create_directories()  # TODO
             if ret:
                 # self.batch.tsk.update_proxy_task_form_current()
 
@@ -670,7 +675,7 @@ class TasksUI:
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("tsk chngd freeze_list_on_changed", self.list_tasks.currentRow()))
         else:
-            self.batch.logger.inf(("list_task_current_item_changed: ", self.list_tasks.currentRow()))
+            self.batch.logger.db(("list_task_current_item_changed: ", self.list_tasks.currentRow()))
             self.last_task_list_index = self.current_list_item_index
             current_list_index = self.list_tasks.currentRow() - 1
             self.current_list_item_index = current_list_index
@@ -710,7 +715,7 @@ class TasksUI:
             if 0 <= current_task_index < len(self.batch.tsk.tasks_data):
                 cur_task = self.batch.tsk.tasks_data[current_task_index]
                 if self.top_ui is not None:
-                    self.top_ui.set_top_info("Current task: [" + str(cur_task.id) + "]    " + cur_task.task_name)
+                    self.top_ui.set_top_info("[{}]    {}".format(cur_task.id, cur_task.task_name))
                 else:
                     self.batch.logger.err("top_ui is None")
 
@@ -731,6 +736,7 @@ class TasksUI:
                 if self.add_form_state == 1:
                     self.qt_form_add.update_form()                           # update add to queue form
                     self.batch.tsk.update_proxy_task_form_current()
+                    self.list_tasks.scrollToBottom()
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
                                                                          len(self.batch.tsk.tasks_data)))

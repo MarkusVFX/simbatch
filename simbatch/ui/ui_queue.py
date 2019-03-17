@@ -1,4 +1,4 @@
-# import copy
+import os
 import subprocess
 
 try:  # Maya 2016
@@ -18,7 +18,9 @@ from ui_queue_forms import QueueFormEdit, QueueFormRemove
 
 
 class QueueListItem(QWidget):
-    def __init__(self, txt_id, txt_name, txt_user, txt_prior, txt_state, txt_evo, txt_node, txt_desc):
+    # def __init__(self, txt_id, txt_name, txt_user, txt_prior, txt_state, txt_evo, txt_node, txt_desc):
+    # TODO PRO VER PRIOR
+    def __init__(self, txt_id, txt_name, txt_user, txt_state, txt_evo, txt_node, txt_desc):
         super(QueueListItem, self).__init__()
         self.qt_widget = QWidget(self)
         self.qt_label_font = QFont()
@@ -49,24 +51,25 @@ class QueueListItem(QWidget):
         self.qt_label_user.setMaximumWidth(30)
         self.qt_lay.addWidget(self.qt_label_user)
 
-        self.qt_label_prior = QLabel(txt_prior)
-        self.qt_label_prior.setFont(self.qt_label_font)
-        self.qt_label_prior.setStyleSheet("""color:#000;""")
-        self.qt_label_prior.setMinimumWidth(22)
-        self.qt_label_prior.setMaximumWidth(30)
-        self.qt_lay.addWidget(self.qt_label_prior)
+        # TODO PRO VER PRIOR
+        # self.qt_label_prior = QLabel(txt_prior)
+        # self.qt_label_prior.setFont(self.qt_label_font)
+        # self.qt_label_prior.setStyleSheet("""color:#000;""")
+        # self.qt_label_prior.setMinimumWidth(22)
+        # self.qt_label_prior.setMaximumWidth(30)
+        # self.qt_lay.addWidget(self.qt_label_prior)
 
         self.qt_label_state = QLabel(txt_state)
         self.qt_label_state.setFont(self.qt_label_font)
         self.qt_label_state.setStyleSheet("""color:#000;""")
-        self.qt_label_state.setMinimumWidth(55)
-        self.qt_label_state.setMaximumWidth(70)
+        self.qt_label_state.setMinimumWidth(50)
+        self.qt_label_state.setMaximumWidth(60)
         self.qt_lay.addWidget(self.qt_label_state)
 
         self.qt_label_evo = QLabel(txt_evo)
         self.qt_label_evo.setFont(self.qt_label_font)
         self.qt_label_evo.setStyleSheet("""color:#000;""")
-        self.qt_label_evo.setMinimumWidth(70)
+        self.qt_label_evo.setMinimumWidth(10)
         self.qt_label_evo.setMaximumWidth(170)
         self.qt_lay.addWidget(self.qt_label_evo)
 
@@ -102,6 +105,8 @@ class QueueUI:
 
     current_list_item_index = None
     last_list_item_index = None
+
+    qt_list_item = None
 
     def __init__(self, batch, mainw, top):
         self.batch = batch
@@ -173,7 +178,9 @@ class QueueUI:
         qt_list_item.setBackground(QBrush(QColor("#ddd")))
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-        list_item_widget = QueueListItem("ID", "queue item name", "user", "prior", "state", "evo", "sim node", "desc")
+        # TODO PRO VER PRIOR
+        # list_item_widget = QueueListItem("ID", "queue item name", "user", "prior", "state", "evo", "sim node", "desc")
+        list_item_widget = QueueListItem("ID", "queue item name", "user", "state", "evo", "sim node", "desc")
 
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
@@ -187,13 +194,17 @@ class QueueUI:
             qt_list_item = QListWidgetItem(widget_list)
             cur_color = self.sts.state_colors[que.state_id].color()
             qt_list_item.setBackground(cur_color)
-            list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, str(que.prior), que.state,
+            # list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, str(que.prior), que.state,
+            #                                  que.evolution, que.sim_node, que.description)
+            list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, que.state,
                                              que.evolution, que.sim_node, que.description)
 
             widget_list.addItem(qt_list_item)
             widget_list.setItemWidget(qt_list_item, list_item_widget)
             qt_list_item.setSizeHint(QSize(130, 26))
             qt_list_item.setBackground(self.sts.state_colors[que.state_id])
+
+        self.list_queue.scrollToBottom()
 
     def reset_list(self):
         self.freeze_list_on_changed = 1
@@ -289,8 +300,7 @@ class QueueUI:
             prev_dir = prev_dir + self.sts.dir_separator
             if self.comfun.path_exists(prev_dir, " prev open "):
                 if self.sts.current_os == 1:
-                    pass
-                    # TODO linux
+                    os.system('xdg-open "{}"'.format(prev_dir))
                 else:
                     subprocess.Popen('explorer "' + prev_dir + '"')
         else:
@@ -517,7 +527,7 @@ class QueueUI:
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("que chngd freeze_list_on_changed", self.list_queue.currentRow()))
         else:
-            self.batch.logger.inf(("list_queue_current_item_changed: ", self.list_queue.currentRow()))
+            self.batch.logger.db(("list_queue_current_item_changed: ", self.list_queue.currentRow()))
             self.last_list_item_index = self.current_list_item_index
             current_list_index = self.list_queue.currentRow() - 1
             self.current_list_item_index = current_list_index
@@ -560,7 +570,7 @@ class QueueUI:
             if 0 <= current_queue_index < len(self.batch.que.queue_data):
                 cur_queue = self.batch.que.queue_data[current_queue_index]
                 if self.top_ui is not None:
-                    self.top_ui.set_top_info("Current task: [" + str(cur_queue.id) + "]    "+cur_queue.queue_item_name)
+                    self.top_ui.set_top_info("[{}]   {}".format(cur_queue.id, cur_queue.queue_item_name))
                 else:
                     self.batch.logger.err("top_ui is None")
 

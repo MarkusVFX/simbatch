@@ -104,9 +104,11 @@ class TasksFormCreateOrEdit(QWidget):
 
         qt_button_lay_detect_framerange = ButtonOnLayout("From cache", width=70)    # TODO
         qt_button_lay_get_framerange = ButtonOnLayout("Get from scene", width=85)
+        qt_button_lay_zeroize = ButtonOnLayout("Zerioze", width=55)
 
         qt_button_lay_detect_framerange.button.clicked.connect(self.get_frame_range_from_cache)
         qt_button_lay_get_framerange.button.clicked.connect(self.get_frame_range_from_scene)
+        qt_button_lay_zeroize.button.clicked.connect(self.zeroize_frameranges)
 
         qt_widget_group_shot = WidgetGroup([qt_edit_buton_sequence, qt_edit_buton_shot,
                                             qt_edit_buton_take, qt_edit_buton_prior,
@@ -114,7 +116,7 @@ class TasksFormCreateOrEdit(QWidget):
         qt_widget_group_time_range = WidgetGroup([qt_edit_buton_sim_start, qt_edit_buton_sim_end,
                                                   qt_edit_buton_prev_start, qt_edit_buton_prev_end,
                                                   # qt_button_lay_detect_framerange,
-                                                  qt_button_lay_get_framerange])
+                                                  qt_button_lay_get_framerange, qt_button_lay_zeroize])
 
         qt_edit_button_options = EditLineWithButtons("Options ", label_minimum_size=60)
         qt_edit_buton_description = EditLineWithButtons("Description ", label_minimum_size=60)
@@ -288,6 +290,12 @@ class TasksFormCreateOrEdit(QWidget):
         else:
             self.top_ui.set_top_info(" Can't detect frame range ", 7)
 
+    def zeroize_frameranges(self):
+        self.qt_edit_line_sim_frame_start.setText("0")
+        self.qt_edit_line_sim_frame_end.setText("0")
+        self.qt_edit_line_prev_frame_start.setText("0")
+        self.qt_edit_line_prev_frame_end.setText("0")
+
     def clear_vars(self):
         self.form_task_item = self.batch.tsk.get_blank_task()
 
@@ -353,18 +361,18 @@ class AddToQueueForm(QWidget):
         qt_edit_button_frame_to = EditLineWithButtons("")
         qt_edit_button_prior = EditLineWithButtons("Prior")
 
-        qt_edit_button_description = EditLineWithButtons("Options", label_minimum_size=60)
-        qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_options)
+        # qt_edit_button_options = EditLineWithButtons("Options", label_minimum_size=60)
+        # qt_edit_button_options.qt_edit_line.textChanged.connect(self.on_edit_options)
 
-        qt_edit_button_options = EditLineWithButtons("Desc", label_minimum_size=60)
-        qt_edit_button_options.qt_edit_line.textChanged.connect(self.on_edit_desc)
+        qt_edit_button_description = EditLineWithButtons("Desc", label_minimum_size=60)
+        qt_edit_button_description.qt_edit_line.textChanged.connect(self.on_edit_desc)
 
         qt_widget_group_frame_range = WidgetGroup([qt_edit_button_sim_from, qt_edit_button_sim_to,
                                                    qt_edit_button_frame_from, qt_edit_button_frame_to,
                                                    qt_edit_button_prior])
         qt_lay_task_options = QVBoxLayout()
         qt_lay_task_options.addLayout(qt_widget_group_frame_range.qt_widget_layout)
-        qt_lay_task_options.addLayout(qt_edit_button_options.qt_widget_layout)
+        # qt_lay_task_options.addLayout(qt_edit_button_options.qt_widget_layout)
         qt_lay_task_options.addLayout(qt_edit_button_description.qt_widget_layout)
 
         qt_gb_atq = QGroupBox()

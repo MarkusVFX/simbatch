@@ -653,9 +653,9 @@ class SchemasUI:
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("sch chngd freeze_list_on_changed", self.list_schemas.currentRow()))
         else:
-            self.batch.logger.inf(("schemas item changed: ", self.list_schemas.currentRow(),
-                                   "   last: ", self.last_list_item_nr,
-                                   "   current: ", self.current_list_item_nr))
+            self.batch.logger.db("schema item changed:{}   last:{}   current:{}".format(self.list_schemas.currentRow(),
+                                                                                        self.last_list_item_nr,
+                                                                                        self.current_list_item_nr))
 
             self.last_list_item_nr = self.current_list_item_nr
             self.current_list_item_nr = self.list_schemas.currentRow()

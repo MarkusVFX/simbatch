@@ -121,9 +121,10 @@ class Interactions:
             objects = val       # first input as objects string  # TODO
 
             if len(objects) == 0:
-                ret = self.get_cloth_objects()
-                if len(ret) > 0:
-                    objects = ",".join(ret)
+                if objects == "<cloth_objects>":
+                    ret = self.get_cloth_objects()
+                    if len(ret) > 0:
+                        objects = ",".join(ret)
 
             import maya.cmds as cmds
             for obj in objects.split(","):

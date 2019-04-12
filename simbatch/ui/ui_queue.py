@@ -268,7 +268,7 @@ class QueueUI:
         tsk = self.batch.tsk.get_task_by_id(task_id)
         sch = self.batch.sch.get_schema_by_id(tsk.schema_id)
         if evo_nr > 0:
-            evo = "evoBx" + str(evo_nr)
+            evo = "_evo" + self.batch.comfun.str_with_zeros(evo_nr, 2)  # TODO batch.prj.current_project.zeros_in_evo
         else:
             evo = None
 

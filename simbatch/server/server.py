@@ -10,6 +10,7 @@ class SimBatchServer:
     jobs_computed = 0        # count computed jobs (queue items) by this server'ssession
     jobs_limit = 0           # if act as server 0:infinite loop, >0 limit jobs to compute
     mode = None              # "single" or "all"
+    force_id = None          # if mode == "single" and force_id = None -> sim first WAITING, if force_id not None sim id
     framework_mode = False   # True: execution form framework,  False: execution from server
 
     current_simnode_state = None
@@ -430,8 +431,20 @@ class SimBatchServer:
             self.comfun.logger.err("script_for_external_software NOT saved !")
             return None
 
-    def is_something_to_do(self, force_software=0):
-        ret = self.batch.que.get_first_with_state_id(self.batch.sts.INDEX_STATE_WAITING, soft=force_software)
+    def is_something_to_do(self, force_software=0, force_id=None):
+        if force_id is None:
+            ret = self.batch.que.get_first_with_state_id(self.batch.sts.INDEX_STATE_WAITING, soft=force_software)
+        else:
+            # TODO get state by id
+            state_id = self.batch.que.queue_data[self.batch.que.get_index_by_id(force_id)].state_id
+            if state_id == self.batch.sts.INDEX_STATE_WAITING:
+                ret = self.batch.que.get_index_by_id(force_id), force_id
+            else:
+                if state_id is not None:
+                    self.batch.logger.wrn(("Current queue item state is not WAITNIG: ", self.batch.sts.states_visible_names[state_id]))
+                else:
+                    self.batch.logger.wrn(("Current queue item state is not WAITNIG: ", state_id))
+                ret = -1, 0
         if ret[0] >= 0:
             queue_item = self.batch.que.queue_data[ret[0]]
             script = queue_item.evolution_script
@@ -466,7 +479,7 @@ class SimBatchServer:
 
     """   MAIN RUN  FOR LOCAL AND REMOTE  """
     """ marker SIM 010   running   """
-    def run(self, argv=None):
+    def run(self, argv=None, force_id=None):
         if self.batch.sts.loading_state < 4:
             self.logger.err(("settings not loaded properly: ", self.batch.sts.loading_state), nl=True)
             return False
@@ -510,6 +523,7 @@ class SimBatchServer:
         self.logger.raw("\n\n")
         if mode == "single":
             self.jobs_limit = 1
+            self.force_id = force_id
             self.logger.inf("run single job")
         elif mode == "limit":
             limit = int(argv)
@@ -553,7 +567,8 @@ class SimBatchServer:
                 self.batch.que.clear_all_queue_items()
                 self.batch.que.load_queue()
 
-                is_something_to_compute = self.is_something_to_do(force_software=self.force_software)
+                is_something_to_compute = self.is_something_to_do(force_software=self.force_software,
+                                                                  force_id=self.force_id)
 
                 if self.jobs_limit > 1:
                     loop_prefix = self.comfun.str_with_spaces(str(self.jobs_limit - self.jobs_computed), 3, as_prefix=True)

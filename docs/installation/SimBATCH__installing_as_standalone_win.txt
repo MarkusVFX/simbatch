@@ -20,7 +20,7 @@
 	
 	
 4 installation for developement: PyTest and Git:
-  please read https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/installing_development_environment_win.txt
+  please read https://github.com/MarkusVFX/simbatch/blob/master/docs/installation/developement/installing_development_environment_win.txt
 
 	
 

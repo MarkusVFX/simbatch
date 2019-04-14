@@ -641,7 +641,10 @@ class SchemasUI:
         file_to_load = self.sch.get_base_setup()
         if file_to_load is not False:
             self.batch.logger.inf(("loading file: ", file_to_load))
-            self.batch.dfn.current_interactions.open_setup(file_to_load)   # TODO ret
+            try:
+                self.batch.dfn.current_interactions.open_setup(file_to_load)   # TODO ret
+            except Exception as e:
+                self.logger.err(e)
         else:
             self.batch.logger.err("Could NOT load base setup!")
 

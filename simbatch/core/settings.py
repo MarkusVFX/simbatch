@@ -52,6 +52,7 @@ class Settings:
     INDEX_STATE_REVIEW = 12
     INDEX_STATE_ACCEPTED = 13
     INDEX_STATE_REJECTED = 14
+    INDEX_STATE_KILLED = 15
 
     INDEX_STATE_CUSTOM = 18
     INDEX_STATE_OFFLINE = 19
@@ -75,6 +76,7 @@ class Settings:
     states_visible_names[INDEX_STATE_REVIEW] = "REVIEW"
     states_visible_names[INDEX_STATE_ACCEPTED] = "ACCEPTED"
     states_visible_names[INDEX_STATE_REJECTED] = "REJECTED"
+    states_visible_names[INDEX_STATE_KILLED] = "KILLED"
 
     states_visible_names[INDEX_STATE_CUSTOM] = "CUSTOM"
     states_visible_names[INDEX_STATE_OFFLINE] = "OFFLINE"

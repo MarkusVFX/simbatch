@@ -251,8 +251,15 @@ class QueueUI:
     def on_click_menu_set_done(self):
         self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_DONE)
 
+    def on_click_menu_set_accepted(self):
+        self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_ACCEPTED)
+
     def on_click_menu_set_hold(self):
         self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_HOLD)
+
+    def on_click_menu_set_killed(self):
+        self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_KILLED)
+
 
     def get_prev_dir_from_queue_item(self):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
@@ -355,11 +362,26 @@ class QueueUI:
         else:
             self.batch.logger.wrn(("can not get file_to_load   from : task_id, version : ", task_id, version))
 
+    def on_click_menu_sim_selected(self):
+        self.sim_current()
+
     def on_click_menu_queue_item_remove(self):
         self.on_click_confirmed_remove_queue_item()
         
     def on_click_menu_queue_item_remove_all_green(self):
         self.on_click_confirmed_remove_queue_items_green()
+
+    def on_click_menu_queue_item_remove_all_done(self):
+        self.on_click_confirmed_remove_queue_items_done()
+
+    def on_click_menu_queue_item_remove_all_killed(self):
+        self.on_click_confirmed_remove_queue_items_killed()
+
+    def on_click_menu_queue_item_remove_all_hold(self):
+        self.on_click_confirmed_remove_queue_items_hold()
+
+    def on_click_menu_queue_item_remove_all_working(self):
+        self.on_click_confirmed_remove_queue_items_working()
 
     @staticmethod
     def on_click_menu_spacer():
@@ -372,14 +394,21 @@ class QueueUI:
         qt_right_menu.addAction("Set WAITING", self.on_click_menu_set_waiting)
         qt_right_menu.addAction("Set WORKING", self.on_click_menu_set_working)
         qt_right_menu.addAction("Set DONE", self.on_click_menu_set_done)
+        qt_right_menu.addAction("Set ACCEPTED", self.on_click_menu_set_accepted)
         qt_right_menu.addAction("Set HOLD", self.on_click_menu_set_hold)
+        qt_right_menu.addAction("Set KILLED", self.on_click_menu_set_killed)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Locate prev", self.on_menu_locate_prev)
         qt_right_menu.addAction("Open prev", self.on_menu_open_prev)
         qt_right_menu.addAction("Open shot scene", self.on_click_menu_open_shot_setup)
         qt_right_menu.addAction("Open simed shot scene", self.on_click_menu_open_simed_shot_setup)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
-        qt_right_menu.addAction("Remove All Green", self.on_click_menu_queue_item_remove_all_green)
+        qt_right_menu.addAction("Simulate Selected", self.on_click_menu_sim_selected)
+        qt_right_menu.addAction("________", self.on_click_menu_spacer)
+        qt_right_menu.addAction("Remove All DONE", self.on_click_menu_queue_item_remove_all_done)
+        qt_right_menu.addAction("Remove All WORKING", self.on_click_menu_queue_item_remove_all_working)
+        qt_right_menu.addAction("Remove All HOLD", self.on_click_menu_queue_item_remove_all_hold)
+        qt_right_menu.addAction("Remove All KILLED", self.on_click_menu_queue_item_remove_all_killed)
         qt_right_menu.addAction("Remove", self.on_click_menu_queue_item_remove)
         qt_right_menu.exec_(global_cursor_pos)
 
@@ -413,14 +442,18 @@ class QueueUI:
         self.qt_button_queue_edit.setEnabled(state)
         self.qt_button_queue_edit.repaint()
 
-    def run_server_from_framework(self, mode):
+    def sim_current(self):
+        if self.batch.que.current_queue is not None:
+            self.run_server_from_framework("single", force_id=self.batch.que.current_queue_id)
+
+    def run_server_from_framework(self, mode, force_id=None):
         server = self.mainw.server  # .SimBatchServer(self.batch, framework_mode=True)
         server.framework_mode = True
         server.loops_counter = 0
         server.timer_delay_seconds = 0
         server.reset()
         #
-        server.run(mode)
+        server.run(mode, force_id=force_id)
         #
         report = server.generate_report()  # TODO report as class
         if report[0] > 0:
@@ -496,13 +529,29 @@ class QueueUI:
                               self.current_list_item_index))
         self.remove_queue_item()
         self.update_list_of_visible_ids()
-        
-    def on_click_confirmed_remove_queue_items_green(self):
-        self.batch.logger.db("remove_queue_items GREEN")
-        self.batch.que.remove_queue_items(only_done=True)
-        self.batch.que.save_queue()        
+
+
+    def remove_items_by_state(self, state_id):
+        self.batch.logger.db(("remove_queue_items", self.sts.states_visible_names[state_id]))
+        self.batch.que.remove_queue_items(state_id=state_id)
+        self.batch.que.save_queue()
         self.reset_list()
         self.update_list_of_visible_ids()
+
+    def on_click_confirmed_remove_queue_items_green(self):
+        self.remove_items_by_state(self.sts.INDEX_STATE_DONE)
+
+    def on_click_confirmed_remove_queue_items_done(self):
+        self.remove_items_by_state(self.sts.INDEX_STATE_DONE)
+
+    def on_click_confirmed_remove_queue_items_killed(self):
+        self.remove_items_by_state(self.sts.INDEX_STATE_KILLED)
+
+    def on_click_confirmed_remove_queue_items_hold(self):
+        self.remove_items_by_state(self.sts.INDEX_STATE_HOLD)
+
+    def on_click_confirmed_remove_queue_items_working(self):
+        self.remove_items_by_state(self.sts.INDEX_STATE_WORKING)
 
     def clear_list(self, with_freeze=True):
         if with_freeze:

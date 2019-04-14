@@ -314,6 +314,7 @@ class AddToQueueForm(QWidget):
     qt_edit_button_prior = None
     qt_gb_add_to_queue_now = None
     qt_lay_actions = None
+    qt_gb_actions = None
 
     qt_edit_button_description = None
     execute_button = None
@@ -353,6 +354,13 @@ class AddToQueueForm(QWidget):
         qt_gb_actions = QGroupBox()
         qt_gb_actions.setTitle("Actions")
         qt_gb_actions.setLayout(qt_lay_actions)
+
+        self.qt_gb_actions = qt_gb_actions
+
+        qt_gb_actions.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed))
+        qt_gb_actions.setMaximumHeight(220)
+        qt_gb_actions.setMinimumHeight(220)
+
         qt_form_add_layout.addWidget(qt_gb_actions)
 
         qt_edit_button_sim_from = EditLineWithButtons("Sim Range")
@@ -469,7 +477,10 @@ class AddToQueueForm(QWidget):
                     get_button = False
                 self.add_action_widget_to_form(act.name, act.actual_value, get_button=get_button)
         else:
+            actionWidgetHeight = 36
+            actionWidgetElementHeight = 44
             for act in current_sch.actions_array:
+                actionWidgetHeight += actionWidgetElementHeight
                 evolution = None
                 mac = current_dfn.get_multiaction_by_name(act.name)
                 if act.mode is not None:
@@ -498,6 +509,11 @@ class AddToQueueForm(QWidget):
                     get_button = False
 
                 self.add_action_widget_to_form(act.name+act_name_sufix, edit_txt=val_str, evo=evolution, get_button=get_button)
+
+            # self.qt_gb_actions.updateGeometry()
+
+            self.qt_gb_actions.setMaximumHeight(actionWidgetHeight)
+            self.qt_gb_actions.setMinimumHeight(actionWidgetHeight)
 
     def add_action_widget_to_form(self, info, edit_txt=None, evo=None, get_button=False):
         if edit_txt is None and evo is None:

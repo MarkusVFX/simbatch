@@ -283,10 +283,12 @@ class Queue:
             self.batch.logger.err("queue item data not removed, item not found!")
             return False
 
-    def remove_queue_items(self, only_done=False):
+    def remove_queue_items(self, only_done=False, state_id=None):
         if only_done:
+            state_id = self.sts.INDEX_STATE_DONE    # TODO clean API  -> conwert done to GREEN
+        if state_id is not None:
             for qi in copy.deepcopy(self.queue_data):
-                if qi.state_id == self.batch.sts.INDEX_STATE_DONE:
+                if qi.state_id == state_id:
                     self.remove_single_queue_item(queue_id=qi.id)
         else:
             self.clear_all_queue_items(clear_stored_data=True)

@@ -39,6 +39,9 @@ class Interactions:
             import maya.cmds as cmd
             if self.comfun.file_exists(target, info="(interactions maya_open_scene)"):
                 ret = cmd.file(target, o=True, force=True)
+            else:
+                self.logger.err((" no file :", target))
+                ret = False
             return ret
         except IOError as e:
             print "I/O error({0}): {1}".format(e.errno, e.strerror)
@@ -64,6 +67,12 @@ class Interactions:
         for obj in objs.split(","):
             if cmds.objExists(obj):
                 cmds.select(obj, tgl=True)
+
+        selected_count = len(cmds.ls(sl=True))
+        if selected_count == 0:
+            return False
+        else:
+            return selected_count
 
     def maya_get_selection(self):
         import maya.cmds as cmds
@@ -113,7 +122,7 @@ class Interactions:
             try:
                 import maya.cmds as cmds
                 cmds.setAttr(str_obj + "." + str_attrib, float(str_val))   # TODO check vals !!!
-            except Exception as e:
+            except:
                 self.logger.err(("maya_set_param: ", str_obj,  str_attrib,  str_val, "   ___   ", str_expression))  # TODO !
                 self.logger.err(("maya_set_param e: ", e))
                 pass
@@ -121,17 +130,90 @@ class Interactions:
             objects = val       # first input as objects string  # TODO
 
             if len(objects) == 0:
-                if objects == "<cloth_objects>":
-                    ret = self.get_cloth_objects()
-                    if len(ret) > 0:
-                        objects = ",".join(ret)
+                ret = self.get_cloth_objects()
+                if len(ret) > 0:
+                    objects = ",".join(ret)
+
+            if objects == "<cloth_objects>":
+                ret = self.get_cloth_objects()
+                if len(ret) > 0:
+                    objects = ",".join(ret)
 
             import maya.cmds as cmds
             for obj in objects.split(","):
                 param_full_name = abbrev_param
                 cmds.setAttr(obj+"."+param_full_name, value)
             self.logger.db(("maya_set_param", object, property, value), nl=True)
-        
+
+    def maya_animate_nucleus_follow(self, nucleus_name, object_to_follow, vtx_id_to_follow=None, vals=None):
+        import maya.cmds as cmds
+
+        if vtx_id_to_follow is None:
+            vtx_id_to_follow = 1     # TODO get vtx close to center
+        if vals is None:
+            vals = ((self.simFrameStart, 1), (self.animFrameStart, 1), (self.simFrameEnd, 0))
+
+        if cmds.objExists(nucleus_name):
+            if cmds.objExists(object_to_follow):
+                if len(vals) == 0:
+                    # TODO val err
+                    pass
+                elif len(vals) == 1:
+                    cmds.setAttr("nucleus1.enable", 0)
+                    for fr in range(cmds.playbackOptions(min=True, q=True), vals[0][0]):
+                        cmds.currentTime(fr)
+                        vtx_pos = cmds.pointPosition(object_to_follow + '.vtx['+str(vtx_id_to_follow)+']', w=True)
+                        cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=vtx_pos[0])
+                        cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=vtx_pos[1])
+                        cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=vtx_pos[2])
+
+                    cmds.setAttr("nucleus1.enable", 1)
+                    # frs =
+                    # fre = cmds.playbackOptions(max=True, q=True)
+                else:
+                    cmds.setAttr("nucleus1.enable", 0)
+                    nucleus_base_pos = cmds.getAttr("nucleus1.translate")[0]
+                    for i, v in enumerate(vals):
+                        if i == 0:
+                            val_from = v
+                        else:
+                            val_to = v
+                            for fr in range(val_from[0], val_to[0]):
+                                cmds.currentTime(fr)
+                                vtx_pos = cmds.pointPosition(object_to_follow + '.vtx['+str(vtx_id_to_follow)+']', w=True)
+
+                                fr_min = val_from[0]
+                                fr_max = val_to[0]
+
+                                val_in_min = val_from[1]
+                                val_in_max = val_to[1]
+
+                                current_frame = fr
+                                curent_multiper = val_in_min - 1.0 * (val_in_min - val_in_max) * 1.0 * (current_frame - fr_min) / (fr_max - fr_min)
+                                # print fr, curent_multiper
+
+                                # simpler: vtx_pos*curent_multiper + nucleus_base_pos*(1-curent_multiper)
+                                med_x = vtx_pos[0]*curent_multiper+nucleus_base_pos[0]*(1-curent_multiper)
+                                med_y = vtx_pos[1]*curent_multiper+nucleus_base_pos[1]*(1-curent_multiper)
+                                med_z = vtx_pos[2]*curent_multiper+nucleus_base_pos[2]*(1-curent_multiper)
+                                current_pos = [med_x, med_y, med_z]
+
+                                if curent_multiper == 1.0:
+                                    nucleus_base_pos = vtx_pos
+                                cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=current_pos[0])
+                                cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=current_pos[1])
+                                cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=current_pos[2])
+                            val_from = v
+
+                    cmds.setAttr("nucleus1.enable", 1)
+
+                return True
+
+            # TODO else err
+        # TODO else err
+
+        return False
+
     def maya_simulate_ncloth(self, ts, te, objects_names, cache_dir, cache_mode=1, cache_subsamples=1):
         import maya.cmds as cmds
         import maya.mel as ml
@@ -172,6 +254,8 @@ class Interactions:
 
             refresh_view = "1"    # TODO 0 for batch mode !!!
             cache_per_geo = "1"    # TODO do user option !!!
+
+            # “add”, “replace”, “merge” or “mergeDelete”
 
             # maya 2015  # TODO !!!
             cmd = 'doCreateNclothCache 4 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'

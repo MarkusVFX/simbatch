@@ -3,6 +3,8 @@ import subprocess
 import threading
 import time
 
+import socket
+
 
 class SimBatchServer:
     timer_delay_seconds = 3  # delay for each loop execution
@@ -39,6 +41,12 @@ class SimBatchServer:
         self.batch = batch
         self.logger = batch.logger
         self.comfun = batch.comfun
+
+        print(socket.gethostname().split(".")[0])
+
+        if framework_mode is True:
+            self.server_name = "local_"+socket.gethostname().split(".")[0].split("pc")[-1]
+
         if self.framework_mode is False:
             ret = self.batch.que.load_queue()
             if ret:
@@ -63,11 +71,12 @@ class SimBatchServer:
                 if node_info is not False:
                     """ state file exists """
                     self.current_simnode_state = node_info.state_id
-                    self.server_name = node_info.node_name
+                    if self.server_name is None:
+                        self.server_name = node_info.node_name
 
                     """  init batch.nod vars as server """
                     self.batch.nod.state_file = simnode_state_file
-                    self.batch.nod.server_name = node_info.node_name
+                    self.batch.nod.server_name = self.server_name
 
                     """  check existence in database  """
                     state_file = self.batch.nod.get_state_file(server_name=str(self.server_name))
@@ -441,10 +450,12 @@ class SimBatchServer:
                 ret = self.batch.que.get_index_by_id(force_id), force_id
             else:
                 if state_id is not None:
-                    self.batch.logger.wrn(("Current queue item state is not WAITNIG: ", self.batch.sts.states_visible_names[state_id]))
+                    self.batch.logger.wrn(("Current item ({}) state is not WAITNIG: {}".format(force_id,
+                                           self.batch.sts.states_visible_names[state_id])))
                 else:
-                    self.batch.logger.wrn(("Current queue item state is not WAITNIG: ", state_id))
+                    self.batch.logger.wrn(("Current item ({}) state is not WAITNIG: {}".format(force_id, state_id)))
                 ret = -1, 0
+
         if ret[0] >= 0:
             queue_item = self.batch.que.queue_data[ret[0]]
             script = queue_item.evolution_script

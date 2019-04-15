@@ -236,14 +236,14 @@ class Definitions:
             return self.current_definition.setup_ext
         else:
             self.batch.logger.err("get_current_setup_ext unknown, current_definition is None")
-            return ".err"
+            return "def"
 
     def get_current_prev_ext(self):    # TODO  env = self.sts.runtime_env
         if self.current_definition is not None:
             return self.current_definition.prev_ext
         else:
             self.batch.logger.err("get_current_prev_ext unknown, current_definition is None")
-            return ".err"
+            return "def"
 
     def add_definition(self, defi):
         self.definitions_array.append(defi)

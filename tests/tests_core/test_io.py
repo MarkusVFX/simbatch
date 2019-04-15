@@ -33,7 +33,5 @@ def test_loaded_sample_project(io):
 
 
 def test_generate_base_setup_file_name(io):
-    tuple_base_setup = io.generate_base_setup_file_name(schema_name="test_schema")
-    assert tuple_base_setup[0] == 1
-    # assert  tuple_base_setup[1] == "D:\\proj\\fx\\test_schema\\base_setup\\test_schema_v001.null"
-    # TODO12
+    base_setup = io.generate_base_setup_file_name(schema_name="test_schema")
+    assert base_setup == "D:\\proj\\fx\\test_schema\\base_setup\\test_schema_v001.def"

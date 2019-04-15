@@ -232,10 +232,7 @@ class CommonFunctions:
         else:
             if len(check_file) > 0:
                 if info is not False:
-                    if len(info) > 0:
-                        self.logger.wrn("File {} not exist ! ({})\n".format(check_file, info))
-                    else:
-                        self.logger.wrn("File {} not exist !\n".format(check_file))
+                    self.logger.wrn("File {} not exist ! ({})\n".format(check_file, info))
             else:
                 self.logger.err("File name length is zero! {}".format(info))
             return False
@@ -303,10 +300,37 @@ class CommonFunctions:
         path_out = self.get_proper_path(path_out)   # win 7 vs 10 fix
         return path_out
 
-    def get_files_from_path_with_pattern(self, path_with_pattern, db=False):
-        self.logger.db(path_with_pattern, force_print=db)
-        self.logger.db((" files count : ", len(glob(path_with_pattern))), force_print=db)
-        return glob(path_with_pattern)
+    def replace_max_in_path(self, param, add_val_to_max=0, zeros_in_version=3):
+        ret = self.get_maximum(param, add_val_to_max=add_val_to_max, zeros_in_version=zeros_in_version)
+        if ret is not False:
+            return param.replace("<max>", ret)
+        else:
+            return False
+
+    def get_maximum(self, param, add_val_to_max=0, zeros_in_version=3):  # get max version from path  <max>
+        param_split = param.split("<max>")
+        if len(param_split) == 2:
+            files = self.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1], db=True)
+            if len(files) == 0:
+                print "(get_maximum) Could not get max version from:", param
+                return False
+            else:
+                max_ver = -1
+                len_pre = len(param_split[0])
+                len_post = len(param_split[1])
+                for f in files:
+                    ver_str = f[len_pre:-len_post]
+                    # print " ww ", ver_str, f
+                    new_val = self.int_or_val(ver_str, -1)
+                    if new_val > max_ver:
+                        max_ver = new_val
+                if max_ver > 0:
+                    return self.str_with_zeros(max_ver + add_val_to_max, zeros_in_version)
+                else:
+                    return False
+        else:
+            print "I have no idea what TODO with more than one <max>"
+            return False
 
     def create_directory_if_not_exists(self, path):
         if self.path_exists(path) is False:
@@ -384,7 +408,7 @@ class CommonFunctions:
 
     @staticmethod
     def is_absolute(check_path):
-        if len(check_path) > 2:
+        if len(check_path) > 0:
             if check_path[0] == "/":  # linux
                 return True
             if check_path[1] == ":" and check_path[2] == "\\":  # win storage
@@ -394,6 +418,11 @@ class CommonFunctions:
             if check_path[0] == "\\" and check_path[1] == "\\":  # win network
                 return True
         return False
+
+    def get_files_from_path_with_pattern(self, path_with_pattern, db=False):
+        self.logger.db(path_with_pattern, force_print=db)
+        self.logger.db((" files count : ", len(glob(path_with_pattern))), force_print=db)
+        return glob(path_with_pattern)
 
     def create_empty_file(self, file_name):
         try:

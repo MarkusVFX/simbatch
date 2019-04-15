@@ -497,6 +497,7 @@ class Queue:
                     splited_actual_value = ai.actual_value.split("^")
                     ret = self.batch.pat.get_params_val_arr_from_string(splited_actual_value[1])
                 else:
+                    splited_actual_value = "<cloth_objects>"  # TODO !!! other types !
                     ret = self.batch.pat.get_params_val_arr_from_string(ai.actual_value)
                 if ret[0] > 0:   # ret[0] count evos
                     for ie in ret[1]:  # ['STR', '4.0', '5.0', '6.0']  # TODO optimize, create EVOS class

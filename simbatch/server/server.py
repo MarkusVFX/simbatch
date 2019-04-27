@@ -94,10 +94,10 @@ class SimBatchServer:
                 self.logger.err("Server NOT initiated properly!")
         
         if self.framework_mode is True:
-            print_server_name = batch.sts.runtime_env + " (local)"
+            print_server_name = "{} ({})".format(self.server_name , batch.sts.runtime_env)
         else:
             simnode_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
-            print_server_name = "{} ({})".format(batch.sts.runtime_env, simnode_name)
+            print_server_name = "{} ({})".format(simnode_name, batch.sts.runtime_env)
         self.logger.inf(("init server :", print_server_name, self.server_dir))
         
     def print_is_something_to_do(self):

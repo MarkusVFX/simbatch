@@ -21,11 +21,9 @@ class TaskListItem(QWidget):
                  txt_queue_version, txt_option, txt_comm):
         super(TaskListItem, self).__init__()
         self.qt_widget = QWidget(self)
-
         self.qt_lay = QHBoxLayout(self.qt_widget)
         self.qt_lay.setSpacing(0)
         self.qt_lay.setContentsMargins(0, 0, 0, 0)
-
         self.qt_label_font = QFont()
         self.qt_label_font.setPointSize(8)
 
@@ -268,6 +266,14 @@ class TasksUI:
         list_item_widget = TaskListItem("ID", "task name", "usr", "seq", "sh", "take", "state", "schV", "queV",
                                         "opts", "desc")
 
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[0]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+        else:
+            cur_color = self.sts.state_colors[0].color()
+            qt_list_item.setBackground(cur_color)
+
+
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
@@ -284,12 +290,17 @@ class TasksUI:
 
                 if filter_pass:
                     qt_list_item = QListWidgetItem(widget_list)
-                    cur_color = self.sts.state_colors[tsk.state_id].color()
-                    qt_list_item.setBackground(cur_color)
                     list_item_widget = TaskListItem(str(tsk.id), tsk.task_name, str(tsk.user_id),
                                                     tsk.sequence, tsk.shot, tsk.take, tsk.state,
                                                     str(tsk.schema_ver), str(tsk.queue_ver),
                                                     tsk.options, tsk.description)
+
+                    if self.sts.runtime_env == "Houdini":
+                        color = self.batch.sts.state_colors_rgb_str[tsk.state_id]
+                        list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+                    else:
+                        cur_color = self.sts.state_colors[tsk.state_id].color()
+                        qt_list_item.setBackground(cur_color)
 
                     widget_list.addItem(qt_list_item)
                     widget_list.setItemWidget(qt_list_item, list_item_widget)
@@ -494,7 +505,11 @@ class TasksUI:
                                         new_task_item.sequence, new_task_item.shot, new_task_item.take,
                                         new_task_item.state, str(new_task_item.schema_ver),
                                         str(new_task_item.queue_ver), new_task_item.options, new_task_item.description)
-        qt_list_item.setBackground(QBrush(QColor("#ff8555")))   # TODO  settings cnst val color !
+
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[new_task_item.state_id]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
         qt_list_item.setSizeHint(QSize(1, 24))
         self.list_tasks.addItem(qt_list_item)
@@ -671,6 +686,32 @@ class TasksUI:
                     array_visible_tasks_ids.append(task.id)
         self.array_visible_tasks_ids = array_visible_tasks_ids
 
+    def item_set_background(self, item, color_index, up=False):
+        if self.sts.runtime_env == "Houdini":
+
+            if up:
+                color = self.batch.sts.state_colors_up_rgb_str[color_index]
+            else:
+                color = self.batch.sts.state_colors_rgb_str[color_index]
+
+            edited_task_item = self.batch.tsk.current_task       #   TODO  huodini list item set background !!!!
+            list_item_widget = TaskListItem(str(edited_task_item.id), edited_task_item.task_name,
+                                            str(edited_task_item.user_id),
+                                            edited_task_item.sequence, edited_task_item.shot, edited_task_item.take,
+                                            edited_task_item.state, str(edited_task_item.schema_ver),
+                                            str(edited_task_item.queue_ver), edited_task_item.options,
+                                            edited_task_item.description)
+
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")        # uicolor
+            self.list_tasks.setItemWidget(item, list_item_widget)
+
+        else:
+            if up:
+                color = self.batch.sts.state_colors_up[color_index].color()
+            else:
+                color = self.batch.sts.state_colors[color_index].color()
+            item.setBackground(color)
+
     def on_current_item_changed(self, current_task_item):
         if self.freeze_list_on_changed == 1:   # freeze update changes on massive action    i.e  clear_list()
             self.batch.logger.deepdb(("tsk chngd freeze_list_on_changed", self.list_tasks.currentRow()))
@@ -688,7 +729,8 @@ class TasksUI:
                         last_index = self.batch.tsk.get_index_by_id(last_id)
                         if item is not None and last_index is not None:
                             color_index = self.batch.tsk.tasks_data[last_index].state_id
-                            item.setBackground(self.batch.sts.state_colors[color_index].color())
+                            # item.setBackground(self.batch.sts.state_colors[color_index].color())
+                            self.item_set_background(item, color_index)
                 else:
                     self.batch.logger.wrn("Wrong last_task_list_index {} vs {} ".format(self.last_task_list_index,
                                                                                         len(self.batch.tsk.tasks_data)))
@@ -721,8 +763,9 @@ class TasksUI:
 
                 if current_list_index >= 0:
                     item_c = self.list_tasks.item(current_list_index + 1)
-                    cur_color = self.batch.sts.state_colors_up[cur_task.state_id].color()
-                    item_c.setBackground(cur_color)
+                    # cur_color = self.batch.sts.state_colors_up[cur_task.state_id].color()
+                    # item_c.setBackground(cur_color)
+                    self.item_set_background(item_c, cur_task.state_id, up=True)
 
                 # update SCHEMA
                 self.batch.sch.current_schema_id = cur_task.schema_id

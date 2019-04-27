@@ -69,7 +69,7 @@ class SettingsUI:
         self.err_info_config_ini = err_info_config_ini
         err_info_config_ini.hide()
         elwb_config_ini = EditLineWithButtons(show_ini_file, edit_text_string=None, text_on_button_1="Test Config",
-                                              text_on_button_2="Test Access", button_width=85)
+                                              text_on_button_2="Test Access") # , button_width=85)
 
         elwb_config_ini.button_1.clicked.connect(self.test_data_config_ini)
         elwb_config_ini.button_2.clicked.connect(self.test_access_config_ini)
@@ -111,8 +111,8 @@ class SettingsUI:
         qt_settings_data_directory_edit = QLineEdit(show_store_data_json_directory)  # TODO   EditLineWithButtons
         qt_settings_data_directory_button = QPushButton("Get")  # TODO   EditLineWithButtons
         qt_settings_data_directory_test_button = QPushButton("Test")  # TODO   EditLineWithButtons
-        qt_settings_data_directory_button.setFixedWidth(40)  # TODO   EditLineWithButtons
-        qt_settings_data_directory_test_button.setFixedWidth(50)  # TODO   EditLineWithButtons
+        # qt_settings_data_directory_button.setFixedWidth(40)  # TODO     Houdini no padding     if self.settings.runtime_env
+        # qt_settings_data_directory_test_button.setFixedWidth(50)  # TODO     Houdini no padding  if self.settings.runtime_env
         qt_settings_data_directory_button.setToolTip('Select directory for store data')
         qt_settings_data_directory_button.clicked.connect(self.on_click_get_data_dir)
         qt_settings_data_directory_test_button.clicked.connect(self.on_click_test_data_dir)
@@ -139,8 +139,9 @@ class SettingsUI:
         qt_settings_definitions_directory_edit = QLineEdit(show_store_definitions_directory)
         qt_settings_definitions_directory_button = QPushButton("Get")  # TODO   EditLineWithButtons
         qt_settings_definitions_directory_test_button = QPushButton("Test")  # TODO   EditLineWithButtons
-        qt_settings_definitions_directory_button.setFixedWidth(40)  # TODO   EditLineWithButtons
-        qt_settings_definitions_directory_test_button.setFixedWidth(50)  # TODO   EditLineWithButtons
+
+        # qt_settings_definitions_directory_button.setFixedWidth(40)  # TODO     Houdini no padding   if self.settings.runtime_env
+        # qt_settings_definitions_directory_test_button.setFixedWidth(50)  # TODO   Houdini no padding   if self.settings.runtime_env
         qt_settings_definitions_directory_button.setToolTip('Select definitions directory')
         qt_settings_definitions_directory_button.clicked.connect(self.on_click_get_definitions_dir)
         qt_settings_definitions_directory_test_button.clicked.connect(self.on_click_test_definitions_dir)
@@ -279,7 +280,7 @@ class SettingsUI:
             qt_radio_mode_db_4.setChecked(True)
         qt_button_group_debug_level.addButton(qt_radio_mode_db_4)
         qt_lay_settings_debug_level.addWidget(qt_radio_mode_db_4)
-        qt_radio_mode_db_5 = QRadioButton("+db")
+        qt_radio_mode_db_5 = QRadioButton("+DEEP")
         if settings.debug_level == 5:
             qt_radio_mode_db_5.setChecked(True)
         qt_button_group_debug_level.addButton(qt_radio_mode_db_5)

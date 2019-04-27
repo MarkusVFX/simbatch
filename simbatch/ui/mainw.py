@@ -220,6 +220,9 @@ class MainWindow(QMainWindow):
             self.setMinimumSize(480, 700)
             self.sts.window = [40, 40, 480, 700]
 
+        if self.sts.runtime_env == "Houdini":
+            self.setStyleSheet("background-color: rgb(42, 44, 45);")    # uicolor
+
         self.setWindowTitle("SimBatch " + self.sts.SIMBATCH_VERSION + "     " + self.sts.runtime_env)
         if self.sts.always_on_top:
             self.setWindowFlags(Qt.WindowStaysOnTopHint)

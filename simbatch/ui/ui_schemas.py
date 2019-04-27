@@ -251,6 +251,13 @@ class SchemasUI:
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
         list_item_widget = SchemaListItem("ID", "schema name", "description", "schV")
 
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[0]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+        else:
+            cur_color = self.sts.state_colors[0].color()
+            qt_list_item.setBackground(cur_color)
+
         list_schemas.addItem(qt_list_item)
         list_schemas.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
@@ -266,6 +273,11 @@ class SchemasUI:
                 qt_list_item.setBackground(curr_color)
                 list_item_widget = SchemaListItem(str(schema.id), schema.schema_name,
                                                   schema.description, str(schema.schema_version))
+
+                if self.sts.runtime_env == "Houdini":
+                    color = self.batch.sts.state_colors_rgb_str[schema.state_id]
+                    list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+
                 list_schemas.addItem(qt_list_item)
                 list_schemas.setItemWidget(qt_list_item, list_item_widget)
                 qt_list_item.setSizeHint(QSize(1, 24))
@@ -575,6 +587,10 @@ class SchemasUI:
         self.batch.logger.db(("added schema:", new_schema_item.schema_name,
                               "   to proj :", self.batch.prj.current_project_id))
 
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[new_schema_item.state_id]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+
         sch_dir = self.batch.prj.current_project.working_directory_absolute
         sch_dir += self.batch.sio.get_flat_name(new_schema_item.schema_name) + self.sts.dir_separator
 
@@ -636,6 +652,11 @@ class SchemasUI:
             ed_item = self.list_schemas.item(current_list_index)
             list_item_widget = SchemaListItem(str(edited_schema_item.id), edited_schema_item.schema_name,
                                               edited_schema_item.description, str(edited_schema_item.schema_version))
+
+            if self.sts.runtime_env == "Houdini":
+                color = self.batch.sts.state_colors_rgb_str[edited_schema_item.state_id]
+                list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+
             self.list_schemas.setItemWidget(ed_item, list_item_widget)
 
             self.schema_form_edit.hide()

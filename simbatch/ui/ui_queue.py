@@ -182,6 +182,13 @@ class QueueUI:
         # list_item_widget = QueueListItem("ID", "queue item name", "user", "prior", "state", "evo", "sim node", "desc")
         list_item_widget = QueueListItem("ID", "queue item name", "user", "state", "evo", "sim node", "desc")
 
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[0]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+        else:
+            cur_color = self.sts.state_colors[0].color()
+            qt_list_item.setBackground(cur_color)
+
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
@@ -198,6 +205,10 @@ class QueueUI:
             #                                  que.evolution, que.sim_node, que.description)
             list_item_widget = QueueListItem(str(que.id), que.queue_item_name, que.user, que.state,
                                              que.evolution, que.sim_node, que.description)
+
+            if self.sts.runtime_env == "Houdini":
+                color = self.batch.sts.state_colors_rgb_str[que.state_id]
+                list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
 
             widget_list.addItem(qt_list_item)
             widget_list.setItemWidget(qt_list_item, list_item_widget)
@@ -380,7 +391,7 @@ class QueueUI:
 
     def on_click_menu_queue_item_remove(self):
         self.on_click_confirmed_remove_queue_item()
-        
+
     def on_click_menu_queue_item_remove_all_green(self):
         self.on_click_confirmed_remove_queue_items_green()
 

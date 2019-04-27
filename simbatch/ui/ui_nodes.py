@@ -204,6 +204,13 @@ class NodesUI:
 
         list_item_widget = NodeListItem("ID", "name",  "state", "descr")
 
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[0]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+        else:
+            cur_color = self.sts.state_colors[0].color()
+            qt_list_item.setBackground(cur_color)
+
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
@@ -217,6 +224,10 @@ class NodesUI:
             cur_color = self.sts.state_colors[nod.state_id].color()
             qt_list_item.setBackground(cur_color)
             list_item_widget = NodeListItem(str(nod.id), nod.node_name, nod.state, nod.description)
+
+            if self.sts.runtime_env == "Houdini":
+                color = self.batch.sts.state_colors_rgb_str[nod.state_id]
+                list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
 
             widget_list.addItem(qt_list_item)
             widget_list.setItemWidget(qt_list_item, list_item_widget)

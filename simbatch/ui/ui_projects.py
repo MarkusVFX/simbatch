@@ -287,6 +287,13 @@ class ProjectsUI:
 
         list_item_widget = ProjectListItem("ID", "proj name", "project dir", "description")
 
+        if self.sts.runtime_env == "Houdini":
+            color = self.batch.sts.state_colors_rgb_str[0]
+            list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
+        else:
+            cur_color = self.sts.state_colors[0].color()
+            qt_list_item.setBackground(cur_color)
+
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
         qt_list_item.setSizeHint(QSize(1, 24))
@@ -307,6 +314,10 @@ class ProjectsUI:
             qt_list_item.setBackground(curr_color)
             list_item_widget = ProjectListItem(str(projects[ip].id), projects[ip].project_name,
                                                projects[ip].project_directory, projects[ip].description)
+
+            if self.sts.runtime_env == "Houdini":
+                color = self.batch.sts.state_colors_rgb_str[projects[ip].state_id]
+                list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
 
             widget_list.addItem(qt_list_item)
             widget_list.setItemWidget(qt_list_item, list_item_widget)

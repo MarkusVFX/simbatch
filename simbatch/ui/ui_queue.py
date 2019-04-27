@@ -341,12 +341,15 @@ class QueueUI:
     def on_click_menu_open_simed_shot_setup(self):
         self.open_shot_setup(simed=True)
 
-    def open_shot_setup(self, simed=False):
+    def open_shot_setup(self, simed=False, only_info=False):
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
         task_id = cur_queue_item.task_id
         version = cur_queue_item.version
 
         file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version, simed=simed)
+
+        if only_info:
+            return file_to_load
 
         if file_to_load is not False:
             if self.comfun.file_exists(file_to_load):
@@ -361,6 +364,16 @@ class QueueUI:
                 self.top_ui.set_top_info("file_to_load not exist", 8)
         else:
             self.batch.logger.wrn(("can not get file_to_load   from : task_id, version : ", task_id, version))
+
+    def on_menu_locate_simed_shot_setup(self):
+        ret = self.open_shot_setup(simed=True, only_info=True)
+        dir = self.comfun.dirname(ret)
+
+        if self.comfun.path_exists(dir, " simed setup dir open "):
+            if self.sts.current_os == 1:
+                os.system('xdg-open "{}"'.format(dir))
+            else:
+                subprocess.Popen('explorer "' + dir + '"')
 
     def on_click_menu_sim_selected(self):
         self.sim_current()
@@ -402,6 +415,7 @@ class QueueUI:
         qt_right_menu.addAction("Open prev", self.on_menu_open_prev)
         qt_right_menu.addAction("Open shot scene", self.on_click_menu_open_shot_setup)
         qt_right_menu.addAction("Open simed shot scene", self.on_click_menu_open_simed_shot_setup)
+        qt_right_menu.addAction("Locate simed setup", self.on_menu_locate_simed_shot_setup)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Simulate Selected", self.on_click_menu_sim_selected)
         qt_right_menu.addAction("________", self.on_click_menu_spacer)

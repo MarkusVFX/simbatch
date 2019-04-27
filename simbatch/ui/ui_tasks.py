@@ -45,7 +45,7 @@ class TaskListItem(QWidget):
 
         self.qt_label_schema = QLabel(txt_schema)
         self.qt_label_schema.setStyleSheet("""color:#000;text-align:right;padding-left:4px;""")
-        self.qt_label_schema.setFixedHeight(28)
+        # self.qt_label_schema.setFixedHeight(28)
         self.qt_label_schema.setFont(self.qt_label_font)
         self.qt_label_schema.setMinimumWidth(40)
         self.qt_label_schema.setMaximumWidth(220)
@@ -97,8 +97,8 @@ class TaskListItem(QWidget):
         self.qt_label_frame_end = QLabel(txt_option)
         self.qt_label_frame_end.setFont(self.qt_label_font)
         self.qt_label_frame_end.setStyleSheet("""color:#000;""")
-        self.qt_label_frame_end.setMinimumWidth(26)
-        self.qt_label_frame_end.setMaximumWidth(26)
+        self.qt_label_frame_end.setMinimumWidth(31)
+        self.qt_label_frame_end.setMaximumWidth(31)
         self.qt_lay.addWidget(self.qt_label_frame_end)
 
         self.qt_label_prior = QLabel(txt_comm)
@@ -265,8 +265,8 @@ class TasksUI:
         qt_list_item.setBackground(QBrush(QColor("#ddd")))
         qt_list_item.setFlags(Qt.ItemFlag.NoItemFlags)
 
-        list_item_widget = TaskListItem("ID", "task name", "user", "seq", "sh", "take", "state", "schV", "queV",
-                                        "opts", "descr")
+        list_item_widget = TaskListItem("ID", "task name", "usr", "seq", "sh", "take", "state", "schV", "queV",
+                                        "opts", "desc")
 
         widget_list.addItem(qt_list_item)
         widget_list.setItemWidget(qt_list_item, list_item_widget)
@@ -736,7 +736,13 @@ class TasksUI:
                 if self.add_form_state == 1:
                     self.qt_form_add.update_form()                           # update add to queue form
                     self.batch.tsk.update_proxy_task_form_current()
-                    self.list_tasks.scrollToBottom()
+                    # self.list_tasks.scrollTo(current_list_index)
+                    # self.list_tasks.scrollTo(current_task_item)
+                    # self.list_tasks.scrollToBottom()
+
+                    # self.list_tasks.updateGeometry()
+                    # self.list_tasks.scrollToItem(current_task_item)
+
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
                                                                          len(self.batch.tsk.tasks_data)))

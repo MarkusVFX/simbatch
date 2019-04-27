@@ -21,28 +21,32 @@ class SchemaListItem(QWidget):
     def __init__(self, txt_id, txt_name, txt_desc, txt_schema_version):
         super(SchemaListItem, self).__init__()
         self.qt_widget = QWidget(self)
-        self.qt_label_font = QFont()
-        self.qt_label_font.setPointSize(8)
+
         self.qt_lay = QHBoxLayout(self.qt_widget)
         self.qt_lay.setSpacing(0)
         self.qt_lay.setContentsMargins(0, 0, 0, 0)
+
+        
+        self.qt_font = QFont()
+        self.qt_font.setPointSize(8)
+
         self.qt_label_id = QLabel(txt_id)
-        self.qt_label_id.setFont(self.qt_label_font)
+        self.qt_label_id.setFont(self.qt_font)
         self.qt_label_id.setStyleSheet("""color:#000;padding-left:4px;""")
-        self.qt_label_id.setMinimumWidth(140)
-        self.qt_label_id.setMaximumWidth(170)
-        self.qt_label_id.setFixedHeight(15)
+        self.qt_label_id.setMinimumWidth(22)
+        self.qt_label_id.setMaximumWidth(40)
+        # self.qt_label_id.setFixedHeight(15)
         self.qt_lay.addWidget(self.qt_label_id)
 
         self.qt_label_name = QLabel(txt_name)
-        self.qt_label_name.setFont(self.qt_label_font)
+        self.qt_label_name.setFont(self.qt_font)
         self.qt_label_name.setStyleSheet("""color:#000;""")
         self.qt_lay.addWidget(self.qt_label_name)
 
         self.qt_label_version = QLabel(txt_schema_version)
         self.qt_label_version.setMinimumWidth(22)
         self.qt_label_version.setMaximumWidth(30)
-        self.qt_label_version.setFont(self.qt_label_font)
+        self.qt_label_version.setFont(self.qt_font)
         self.qt_label_version.setStyleSheet("""color:#000;""")
         self.qt_lay.addWidget(self.qt_label_version)
 

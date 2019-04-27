@@ -319,7 +319,10 @@ class MainWindow(QMainWindow):
             self.batch.logger.clear_err_buffer()
 
     def on_tab_change(self, tab):
-        self.batch.logger.inf(("tab change: ", tab))
+        self.batch.logger.db(("tab change:", tab, self.qt_tab_widget.tabText(tab)))
+        # if tab==3:
+        #     if self.que_ui.qt_list_item is not None:
+        #         self.que_ui.qt_list_item
 
     def on_clicked_but_print_general(self):
         self.batch.print_important_values()

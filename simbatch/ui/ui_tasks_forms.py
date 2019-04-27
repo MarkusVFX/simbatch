@@ -351,6 +351,7 @@ class AddToQueueForm(QWidget):
         self.qt_lay_actions = qt_lay_actions
         qt_lay_actions.setSpacing(0)
         qt_lay_actions.setContentsMargins(0, 0, 0, 0)
+        # qt_lay_actions.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
         qt_gb_actions = QGroupBox()
         qt_gb_actions.setTitle("Actions")
         qt_gb_actions.setLayout(qt_lay_actions)

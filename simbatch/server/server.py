@@ -42,7 +42,7 @@ class SimBatchServer:
         self.logger = batch.logger
         self.comfun = batch.comfun
 
-        print(socket.gethostname().split(".")[0])
+        # print(socket.gethostname().split(".")[0])
 
         if framework_mode is True:
             self.server_name = "local_"+socket.gethostname().split(".")[0].split("pc")[-1]

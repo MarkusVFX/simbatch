@@ -28,26 +28,23 @@ class Interactions:
         self.save_current_scene_as(param)
 
     # houdini interactions
-    def houdini_open_scene(self, file):
-        pass
-        
+    def houdini_open_scene(self, file_name):
+        hou.hipFile.load(file_name, suppress_save_prompt=True, ignore_load_warnings=True)
+
     def houdini_import_ani(self, objects, dir):
         pass
-        
+
     def houdini_import_cam(self, objects, file_or_dir):
         pass
-        
+
     def houdini_import_obj(self, objects, file_or_dir):
         pass
-    
+
     def houdini_simulate(self, ts, te, objects_names, cache_dir):
-        pass   
-        
+        pass
+
     def houdini_render(self, ts, te, out_file=""):
         pass
 
-    def houdini_save_scene(self, file):
-        pass
-
-    def save_current_scene_as(self, file):
-        pass
+    def save_current_scene_as(self, file_name):
+        hou.hipFile.save(file_name, save_to_recent_files=True)

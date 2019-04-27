@@ -98,14 +98,22 @@
 				"default": "<default_camera>",
 				"template": ["interaction.hou_render(\"",  "<ts>", " , ", "<te>", " , \"", "<f>", "\")"]
 			},
-			"6":{
-				"id": 6,
-				"type": "single",
-				"name": "Script",
-				"desc": "Run Pyhton Script",
-				"default": "<scripts_dir>*.py",
-				"template": ["interaction.hou_script_py(\"", "<f>", "\")"]
-			}
+            "6":{
+                "id": 6,
+                "type": "single",
+                "name": "Save",
+                "desc": "Save Houdini Scene",
+                "ui" : ["<shot_setup>", ["Get dir","[get_directory]"]],
+                "template": ["interactions.save_setup(", "<ui>", ")"]
+            },
+            "7":{
+                "id": 7,
+                "type": "single",
+                "name": "Script",
+                "desc": "Run Pyhton Script",
+                "default": "<scripts_dir>*.py",
+                "template": ["interaction.hou_script_py(\"", "<f>", "\")"]
+            }
 		}
 	}
 }

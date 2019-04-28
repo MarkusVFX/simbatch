@@ -1,0 +1,121 @@
+{
+	"definition": {
+		"meta": {
+			"name": "Houdini",
+			"version": 1,
+			"software": "Houdini",
+			"totalActions": 6,
+			"setupExt" : "hipnc",
+			"prevExt" : "jpg",
+			"interactionScript": "interactions_houdini.py",
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
+		},
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open Houdini scene",
+				"default": "<base_setup_directory>",
+				"template": ["interaction.hou_open_scene(\"", "<f>", "\")"]
+			},
+			"2":{
+				"id": 2,
+				"type": "multi",
+				"name": "Import",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "ANI",
+						"desc": "Animation cache",
+						"default": "<shot_ani_cache_dir>",
+						"template": ["interaction.hou_import_ani(", "<o>", ", \"", "<d>", "\" )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "CAM",
+						"desc": "Camera file",
+						"default": "<shot_cam_dir>",
+						"template": ["interaction.hou_import_cam(", "<o>", ", \"", "<f>", "\" )"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "OBJ",
+						"desc": "Geometry file",
+						"default": "<project_props_dir>",
+						"template": ["interaction.hou_import_obj(", "<o>", ", \"", "<f>", "\" )"]
+					}
+				}
+			},
+			"3":{
+				"id": 3,
+				"type": "single",
+				"name": "Set Value",
+				"desc": "Set value for object property",
+				"default": "<object>.<param>=<value>",
+				"template": ["interaction.hou_set_param(", "<o>", ", ", "<p>", ", ", "<v>", ")"]
+			},
+			"4":{
+				"id": 4,
+				"type": "multi",
+				"name": "Simulate", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "pyro",
+						"desc": "pyro sim",
+						"default": "<pyro_object>",
+						"template": ["interaction.hou_simulate_pyro(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "fluid",
+						"desc": "fluid sim",
+						"default": "<fluid_object>",
+						"template": ["interaction.hou_simulate_fluid(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "cloth",
+						"desc": "cloth sim",
+						"default": "<cloth_objects>",
+						"template": ["interaction.hou_simulate_cloth(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					},
+					"4": {
+						"id": 4,
+						"mode": "bullet",
+						"desc": "bullet sim",
+						"default": "<bullet_object>",
+						"template": ["interaction.hou_simulate_bullet(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\" )"]
+					}
+				}
+			},
+			"5":{
+				"id": 5,
+				"type": "single",
+				"name": "Render",
+				"desc": "Render Scene",
+				"default": "<default_camera>",
+				"template": ["interaction.hou_render(\"",  "<ts>", " , ", "<te>", " , \"", "<f>", "\")"]
+			},
+            "6":{
+                "id": 6,
+                "type": "single",
+                "name": "Save",
+                "desc": "Save Houdini Scene",
+                "ui" : ["<shot_setup>", ["Get dir","[get_directory]"]],
+                "template": ["interactions.save_setup(", "<ui>", ")"]
+            },
+            "7":{
+                "id": 7,
+                "type": "single",
+                "name": "Script",
+                "desc": "Run Pyhton Script",
+                "default": "<scripts_dir>*.py",
+                "template": ["interaction.hou_script_py(\"", "<f>", "\")"]
+            }
+		}
+	}
+}
+ 
+ 

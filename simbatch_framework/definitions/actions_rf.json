@@ -1,0 +1,45 @@
+{
+	"definition": {
+		"meta": {
+			"name": "RealFlow",
+			"version": 1,
+			"software": "RealFlow",
+			"totalActions": 4,
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
+		},
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open RF scene",
+				"default": "<base_setup>",
+				"template": ["interaction.rf_open_scene(\"", "<f>", "\")"]
+			},
+			"2":{
+				"id": 1,
+				"type": "single",
+				"name": "Set Param",
+				"desc": "Set value for parameter",
+				"default": "",
+				"template": ["interaction.rf_set_param(\"", "<o>", ", ", "<p>", ", ", "<v>", "\")"]
+			},
+			"3":{
+				"id": 1,
+				"type": "single",
+				"name": "Simulate",
+				"desc": "Simulate current scene",
+				"default": "",
+				"template": ["interaction.rf_simulate(\"",  "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\")"]
+			},
+			"4":{
+				"id": 1,
+				"type": "single",
+				"name": "Script",
+				"desc": "execute RF script",
+				"default": "<script_directory>",
+				"template": ["interaction.rf_script(\"", "<f>", "\")"]
+			}
+		}
+	}
+}

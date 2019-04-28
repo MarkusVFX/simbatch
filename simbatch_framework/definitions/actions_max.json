@@ -1,0 +1,145 @@
+{
+	"definition": {
+		"meta": {
+			"name": "3dsmax",
+			"version": 1,
+			"software": "3dsmax",
+			"totalActions": 6,
+			"setupExt" : "max",
+			"prevExt" : "jpg",
+			"interactionScript": "interactions_max.py",
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
+		},		
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open max scene",
+				"ui" : ["<schema_base_setup>", ["Get file","[get_file]"]],
+				"template": ["interactions.max_open_scene(", "<ui>", ")"]
+			},
+			"2":{
+				"id": 2,
+				"type": "multi",
+				"name": "Import",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "ANI",
+						"desc": "Animation cache",
+						"ui" : ["<shot_ani_cache_dir>", ["Get dir","[get_directory]"],["Get selection","interactions.max_get_selection"]],
+						"template": ["interactions.max_import_ani(", "<ui>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "CAM",
+						"desc": "Camera file",
+						"ui" : ["<shot_cam_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.max_import_cam(", "<ui>", ")"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "OBJ",
+						"desc": "Geometry file",
+						"ui" : ["<project_props_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.max_import_obj(", "<ui>", ")"]
+					}
+				}
+			},
+			"3":{
+				"id": 3,
+				"type": "single",
+				"name": "Set Value",
+				"desc": "Set value for object property",
+ 				"ui" : ["<object>.<param>=<value>", ["Get selection","interactions.max_get_selection"],["Info","[show_info|format: object.param=value]"]],
+                "template": ["interactions.max_set_param(", "<ui>", ")"]
+			},
+			"4":{
+				"id": 4,
+				"type": "multi",
+				"name": "Simulate", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "nCloth",
+						"desc": "nCloth sim",
+						"ui" : ["<cloth_objects>", ["Get selection","interactions.max_get_selection"]],
+						"template": ["interaction.max_simulate_cloth(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "ParticleFlow",
+						"desc": "ParticleFlow sim",
+						"ui" : ["<pf_object>", ["Get selection","interactions.max_get_selection"]],
+						"template": ["interaction.max_simulate_pf(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "FumeFX",
+						"desc": "FumeFX sim",
+						"ui" : ["<fume_container>", ["Get selection","interactions.max_get_selection"]],
+						"template": ["interaction.max_simulate_fumefx(","<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
+					},
+					"4": {
+						"id": 4,
+						"mode": "FumeFX WT",
+						"desc": "FumeFX Wavelet",
+						"ui" : ["<fume_container>", ["Get selection","interactions.max_get_selection"]],
+						"template": ["interaction.max_simulate_fumefxwt(", "<ts>", ", ", "<te>", ", ", "<o>", ", \"", "<d>", "\"  )"]
+					}
+				}
+			},
+			"5":{
+				"id": 5,
+				"type": "multi",
+				"name": "Render", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "VIEWPORT",
+						"desc": "grab viewport",
+						"ui" : ["<shot_prev_seq>"],
+						"template": ["interaction.max_render_prev(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "RENDER",
+						"desc": "scanline render scene",
+						"ui" : ["<shot_prev_seq>"],
+						"template": ["interaction.max_render_render(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
+					}
+				}
+			},
+			"6":{
+				"id": 6,
+				"type": "single",
+				"name": "Save",
+				"desc": "Save Current Scene",
+				"ui" : ["<shot_setup>", ["Get dir","[get_directory]"]],
+				"template": ["interaction.max_save_scene(", "<ui>", ")"]
+			},
+			"7":{
+				"id": 7,
+				"type": "multi",
+				"name": "Script", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "PY",
+						"desc": "run Python file",
+						"ui" : ["<scripts_dir>*.py", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interaction.max_script_py(", "<ui>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "MXS",
+						"desc": "run MaxScript file",
+						"ui" : ["<scripts_dir>*.ms", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interaction.max_script_mxs(", "<ui>", ")"]
+					}
+				}
+			}
+		}
+	}	
+}

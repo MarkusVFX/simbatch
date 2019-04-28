@@ -1,1 +1,0 @@
-evalDeferred "python(\"execfile('C:/mqs/git/simbatch/simbatch/server/script_execute.py')\")";

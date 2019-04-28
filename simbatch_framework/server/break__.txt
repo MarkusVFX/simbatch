@@ -1,2 +1,0 @@
-If this file name is break.txt, it will break main server's loop. It's nice way to stop server
-If this file is named break__.txt it means loop was successful broken and break.txt was renamed

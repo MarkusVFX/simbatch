@@ -28,7 +28,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.89"   # current version
+    SIMBATCH_VERSION = "v0.2.91"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -37,7 +37,7 @@ class Settings:
 
     states_visible_names = {}
 
-    INDEX_STATE_NULL = 0
+    INDEX_HEADER = 0   # state id will set header color
     INDEX_STATE_INIT = 1
     INDEX_STATE_WAITING = 2
     INDEX_STATE_QUEUED = 3
@@ -61,7 +61,7 @@ class Settings:
     INDEX_STATE_ACTIVE = 22
     INDEX_STATE_DEFAULT = 23
 
-    states_visible_names[INDEX_STATE_NULL] = "NULL"
+    states_visible_names[INDEX_HEADER] = "HEADER"
     states_visible_names[INDEX_STATE_INIT] = "INIT"
     states_visible_names[INDEX_STATE_WAITING] = "WAITING"
     states_visible_names[INDEX_STATE_QUEUED] = "QUEUED"
@@ -93,8 +93,14 @@ class Settings:
     ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors
     state_colors_up = []    # selected item list colors
+    state_colors_rgb_str = []   # item list colors   as RGB string
+    state_colors_up_rgb_str = []   # item list colors   as RGB string
+
     default_gray_brush = None
     default_light_gray_brush = None
+    default_gray_rgb_str = None          # as RGB string
+    default_light_gray_rgb_str = None    # as RGB string
+
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
     force_start_tab = 0     # if > 0 show tab with this index after run
@@ -224,6 +230,12 @@ class Settings:
         for i in range(0, 40):
             self.state_colors.append(self.default_gray_brush)
             self.state_colors_up.append(self.default_light_gray_brush)
+
+        self.state_colors_rgb_str = []
+        self.state_colors_up_rgb_str = []
+        for i in range(0, 40):
+            self.state_colors_rgb_str.append(self.default_gray_rgb_str)
+            self.state_colors_up_rgb_str.append(self.default_light_gray_rgb_str)
 
     """  get absolute path config file using relative or empty path/file  """
     def get_ini_file_and_path(self, ini_path="", ini_file="", check_is_exists=True):
@@ -475,12 +487,20 @@ class Settings:
                     li = line.split(";")
                     if len(li) > 7: 
                         self.state_colors[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[2], 40), 
-                                                                            self.comfun.int_or_val(li[3], 40),
-                                                                            self.comfun.int_or_val(li[4], 40))
+                                                                          self.comfun.int_or_val(li[3], 40),
+                                                                          self.comfun.int_or_val(li[4], 40))
                                                                             
                         self.state_colors_up[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[6], 140), 
                                                                              self.comfun.int_or_val(li[7], 140),
                                                                              self.comfun.int_or_val(li[8], 140))
+
+                        self.state_colors_rgb_str[li_counter] = ", ".join([str(self.comfun.int_or_val(li[2], 40)), 
+                                                                           str(self.comfun.int_or_val(li[3], 40)),
+                                                                           str(self.comfun.int_or_val(li[4], 40))])
+
+                        self.state_colors_up_rgb_str[li_counter] = ", ".join([str(self.comfun.int_or_val(li[6], 140)), 
+                                                                              str(self.comfun.int_or_val(li[7], 140)),
+                                                                              str(self.comfun.int_or_val(li[8], 140))])
                 f.close()
 
                 if self.debug_level >= 3:
@@ -490,6 +510,8 @@ class Settings:
                 for i in range(0, 40):
                     self.state_colors.append(self.default_gray_brush)
                     self.state_colors_up.append(self.default_light_gray_brush)
+                    self.state_colors_rgb_str.append(self.default_gray_rgb_str)
+                    self.state_colors_up_rgb_str.append(self.default_light_gray_rgb_str)
 
                 if self.debug_level >= 3:
                     self.logger.wrn(("NOT loaded colors: ", color_file))

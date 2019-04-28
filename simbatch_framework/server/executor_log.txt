@@ -1,0 +1,10 @@
+2019-02-25 21:21:47   START: id:38  evo:  descr:[32s]                                                                            tes t 22 fr
+2019-02-25 21:22:01    set DONE [38]   copy 123_2  v:0   by server: SimNode_01
+2019-02-25 21:22:01   Maya Exiting
+2019-02-25 21:22:01   Maya Exited
+
+
+2019-02-25 21:27:01   START: id:38  evo:  descr:[13s]         tes t 22 fr
+2019-02-25 21:27:19    set DONE [38]   copy 123_2  v:0   by server: SimNode_01
+2019-02-25 21:27:19   Maya Exiting
+2019-02-25 21:27:20   Maya Exited

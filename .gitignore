@@ -21,6 +21,25 @@ simbatch/server/script_execute.mel
 simbatch/server/executor_log.txt
 
 
+
+
+
+simbatch_framework/data_test
+simbatch_framework/definitions_test
+simbatch_framework/definitions/interaction_example.json
+
+simbatch_framework/server/break.txt
+simbatch_framework/server/break__.txt
+simbatch_framework/server/state.txt
+simbatch_framework/server/log.txt
+simbatch_framework/server/server_log.txt
+simbatch_framework/server/script_execute.py
+simbatch_framework/server/script_execute.mel
+simbatch_framework/server/executor_log.txt
+
+
+
+
 env/
 build/
 dist/
@@ -30,7 +49,7 @@ eggs/
 *.egg
 *.bak
 *.pyc
-*.json
+*.jsonx
 __pycache__/
 .pytest_cache/
 

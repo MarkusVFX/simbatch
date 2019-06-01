@@ -313,7 +313,9 @@ class Interactions:
             # out_file_header = base_name.split(".")[0]
             # out_file_ext = base_name.split(".")[1]
             # print " [db] SimC Rend !   ",  out_dir,  out_file_header,  out_file_ext
-            out_file = out_file.replace("####", "")
+            out_file = out_file.replace("<fr>", "####")
+
+            out_file = out_file.replace("####", "")   # TODO !!!
             out_file = out_file[:-5]
             self.logger.db((" render out file: ",  out_file))
             # cmds.playblast(f=outFile, st=int(ts), et=int(te), format='qt', compression='H.264', framePadding=4, percent=100, wh=[1920, 1080])

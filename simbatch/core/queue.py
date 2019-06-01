@@ -604,6 +604,30 @@ class Queue:
             self.batch.logger.err("template_queue_item is None")
         return queue_items
 
+    def get_simed_shot_file_name(self, que_item):
+        scr = que_item.evolution_script
+        if "_save_scene" in scr:
+            spl_scr = scr.split("_save_scene")
+            self.batch.logger.deepdb("(get_simed_shot_file_name) found_A:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+
+            if len(spl_scr)>0:
+                spl_spl_scr = spl_scr[1][2:]
+                self.batch.logger.deepdb("(get_simed_shot_file_name) found_B:{}, spl_scr:{}  ".format(len(spl_spl_scr), spl_spl_scr))
+                spl_spl_spl_scr = spl_spl_scr.split(")")[0][:-1]
+                if len(spl_spl_spl_scr) > 0:
+                    self.batch.logger.deepdb("(get_simed_shot_file_name) name:{}  ".format(spl_spl_spl_scr))
+                    return spl_spl_spl_scr
+                else:
+                    self.batch.logger.deepdb("(get_simed_shot_file_name) found_C:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+                    return None
+            else:
+                self.batch.logger.deepdb("(get_simed_shot_file_name) found:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+                return None
+
+        else:
+            self.batch.logger.deepdb("(get_simed_shot_file_name) None")
+            return None
+
     """ marker ATQ 304   get scripts set_param  from combinations array   """
     def get_params_from_evo_combinations(self, arr):
         scripts_str = ""

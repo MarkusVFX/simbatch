@@ -431,6 +431,19 @@ class Schemas:
             self.batch.logger.err("Current schema is None!")
             return False
 
+    def replace_max_in_path(self, param, add_val_to_max=0, zeros_in_version=None):
+        ret = self.batch.sio.predefined.get_maximum(param, add_val_to_max=add_val_to_max, zeros_in_version=zeros_in_version)
+        if ret is not False:
+            return param.replace("<max>", ret)
+        else:
+            return False
+
+    def additional_schema_action(self, input):
+        self.batch.logger.inf(" additional_schema_action " + input)   # TODO !!!
+        que = self.batch.que.current_queue
+        task = self.batch.tsk.get_task_by_id(que.task_id)
+        sch = self.get_schema_by_id(task.schema_id)
+
     def get_base_setup_from_current_schema(self, use_task_id=""):
         for act in self.current_schema.actions_array:
             if act.name == "Open":

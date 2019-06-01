@@ -25,6 +25,8 @@ class PredefinedVariables:
         "schema_name": {"type": "s", "function": "get_schema_name"},
         "sch_n": {"type": "s", "function": "get_schema_name"},
         "sch_v": {"type": "s", "function": "get_schema_version"},
+        "que_v": {"type": "s", "function": "get_queue_version"},
+        "sim_v": {"type": "s", "function": "get_sim_version"},
         "opts": {"type": "s", "function": "get_task_options"},
         "shot_name": {"type": "s", "function": "get_shot_name"},
         "default_camera": {"type": "s", "function": "get_default_camera_name"},
@@ -224,6 +226,17 @@ class PredefinedVariables:
         schema_version = self.batch.sch.current_schema.schema_version
         return str(schema_version)
 
+    def get_queue_version(self, evo, option="", plus=0):
+        queue_version = self.batch.tsk.current_task.queue_ver + plus
+        qv = self.batch.comfun.str_with_zeros(queue_version, self.batch.prj.current_project.zeros_in_version)
+        if evo is None:
+            return qv
+        else:
+            return qv + evo
+
+    def get_sim_version(self, evo, option=""):
+        return self.get_queue_version(evo=evo, option=option, plus=1)
+
     def get_task_options(self, evo, option=""):
         task_options = self.batch.tsk.current_task.options
         task_options = task_options.split(",")
@@ -267,7 +280,10 @@ class PredefinedVariables:
             self.batch.logger.err(("Can NOT convert option to int: ", option))
             return False
 
-    def get_maximum(self, param, option=""):  # get max version from path  <max>
+    def get_maximum(self, param, option="", add_val_to_max=0, zeros_in_version=None):  # get max version from path  <max>
+        if zeros_in_version is None:
+            zeros_in_version = self.batch.prj.current_project.zeros_in_version
+
         param_split = param.split("<max>")
         if len(param_split) == 2:
             files = self.batch.comfun.get_files_from_path_with_pattern(param_split[0] + "*" + param_split[1], db=True)
@@ -283,9 +299,10 @@ class PredefinedVariables:
                     new_val = self.batch.comfun.int_or_val(ver_str, -1)
                     if new_val > max_ver:
                         max_ver = new_val
-                if max_ver > 0:
-                    return self.batch.comfun.str_with_zeros(max_ver, self.batch.prj.current_project.zeros_in_version)
+                if max_ver >= 0:
+                    return self.batch.comfun.str_with_zeros(max_ver+add_val_to_max, zeros_in_version)
                 else:
+                    self.batch.logger.err(("(get_maximum) wrong max_ver:", max_ver))
                     return False
         else:
             self.batch.logger.err("I have no idea what TODO with more than one <max>")
@@ -736,13 +753,13 @@ class StorageInOut:
                     ver = self.batch.sch.current_schema.schema_version
                 if ver is None:
                     ver = 1
-                    self.batch.logger.deepdb("(load_base_setup) set default setup version 1 ")
+                    self.batch.logger.deepdb("(generate_base_setup_...) set default setup version 1 ")
 
             if len(schema_name) == 0:
                 if self.batch.sch.current_schema is not None:
                     schema_name = self.batch.sch.current_schema.schema_name
                 else:
-                    self.batch.logger.err("(generate_base_setup...) schema_name is empty and current_schema is None")
+                    self.batch.logger.err("(generate_base_setup_...) schema_name is empty and current_schema is None")
                     return False
 
             proj_working_dir = self.prj.current_project.working_directory_absolute
@@ -750,7 +767,9 @@ class StorageInOut:
             directory = proj_working_dir+schema_flat_name+self.dir_separator+"base_setup"+self.dir_separator
             file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_setup_ext()
-            return directory + schema_flat_name + file_version + "." + file_ext
+            out_filename = directory + schema_flat_name + file_version + "." + file_ext
+            self.batch.logger.deepdb(("(generate_base_setup_file_...) file name ", out_filename))
+            return out_filename
 
     def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None, evo_inject="", simed=False):
         if self.prj.current_project_index < 0:
@@ -789,7 +808,9 @@ class StorageInOut:
                     simed_inject = "__simed__v"
                 else:
                     simed_inject = "__v"
-                return directory + schema_flat_name + simed_inject + file_version + evo_inject + "." + file_ext
+                out_filename = directory + schema_flat_name + simed_inject + file_version + evo_inject + "." + file_ext
+                self.batch.logger.deepdb(("(generate_shot_setup_...) file name ", out_filename))
+                return out_filename
 
     def generate_shot_name(self):
         if self.prj.current_project is None or \

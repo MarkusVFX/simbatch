@@ -212,6 +212,12 @@ class Tasks:
                 ret = curr_task.take
         return ret
 
+    def additional_task_action(self, input):
+        self.batch.logger.inf(" additional_task_action " + input)   # TODO !!!
+        que = self.batch.que.current_queue
+        task = self.batch.tsk.get_task_by_id(que.task_id)
+        sch = self.batch.sch.get_schema_by_id(task.schema_id)
+
     def get_task_frame_range(self):
         curr_task = self.tasks_data[self.current_task_index]
         return[self.comfun.int_or_val(curr_task.sim_frame_start, 1), self.comfun.int_or_val(curr_task.sim_frame_end, 2)]

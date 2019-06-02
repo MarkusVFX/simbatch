@@ -171,6 +171,7 @@ class MainWindow(QMainWindow):
         self.connect(QShortcut(QKeySequence(Qt.Key_R), self), SIGNAL('activated()'), self.on_clicked_but_refresh)
         self.connect(QShortcut(QKeySequence(Qt.Key_W), self), SIGNAL('activated()'), self.on_shortcut_set_waiting)
         self.connect(QShortcut(QKeySequence(Qt.Key_D), self), SIGNAL('activated()'), self.on_shortcut_set_done)
+        self.connect(QShortcut(QKeySequence(Qt.Key_A), self), SIGNAL('activated()'), self.on_shortcut_set_accepted)
         self.connect(QShortcut(QKeySequence(Qt.Key_H), self), SIGNAL('activated()'), self.on_shortcut_set_hold)
         self.connect(QShortcut(QKeySequence(Qt.Key_X), self), SIGNAL('activated()'), self.on_shortcut_delete)
         self.connect(QShortcut(QKeySequence(Qt.Key_Y), self), SIGNAL('activated()'), self.on_shortcut_yes)
@@ -400,11 +401,16 @@ class MainWindow(QMainWindow):
 
     def on_shortcut_set_done(self):
         if self.qt_tab_widget.currentIndex() == 2:   # valid for: P C T Q N D S
-            self.batch.logger.inf("(shotcut H) set DONE state")
+            self.batch.logger.inf("(shotcut D) set DONE state")
             self.tsk_ui.on_click_menu_set_done()
         if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S
-            self.batch.logger.inf("(shotcut H) set DONE state")
+            self.batch.logger.inf("(shotcut D) set DONE state")
             self.que_ui.on_click_menu_set_done()
+
+    def on_shortcut_set_accepted(self):
+        if self.qt_tab_widget.currentIndex() == 3:   # valid for: Q
+            self.batch.logger.inf("(shotcut A) set ACCEPTED state")
+            self.que_ui.on_click_menu_set_accepted()
 
     def on_shortcut_set_waiting(self):
         if self.qt_tab_widget.currentIndex() == 3:   # valid for: P C T Q N D S

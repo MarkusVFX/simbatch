@@ -96,7 +96,7 @@ class TaskListItem(QWidget):
         self.qt_label_frame_end.setFont(self.qt_label_font)
         self.qt_label_frame_end.setStyleSheet("""color:#000;""")
         self.qt_label_frame_end.setMinimumWidth(31)
-        self.qt_label_frame_end.setMaximumWidth(31)
+        self.qt_label_frame_end.setMaximumWidth(50)
         self.qt_lay.addWidget(self.qt_label_frame_end)
 
         self.qt_label_prior = QLabel(txt_comm)

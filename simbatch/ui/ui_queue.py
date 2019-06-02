@@ -271,42 +271,84 @@ class QueueUI:
     def on_click_menu_set_killed(self):
         self._change_current_queue_item_state_and_reset_list(self.sts.INDEX_STATE_KILLED)
 
+    def on_menu_additional_schema_action(self):
+        self.batch.sch.additional_schema_action("QUE")
 
-    def get_prev_dir_from_queue_item(self):
+    def on_menu_additional_task_action(self):
+        self.batch.tsk.additional_task_action("QUE")
+
+
+    # def get_prev_dir_from_queue_item(self):
+    #     cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
+    #     proj_id = cur_queue_item.proj_id
+    #     task_id = cur_queue_item.task_id
+    #     evo_nr = cur_queue_item.evolution_nr
+    #     version = cur_queue_item.version
+    #     # prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
+    #     #                                             forceQueueVersion=version)
+    #     # prev_dir = self.batch.sio.generate_shot_prev_seq()   # TODO   cleanup def generate_shot_prev_seq
+    #
+    #     prj = self.batch.prj.get_project_by_id(proj_id)
+    #     tsk = self.batch.tsk.get_task_by_id(task_id)
+    #     sch = self.batch.sch.get_schema_by_id(tsk.schema_id)
+    #     if evo_nr > 0:
+    #         evo = "_evo" + self.batch.comfun.str_with_zeros(evo_nr, 2)  # TODO batch.prj.current_project.zeros_in_evo
+    #     else:
+    #         evo = None
+    #
+    #     ret = self.batch.sio.generate_shot_prev_seq(prj=prj, sch=sch, tsk=tsk, ver=version, evo=evo)  # TODO cleanup)
+    #
+    #     if ret[0] == 1:
+    #         return ret[1]
+    #     else:
+    #         ret = self.batch.sio.generate_shot_working_dir()
+    #         if ret[0] == 1:
+    #             self.batch.logger.wrn("can not generate prev dir")
+    #         else:
+    #             self.batch.logger.wrn("can not generate shot_working_dir")
+    #             if self.batch.prj.current_project is None:
+    #                 self.batch.logger.wrn(" self.prj.current_project in None")
+    #             if self.batch.sch.current_schema is None:
+    #                 self.batch.logger.wrn(" self.batch.sch.current_schema in None")
+    #             if self.batch.tsk.current_task is None:
+    #                 self.batch.logger.wrn(" self.batch.tsk.current_task in None")
+    #         return False
+
+    def get_prev_dir_from_queue_item(self):   # TODO optimize !!!!
         cur_queue_item = self.batch.que.queue_data[self.batch.que.current_queue_index]
-        proj_id = cur_queue_item.proj_id
-        task_id = cur_queue_item.task_id
-        evo_nr = cur_queue_item.evolution_nr
-        version = cur_queue_item.version
-        # prev_dir = self.batch.dfn.get_task_prev_dir(forceProjID=proj_id, forceTaskID=task_id, evolution_nr=evo_nr,
-        #                                             forceQueueVersion=version)
-        # prev_dir = self.batch.sio.generate_shot_prev_seq()   # TODO   cleanup def generate_shot_prev_seq
+        scr = cur_queue_item.evolution_script
+        if "_render_blast" in scr:
+            spl_scr = scr.split("_render_blast(")
+            self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found_A:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
 
-        prj = self.batch.prj.get_project_by_id(proj_id)
-        tsk = self.batch.tsk.get_task_by_id(task_id)
-        sch = self.batch.sch.get_schema_by_id(tsk.schema_id)
-        if evo_nr > 0:
-            evo = "_evo" + self.batch.comfun.str_with_zeros(evo_nr, 2)  # TODO batch.prj.current_project.zeros_in_evo
-        else:
-            evo = None
+            if len(spl_scr) > 0:
+                spl_spl_scr = spl_scr[1]
+                self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found_B:{}, spl_scr:{}  ".format(len(spl_spl_scr), spl_spl_scr))
+                spl_spl_spl_scr = spl_spl_scr.split(")")[0]
+                if len(spl_spl_spl_scr) > 0:
+                    self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found_C:{}, spl_scr:{}  ".format(len(spl_spl_spl_scr), spl_spl_spl_scr))
+                    spl_spl_spl_spl_scr = spl_spl_spl_scr.split("\"")
+                    self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found_D:{}, spl_scr:{}  ".format(len(spl_spl_spl_spl_scr), spl_spl_spl_spl_scr))
+                    if len(spl_spl_spl_spl_scr[-1]) > 0:
+                        path = spl_spl_spl_spl_scr[-1]    # TODO optimize !!!!
+                    elif len(spl_spl_spl_spl_scr[-2]) > 0:
+                        path = spl_spl_spl_spl_scr[-2]    # TODO optimize !!!!
+                    else:
+                        self.batch.logger.err("(get_prev_dir_from_queue_item) path not found:{} ".format(path))
+                        return None
 
-        ret = self.batch.sio.generate_shot_prev_seq(prj=prj, sch=sch, tsk=tsk, ver=version, evo=evo)  # TODO cleanup)
-
-        if ret[0] == 1:
-            return ret[1]
-        else:
-            ret = self.batch.sio.generate_shot_working_dir()
-            if ret[0] == 1:
-                self.batch.logger.wrn("can not generate prev dir")
+                    path= path.replace("<fr>", "####")
+                    self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found path:{} ".format(path))
+                    return path
+                else:
+                    self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found_Z:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+                    return None
             else:
-                self.batch.logger.wrn("can not generate shot_working_dir")
-                if self.batch.prj.current_project is None:
-                    self.batch.logger.wrn(" self.prj.current_project in None")
-                if self.batch.sch.current_schema is None:
-                    self.batch.logger.wrn(" self.batch.sch.current_schema in None")
-                if self.batch.tsk.current_task is None:
-                    self.batch.logger.wrn(" self.batch.tsk.current_task in None")
-            return False
+                self.batch.logger.deepdb("(get_prev_dir_from_queue_item) found:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+                return None
+        else:
+            self.batch.logger.deepdb("(get_prev_dir_from_queue_item) None")
+            return None
 
     def on_menu_locate_prev(self):
         ret = self.get_prev_dir_from_queue_item()
@@ -357,7 +399,11 @@ class QueueUI:
         task_id = cur_queue_item.task_id
         version = cur_queue_item.version
 
-        file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version, simed=simed)
+        ret = self.batch.que.get_simed_shot_file_name(cur_queue_item)
+        if ret is not None:
+            file_to_load = ret
+        else:
+            file_to_load = self.batch.sio.generate_shot_setup_file_name(tsk_id=task_id, ver=version, simed=simed)
 
         if only_info:
             return file_to_load
@@ -421,6 +467,9 @@ class QueueUI:
         qt_right_menu.addAction("Set ACCEPTED", self.on_click_menu_set_accepted)
         qt_right_menu.addAction("Set HOLD", self.on_click_menu_set_hold)
         qt_right_menu.addAction("Set KILLED", self.on_click_menu_set_killed)
+        qt_right_menu.addAction("________", self.on_click_menu_spacer)
+        qt_right_menu.addAction("export nCloth as .abc", self.on_menu_additional_schema_action)     # HACK TRIX
+        qt_right_menu.addAction("import  cloth to fur", self.on_menu_additional_task_action)        # HACK TRIX
         qt_right_menu.addAction("________", self.on_click_menu_spacer)
         qt_right_menu.addAction("Locate prev", self.on_menu_locate_prev)
         qt_right_menu.addAction("Open prev", self.on_menu_open_prev)

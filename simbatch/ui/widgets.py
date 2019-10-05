@@ -224,7 +224,10 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
     cb2 = None
     cb3 = None
 
+    parent_layout = None
+    action_index_on_parent_layout = None
     widget_id = None
+    qt_widget_layout = None
 
     current_action_index = 0   # current index from MultiAction;  0 for single action
 
@@ -232,7 +235,7 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
     logger = None
     interactions = None
 
-    def __init__(self, batch, top_ui, widget_id, label_txt, multi_action, edit_txt=None, combo_items="",
+    def __init__(self, batch, top_ui, schema_form, label_txt, multi_action, edit_txt=None, combo_items="",
                  combo_def_val="", button_1_caption=None, button_1_fun_str=None,
                  button_2_caption=None, button_2_fun_str=None, enabled1=True, enabled2=True):
 
@@ -241,7 +244,8 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
         self.top_ui = top_ui
         self.logger = batch.logger
         self.interactions = batch.dfn.current_interactions      # connect  qt_button_1   or and   qt_button_1
-        self.widget_id = widget_id
+        self.schema_form = schema_form
+        self.widget_id = schema_form.form_actions_count+1
         self.multi_action = multi_action
 
         qt_widget_layout = QHBoxLayout()
@@ -305,7 +309,26 @@ class ActionWidget(QWidget):    # used for add schema,  edit schema  form.    Fo
             self.qt_combo.setCurrentIndex(set_index)
             qt_widget_layout.addWidget(self.qt_combo)
             self.qt_combo.currentIndexChanged.connect(self.on_change_combo)
+
+        self.qt_button_act_del = QPushButton("x")
+        qt_widget_layout.addWidget(self.qt_button_act_del)
+        self.qt_button_act_del.clicked.connect(self.on_act_del)
+
         self.setLayout(qt_widget_layout)
+
+    def on_act_del(self):
+        if self.parent_layout is not None:
+            # self.parent_layout.removeWidget(self.action_widgets[index])
+            # self.qt_widget_layout.removeWidget()
+            for i in reversed(range(self.qt_widget_layout.count())):
+                self.qt_widget_layout.itemAt(i).widget().deleteLater()
+            self.parent_layout.removeWidget(self)
+            # self.local_schema_item.actions_array.append(new_widget.get_current_action())
+            # self.form_actions_count -= 1
+
+            self.schema_form.remove_action_widget_from_form(self.widget_id)
+        else:
+            self.logger.wrn("self.parent_layout is  None")
 
     def eval_button_fun(self, edit, button_fun_str):
         self.logger.deepdb(("eval_button_fun", button_fun_str))

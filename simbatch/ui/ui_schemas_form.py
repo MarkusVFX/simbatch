@@ -244,14 +244,14 @@ class SchemaFormCreateOrEdit(QWidget):
         top = self.top_ui
         if multi_action.actions_count == 0:   # incorrectly defined action
             dummy_multiaction = self.batch.dfn.create_multiaction(-1, "empty action")
-            action_widget = ActionWidget(batch, top, -1, "incorrectly defined action", dummy_multiaction)
+            action_widget = ActionWidget(batch, top, self, "incorrectly defined action", dummy_multiaction)
         else:
 
             if multi_action.actions_count == 1:   # single action, no combo
                 if len(multi_action.actions[0].actual_value) == 0:
                     # multi_action.actions[0].actual_value = multi_action.actions[0].default_value
                     multi_action.actions[0].actual_value = multi_action.actions[0].ui[0]
-                action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.actions[0].name,
+                action_widget = ActionWidget(batch, top, self, multi_action.actions[0].name,
                                              copy.deepcopy(multi_action),
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                              button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
@@ -262,12 +262,19 @@ class SchemaFormCreateOrEdit(QWidget):
 
                     # a.actual_value = a.default_value    # TODO actual vs user val
                     a.actual_value = a.ui[0]
-                action_widget = ActionWidget(batch, top, self.form_actions_count+1, multi_action.name,
-                                             copy.deepcopy(multi_action),
+                action_widget = ActionWidget(batch, top, self, multi_action.name, copy.deepcopy(multi_action),
                                              button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
                                              button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
                                              combo_items=combo_items)
         return action_widget
+
+    def remove_action_widget_from_form(self, index):
+        # reset id for older widgets
+        for i, aw in enumerate(self.action_widgets):
+            if i > index-1:
+                aw.widget_id -= 1
+        del self.action_widgets[index-1]
+        self.form_actions_count -= 1
 
     def add_action_widget_to_form(self, multi_action):
         qt_lay = self.qt_lay_fae_actions

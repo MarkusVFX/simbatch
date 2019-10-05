@@ -268,14 +268,6 @@ class SchemaFormCreateOrEdit(QWidget):
                                              combo_items=combo_items)
         return action_widget
 
-    def remove_action_widget_from_form(self, index):
-        # reset id for older widgets
-        for i, aw in enumerate(self.action_widgets):
-            if i > index-1:
-                aw.widget_id -= 1
-        del self.action_widgets[index-1]
-        self.form_actions_count -= 1
-
     def add_action_widget_to_form(self, multi_action):
         qt_lay = self.qt_lay_fae_actions
 
@@ -316,6 +308,50 @@ class SchemaFormCreateOrEdit(QWidget):
             b.widget().deleteLater()
             self.qt_lay_fae_actions.takeAt(0)
         self.form_actions_count = 0
+
+    def remove_action_widget_from_form(self, index):
+        # reset id for older widgets
+        for i, aw in enumerate(self.action_widgets):
+            if i > index-1:
+                aw.widget_id -= 1
+        del self.action_widgets[index-1]
+        self.form_actions_count -= 1
+
+    def move_action_widget_up(self, index):
+        awa = self.action_widgets  # action widets array
+
+        if index > 1:
+            self.batch.logger.deepdb(" move up " + str(index)  +"    id:"+  str(awa[index-1].widget_id)  )
+            for i, aw in enumerate(awa):
+                if i >= index - 2:
+                    self.qt_lay_fae_actions.removeWidget(awa[i])
+
+            awa[index - 1], awa[index-2] = awa[index-2], awa[index - 1]
+            awa[index - 1].widget_id, awa[index-2].widget_id = awa[index-2].widget_id, awa[index - 1].widget_id
+
+            for i, aw in enumerate(awa):
+                if i >= index - 2:
+                    self.qt_lay_fae_actions.addWidget(awa[i])
+        else:
+            self.batch.logger.inf("First element, cant be moved up ")
+
+    def move_action_widget_dwn(self, index):
+        awa = self.action_widgets   # action widets array
+
+        if index < len(awa):
+            self.batch.logger.deepdb(" move dwn " + str(index)  +"    id:"+  str(awa[index-1].widget_id)  )
+            for i, aw in enumerate(awa):
+                if i >= index -1:
+                    self.qt_lay_fae_actions.removeWidget(awa[i])
+
+            awa[index-1], awa[index] = awa[index], awa[index-1]
+            awa[index-1].widget_id, awa[index].widget_id = awa[index].widget_id, awa[index-1].widget_id
+
+            for i, aw in enumerate(awa):
+                if i >= index -1:
+                    self.qt_lay_fae_actions.addWidget(awa[i])
+        else:
+            self.batch.logger.inf("Last element, cant be moved down ")
 
     def refresh_actions_ui(self):
         cur_index = self.batch.dfn.current_definition_index

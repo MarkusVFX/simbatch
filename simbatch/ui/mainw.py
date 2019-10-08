@@ -322,6 +322,10 @@ class MainWindow(QMainWindow):
             self.batch.logger.print_err_buffer()
             self.batch.logger.clear_err_buffer()
 
+        if self.batch.prj.current_project_index is not None:
+            item = self.pro_ui.qt_list_projects.item(self.batch.prj.current_project_index+1)
+            self.pro_ui.qt_list_projects.setCurrentItem(item)
+
     def on_tab_change(self, tab):
         self.batch.logger.db(("tab change:", tab, self.qt_tab_widget.tabText(tab)))
         # if tab==3:

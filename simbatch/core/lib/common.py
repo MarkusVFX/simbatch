@@ -366,11 +366,11 @@ class CommonFunctions:
         ret_w = False
         if ret_r:
             if with_info:
-                self.logger.inf("Read from {} test".format(directory_info), force_prefix="OK ")
+                self.logger.inf("Read from {} test ({})".format(directory_info, directory), force_prefix="OK ")
             ret_w = os.access(directory, os.W_OK)
             if ret_w:
                 if with_info:
-                    self.logger.inf("Save to {} test".format(directory_info), force_prefix="OK ")
+                    self.logger.inf("Save to {} test ({})".format(directory_info, directory), force_prefix="OK ")
             else:
                 if with_info:
                     self.logger.err("Could NOT save to {} :  {} ".format(directory_info, directory))

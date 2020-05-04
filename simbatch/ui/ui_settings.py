@@ -51,8 +51,10 @@ class SettingsUI:
 
         if self.settings.runtime_env == "Maya":
             qt_scroll_widget.setMinimumHeight(560)
+        if self.settings.runtime_env == "Houdini":
+            qt_scroll_widget.setMinimumHeight(760)
         else:
-            qt_scroll_widget.setMinimumHeight(550)
+            qt_scroll_widget.setMinimumHeight(650)
 
         qt_scroll_area.setWidget(qt_scroll_widget)
         qt_scroll_widget.setLayout(qt_lay_settings_main)
@@ -82,25 +84,25 @@ class SettingsUI:
         qt_group_data_options.setTitle("Data options")
         qt_lay_settings_mode = QHBoxLayout()
         qt_label_mode = QLabel("Data store mode: ")
-        qt_lay_settings_mode.addWidget(qt_label_mode) 
-        
+        qt_lay_settings_mode.addWidget(qt_label_mode)
+
         qt_radio_mode1 = QRadioButton("json")
         if settings.store_data_mode == 1:
-            qt_radio_mode1.setChecked(True) 
+            qt_radio_mode1.setChecked(True)
         qt_lay_settings_mode.addWidget(qt_radio_mode1)
         qt_radio_mode1.clicked.connect(lambda: self.on_click_radio_data(1))
-        
+
         qt_radio_mode2 = QRadioButton("MySQL")
         if settings.store_data_mode == 2:
-            qt_radio_mode2.setChecked(True) 
-        qt_lay_settings_mode.addWidget(qt_radio_mode2) 
+            qt_radio_mode2.setChecked(True)
+        qt_lay_settings_mode.addWidget(qt_radio_mode2)
         qt_radio_mode2.clicked.connect(lambda: self.on_click_radio_data(2))
-        
+
         qt_group_data_options.setLayout(qt_lay_settings_mode)
-        
-        
+
+
         ''' DATA DIRECTORY '''
-        qt_group_data_directory = QGroupBox() 
+        qt_group_data_directory = QGroupBox()
         qt_lay_settings_data = QHBoxLayout()
         qt_settings_data_directory_label = QLabel("Database directory : ")
 
@@ -123,11 +125,11 @@ class SettingsUI:
         qt_lay_settings_data.addWidget(qt_settings_data_directory_edit)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_button)
         qt_lay_settings_data.addWidget(qt_settings_data_directory_test_button)
-        
+
         qt_group_data_directory.setLayout(qt_lay_settings_data)
-        
-        
-        ''' DEFINITIONS DIRECTORY ''' 
+
+
+        ''' DEFINITIONS DIRECTORY '''
         qt_group_definitions_directory = QGroupBox() 
         qt_lay_settings_definitions = QHBoxLayout()
         qt_settings_definitions_directory_label = QLabel("Definitions directory : ")
@@ -154,10 +156,10 @@ class SettingsUI:
         qt_lay_settings_definitions.addWidget(qt_settings_definitions_directory_test_button)
         
         qt_group_definitions_directory.setLayout(qt_lay_settings_definitions)
-        
-        
-        ''' EXAMPLE DATA '''  
-        qt_group_example_data = QGroupBox() 
+
+
+        ''' EXAMPLE DATA '''
+        qt_group_example_data = QGroupBox()
         qt_lay_settings_buttons_data = QHBoxLayout()
         qt_settings_create_example_data_button = QPushButton("Create example data")
         qt_settings_clear_all_data_button = QPushButton("Clear all data")
@@ -165,7 +167,7 @@ class SettingsUI:
         qt_lay_settings_buttons_data.addWidget(qt_settings_clear_all_data_button)
         qt_settings_create_example_data_button.clicked.connect(self.on_click_create_example_data)
         qt_settings_clear_all_data_button.clicked.connect(self.on_click_clear_all_data)
-        
+
         qt_group_example_data.setLayout(qt_lay_settings_buttons_data)
 
 
@@ -220,7 +222,7 @@ class SettingsUI:
         qt_lay_settings_user.addRow(qt_sett_ser_1a, qt_sett_ser_1b)   # PRO version
         qt_lay_settings_user.addRow(qt_sett_ser_2a, qt_sett_ser_2b)   # PRO version
         qt_lay_settings_user.addRow(qt_sett_ser_3a, qt_sett_ser_3b)   # PRO version
-        qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)   # PRO version 
+        qt_lay_settings_user.addRow(qt_sett_ser_4a, qt_sett_ser_4b)   # PRO version
 
         qt_radio_group_user.setLayout(qt_lay_settings_user)   # PRO version
 
@@ -326,18 +328,16 @@ class SettingsUI:
 
         ''' Add all QGroupBoxes to  qt_scroll_widget  '''
         qt_lay_settings_main.addWidget(qt_group_config_ini)
-        qt_lay_settings_main.addItem(QSpacerItem(1, 4))
-        qt_lay_settings_main.addWidget(qt_group_data_options)  
-        qt_lay_settings_main.addWidget(qt_group_data_directory)   
-        qt_lay_settings_main.addWidget(qt_group_definitions_directory)  
-        qt_lay_settings_main.addWidget(qt_group_example_data)    
-        qt_lay_settings_main.addItem(QSpacerItem(1, 4))
-        qt_lay_settings_main.addWidget(qt_radio_group_colors)  
+        qt_lay_settings_main.addWidget(qt_group_data_options)
+        qt_lay_settings_main.addWidget(qt_group_data_directory)
+        qt_lay_settings_main.addWidget(qt_group_definitions_directory)
+        qt_lay_settings_main.addWidget(qt_group_example_data)
+        qt_lay_settings_main.addWidget(qt_radio_group_colors)
         qt_lay_settings_main.addWidget(qt_radio_group_debug_level)
         # qt_lay_settings_main.addWidget(qt_radio_group_sql)   # PRO version
         # qt_lay_settings_main.addWidget(qt_radio_group_user)   # PRO version
         qt_lay_settings_main.addWidget(qt_radio_group_info)
-        qt_lay_settings_main.addItem(QSpacerItem(1, 20))
+        qt_lay_settings_main.addItem(QSpacerItem(1, 1, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
         qt_lay_scroll_and_buttons.addLayout(qt_lay_settings_buttons)
 

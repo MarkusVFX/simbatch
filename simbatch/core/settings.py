@@ -1,7 +1,7 @@
 import os
 import json
 from random import randint
-from lib.common import CommonFunctions
+from .lib.common import CommonFunctions
 
 
 class Settings:
@@ -28,7 +28,7 @@ class Settings:
     admin_user = None                           # PRO version
 
     # predefined settings
-    SIMBATCH_VERSION = "v0.2.92"   # current version
+    SIMBATCH_VERSION = "v0.3.0"   # current version
     JSON_PROJECTS_FILE_NAME = "data_projects.json"
     JSON_SCHEMAS_FILE_NAME = "data_schemas.json"
     JSON_TASKS_FILE_NAME = "data_tasks.json"
@@ -174,44 +174,44 @@ class Settings:
         return self.SIMBATCH_VERSION
 
     def print_all(self):
-        print " loading_state: ", self.loading_state
-        print " ini_file: ", self.ini_file
-        print " runtime_env: ", self.runtime_env
+        print(" loading_state: ", self.loading_state)
+        print(" ini_file: ", self.ini_file)
+        print(" runtime_env: ", self.runtime_env)
 
         if self.json_settings_data is not None:
             if "dataMode" in self.json_settings_data:
-                print " json_settings_data[dataMode][current]: ", self.json_settings_data["dataMode"]["current"]
+                print(" json_settings_data[dataMode][current]: ", self.json_settings_data["dataMode"]["current"])
             else:
                 self.logger.err(("MISSING dataMode KEY IN SETTINGS FILE:", self.ini_file))
             if "colorMode" in self.json_settings_data:
-                print " json_settings_data[colorMode][current]: ", self.json_settings_data["colorMode"]["current"]
+                print(" json_settings_data[colorMode][current]: ", self.json_settings_data["colorMode"]["current"])
             else:
                 self.logger.err(("MISSING colorMode KEY IN SETTINGS FILE:", self.ini_file))
             if "debugLevel" in self.json_settings_data:
-                print " json_settings_data[debugLevel][current]: ", self.json_settings_data["debugLevel"]["current"]
+                print(" json_settings_data[debugLevel][current]: ", self.json_settings_data["debugLevel"]["current"])
             else:
                 self.logger.err(("MISSING debugLevel KEY IN SETTINGS FILE:", self.ini_file))
             if "window" in self.json_settings_data:
-                print " json_settings_data[window]: ", self.json_settings_data["window"]
+                print(" json_settings_data[window]: ", self.json_settings_data["window"])
             else:
                 self.logger.err(("MISSING window KEY IN SETTINGS FILE:", self.ini_file))
 
-        print " store_data_mode: ", self.store_data_mode
-        print " debug_level: ", self.debug_level
-        print " store_data_json_directory: ", self.store_data_json_directory
+        print(" store_data_mode: ", self.store_data_mode)
+        print(" debug_level: ", self.debug_level)
+        print(" store_data_json_directory: ", self.store_data_json_directory)
         if self.store_data_json_directory != self.store_data_json_directory_abs:
-            print " store_data_json_directory_abs: ", self.store_data_json_directory_abs
-        print " store_data_backup_directory: ", self.store_data_backup_directory
+            print(" store_data_json_directory_abs: ", self.store_data_json_directory_abs)
+        print(" store_data_backup_directory: ", self.store_data_backup_directory)
         if self.store_data_backup_directory != self.store_data_backup_directory_abs:
-            print " store_data_backup_directory_abs: ", self.store_data_backup_directory_abs
-        print " store_definitions_directory: ", self.store_definitions_directory
+            print(" store_data_backup_directory_abs: ", self.store_data_backup_directory_abs)
+        print(" store_definitions_directory: ", self.store_definitions_directory)
         if self.store_definitions_directory != self.store_definitions_directory_abs:
-            print " store_definitions_directory_abs: ", self.store_definitions_directory_abs
-        print " sql settings: ", self.sql
-        print " admin_user: ", self.admin_user
-        print " window:", self.window
+            print(" store_definitions_directory_abs: ", self.store_definitions_directory_abs)
+        print(" sql settings: ", self.sql)
+        print(" admin_user: ", self.admin_user)
+        print(" window:", self.window)
 
-        print "\n\n"
+        print("\n\n")
 
     @staticmethod
     def random_welcome_message():
@@ -326,7 +326,7 @@ class Settings:
                 try:
                     self.json_settings_data = json.load(f)
                 except IOError:
-                    print " [ERR] json.load(f) exception ", f
+                    print(" [ERR] json.load(f) exception ", f)
                     pass
                 ret = self.check_data_integration()
                 if ret:
@@ -389,13 +389,13 @@ class Settings:
                             self.loading_state = 3
                             self.settings_err_info = "Store data mode: {} incorrect value".format(self.store_data_mode)
                 else:
-                    print " [WRN] json data inconsistency:", self.ini_file
+                    print(" [WRN] json data inconsistency:", self.ini_file)
                     self.loading_state = 2
         else:
             self.settings_err_info = " [ERR] config.ini file not exists: {}".format(self.ini_file)
             self.loading_state = -1
 
-        print "\n\n[ERR] ", self.settings_err_info
+        print("\n\n[ERR] ", self.settings_err_info)
         return False
 
     def save_settings(self, settings_file=""):

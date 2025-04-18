@@ -1,4 +1,5 @@
 import sys
+import os
 
 class Interactions:
     current_os = -1
@@ -44,7 +45,7 @@ class Interactions:
                 ret = False
             return ret
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            print(f"I/O error({e.errno}): {e.strerror}")
 
     def maya_save_scene(self, file):  # TODO cleanup  maya_save_scene  vs save_current_scene_as
         self.logger.int(("maya_save_scene", file))
@@ -80,7 +81,7 @@ class Interactions:
         return sel
         
     def maya_get_camera(self):
-        print "TODO: maya_get_camera"
+        print("TODO: maya_get_camera")
         pass
     
     def get_curent_scene_file(self):
@@ -111,9 +112,8 @@ class Interactions:
         self.logger.int(("maya_import_obj", objects, file_or_dir))
 
     def maya_set_param(self, val, abbrev_param=None, value=None):
-
         if abbrev_param is None:
-            str_expression = val             # first input as expresiion string  # TODO
+            str_expression = val             # first input as expression string  # TODO
             a1 = str_expression.split(".")
             a2 = a1[1].split("=")
             str_obj = a1[0].strip()
@@ -121,28 +121,27 @@ class Interactions:
             str_val = a2[1].strip()
             try:
                 import maya.cmds as cmds
-                cmds.setAttr(str_obj + "." + str_attrib, float(str_val))   # TODO check vals !!!
-            except:
-                self.logger.err(("maya_set_param: ", str_obj,  str_attrib,  str_val, "   ___   ", str_expression))  # TODO !
+                cmds.setAttr(f"{str_obj}.{str_attrib}", float(str_val))   # TODO check vals !!!
+            except Exception as e:
+                self.logger.err(("maya_set_param: ", str_obj, str_attrib, str_val, "   ___   ", str_expression))
                 self.logger.err(("maya_set_param e: ", e))
-                pass
         else:
             objects = val       # first input as objects string  # TODO
 
-            if len(objects) == 0:
+            if not objects:
                 ret = self.get_cloth_objects()
-                if len(ret) > 0:
+                if ret:
                     objects = ",".join(ret)
 
             if objects == "<cloth_objects>":
                 ret = self.get_cloth_objects()
-                if len(ret) > 0:
+                if ret:
                     objects = ",".join(ret)
 
             import maya.cmds as cmds
             for obj in objects.split(","):
                 param_full_name = abbrev_param
-                cmds.setAttr(obj+"."+param_full_name, value)
+                cmds.setAttr(f"{obj}.{param_full_name}", value)
             self.logger.db(("maya_set_param", object, property, value), nl=True)
 
     def maya_animate_nucleus_follow(self, nucleus_name, object_to_follow, vtx_id_to_follow=None, vals=None):
@@ -162,7 +161,7 @@ class Interactions:
                     cmds.setAttr("nucleus1.enable", 0)
                     for fr in range(cmds.playbackOptions(min=True, q=True), vals[0][0]):
                         cmds.currentTime(fr)
-                        vtx_pos = cmds.pointPosition(object_to_follow + '.vtx['+str(vtx_id_to_follow)+']', w=True)
+                        vtx_pos = cmds.pointPosition(f"{object_to_follow}.vtx[{vtx_id_to_follow}]", w=True)
                         cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=vtx_pos[0])
                         cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=vtx_pos[1])
                         cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=vtx_pos[2])
@@ -180,7 +179,7 @@ class Interactions:
                             val_to = v
                             for fr in range(val_from[0], val_to[0]):
                                 cmds.currentTime(fr)
-                                vtx_pos = cmds.pointPosition(object_to_follow + '.vtx['+str(vtx_id_to_follow)+']', w=True)
+                                vtx_pos = cmds.pointPosition(f"{object_to_follow}.vtx[{vtx_id_to_follow}]", w=True)
 
                                 fr_min = val_from[0]
                                 fr_max = val_to[0]
@@ -243,7 +242,7 @@ class Interactions:
         cmds.playbackOptions(minTime=fr_start)
         cmds.playbackOptions(maxTime=fr_end)
         try:
-            cmd = 'select -r ' + objects_names.replace(",", " ")    #  TODO ' ; viewFit;'
+            cmd = f'select -r {objects_names.replace(",", " ")}'    #  TODO ' ; viewFit;'
             self.logger.inf(cmd, nl=True, nl_after=True)
             ml.eval(cmd)
             self.logger.int(("selected:", len(cmds.ls(sl=True))), nl=True)
@@ -255,7 +254,7 @@ class Interactions:
             refresh_view = "1"    # TODO 0 for batch mode !!!
             cache_per_geo = "1"    # TODO do user option !!!
 
-            # “add”, “replace”, “merge” or “mergeDelete”
+            # add, replace, merge or mergeDelete
 
             # maya 2015  # TODO !!!
             cmd = 'doCreateNclothCache 4 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'
@@ -277,7 +276,6 @@ class Interactions:
         #    cmd.currentTime(fr)
         #    cmd.refresh()
         return status_after_sim
-
         
     def maya_simulate_nhair(self, ts, te, objects_names, cache_dir):
         pass
@@ -332,12 +330,11 @@ class Interactions:
         filearr = file.split(" ")
         file = filearr.pop(0)
         if self.comfun.file_exists(file):
-
-            """   exec file  not importing sys"""
             import sys
             if len(filearr) > 0:
                 sys.argv = filearr
-            execfile(file)
+            with open(file, 'r') as f:
+                exec(f.read())
         else:
             self.logger.err(("Script file not exist", file))
         
@@ -352,7 +349,7 @@ class Interactions:
     def get_objects_by_type(self, type):
         if type == 'nCloth':
             objs = self.get_cloth_objects()
-            self.logger.inf("Detected ({}) nCloth objects:".format(len(objs), objs))
+            self.logger.inf(f"Detected ({len(objs)}) nCloth objects: {objs}")
 
         objs_str = ""
         for obj in objs:

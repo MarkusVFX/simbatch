@@ -1,7 +1,8 @@
 import sys, errno
 
 try:
-    from PySide.QtGui import *
+    from PySide2.QtGui import *
+    from PySide2.QtWidgets import QApplication
 except ImportError:
     print ("\n\n  PySide import ERROR!\n  Please install PySide or PySide2\n  pip install -U PySide")
     sys.exit(errno.EACCES)

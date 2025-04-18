@@ -9,12 +9,10 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from widgets import *
-# from simbatch.core.schemas import *
-# from simbatch.core.definitions import *
 import copy
 
-from ui_schemas_form import SchemaFormCreateOrEdit
+from .widgets import *
+from .ui_schemas_form import SchemaFormCreateOrEdit
 
 
 class SchemaListItem(QWidget):

@@ -1,17 +1,18 @@
 import platform
 
-from settings import Settings
-from lib.common import CommonFunctions
-from lib.logger import Logger
-from lib.patterns import Patterns
-from users import Users
-from definitions import Definitions
-from projects import Projects
-from schemas import Schemas
-from tasks import Tasks
-from queue import Queue
-from nodes import SimNodes
-from io import StorageInOut
+from .settings import Settings
+from .lib.common import CommonFunctions
+from .lib.logger import Logger
+from .lib.patterns import Patterns
+from .projects import Projects
+from .schemas import Schemas
+from .tasks import Tasks
+from .queue import Queue
+from .actions import Actions
+from .users import Users
+from .nodes import SimNodes
+from .io import StorageInOut
+from .definitions import Definitions
 
 
 class SimBatch:
@@ -42,9 +43,9 @@ class SimBatch:
         self.sch = Schemas(self)        # sch
         self.tsk = Tasks(self)          # tsk
         self.que = Queue(self)          # que
-        self.nod = SimNodes(self)       # nod
+        self.nod = SimNodes(self)          # nod
         self.dfn = Definitions(self)    # dfn
-        self.sio = StorageInOut(self)   # sio
+        self.sio = StorageInOut(self)            # sio
         self.pat = Patterns()           # pat
         #  abbreviation  END
 
@@ -54,70 +55,70 @@ class SimBatch:
         self.prj.print_all()
 
     def print_important_values(self):
-        print "  \n\n  Current runtime_env: {}".format(self.sts.runtime_env)
+        print(f"\n\n  Current runtime_env: {self.sts.runtime_env}")
 
         # projects
-        print "\n PROJECTS: "
+        print("\n PROJECTS: ")
         self.prj.print_current()
 
         # schemas
-        print "\n SCHEMAS: "
+        print("\n SCHEMAS: ")
         self.sch.print_current()
 
         # tasks
-        print "\n TASKS: "
+        print("\n TASKS: ")
         self.tsk.print_current()
 
         # queue
-        print "\n QUEUE: "
+        print("\n QUEUE: ")
         self.que.print_current()
 
         # nodes
-        print "\n NODES: "
+        print("\n NODES: ")
         self.nod.print_current()
 
-        # nodes
-        print "\n DEFINITIONS: "
+        # definitions
+        print("\n DEFINITIONS: ")
         self.dfn.print_current()
 
-        print "\n\n"
+        print("\n\n")
 
     def print_current_detailed_values(self, index):
-        print "  \n\n"
+        print("  \n\n")
         if self.sts.ui_edition_mode == 0:    # open source no wizard tab
             index += 1                       # index compensation
 
         if index == 0:
-            print " WIZARD: "
+            print(" WIZARD: ")
         if index == 1:
-            print " PROJECTS: "
+            print(" PROJECTS: ")
             self.prj.print_all()
             self.prj.print_current()
         if index == 2:
-            print " SCHEMAS: "
+            print(" SCHEMAS: ")
             self.sch.print_all()
             self.sch.print_current()
         if index == 3:
-            print " TASKS: "
+            print(" TASKS: ")
             self.tsk.print_all()
             self.tsk.print_current()
         if index == 4:
-            print " QUEUE: "
+            print(" QUEUE: ")
             self.que.print_all()
             self.que.print_current()
         if index == 5:
-            print " SIMNODES: "
+            print(" SIMNODES: ")
             self.nod.print_all()
             self.nod.print_current()
         if index == 6:
-            print " DEFINITIONS: "
+            print(" DEFINITIONS: ")
             self.dfn.print_all()
             self.dfn.print_current()
         if index == 7:
-            print " SETTINGS: "
+            print(" SETTINGS: ")
             self.sts.print_all()
 
-        print "\n\n"
+        print("\n\n")
 
     def clear_all_stored_data(self):
         self.prj.clear_all_projects_data(clear_stored_data=True)

@@ -8,7 +8,7 @@ try:
 except ImportError:
     pass
 
-from actions import MultiAction, SingleAction, ActionParameters
+from .actions import MultiAction, SingleAction, ActionParameters
 
 # JSON Name Format, PEP8 Name Format
 DEFINITION_ITEM_FIELDS_NAMES = [
@@ -33,15 +33,15 @@ class ExampleInteractions:
 
     @staticmethod
     def load():
-        print " [interact example] loaded "
+        print("[interact example] loaded")
 
     @staticmethod
     def test():
-        print " [interact example] test "
+        print("[interact example] test")
 
     @staticmethod
     def interact_get_scene_objects():
-        print " [interact example]     def interact_get_scene_objects "
+        print("[interact example]     def interact_get_scene_objects")
 
 
 class SingleDefinition:
@@ -65,13 +65,13 @@ class SingleDefinition:
         self.logger = logger
 
     def __repr__(self):
-        return "SingleDefinition({})".format(self.software)
+        return f"SingleDefinition({self.software})"
 
     def __str__(self):
-        return "SingleDefinition  name:" + self.name
+        return f"SingleDefinition  name:{self.name}"
 
     def print_total(self, prefix=""):
-        print "   [INF] {} total actions:{}".format(prefix, self.total_actions)
+        print(f"   [INF] {prefix} total actions:{self.total_actions}")
 
     def print_all(self):
         for action_group in self.multi_actions_array:
@@ -83,18 +83,16 @@ class SingleDefinition:
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw("\n\n name: {} total_actions: {} names count: {}".format(self.name, self.total_actions,
-                                                                            len(self.action_names)))
+        logger_raw(f"\n\n name: {self.name} total_actions: {self.total_actions} names count: {len(self.action_names)}")
         for i, an in enumerate(self.action_names):
-            logger_raw("  arr action_names: {}  {} ".format(i, an))
+            logger_raw(f"  arr action_names: {i}  {an} ")
         for i, ga in enumerate(self.multi_actions_array):
             if ga.actions_count == len(ga.actions):
-                logger_raw("   group_name: {} {}  count: {}".format(i, ga.name, ga.actions_count))
+                logger_raw(f"   group_name: {i} {ga.name}  count: {ga.actions_count}")
             else:
-                logger_raw("   group_name: {} {}  ERR count : {} != {} ".format(i, ga.name, ga.actions_count,
-                                                                                len(ga.actions)))
+                logger_raw(f"   group_name: {i} {ga.name}  ERR count : {ga.actions_count} != {len(ga.actions)} ")
             for j, sa in enumerate(ga.actions):
-                logger_raw("       action {}  name: {}  default_value: {}  ui: {}".format(j, sa.name, sa.ui[0], sa.ui))
+                logger_raw(f"       action {j}  name: {sa.name}  default_value: {sa.ui[0]}  ui: {sa.ui}")
         self.logger.buffering_off()
         return self.logger.get_buffer()
 
@@ -164,33 +162,42 @@ class Definitions:
         # self.current_interactions = ExampleInteractions()
 
     def __repr__(self):
-        return "Definitions({})".format(self.batch)
+        return f"Definitions({self.batch})"
 
     def __str__(self):
-        return "Definitions,  current_definition:" + str(self.current_definition)
+        return f"Definitions,  current_definition:{self.current_definition}"
 
     '''  print project data, for debug  '''
     def print_current(self):
-        print "     current definition index: {}   name: {}  total_: {}\n".format(self.current_definition_index,
-                                                                                  self.current_definition_name,
-                                                                                  self.total_definitions)
+        print("     current definition: id: {}     index: {}    total_definitions: {}\n".format(self.current_definition_id,
+                                                                                             self.current_definition_index,
+                                                                                             self.total_definitions))
+        if self.current_definition_index is not None:
+            cur_def = self.current_definition
+            print("       current definition: ", cur_def.definition_name)
+            print("       software: ", cur_def.software)
+            print("       description: ", cur_def.description)
+            print("       actions count: ", len(cur_def.actions_array))
+            for a in cur_def.actions_array:
+                print("       __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template))
 
     '''  print definitions data, for debug  '''
     def print_total(self, print_children=False):
         if print_children:
             for i, d in enumerate(self.definitions_array):
-                d.print_total(prefix="Definition "+str(i))
-        print "   [INF] Definitions total_definitions:", self.total_definitions
+                d.print_total(prefix=f"Definition {i}")
+        print(f"   [INF] Definitions total_definitions: {self.total_definitions}")
 
     def print_all(self, print_children=False):
-        for d in self.definitions_array:
-            print "\n\n   software:{}".format(d.software)
-            if print_children:
-                d.print_all()
         if self.total_definitions == 0:
-            print "   [INF] no definition loaded"
-        else:
-            print "   [INF] definition total:", self.total_definitions
+            print("   [INF] no definitions loaded")
+        for d in self.definitions_array:
+            print("\n\n   {}   id:{}   software:{}".format(d.name, d.id, d.software))
+            print("   description: ", d.description)
+            print("   actions count: ", len(d.actions_array))
+            for a in d.actions_array:
+                print("   __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template))
+            print("\n\n")
 
     def get_definitions(self):
         return self.definitions_array
@@ -312,13 +319,16 @@ class Definitions:
 
     # TODO move to common !!!!
     def class_from_file(self, filename):
-        with file(filename) as f:
-            content = f.read()
         try:
-            exec content
+            with open(filename, 'r') as f:
+                content = f.read()
+            exec(content)
             return eval("Interactions")
-        except SyntaxError:
-            self.batch.logger.err(("syntax error definition file:", filename), nl=True, nl_after=True)
+        except SyntaxError as e:
+            self.batch.logger.err(f"syntax error definition file: {filename}", nl=True, nl_after=True)
+            return None
+        except Exception as e:
+            self.batch.logger.err(f"Error loading definition file: {str(e)}")
             return None
     # TODO move to common !!!!
 
@@ -403,8 +413,6 @@ class Definitions:
                                     new_definition.add_group_action(new_group_action)
                             else:
                                 self.batch.logger.wrn(("No actions defined in : ", json_file, " dir:", definitions_dir))
-            # self.print_all(print_children=True)
-            # self.print_total(print_children=True)
             return loading_errors
         else:
             self.batch.logger.err(("Definitions directory not exist: ", definitions_dir))

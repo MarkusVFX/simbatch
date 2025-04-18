@@ -968,6 +968,33 @@ class StorageInOut:
         # TODO "<default_camera>"
         return 1, ""
 
+    def print_this(self):
+        print("   [INF] IO: ")
+        print("       data dir: {}".format(self.data_directory))
+        print("       json dir: {}".format(self.json_directory))
+        print("       scripts dir: {}".format(self.scripts_directory))
+        print("       templates dir: {}".format(self.templates_directory))
+        print("       logs dir: {}".format(self.logs_directory))
+        print("       cache dir: {}".format(self.cache_directory))
+        print("       temp dir: {}".format(self.temp_directory))
+        print("       backup dir: {}".format(self.backup_directory))
+        print("       user dir: {}".format(self.user_directory))
+        print("       project dir: {}".format(self.project_directory))
+        print("       task dir: {}".format(self.task_directory))
+        print("       queue dir: {}".format(self.queue_directory))
+        print("       schema dir: {}".format(self.schema_directory))
+        print("       definition dir: {}".format(self.definition_directory))
+        print("       action dir: {}".format(self.action_directory))
+        print("       node dir: {}".format(self.node_directory))
+        print("       user dir: {}".format(self.user_directory))
+        print("       project dir: {}".format(self.project_directory))
+        print("       task dir: {}".format(self.task_directory))
+        print("       queue dir: {}".format(self.queue_directory))
+        print("       schema dir: {}".format(self.schema_directory))
+        print("       definition dir: {}".format(self.definition_directory))
+        print("       action dir: {}".format(self.action_directory))
+        print("       node dir: {}".format(self.node_directory))
+
 
 
 

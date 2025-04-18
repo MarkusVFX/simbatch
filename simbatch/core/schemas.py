@@ -1,7 +1,10 @@
 import copy
 import os
+import json
+from .lib.common import CommonFunctions
+from .lib.logger import Logger
 
-from actions import SingleAction
+from .actions import SingleAction
 
 
 # JSON Name Format, PEP8 Name Format
@@ -71,20 +74,25 @@ class SchemaItem:
     def __str__(self):
         return "SchemaItem   id:{}  name:{}".format(self.id, self.schema_name)
 
+    def print_this(self, detailed=False):
+        print("\n SCHEMA: {}".format(self.schema_name))
+        print("   id: {}  state: {}  project_id: {}  definition: {}".format(
+            self.id, self.state, self.project_id, self.based_on_definition))
+        print("   version: {}  description: {}".format(self.schema_version, self.description))
+        if detailed:
+            self.detailed_print()
+        else:
+            self.basic_print()
+
     def basic_print(self):
-        print "\n [INF] basic print: "
-        print "       schema name: {}, based on: {}".format(self.schema_name, self.based_on_definition)
-        print "       actions_array:{}".format(self.actions_array)
+        print("   actions: {}".format(len(self.actions_array)))
+        for a in self.actions_array:
+            print("     {}  {}".format(a.name, a.actual_value))
 
     def detailed_print(self):
-        print "\n [INF] detailed print: "
-        print "       schema id:{}   name:{} ".format(self.id, self.schema_name)
-        print "       state id:{}   state:{} ".format(self.state_id, self.state)
-        print "       proj id:{}   definition:{}".format(self.project_id, self.based_on_definition)
-        print "       schema_version {}   description:{}".format(self.schema_version, self.description)
-        print "       actions count:{}".format(len(self.actions_array))
-        for i, act in enumerate(self.actions_array):
-            print "           {}  {}".format(i, act.name)
+        print("   actions: {}".format(len(self.actions_array)))
+        for a in self.actions_array:
+            print("     {}  {}  {}  {}".format(a.name, a.actual_value, a.template, a.mode))
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
@@ -223,41 +231,34 @@ class Schemas:
 
     '''  print schema data, for debug  '''
     def print_schema(self, schema=None):
-        prefix = ""
         if schema is None:
-            prefix = "current "
-            if self.current_schema_id is not None:
-                print "\n     current schema id:{}   index:{}   total:{}".format(self.current_schema_id,
-                                                                                 self.current_schema_index,
-                                                                                 self.total_schemas)
-                schema = self.current_schema
-            else:
-                self.batch.logger.wrn("current schema undefined, nothing to print")
-                return False
-
-        print "\n       {}schema name:{}".format(prefix, schema.schema_name)
-        print "       definition id:{}   project id:{}".format(schema.based_on_definition, schema.project_id)
-        for a in schema.actions_array:
-            print "       __a: name:{}  def_val:{}  actual_val:{}  descr:{}  mode:{}".format(a.name,
-                                                                                             a.ui[0],
-                                                                                             a.actual_value,
-                                                                                             a.description,
-                                                                                             a.mode)
+            schema = self.current_schema
+        if schema is not None:
+            print("\n SCHEMA: {}".format(schema.schema_name))
+            print("   id: {}  state: {}  project_id: {}  definition: {}".format(
+                schema.id, schema.state, schema.project_id, schema.based_on_definition))
+            print("   version: {}  description: {}".format(schema.schema_version, schema.description))
+            print("   actions: {}".format(len(schema.actions_array)))
+            for a in schema.actions_array:
+                print("     {}  {}  {}  {}".format(a.name, a.actual_value, a.template, a.mode))
+        else:
+            print("   [INF] no schema to print")
 
     def print_current(self):
-        self.print_schema()
+        self.print_schema(self.current_schema)
 
     def print_all(self):
         if self.total_schemas == 0:
-            print "   [INF] no schema loaded"
-        for sch in self.schemas_data:
-            print "\n\n   {}   id:{}   state:{}".format(sch.schema_name, sch.id, sch.state)
-            print "   sch ver:", sch.schema_version
-            print "   proj id:{},  definition:{} ".format(sch.project_id, sch.based_on_definition)
-            print "   actions count: ", len(sch.actions_array)
-            for a in sch.actions_array:
-                print "   __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template)
-        print "\n\n"
+            print("   [INF] no schemas loaded")
+        for s in self.schemas_data:
+            print("\n\n   {} id:{} state:{} project_id:{}".format(
+                s.schema_name, s.id, s.state, s.project_id))
+            print("   definition: {} version:{}".format(s.based_on_definition, s.schema_version))
+            print("   description: {}".format(s.description))
+            print("   actions count: {}".format(len(s.actions_array)))
+            for a in s.actions_array:
+                print("   __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template))
+        print("\n\n")
 
     def get_schema_names(self, as_string=False, fit=()):
         schema_names = []
@@ -359,12 +360,18 @@ class Schemas:
         return False
 
     def update_current_from_index(self, index):
+        if index is None:
+            self.clear_current_schema()
+            return False
         if len(self.schemas_data) > 0 and index > -1:
-            self.current_schema_index = index
-            self.current_schema_id = self.schemas_data[index].id
-            self.current_schema = self.schemas_data[index]
-            self.update_current_definition_on_schema_change()
-            return self.current_schema_id
+            if index < len(self.schemas_data):
+                self.current_schema_index = index
+                self.current_schema_id = self.schemas_data[index].id
+                self.current_schema = self.schemas_data[index]
+                return True
+            else:
+                self.batch.logger.err(("wrong index:", index))
+                return False
         else:
             self.clear_current_schema()
             return False

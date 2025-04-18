@@ -1,25 +1,27 @@
-import ctypes, sys, errno
+import ctypes
+import sys
+import errno
 
 try:
-    from PySide.QtCore import *
-    from PySide.QtGui import *
+    from PySide2.QtCore import *
+    from PySide2.QtGui import *
+    from PySide2.QtWidgets import *
 except ImportError:
     try:
-        from PySide2.QtCore import *
-        from PySide2.QtGui import *
-        from PySide2.QtWidgets import *
+        from PySide.QtCore import *
+        from PySide.QtGui import *
     except ImportError:
-        print 'PySide import ERROR!  Please install PySide or PySide2'
+        print('PySide import ERROR!  Please install PySide or PySide2')
         sys.exit(errno.EACCES)
 
-from ui_wizard import WizardUI
-from ui_projects import ProjectsUI
-from ui_schemas import SchemasUI
-from ui_tasks import TasksUI
-from ui_queue import QueueUI
-from ui_nodes import NodesUI
-from ui_settings import SettingsUI
-from ui_definitions import DefinitionsUI
+from .ui_wizard import WizardUI
+from .ui_projects import ProjectsUI
+from .ui_schemas import SchemasUI
+from .ui_tasks import TasksUI
+from .ui_queue import QueueUI
+from .ui_nodes import NodesUI
+from .ui_settings import SettingsUI
+from .ui_definitions import DefinitionsUI
 
 
 class TopMenuUI:
@@ -104,8 +106,8 @@ class TopMenuUI:
         self.qt_but_refresh = qt_but_refresh
 
     def set_top_info(self, txt, mode=1, limit=0):  # 1 normal ...  9 error
-        if type(txt) is tuple:
-            txt = "  ".join([str(el) for el in txt])
+        if isinstance(txt, tuple):
+            txt = "  ".join(str(el) for el in txt)
         if mode > 1:
             txt = "    " + txt + "      "
         else:

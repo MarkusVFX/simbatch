@@ -20,7 +20,6 @@ class Interactions:
     def sa_loop_over_files(self, file):
         return ret2
         
-        
     def sa_loop_over_dir(self, file):
         import maya.cmds as cmd
         ret1 = cmd.file(rename=target)
@@ -28,10 +27,10 @@ class Interactions:
         return ret2
         
     def simple_info_print(self):
-        print "\n\n simple info test "
+        print("\n\n simple info test ")
         
     def detailed_info_print(self):
-        print "\n\n detailed info test "
+        print("\n\n detailed info test ")
         
     def reset_filter(self):
         return "*.*"

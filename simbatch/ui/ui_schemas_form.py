@@ -11,7 +11,7 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from widgets import *
+from .widgets import *
 
 
 class SchemaFormCreateOrEdit(QWidget):

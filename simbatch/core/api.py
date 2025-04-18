@@ -12,7 +12,7 @@ class SimBatchAPI:
         self.simbatch_core = core.SimBatch("no-gui", ini_file=ini_file)
 
     def hello_world(self):
-        print self.simbatch_core.sts.random_welcome_message()
+        print(self.simbatch_core.sts.random_welcome_message())
 
     def load_data(self):
         self.simbatch_core.load_data()

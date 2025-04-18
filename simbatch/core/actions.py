@@ -1,6 +1,6 @@
 import copy
 
-from lib.common import Logger
+from .lib.common import Logger
 
 
 ACTION_DATA_FIELDS_NAMES = (
@@ -31,10 +31,10 @@ class SingleParameter:    # "STR": ["stretch", "stretchResistance", 40, "stretch
         self.description = description
 
     def __str__(self):
-        return "SingleParameter    name:" + self.name
+        return f"SingleParameter    name:{self.name}"
 
-    def print_minimum(self):
-        print "   {}   name: {}".format(self.abbrev, self.name)
+    def print_this(self):
+        print(f"   {self.abbrev}   name: {self.name}")
 
 
 class ActionParameters:
@@ -49,7 +49,7 @@ class ActionParameters:
 
     def print_params(self):
         for p in self.param_list:
-            print "  {}  _  {}   __   {}    ___  {}".format(p.abbrev, p.name, p.description, p.execution_name)
+            print(f"  {p.abbrev}  _  {p.name}   __   {p.description}    ___  {p.execution_name}")
 
     def add_param_to_list(self, abbrev, name, execution_name, def_val, description):
         self.param_list.append(SingleParameter(abbrev, name, execution_name, def_val, description))
@@ -93,42 +93,26 @@ class SingleAction:
         self.logger = Logger()
 
     def __repr__(self):
-        return 'SingleAction("{}", "{}", "{}", actual_value="{}", ui="{}")'.format(self.name, self.description,
-                                                                                   self.template, self.actual_value,
-                                                                                   self.ui)
+        return f'SingleAction("{self.name}", "{self.description}", "{self.template}", actual_value="{self.actual_value}", ui="{self.ui}")'
 
     def __str__(self):
-        return "SingleAction {} {} {} ".format(self.name, self.description, self.template)
+        return f"SingleAction {self.name} {self.description} {self.template}"
 
-    def print_minimum(self):
-        print "   action: {}   actual_value: {}".format(self.name, self.actual_value)
+    def print_this(self):
+        print(f"   action: {self.name}   actual_value: {self.actual_value}")
 
     def set_evos_possible(self, bool_val):
         self.evos_possible = bool_val
 
-    @staticmethod
-    def unicode_arr_to_asci_str(arr):    # TODO std lib !
+    def str_arr_to_str(self, arr):    # TODO std lib !
         ret = ""
-        for a in arr:
-            ret += a
+        for s in arr:
+            ret += s
         return ret
 
-    def print_action(self):
-        print "   action: {}   def_val: {}   actual_val: {}   templ: {}   mode: {}".format(self.name,
-                                                                                           self.ui[0],
-                                                                                           self.actual_value,
-                                                                                           self.template,
-                                                                                           self.mode)
-
-        self.logger.clear_buffer()
-        self.logger.buffering_on()
-        logger_raw = self.logger.raw
-        logger_raw("   action:          {}\n      default_value: {}\n      actual_value: {}\
-                   \n      template:       {}".format(self.name, self.ui[0], self.actual_value,
-                                                      self.unicode_arr_to_asci_str(self.template)))
-
-        self.logger.buffering_off()
-        return self.logger.get_buffer()
+    def print_this(self):
+        print(f"   action: {self.name}   def_val: {self.ui[0]}   actual_val: {self.actual_value}   templ: {self.template}   mode: {self.mode}")
+        print(f"   template: {self.str_arr_to_str(self.template)}")
 
     """
     def get_action(self):
@@ -181,18 +165,18 @@ class MultiAction:
         self.logger = Logger()
 
     def __repr__(self):
-        return "MultiAction({},{})".format(self.multi_id, self.name)
+        return f"MultiAction({self.multi_id},{self.name})"
 
     def __str__(self):
-        return "MultiAction  name:" + self.name
+        return f"MultiAction  name:{self.name}"
 
     def print_actions(self):
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw("\nname:  {}     total_actions:  {} ".format(self.name, self.actions_count))
+        logger_raw(f"\nname:  {self.name}     total_actions:  {self.actions_count} ")
         for i, ac in enumerate(self.actions):
-            logger_raw("   action:  {}    desc: {} ".format(ac.name, ac.description))
+            logger_raw(f"   action:  {ac.name}    desc: {ac.description} ")
 
         self.logger.buffering_off()
         return self.logger.get_buffer()
@@ -210,3 +194,37 @@ class MultiAction:
             if a.mode == mode:
                 return i
         return None
+
+
+class Actions:
+    """Class to manage all actions"""
+    batch = None
+    comfun = None
+    logger = None
+
+    def __init__(self, batch):
+        self.batch = batch
+        self.comfun = batch.comfun
+        self.logger = batch.logger
+
+    def get_action_by_name(self, name):
+        """Get action by name"""
+        # TODO: Implement action lookup logic
+        return None
+
+    def get_actions_list(self):
+        """Get list of all available actions"""
+        # TODO: Implement action list retrieval
+        return []
+
+    def print_actions(self):
+        """Print all available actions"""
+        actions = self.get_actions_list()
+        if not actions:
+            print("No actions available")
+            return
+        for action in actions:
+            print(f"Action: {action.name}")
+            print(f"  Description: {action.description}")
+            print(f"  Template: {action.template}")
+            print("---")

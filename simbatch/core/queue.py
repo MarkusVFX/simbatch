@@ -1,5 +1,8 @@
-import os
 import copy
+import os
+from .lib.common import CommonFunctions
+from .lib.logger import Logger
+from .schemas import SchemaItem
 
 # JSON Name Format, PEP8 Name Format
 QUEUE_ITEM_FIELDS_NAMES = [
@@ -64,11 +67,11 @@ class QueueItem:
                                                                             self.evolution_nr, self.evolution_script)
 
     def print_this(self):
-        print "\n QUEUE ITEM: {}".format(self.queue_item_name)
-        print "   id: {}   [seq|sh|tk] : [{}|{}|{}] \n".format(self.id, self.sequence, self.shot, self.take)
-        print "   ver:{}  evo_nr: {}   evo: {}    \n".format(self.version, self.evolution_nr, self.evolution)
-        print "   state:{}  state_id: {}    \n".format(self.state, self.state_id)
-        print "   evolution_script:{}\n".format(self.evolution_script)
+        print("\n QUEUE ITEM: {}".format(self.queue_item_name))
+        print("   id: {}   [seq|sh|tk] : [{}|{}|{}] \n".format(self.id, self.sequence, self.shot, self.take))
+        print("   ver:{}  evo_nr: {}   evo: {}    \n".format(self.version, self.evolution_nr, self.evolution))
+        print("   state:{}  state_id: {}    \n".format(self.state, self.state_id))
+        print("   evolution_script:{}\n".format(self.evolution_script))
 
     """ marker ATQ 220   generate name   """
     def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
@@ -119,27 +122,26 @@ class Queue:
 
     '''   print project data, mainly for debug  '''
     def print_info(self):
-        print "\n QUEUE: "
-        print "     current queue item id: {}   index: {}   total queue items: {}\n".format(self.current_queue_id,
-                                                                                            self.current_queue_index,
-                                                                                            self.total_queue_items)
+        print("\n QUEUE: ")
+        print("     current queue item id: {}   index: {}   total queue items: {}\n".format(self.current_queue_id,
+                                                                                          self.current_queue_index,
+                                                                                          self.total_queue_items))
 
     def print_current(self):
-        print " QUEUE INFO:   items total:{}, current index:{}, current id:{}".format(self.total_queue_items, 
-                                                                                      self.current_queue_index,
-                                                                                      self.current_queue_id)
+        print(" QUEUE INFO:   items total:{}, current index:{}, current id:{}".format(self.total_queue_items, 
+                                                                                     self.current_queue_index,
+                                                                                     self.current_queue_id))
         if self.current_queue_index is not None:
             self.current_queue.print_this()
 
     def print_all(self):
         if self.total_queue_items == 0:
-            print "   [INF] no queue items loaded"
+            print("   [INF] no queue items loaded")
         for q in self.queue_data:
-            print "\n\n {}  {}  {}  {} state:{}   evo:{}   simnode:{}  desc:{}".format(q.id, q.queue_item_name, q.prior,
-                                                                                       q.proj_id, q.state, q.evolution,
-                                                                                       q.sim_node, q.description,
-                                                                                       q.proj_id)
-        print "\n\n"
+            print("\n\n {}  {}  {}  {} state:{}   evo:{}   simnode:{}  desc:{}".format(q.id, q.queue_item_name, q.prior,
+                                                                                        q.proj_id, q.state, q.evolution,
+                                                                                        q.sim_node, q.description))
+        print("\n\n")
 
     @staticmethod
     def get_blank_queue_item():
@@ -412,6 +414,7 @@ class Queue:
 
     """ marker ATQ 210   generate queue item template   """
     def generate_template_queue_item(self, task, schema):
+        from .tasks import TaskItem  # Lazy import
         """  generate template for multi use on add to queue process   """
 
         if task is not None:

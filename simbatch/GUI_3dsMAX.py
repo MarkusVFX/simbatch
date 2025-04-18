@@ -29,7 +29,7 @@ reload ( simbatch_core )
 reload ( simbatch_server )
 reload ( simbatch_ui ) 
 
-from PySide import QtGui
+from PySide2 import QtCore, QtGui, QtWidgets
 import MaxPlus
 
 class _GCProtector(object):

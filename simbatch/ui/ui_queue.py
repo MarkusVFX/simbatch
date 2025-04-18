@@ -12,9 +12,8 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from widgets import *
-
-from ui_queue_forms import QueueFormEdit, QueueFormRemove
+from .widgets import *
+from .ui_queue_forms import QueueFormEdit, QueueFormRemove
 
 
 class QueueListItem(QWidget):
@@ -379,7 +378,7 @@ class QueueUI:
                 import subprocess
                 if self.sts.current_os == 1:
                     # TODO hardcode
-                    print "HK rv:",  ret
+                    print("HK rv:", ret)
                     subprocess.Popen(['rv', 'rvlink://'+ret])
                     # TODO hardcode
                 else:

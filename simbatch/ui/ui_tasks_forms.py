@@ -9,7 +9,7 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from widgets import *
+from .widgets import *
 
 
 class TasksFormCreateOrEdit(QWidget):
@@ -409,52 +409,52 @@ class AddToQueueForm(QWidget):
         # qt_edit_button_frame_to.qt_edit_line.textChanged.connect(self.on_change_render_to)
 
     def form_basic_db_print(self):
-        print "\n"
+        print("\n")
         self.collect_options_from_widgets()
         self.tsk.print_task(self.task_options.proxy_task)
 
     def form_detailed_db_print(self):
-        print "\n"
+        print("\n")
         print_all = True
         self.collect_options_from_widgets()
 
         if print_all:
-            print "\n [INF] PRINT ACTIONS OPTIONS"
+            print("\n [INF] PRINT ACTIONS OPTIONS")
             for i, op in enumerate(self.schema_options.proxy_schema.actions_array):
-                print i, op
+                print(i, op)
             if self.task_options is not None:
-                print "\n [INF] PRINT TASK OPTIONS"
+                print("\n [INF] PRINT TASK OPTIONS")
                 self.tsk.print_task(self.task_options.proxy_task)
             else:
-                print "\n [WRN] task_options undefined!"
+                print("\n [WRN] task_options undefined!")
 
         # generate_script_from_actions
         if print_all:
-            print "\n [INF] PRINT OPTIONS"
+            print("\n [INF] PRINT OPTIONS")
             for i, act in enumerate(self.batch.sch.current_schema.actions_array):
-                print act.generate_script_from_action_template(self.batch, act.actual_value, with_new_line=False,
-                                                               evo="1")
+                print(act.generate_script_from_action_template(self.batch, act.actual_value, with_new_line=False,
+                                                               evo="1"))
 
-        print "\n [INF] GENERATE EVO"
+        print("\n [INF] GENERATE EVO")
 
         # schema_options.actions_array = self.actions_options
         # self.schema_options.proxy_schema.actions_array.actual_value
         # marker ATQ 302
         proxy_sch = self.schema_options.proxy_schema
-        print "_ps: ", proxy_sch
+        print("_ps: ", proxy_sch)
         arr_scripts_params = self.batch.que.get_array_of_scripts_params_val_from_schema_actions(proxy_sch)
-        print "_ap: ", arr_scripts_params
+        print("_ap: ", arr_scripts_params)
         # marker ATQ 303
         all_evo_combinations_array = self.batch.que.do_params_combinations(arr_scripts_params)
-        print "_eo: ", all_evo_combinations_array
+        print("_eo: ", all_evo_combinations_array)
 
-        print "\n [INF] GENERATE QUEUE ITEMS"
+        print("\n [INF] GENERATE QUEUE ITEMS")
         qi = self.batch.que.generate_queue_items(self.batch.tsk.current_task_id, schema_options=self.schema_options)
 
         for i, q in enumerate(qi):
-            print "gen qi: ", i, q
+            print("gen qi: ", i, q)
 
-        print "\n [INF] END"
+        print("\n [INF] END")
 
     def update_form(self):
         current_task = self.tsk.current_task

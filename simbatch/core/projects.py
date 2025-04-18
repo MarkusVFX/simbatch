@@ -1,4 +1,4 @@
-from io import *
+from .io import *
 
 # JSON Name Format, PEP8 Name Format
 PROJECT_ITEM_FIELDS_NAMES = [
@@ -132,31 +132,31 @@ class Projects:
 
     #  print project data, for debug
     def print_current(self):
-        print "     current project: id: {}     index: {}    total_projects: {}\n".format(self.current_project_id,
-                                                                                          self.current_project_index,
-                                                                                          self.total_projects)
+        print("     current project: id: {}     index: {}    total_projects: {}\n".format(self.current_project_id,
+                                                                                        self.current_project_index,
+                                                                                        self.total_projects))
         if self.current_project_index is not None:
             cur_proj = self.current_project
-            print "       current project: ", cur_proj.project_name
-            print "       project_directory ", cur_proj.project_directory
-            print "       working_directory ", cur_proj.working_directory
-            print "       cameras_directory ", cur_proj.cameras_directory
-            print "       cache_directory ", cur_proj.cache_directory
-            print "       seq_shot_take_pattern:{}, zeros:{}, description:{}".format(cur_proj.seq_shot_take_pattern,
-                                                                                     cur_proj.zeros_in_version,
-                                                                                     cur_proj.description)
+            print("       current project: ", cur_proj.project_name)
+            print("       project_directory ", cur_proj.project_directory)
+            print("       working_directory ", cur_proj.working_directory)
+            print("       cameras_directory ", cur_proj.cameras_directory)
+            print("       cache_directory ", cur_proj.cache_directory)
+            print("       seq_shot_take_pattern:{}, zeros:{}, description:{}".format(cur_proj.seq_shot_take_pattern,
+                                                                                   cur_proj.zeros_in_version,
+                                                                                   cur_proj.description))
 
     def print_all(self):
         if self.total_projects == 0:
-            print "   [INF] no projects loaded"
+            print("   [INF] no projects loaded")
         for p in self.projects_data:
-            print "\n\n   {} id:{} is_default:{} state:{}".format(p.project_name, p.id, p.is_default, p.state)
-            print "   ", p.project_directory,
-            print "   ", p.working_directory_absolute
-            print "   seq_shot_take_pattern:{}, zeros:{}, description:{}".format(p.seq_shot_take_pattern,
-                                                                                 p.zeros_in_version,
-                                                                                 p.description)
-        print "\n\n"
+            print("\n\n   {} id:{} is_default:{} state:{}".format(p.project_name, p.id, p.is_default, p.state))
+            print("   ", p.project_directory)
+            print("   ", p.working_directory_absolute)
+            print("   seq_shot_take_pattern:{}, zeros:{}, description:{}".format(p.seq_shot_take_pattern,
+                                                                                p.zeros_in_version,
+                                                                                p.description))
+        print("\n\n")
 
     #  get index from list 'projects_data'  by id of project
     def get_index_from_id(self, proj_id):

@@ -6,8 +6,9 @@ from os import path
 from collections import OrderedDict
 from datetime import datetime
 from glob import glob
+import random
 
-from logger import Logger
+from .logger import Logger
 
 
 class CommonFunctions:
@@ -31,9 +32,9 @@ class CommonFunctions:
     def print_list(self, get_list, check_float=False):
         for index, val in enumerate(get_list):
             if check_float:
-                print "     ", index, " : ", val, "  ___  ", self.is_float(val)
+                print("     ", index, " : ", val, "  ___  ", self.is_float(val))
             else:
-                print "     ", index, " : ", val
+                print("     ", index, " : ", val)
 
     @staticmethod
     def is_int(value):     # check is int   [for True return 0]
@@ -129,12 +130,12 @@ class CommonFunctions:
                     tmp_sin.append(int(amplitude * math.sin(ti * math.pi / period * 2)))
                 sin_arr.append(tmp_sin)
                 if debug_mode > 0:
-                    print " [{}]   new sinus len:{}    per:{}   amp:{}".format(len(sin_arr), len(sin_arr[-1]), period,
-                                                                               amplitude)
+                    print(" [{}]   new sinus len:{}    per:{}   amp:{}".format(len(sin_arr), len(sin_arr[-1]), period,
+                                                                               amplitude))
                     if debug_mode > 1:
-                        print sin_arr[-1]
+                        print(sin_arr[-1])
             if debug_mode > 0:
-                print "\n"
+                print("\n")
         return sin_arr
 
     @staticmethod
@@ -238,7 +239,7 @@ class CommonFunctions:
             return False
 
     def path_exists(self, check_path, info=""):
-        if isinstance(check_path, basestring):
+        if isinstance(check_path, str):
             if path.exists(str(check_path)):
                 return True
             else:
@@ -381,27 +382,23 @@ class CommonFunctions:
 
     @staticmethod
     def is_absolute(check_path):
-        if len(check_path) > 0:
-            if check_path[0] == "/":  # linux
+        if isinstance(check_path, str):
+            if os.path.isabs(check_path):
                 return True
-            if check_path[1] == ":" and check_path[2] == "\\":  # win storage
-                return True
-            if check_path[1] == ":" and check_path[2] == "/":  # win storage nice notation
-                return True
-            if check_path[0] == "\\" and check_path[1] == "\\":  # win network
-                return True
-        return False
+            else:
+                return False
+        else:
+            self.logger.err(("wrong path type:", type(check_path)))
+            return False
 
     def create_empty_file(self, file_name):
         try:
-            with open(file_name, 'a') as f:
-                f.write("")
+            with open(file_name, 'w') as f:
+                pass
             return True
-        except IOError as e:
-            self.logger.err("I/O error({0}): {1}".format(e.errno, e.strerror))
-        except RuntimeError:
-            self.logger.err(("Unexpected error:", sys.exc_info()[0]))
-            raise
+        except Exception as e:
+            self.logger.err(("Error creating empty file:", str(e)))
+            return False
 
     def delete_file(self, file_name):
         try:
@@ -432,27 +429,37 @@ class CommonFunctions:
 
     def load_json_file(self, file_name):
         if self.file_exists(file_name, info=file_name, check_not_empty=True):
-            with open(file_name) as f:
-                json_data = json.load(f, object_pairs_hook=OrderedDict)
-            return json_data
+            try:
+                with open(file_name, 'r') as f:
+                    return json.load(f)
+            except json.JSONDecodeError as e:
+                self.logger.err(("JSON decode error:", str(e)))
+                return None
+            except Exception as e:
+                self.logger.err(("Error loading JSON file:", str(e)))
+                return None
         else:
             return None
 
     @staticmethod
     def save_json_file(file_name, content):
-        with open(file_name, 'w+') as f:
-            json.dump(content, f,  indent=2)
-        return True   # TODO  Exception
+        try:
+            with open(file_name, 'w') as f:
+                json.dump(content, f, indent=2)
+            return True
+        except Exception as e:
+            self.logger.err(("Error saving JSON file:", str(e)))
+            return False
 
     def save_to_file(self, file_name, content, nl_at_end=False):
         try:
             with open(file_name, 'w') as f:
                 f.write(content)
                 if nl_at_end:
-                    f.write("\n")
+                    f.write('\n')
             return True
-        except IOError:
-            self.logger.err("No data saved to file: {}".format(file_name))
+        except Exception as e:
+            self.logger.err(("Error saving file:", str(e)))
             return False
 
     """
@@ -534,3 +541,211 @@ class CommonFunctions:
         if db:
             self.logger.deepdb(("(get_incremented_name) (gin) return ", head, number))
         return head + number
+
+    def get_random_int(self, min_val, max_val):
+        return random.randint(min_val, max_val)
+
+    def get_random_float(self, min_val, max_val):
+        return random.uniform(min_val, max_val)
+
+    def get_sinus_array(self, length, period, amplitude):
+        sin_arr = []
+        for i in range(length):
+            sin_arr.append(amplitude * math.sin(2 * math.pi * i / period))
+        return sin_arr
+
+    def get_cosinus_array(self, length, period, amplitude):
+        cos_arr = []
+        for i in range(length):
+            cos_arr.append(amplitude * math.cos(2 * math.pi * i / period))
+        return cos_arr
+
+    def get_tangens_array(self, length, period, amplitude):
+        tan_arr = []
+        for i in range(length):
+            tan_arr.append(amplitude * math.tan(2 * math.pi * i / period))
+        return tan_arr
+
+    def get_cotangens_array(self, length, period, amplitude):
+        cot_arr = []
+        for i in range(length):
+            cot_arr.append(amplitude * (1 / math.tan(2 * math.pi * i / period)))
+        return cot_arr
+
+    def get_random_array(self, length, min_val, max_val):
+        rand_arr = []
+        for i in range(length):
+            rand_arr.append(random.uniform(min_val, max_val))
+        return rand_arr
+
+    def get_random_int_array(self, length, min_val, max_val):
+        rand_arr = []
+        for i in range(length):
+            rand_arr.append(random.randint(min_val, max_val))
+        return rand_arr
+
+    def get_random_bool_array(self, length):
+        rand_arr = []
+        for i in range(length):
+            rand_arr.append(random.choice([True, False]))
+        return rand_arr
+
+    def get_random_string_array(self, length, min_len, max_len):
+        rand_arr = []
+        for i in range(length):
+            rand_arr.append(''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for _ in range(random.randint(min_len, max_len))))
+        return rand_arr
+
+    def get_random_string(self, min_len, max_len):
+        return ''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for _ in range(random.randint(min_len, max_len)))
+
+    def get_random_bool(self):
+        return random.choice([True, False])
+
+    def get_random_choice(self, choices):
+        return random.choice(choices)
+
+    def get_random_choices(self, choices, k):
+        return random.choices(choices, k=k)
+
+    def get_random_sample(self, choices, k):
+        return random.sample(choices, k)
+
+    def get_random_shuffle(self, choices):
+        random.shuffle(choices)
+        return choices
+
+    def get_random_seed(self, seed):
+        random.seed(seed)
+        return random.random()
+
+    def get_random_state(self):
+        return random.getstate()
+
+    def set_random_state(self, state):
+        random.setstate(state)
+        return True
+
+    def get_random_bytes(self, length):
+        return random.randbytes(length)
+
+    def get_random_bits(self, length):
+        return random.getrandbits(length)
+
+    def get_random_gauss(self, mu, sigma):
+        return random.gauss(mu, sigma)
+
+    def get_random_normalvariate(self, mu, sigma):
+        return random.normalvariate(mu, sigma)
+
+    def get_random_lognormvariate(self, mu, sigma):
+        return random.lognormvariate(mu, sigma)
+
+    def get_random_expovariate(self, lambd):
+        return random.expovariate(lambd)
+
+    def get_random_gammavariate(self, alpha, beta):
+        return random.gammavariate(alpha, beta)
+
+    def get_random_betavariate(self, alpha, beta):
+        return random.betavariate(alpha, beta)
+
+    def get_random_paretovariate(self, alpha):
+        return random.paretovariate(alpha)
+
+    def get_random_weibullvariate(self, alpha, beta):
+        return random.weibullvariate(alpha, beta)
+
+    def get_random_vonmisesvariate(self, mu, kappa):
+        return random.vonmisesvariate(mu, kappa)
+
+    def get_random_triangular(self, low, high, mode):
+        return random.triangular(low, high, mode)
+
+    def get_random_uniform(self, a, b):
+        return random.uniform(a, b)
+
+    def get_random_betavariate(self, alpha, beta):
+        return random.betavariate(alpha, beta)
+
+    def get_random_expovariate(self, lambd):
+        return random.expovariate(lambd)
+
+    def get_random_gammavariate(self, alpha, beta):
+        return random.gammavariate(alpha, beta)
+
+    def get_random_gauss(self, mu, sigma):
+        return random.gauss(mu, sigma)
+
+    def get_random_lognormvariate(self, mu, sigma):
+        return random.lognormvariate(mu, sigma)
+
+    def get_random_normalvariate(self, mu, sigma):
+        return random.normalvariate(mu, sigma)
+
+    def get_random_paretovariate(self, alpha):
+        return random.paretovariate(alpha)
+
+    def get_random_triangular(self, low, high, mode):
+        return random.triangular(low, high, mode)
+
+    def get_random_uniform(self, a, b):
+        return random.uniform(a, b)
+
+    def get_random_vonmisesvariate(self, mu, kappa):
+        return random.vonmisesvariate(mu, kappa)
+
+    def get_random_weibullvariate(self, alpha, beta):
+        return random.weibullvariate(alpha, beta)
+
+    def get_random_betavariate(self, alpha, beta):
+        return random.betavariate(alpha, beta)
+
+    def get_random_expovariate(self, lambd):
+        return random.expovariate(lambd)
+
+    def get_random_gammavariate(self, alpha, beta):
+        return random.gammavariate(alpha, beta)
+
+    def get_random_gauss(self, mu, sigma):
+        return random.gauss(mu, sigma)
+
+    def get_random_lognormvariate(self, mu, sigma):
+        return random.lognormvariate(mu, sigma)
+
+    def get_random_normalvariate(self, mu, sigma):
+        return random.normalvariate(mu, sigma)
+
+    def get_random_paretovariate(self, alpha):
+        return random.paretovariate(alpha)
+
+    def get_random_triangular(self, low, high, mode):
+        return random.triangular(low, high, mode)
+
+    def get_random_uniform(self, a, b):
+        return random.uniform(a, b)
+
+    def get_random_vonmisesvariate(self, mu, kappa):
+        return random.vonmisesvariate(mu, kappa)
+
+    def get_random_weibullvariate(self, alpha, beta):
+        return random.weibullvariate(alpha, beta)
+
+    def print_this(self):
+        print("   [INF] Common Functions: ")
+        print("       debug level: {}".format(self.debug_level))
+        print("       console print: {}".format(self.console_print))
+        print("       file print: {}".format(self.file_print))
+        print("       log file: {}".format(self.log_file))
+        print("       log file path: {}".format(self.log_file_path))
+        print("       log file name: {}".format(self.log_file_name))
+        print("       log file extension: {}".format(self.log_file_extension))
+        print("       log file full path: {}".format(self.log_file_full_path))
+        print("       log file full name: {}".format(self.log_file_full_name))
+        print("       log file full extension: {}".format(self.log_file_full_extension))
+        print("       log file full path: {}".format(self.log_file_full_path))
+        print("       log file full name: {}".format(self.log_file_full_name))
+        print("       log file full extension: {}".format(self.log_file_full_extension))
+
+    def is_string(self, val):
+        return isinstance(val, str)  # Replace basestring with str for Python 3

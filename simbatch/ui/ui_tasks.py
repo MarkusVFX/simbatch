@@ -12,8 +12,8 @@ except ImportError:
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from widgets import *
-from ui_tasks_forms import AddToQueueForm, TasksFormCreateOrEdit
+from .widgets import *
+from .ui_tasks_forms import AddToQueueForm, TasksFormCreateOrEdit
 
 
 class TaskListItem(QWidget):
@@ -652,7 +652,7 @@ class TasksUI:
                         if "_v"+curr_ver_str in atxt:
                             updated_atxt = atxt.replace("_v"+curr_ver_str, "_v"+next_ver_str)
                             a.qt_edit_line_widget.qt_edit_line.setText(updated_atxt)
-                            print updated_atxt
+                            print(updated_atxt)
                 else:
                     self.top_ui.set_top_info("Items not added to queue !", 9)
             else:
@@ -724,10 +724,10 @@ class TasksUI:
             if self.last_task_list_index is not None:
                 if self.last_task_list_index is not None and self.last_task_list_index < len(self.batch.tsk.tasks_data):
                     item = self.list_tasks.item(self.last_task_list_index + 1)
-                    if self.last_task_list_index < len(self.array_visible_tasks_ids):
+                    if item is not None and self.last_task_list_index < len(self.array_visible_tasks_ids):
                         last_id = self.array_visible_tasks_ids[self.last_task_list_index]
                         last_index = self.batch.tsk.get_index_by_id(last_id)
-                        if item is not None and last_index is not None:
+                        if last_index is not None:
                             color_index = self.batch.tsk.tasks_data[last_index].state_id
                             # item.setBackground(self.batch.sts.state_colors[color_index].color())
                             self.item_set_background(item, color_index)

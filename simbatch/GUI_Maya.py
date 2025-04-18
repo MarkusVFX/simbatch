@@ -11,6 +11,11 @@ simbatch_config_ini = "S:/simbatch/config.ini"
 #
 
 import sys
+import os
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+
 if not simbatch_instalation_dir in sys.path:
     sys.path.append(simbatch_installation_root)
 
@@ -39,7 +44,7 @@ except ImportError:
     try:  # Maya 2017
         import shiboken2 as shiboken
     except ImportError:
-        print "shiboken import ERROR"
+        print("shiboken import ERROR")
 
 try:
     simbatch_window.close()
@@ -47,12 +52,16 @@ except:
     pass
 
 
-def get_maya_window():
-    pointer = mui.MQtUtil.mainWindow()
-    return shiboken.wrapInstance(long(pointer), QWidget)
+def maya_main_window():
+    import maya.OpenMayaUI as apiUI
+    import shiboken
+    from PySide.QtGui import QWidget
+    ptr = apiUI.MQtUtil.mainWindow()
+    if ptr is not None:
+        return shiboken.wrapInstance(int(ptr), QWidget)
 
 
-maya_window = get_maya_window()
+maya_window = maya_main_window()
 
 
 simbatch = simbatch_core.SimBatch("Maya", ini_file=simbatch_config_ini)

@@ -62,11 +62,16 @@ class NodesUI:
     comfun = None
 
     add_node_form_state = 0
+    edit_node_form_state = 0
     remove_node_form_state = 0
 
     qt_form_add_node = None
     qt_form_add_node_el_path = None
     qt_form_add_node_el_name = None
+    qt_form_edit_node = None
+    qt_form_edit_node_el_path = None
+    qt_form_edit_node_el_name = None
+    qt_form_edit_node_el_desc = None
     qt_form_remove_node = None
 
     freeze_list_on_changed = 0
@@ -81,6 +86,7 @@ class NodesUI:
         self.debug_level = batch.sts.debug_level
         self.top_ui = top
         self.mainw = mainw
+        self.server = mainw.server
 
         self.nod = batch.nod   # TODO
         self.sts = batch.sts   # TODO
@@ -109,17 +115,20 @@ class NodesUI:
         qt_lay_nodes_buttons = QHBoxLayout()
 
         qt_b_add_node = QPushButton("Add")
+        qt_b_edit_node = QPushButton("Edit")
         qt_b_reset_node = QPushButton("Reset")
         qt_b_remove_node = QPushButton("Remove")
         qt_b_update_nodes = QPushButton("Reload")
 
         qt_lay_nodes_list.addWidget(qt_list_nodes)
         qt_lay_nodes_buttons.addWidget(qt_b_add_node)
+        qt_lay_nodes_buttons.addWidget(qt_b_edit_node)
         qt_lay_nodes_buttons.addWidget(qt_b_reset_node)
         qt_lay_nodes_buttons.addWidget(qt_b_remove_node)
         qt_lay_nodes_buttons.addWidget(qt_b_update_nodes)
 
         qt_b_add_node.clicked.connect(self.on_click_show_add_node_form)
+        qt_b_edit_node.clicked.connect(self.on_click_show_edit_node_form)
         qt_b_reset_node.clicked.connect(self.on_reset_node)
         qt_b_remove_node.clicked.connect(self.on_click_show_remove_node_form)
         qt_b_update_nodes.clicked.connect(self.on_update_nodes)
@@ -141,26 +150,92 @@ class NodesUI:
         self.qt_form_add_node_el_path = wfa_path.qt_edit_line
 
         wfa_name = EditLineWithButtons("Name: ", text_on_button_1="Get from path")
-        wfa_name.button_1.clicked.connect(self.on_click_name_from_file)
+        wfa_name.button_1.clicked.connect(self.on_click_name_from_path)
+        wfa_name.button_1.setToolTip("Get current name from server file status.txt")  # TODO Consistent naming in database and server status file 
         self.qt_form_add_node_el_name = wfa_name.qt_edit_line
 
+        # Separator
+        separator = QFrame()
+        separator.setFrameShape(QFrame.HLine)
+        separator.setFrameShadow(QFrame.Sunken)
+        
+        # Full init server button
+        wfr_button_full_init = ButtonWithCheckBoxes("Full init server", button_width=155, label_text=" ")
+        wfr_button_full_init.button.setToolTip("Complete server initialization: creates directory if needed, adds to database, copies source files and config.ini, creates state.txt")
+        wfr_button_full_init.button.clicked.connect(self.on_click_full_init_server)    #mmm
+        
         wfr_button_src = ButtonWithCheckBoxes("Copy/Update source files", button_width=155, label_text=" ")
-        wfr_button_src.button.setEnabled(False)
-        wfr_button_src.button.clicked.connect(self.on_click_update_src)
+        # wfr_button_src.button.setEnabled(False)
+        wfr_button_src.button.clicked.connect(self.on_click_copy_src)
         wfr_button_add = ButtonWithCheckBoxes("Add Path To Database", button_width=155, label_text=" ")
         wfr_button_add.button.clicked.connect(self.on_click_add_node)
+        
+        wfr_button_config = ButtonWithCheckBoxes("Copy config.ini", button_width=155, label_text=" ")
+        wfr_button_config.button.clicked.connect(self.on_click_copy_config)
 
         qt_form_add_node_layout.addRow(" ", QLabel("   "))
         qt_form_add_node_layout.addRow(" ", wfa_path.qt_widget_layout)
         qt_form_add_node_layout.addRow(" ", wfa_name.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", separator)
+        qt_form_add_node_layout.addRow(" ", wfr_button_full_init.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", separator)
         qt_form_add_node_layout.addRow(" ", wfr_button_add.qt_widget_layout)
         qt_form_add_node_layout.addRow(" ", wfr_button_src.qt_widget_layout)
+        qt_form_add_node_layout.addRow(" ", wfr_button_config.qt_widget_layout)
         qt_form_add_node_layout.addRow(" ", QLabel("   "))
 
         qt_gb_add_node = QGroupBox()
         qt_gb_add_node.setLayout(qt_form_add_node_layout)
         qt_form_add_node_layout_ext.addWidget(qt_gb_add_node)
         qt_gb_add_node.setTitle("Add Sim Node")
+
+
+        # EDIT
+        # EDIT EDIT
+        # EDIT EDIT EDIT
+        qt_form_edit_node = QWidget()
+        self.qt_form_edit_node = qt_form_edit_node
+        qt_form_edit_node_layout_ext = QVBoxLayout()
+        qt_form_edit_node.setLayout(qt_form_edit_node_layout_ext)
+
+        qt_form_edit_node_layout = QFormLayout()
+
+        wfe_path = EditLineWithButtons("Path: ", text_on_button_1="Get dir", text_on_button_2="Check")
+        wfe_path.button_1.clicked.connect(self.on_click_edit_path_get)
+        wfe_path.button_2.clicked.connect(self.on_click_edit_path_check)
+        self.qt_form_edit_node_el_path = wfe_path.qt_edit_line
+
+        wfe_name = EditLineWithButtons("Name: ", text_on_button_1="Get from server")
+        wfe_name.button_1.setToolTip("Get current name from server file status.txt")  # TODO Consistent naming in database and server status file 
+        wfe_name.button_1.clicked.connect(self.on_click_get_name_from_server)
+        self.qt_form_edit_node_el_name = wfe_name.qt_edit_line
+
+        wfe_desc = EditLineWithButtons("Description: ", text_on_button_1="Get date")
+        wfe_desc.button_1.clicked.connect(self.on_click_edit_desc_date)
+        self.qt_form_edit_node_el_desc = wfe_desc.qt_edit_line
+
+        wfe_button_update = ButtonWithCheckBoxes("Update Node", button_width=155, label_text=" ")
+        wfe_button_update.button.clicked.connect(self.on_click_update_node)
+        
+        wfe_button_src = ButtonWithCheckBoxes("Copy/Update source files", button_width=155, label_text=" ")
+        wfe_button_src.button.clicked.connect(self.on_click_update_src)
+        
+        wfe_button_config = ButtonWithCheckBoxes("Update server's config.ini", button_width=155, label_text=" ")
+        wfe_button_config.button.clicked.connect(self.on_click_update_server_config)
+
+        qt_form_edit_node_layout.addRow(" ", QLabel("   "))
+        qt_form_edit_node_layout.addRow(" ", wfe_path.qt_widget_layout)
+        qt_form_edit_node_layout.addRow(" ", wfe_name.qt_widget_layout)
+        qt_form_edit_node_layout.addRow(" ", wfe_desc.qt_widget_layout)
+        qt_form_edit_node_layout.addRow(" ", wfe_button_update.qt_widget_layout)
+        qt_form_edit_node_layout.addRow(" ", wfe_button_src.qt_widget_layout)
+        qt_form_edit_node_layout.addRow(" ", wfe_button_config.qt_widget_layout)
+        qt_form_edit_node_layout.addRow(" ", QLabel("   "))
+
+        qt_gb_edit_node = QGroupBox()
+        qt_gb_edit_node.setLayout(qt_form_edit_node_layout)
+        qt_form_edit_node_layout_ext.addWidget(qt_gb_edit_node)
+        qt_gb_edit_node.setTitle("Edit Sim Node")
 
 
         # REMOVE
@@ -192,7 +267,7 @@ class NodesUI:
 
         self.hide_all_forms()
 
-        self.comfun.add_widgets(qt_lay_nodes_forms, [qt_form_add_node, qt_form_remove_node])
+        self.comfun.add_widgets(qt_lay_nodes_forms, [qt_form_add_node, qt_form_edit_node, qt_form_remove_node])
 
         self.comfun.add_layouts(qt_lay_nodes_main, [qt_lay_nodes_list, qt_lay_nodes_forms, qt_lay_nodes_buttons])
 
@@ -339,10 +414,15 @@ class NodesUI:
             self.qt_list_nodes.takeItem(0)
 
     def hide_all_forms(self):
-        self.qt_form_add_node.hide()
-        self.qt_form_remove_node.hide()
-        self.add_node_form_state = 0
-        self.remove_node_form_state = 0
+        if hasattr(self, 'qt_form_add_node') and self.qt_form_add_node is not None:
+            self.qt_form_add_node.hide()
+            self.add_node_form_state = 0
+        if hasattr(self, 'qt_form_edit_node') and self.qt_form_edit_node is not None:
+            self.qt_form_edit_node.hide()
+            self.edit_node_form_state = 0
+        if hasattr(self, 'qt_form_remove_node') and self.qt_form_remove_node is not None:
+            self.qt_form_remove_node.hide()
+            self.remove_node_form_state = 0
 
     def on_click_show_add_node_form(self):
         if self.add_node_form_state == 0:
@@ -353,22 +433,12 @@ class NodesUI:
             self.qt_form_add_node.hide()
             self.add_node_form_state = 0
 
-    def on_click_name_from_file(self):
+    def on_click_name_from_path(self):     # mmm
         dir = self.qt_form_add_node_el_path.text()
-        file = "state.txt"   # TODO  move to setttings  or add custom
 
-        if len(dir) == 0:
-            self.top_ui.set_top_info("Please set path first!", 8)
-            return False
-        if self.batch.comfun.file_exists(dir + file):
-            ret = self.batch.nod.get_server_name_from_file(dir + file)
-            if len(ret) > 0:
-                self.qt_form_add_node_el_name.setText(ret)
-                self.top_ui.set_top_info("Found name: " + ret, 4)
-            else:
-                self.top_ui.set_top_info("Name not defined in state file!", 8)
-        else:
-            self.top_ui.set_top_info("State file not exist, please insert name manually ", 8)
+        dir_name = os.path.basename(os.path.normpath(dir))
+        self.qt_form_add_node_el_name.setText(dir_name)
+        self.top_ui.set_top_info("Directory name: " + dir_name, 4)
 
     def on_click_path_get(self):
         # self.batch.comfun.file_dialog_to_edit_line(self.qt_form_add_node_el_path, QFileDialog, "")
@@ -376,7 +446,11 @@ class NodesUI:
 
     def on_click_path_check(self):
         dir = self.qt_form_add_node_el_path.text()
-        file = "state.txt"   # TODO  move to setttings  or add custom
+        file = "state.txt"   # TODO  move filename defininition to setttings  or add custom
+        
+        if not dir.endswith(os.sep):
+            dir = dir + os.sep
+            
         if self.batch.comfun.path_exists(dir):
             if self.batch.comfun.file_exists(dir+file):
                 self.top_ui.set_top_info("Directory exist, state file exist ", 4)
@@ -385,23 +459,29 @@ class NodesUI:
         else:
             self.top_ui.set_top_info("Directory not exist ", 7)
 
-    def on_click_update_src(self): # TODO
-        # self.batch.update_sources_from_master()
-        return False
+    def on_click_copy_src(self): # 'Add' form
+        dest = self.qt_form_add_node_el_path.text()   # 'Add' form path
+        self.server.update_sources_from_master(force_destination=dest)
 
-    def on_click_add_node(self):
-        self.batch.logger.db(("add_node",  "add"))
+    def on_click_update_src(self): # 'Edit' form
+        dest = self.qt_form_edit_node_el_path.text()  # 'Edit' form path    
+        self.server.update_sources_from_master(force_destination=dest)
+
+    def on_click_add_node(self): #mmm
         desc = self.batch.comfun.get_current_time()
         node_dir = self.qt_form_add_node_el_path.text()
+        self.batch.logger.db(f"on_click_add_node: {node_dir}")
 
         if len(node_dir) > 0:
+            if not node_dir.endswith(os.sep):
+                node_dir = node_dir + os.sep
+                
             if self.batch.comfun.path_exists(node_dir):
                 node_name = self.qt_form_add_node_el_name.text()
                 if len(node_name) > 0:
                     state_file = node_dir + "state.txt"   # TODO  move to setttings  or add custom
-
-                    node_state_id = self.batch.sts.INDEX_STATE_WAITING
-                    if self.batch.comfun.file_exists(state_file):
+                    node_state_id = self.batch.sts.INDEX_STATE_INIT
+                    if self.batch.comfun.file_exists(state_file, info=False):
                         ret = self.batch.nod.get_node_state(state_file)
                         if ret > 0:
                             node_state_id = ret
@@ -409,7 +489,6 @@ class NodesUI:
                     else:
                         self.batch.nod.create_node_state_file(state_file, node_name, node_state_id)
                         # TODO  server py files !!!
-
                     node_state = self.batch.sts.states_visible_names[node_state_id]
 
                     new_node = self.batch.nod.get_new_node(node_name, node_state, node_state_id, state_file, desc)
@@ -427,6 +506,110 @@ class NodesUI:
         else:
             self.top_ui.set_top_info("Please set path first!", 8)
 
+    def on_click_show_edit_node_form(self):
+        if self.nod.current_node is None:
+            self.batch.logger.wrn("(edit node) PLEASE SELECT NODE FIRST")
+            self.top_ui.set_top_info("Select a node to edit first", 7)
+            return
+            
+        if self.edit_node_form_state == 0:
+            self.hide_all_forms()
+            # Pre-populate form with current node data
+            current_node = self.nod.current_node
+            self.qt_form_edit_node_el_path.setText(os.path.dirname(current_node.state_file))
+            self.qt_form_edit_node_el_name.setText(current_node.node_name)
+            self.qt_form_edit_node_el_desc.setText(current_node.description)
+            
+            self.qt_form_edit_node.show()
+            self.edit_node_form_state = 1
+        else:
+            self.qt_form_edit_node.hide()
+            self.edit_node_form_state = 0
+    
+    def on_click_edit_path_get(self):
+        self.batch.comfun.get_dialog_directory(self.qt_form_edit_node_el_path, QFileDialog, dir_separator=os.sep)
+    
+    def on_click_edit_path_check(self):
+        if len(self.qt_form_edit_node_el_path.text()) > 0:
+            if self.batch.comfun.path_exists(self.qt_form_edit_node_el_path.text()):
+                self.top_ui.set_top_info("Directory exists!", 1)
+            else:
+                self.top_ui.set_top_info("Directory NOT exists!", 9)
+        else:
+            self.top_ui.set_top_info("Please set path first!", 8)
+            
+    def on_click_get_name_from_server(self):     # mmm
+        node_dir = self.qt_form_edit_node_el_path.text()
+        if len(node_dir) > 0:
+            if not node_dir.endswith(os.sep):
+                node_dir = node_dir + os.sep
+                
+            state_file = node_dir + "state.txt"
+            if self.batch.comfun.file_exists(state_file):
+                server_name = self.batch.nod.get_server_name_from_file(state_file)
+                if len(server_name) > 0:
+                    self.qt_form_edit_node_el_name.setText(server_name)
+                    self.top_ui.set_top_info("Node name loaded from file", 1)
+                    self.batch.logger.inf(f"Node name '{server_name}' loaded from file: {state_file}")
+                else:
+                    self.top_ui.set_top_info("Node name is empty in file", 8)
+            else:
+                self.top_ui.set_top_info("State file not exists!", 9)
+        else:
+            self.top_ui.set_top_info("Please set path first!", 8)
+            
+    def on_click_edit_desc_date(self):
+        desc = self.batch.comfun.get_current_time()
+        self.qt_form_edit_node_el_desc.setText(desc)
+    
+    def on_click_update_node(self):
+        if self.nod.current_node is None:
+            self.batch.logger.wrn("(update node) PLEASE SELECT NODE FIRST")
+            self.top_ui.set_top_info("Select a node to update first", 7)
+            return
+            
+        self.batch.logger.db(("update_node", "update"))
+        node_dir = self.qt_form_edit_node_el_path.text()
+        
+        if len(node_dir) > 0:
+            if not node_dir.endswith(os.sep):
+                node_dir = node_dir + os.sep
+                
+            if self.batch.comfun.path_exists(node_dir):
+                node_name = self.qt_form_edit_node_el_name.text()
+                if len(node_name) > 0:
+                    state_file = node_dir + "state.txt"
+                    desc = self.qt_form_edit_node_el_desc.text()
+                    
+                    current_node = self.nod.current_node
+                    current_node.node_name = node_name
+                    current_node.state_file = state_file
+                    current_node.description = desc
+                    
+                    # Update state file if changed
+                    if self.batch.comfun.file_exists(state_file):
+                        # Only update name in state file, keep state
+                        node_state_id = current_node.state_id
+                        self.batch.nod.create_node_state_file(state_file, node_name, node_state_id, update_mode=True)
+                    else:
+                        # Create new state file
+                        node_state_id = self.batch.sts.INDEX_STATE_WAITING
+                        self.batch.nod.create_node_state_file(state_file, node_name, node_state_id)
+                    
+                    # Save changes to database
+                    if self.batch.nod.save_nodes():
+                        self.top_ui.set_top_info(f"Updated simnode: {node_name}", 1)
+                        self.reset_list()
+                        self.hide_all_forms()
+                    else:
+                        self.top_ui.set_top_info("Failed to update simnode!", 6)
+                else:
+                    self.top_ui.set_top_info("Please set sim node name!", 9)
+            else:
+                self.top_ui.set_top_info("Directory not exist", 9)
+        else:
+            self.top_ui.set_top_info("Please set path first!", 8)
+
     def on_click_show_remove_node_form(self):
         if self.remove_node_form_state == 0:
             self.hide_all_forms()
@@ -437,7 +620,7 @@ class NodesUI:
             self.remove_node_form_state = 0
 
     def on_click_confirmed_remove_node(self):
-        if self.nod.current_node_index >= 0:
+        if self.nod.current_node_index is not None and self.nod.current_node_index >= 0:
             current_node = self.nod.nodes_data[self.nod.current_node_index]
             self.batch.logger.db(("remove node:", current_node.id, current_node.node_name))
             self.nod.remove_node(current_node.id, do_save=True)
@@ -523,11 +706,190 @@ class NodesUI:
                 item_c.setBackground(cur_color)
                 if self.top_ui is not None:
                     self.top_ui.set_top_info("Current node:   " + str(cur_node.node_name))
+                
+                # Update edit form if it's visible
+                if self.edit_node_form_state == 1 and hasattr(self, 'qt_form_edit_node_el_path'):
+                    self.qt_form_edit_node_el_path.setText(os.path.dirname(cur_node.state_file))
+                    self.qt_form_edit_node_el_name.setText(cur_node.node_name)
+                    self.qt_form_edit_node_el_desc.setText(cur_node.description)
             else:
                 self.batch.logger.wrn(("(on change) Wrong current_list_index: ", current_list_index))
 
-    def get_node_directory(self, project_name, schema_name, node_name):
-        return f"{self.batch.prj.current_project.working_directory_absolute}{project_name}{os.sep}{schema_name}{os.sep}nodes{os.sep}{node_name}{os.sep}"
+    def on_click_update_server_config(self):
+        """
+        Update the server's config.ini with absolute paths
+        1) Get current json data from current SimBatch config.ini
+        2) Change paths to absolute paths
+        3) Add master_source setting
+        4) Save as config.ini in server directory
+        """
+        if self.nod.current_node is None:
+            self.batch.logger.wrn("(update server config) PLEASE SELECT NODE FIRST")
+            self.top_ui.set_top_info("Select a node to update config first", 7)
+            return
+            
+        # Get server directory from current node's state file
+        current_node = self.nod.current_node
+        server_dir = os.path.dirname(current_node.state_file)
+        
+        # Use the common helper function to create/update config.ini
+        self.create_or_update_config(server_dir, "Server config updated")
 
-    def get_node_file_path(self, project_name, schema_name, node_name):
-        return f"{self.get_node_directory(project_name, schema_name, node_name)}node.json"
+    def on_click_copy_config(self):
+        """
+        Copy the config.ini file to the server directory
+        1) Get current json data from current SimBatch config.ini
+        2) Change paths to absolute paths
+        3) Add master_source setting
+        4) Save as config.ini in server directory
+        """
+        # Get server directory from the path input field
+        server_dir = self.qt_form_add_node_el_path.text()
+        
+        # Use the common helper function to create/update config.ini
+        self.create_or_update_config(server_dir, "Config copied")
+        
+    def create_or_update_config(self, server_dir, success_msg_prefix="Config updated"):
+        """
+        Common helper function to create or update config.ini in the specified directory
+        
+        Args:
+            server_dir (str): The server directory where config.ini should be created/updated
+            success_msg_prefix (str): Prefix for success message (e.g. "Config copied" or "Server config updated")
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        if not server_dir or not os.path.exists(server_dir):
+            self.top_ui.set_top_info("Invalid server directory path", 8)
+            return False
+            
+        # Get current config
+        current_config = None
+        try:
+            # Try to load config from settings
+            current_config = self.batch.sts.get_settings_as_json()
+            if not current_config:
+                self.top_ui.set_top_info("Could not get current settings", 8)
+                return False
+                
+            # Update paths to absolute paths
+            if "storeData" in current_config:
+                if "dataDirectory" in current_config["storeData"]:
+                    current_config["storeData"]["dataDirectory"] = self.ensure_absolute_path(current_config["storeData"]["dataDirectory"])
+                    
+                if "backupDirectory" in current_config["storeData"]:
+                    current_config["storeData"]["backupDirectory"] = self.ensure_absolute_path(current_config["storeData"]["backupDirectory"])
+                    
+                if "definitionsDirectory" in current_config["storeData"]:
+                    current_config["storeData"]["definitionsDirectory"] = self.ensure_absolute_path(current_config["storeData"]["definitionsDirectory"])
+                
+            # Add master_source path if it doesn't exist
+            if "simnodes" not in current_config:
+                current_config["simnodes"] = {}
+                
+            # Set master_source to current installation directory
+            current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            current_config["simnodes"]["master_source"] = current_dir
+            
+            # Save config to server directory
+            config_path = os.path.join(server_dir, "config.ini")
+            import json
+            with open(config_path, 'w') as f:
+                json.dump(current_config, f, indent=4)
+                
+            success_message = f"{success_msg_prefix} at: {config_path}"
+            self.top_ui.set_top_info(success_message, 1)
+            self.batch.logger.inf(success_message)
+            return True
+            
+        except Exception as e:
+            error_message = f"Error updating config: {str(e)}"
+            self.top_ui.set_top_info(error_message, 8)
+            self.batch.logger.err(error_message)
+            return False
+
+    def ensure_absolute_path(self, path):
+        """Convert relative path to absolute path if needed"""
+        if not path or len(path) == 0:
+            return ""
+            
+        if os.path.isabs(path):
+            return path
+            
+        # If path is just a directory name or relative path
+        current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(current_dir, path)
+
+    def on_click_full_init_server(self):
+        """
+        Full server initialization:
+        1) Check path in Path field (must be not empty and absolute path)
+        2) Create directory if it doesn't exist
+        3) Execute Add Path To Database
+        4) Execute Copy/Update source files
+        5) Execute copy config.ini
+        6) Create state.txt file with INDEX_STATE_INIT and name from Name field
+        """
+                
+        # 0) Check node name
+        node_name = self.qt_form_add_node_el_name.text()
+        if not node_name:
+            self.top_ui.set_top_info("Name field is empty", 8)
+            return False
+
+        if self.batch.sts.master_directory_abs is None:
+            self.batch.sts.master_directory_abs =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   #mmm
+            self.batch.sts.save_settings()
+            self.batch.logger.inf(f"new valuse saved to settings: master_directory_abs: {self.batch.sts.master_directory_abs }")
+
+        # 1) Check path
+        node_dir = self.qt_form_add_node_el_path.text()
+        if not node_dir:
+            self.top_ui.set_top_info("Path field is empty", 8)
+            return False
+            
+        if not self.comfun.is_absolute(node_dir):
+            self.top_ui.set_top_info("Path must be absolute", 8)
+            return False
+            
+        if not node_dir.endswith(os.sep):
+            node_dir = node_dir + os.sep
+            self.qt_form_add_node_el_path.setText(node_dir)
+            
+        # 2) Create directory if it doesn't exist
+        if not os.path.exists(node_dir):
+            try:
+                os.makedirs(node_dir)
+                self.top_ui.set_top_info(f"Created directory: {node_dir}", 1)
+            except Exception as e:
+                self.top_ui.set_top_info(f"Failed to create directory: {str(e)}", 8)
+                return False
+
+        # 3) Add Path To Database
+        self.batch.logger.db(("on_click_full_init_server 3", node_dir, node_name))
+        self.on_click_add_node()
+        
+        # 4) Copy/Update source files
+        self.batch.logger.db(("on_click_full_init_server 4", node_dir, node_name))
+        dest = self.qt_form_add_node_el_path.text() # 'Add' form path
+        self.server.update_sources_from_master(force_destination=dest)
+        
+        # 5) Copy config.ini
+        self.batch.logger.db(("on_click_full_init_server 5", node_dir, node_name))
+        self.create_or_update_config(node_dir, "Config copied")
+            
+        # 6) Create state.txt file with INDEX_STATE_INIT
+
+        self.batch.logger.db(("on_click_full_init_server 6", node_dir, node_name))
+        state_file = node_dir + "state.txt"
+        if self.batch.comfun.file_exists(state_file, info=False) is False: 
+            init_state_id = self.batch.sts.INDEX_STATE_INIT
+            create_result = self.batch.nod.create_node_state_file(state_file, node_name, init_state_id)
+            if not create_result:
+                self.top_ui.set_top_info("Failed to create state.txt file", 8)
+                self.batch.logger.err(f"Failed to create state.txt file: {state_file}")
+                return False
+            
+        self.top_ui.set_top_info(f"Server '{node_name}' fully initialized: {node_dir}", 1)
+        return True

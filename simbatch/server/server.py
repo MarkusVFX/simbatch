@@ -33,7 +33,7 @@ class SimBatchServer:
     report_done_jobs = 0
     current_job = None
 
-    def __init__(self, batch, force_software=0, jobs_limit=0, framework_mode=False):
+    def __init__(self, batch, force_software=0, jobs_limit=0, framework_mode=False, force_server_dir=None):
         self.force_software = force_software
         self.jobs_limit = jobs_limit
         if framework_mode:
@@ -58,7 +58,10 @@ class SimBatchServer:
 
         ''' elif self.framework_mode is True: queue is already loaded ! (no need to load) '''
 
-        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep
+        if force_server_dir is not None:
+            self.server_dir = force_server_dir
+        else:
+            self.server_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep
         self.test_server_dir()
 
         simnode_state_file = self.server_dir + self.state_file_name
@@ -77,6 +80,7 @@ class SimBatchServer:
                     """  init batch.nod vars as server """
                     self.batch.nod.state_file = simnode_state_file
                     self.batch.nod.server_name = self.server_name
+                    print(f" ____init :   self.batch.nod.server_name: {self.batch.nod.server_name}")
 
                     """  check existence in database  """
                     state_file = self.batch.nod.get_state_file(server_name=str(self.server_name))
@@ -235,7 +239,7 @@ class SimBatchServer:
             self.logger.err("Server dir not defined! Variable  self.server_dir  is not defined!")
 
         '''  test master source update  '''
-        master_source_path = self.get_existing_source_path()
+        master_source_path = self.get_master_source_path()
         if master_source_path is not None:
             self.logger.inf("Master source path exist: {}".format(master_source_path), force_prefix=" > ")
             self.comfun.test_directory_access(master_source_path, "master source")
@@ -279,42 +283,59 @@ class SimBatchServer:
         # TODO test write access create data dir
         pass
         
-    def get_existing_source_path(self):
-        if self.batch.sts.installation_directory_abs is None:
+    def get_master_source_path(self):
+        if self.batch.sts.master_directory_abs is None:
+            self.logger.err("master_directory_abs is not defined")
+            self.logger.inf("To fix this issue:")
+            self.logger.inf("1. Open SimBatch and go to 'Sim Nodes'")
+            self.logger.inf("2. Select the node and click 'Edit Sim Node'")
+            self.logger.inf("3. Click 'Update server's config.ini' to generate proper paths")
             return None
-        source_path = self.batch.sts.installation_directory_abs + "/"
+        
+        source_path = self.batch.sts.master_directory_abs + os.sep
         if self.batch.comfun.path_exists(source_path):
             return source_path
         else:
+            self.logger.err(f"Path doesn't exist: {source_path}")
+            self.logger.inf("Please update your server configuration using 'Update server's config.ini' button in the 'Edit Sim Node' dialog")
             return None
 
-    def update_sources_from_master(self):
-        self.update_sources()
+    def update_sources_from_master(self, force_destination=None):
+        self.update_sources(force_destination=force_destination)
         
     def update_sources_to_master(self):
         self.update_sources(reverse_to_master=True)
         
-    def update_sources(self, reverse_to_master=False):
-        if self.batch.sts.installation_directory_abs is not None:
+    def update_sources(self, reverse_to_master=False, force_destination=None):
+        if self.batch.sts.master_directory_abs is not None:
             # TODO self.batch.sts.dir_separator  vs universal separator
-            source_path = self.get_existing_source_path()
+
+            source_path = self.get_master_source_path()
+
+            if force_destination is not None:
+                dst_path = force_destination
+            else:
+                dst_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
+
+            # dst_path_subdir_server = os.path.join( dst_path , "server" )
+
             if source_path is not None:
-                dst_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/"
-            
                 if reverse_to_master:
                     source_path, dst_path = dst_path, source_path
             
-                if self.batch.sts.current_os == 2:
-                    source_path = self.batch.comfun.convert_to_win_path(source_path)
-                    dst_path = self.batch.comfun.convert_to_win_path(dst_path)
+                #if self.batch.sts.current_os == 2:
+                #    source_path = self.batch.comfun.convert_to_win_path(source_path)
+                #    dst_path = self.batch.comfun.convert_to_win_path(dst_path)
 
                 ret_r = self.batch.comfun.test_directory_access(source_path, with_info=False)[0]
                 ret_w = self.batch.comfun.test_directory_access(dst_path, with_info=False)[1]
                 if ret_r and ret_w:
                     #
-                    self.logger.inf(("update sources from  {}\n".format(source_path)), nl=True)
-                    self.batch.sio.copy_file(source_path, dst_path, "server.py", sub_dir="server")
-                    self.batch.sio.copy_file(source_path, dst_path, "executor.py", sub_dir="server")
+                    self.logger.inf(f"update sources from  {source_path} to {dst_path}", nl=True)
+                    self.batch.sio.copy_file(source_path, dst_path, "SimBatch_server.py")
+                    self.batch.sio.copy_file(source_path, dst_path, "__init__.py", sub_dir="server", create_dst_dir=True)
+                    self.batch.sio.copy_file(source_path, dst_path, "server.py", sub_dir="server", create_dst_dir=True)
+                    self.batch.sio.copy_file(source_path, dst_path, "executor.py", sub_dir="server", create_dst_dir=True)
                     self.batch.sio.copy_tree(str(source_path), str(dst_path), sub_dir="core")
                     #
                 else:
@@ -325,7 +346,7 @@ class SimBatchServer:
             else:
                 self.logger.err("master source path  {}  not exist".format(source_path))
         else:
-            self.logger.err("(update_sources_from_master) installation_directory_abs is not defined")
+            self.logger.err("(update_sources_from_master) master_directory_abs is not defined")
         
     def add_to_log(self, info, log_file=None):
         date = self.comfun.get_current_time()
@@ -339,6 +360,7 @@ class SimBatchServer:
     def reset(self):
         self.jobs_computed = 0
         self.loops_counter = 0
+        self.break_loop = False
         self.reset_report()
 
     def reset_report(self):
@@ -408,7 +430,9 @@ class SimBatchServer:
         return self.set_queue_item_state(queue_id, "ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
     def generate_script_from_queue_item(self, py_file, job_script, job_description, job_id):
-        script_out = "'''   created by: " + self.server_name + "   [" + self.comfun.get_current_time() + "]   '''\n"
+        # Handle case where server_name might be None
+        server_name = "unknown_server_name" if self.server_name is None else self.server_name
+        script_out = "'''   created by: " + server_name + "   [" + self.comfun.get_current_time() + "]   '''\n"
 
         append_dir = os.path.dirname(os.path.dirname(self.server_dir))
         append_dir = append_dir.replace("\\", "/")  # OS MARKER
@@ -417,7 +441,7 @@ class SimBatchServer:
         script_out += "\nimport core.core as simbatch_core\nimport server.executor as executor"
         script_out += '\n\nsimbatch = simbatch_core.SimBatch("executor")'
 
-        script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ", \"" + self.server_name + "\")"
+        script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ", \"" + server_name + "\")"
         script_out += "\ninteractions = sibe.batch.dfn.current_interactions"
 
         script_out += "\nsibe.add_to_log_with_new_line( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP
@@ -460,8 +484,9 @@ class SimBatchServer:
             queue_item = self.batch.que.queue_data[ret[0]]
             script = queue_item.evolution_script
             soft_id = queue_item.soft_id
-            info = " id:{}  evo:{}  descr:{}".format(ret[1], queue_item.evolution, queue_item.description)
-            self.logger.db(("there is_something_to_do: ", ret[0], ret[1], force_software))
+            info = f" id:{ret[1]}, evo:{queue_item.evolution}, descr:{queue_item.description}"
+            self.logger.db(f"there is_something_to_do: id:{ret[1]}, force_software:{force_software}")
+            self.logger.deepdb(f"   script: {script}")
             return 1, ret[0], ret[1], script, soft_id, info
         else:
             return 0, None, None, None, None, None  # bool, index, id, script, soft_id  # TODO class
@@ -535,7 +560,7 @@ class SimBatchServer:
         if mode == "single":
             self.jobs_limit = 1
             self.force_id = force_id
-            self.logger.inf("run single job")
+            self.logger.inf(f"Run single job. {f'Force id: {self.force_id}' if self.force_id else ''}   {f'Force software: {self.force_software}' if self.force_software else ''}")  
         elif mode == "limit":
             limit = int(argv)
             if limit > 0:
@@ -553,6 +578,7 @@ class SimBatchServer:
             
     def run_loop(self):
         self.loops_counter += 1
+
         if self.break_loop is False and (self.jobs_limit == 0 or self.jobs_computed < self.jobs_limit):
             if self.jobs_limit == 0:
                 '''  infinite loop  '''
@@ -563,7 +589,6 @@ class SimBatchServer:
                                 "  limit:", self.jobs_limit, "   computed:", self.jobs_computed))
 
             """    MAIN EXECUTION LOOP    """
-
             if self.current_simnode_state != 0:   # server not in local mode
                 self.current_simnode_state = self.batch.nod.get_node_state(self.server_dir + self.state_file_name)
 
@@ -607,6 +632,8 @@ class SimBatchServer:
                         """     RUN SINGLE JOB AS LOCAL     """
 
                         interactions = self.batch.dfn.current_interactions   # used in eval
+                        has_errors = False  # Track if any errors occurred
+                        
                         if interactions is not None:
                             for job_line in job_script.split(";"):
                                 clean_job_line = job_line.replace('\\', '\\\\').lstrip()
@@ -615,17 +642,27 @@ class SimBatchServer:
                                     try:
                                         ret = eval(clean_job_line)
                                         self.logger.deepdb((" q job line ret:", ret))
-                                    except ValueError:
-                                        self.logger.err(("eval q job", clean_job_line))
+                                    except Exception as e:
+                                        self.logger.err(("eval q job error:", clean_job_line, e))
+                                        has_errors = True  # Mark that an error occurred
                                 else:
                                     self.logger.deepdb(" empty q job line")
 
-                            self.set_queue_item_done(job_id, str(self.server_name))
-                            self.last_info = "DONE id: {}".format(job_id)
+                            # Set job status based on whether errors occurred
+                            if has_errors:
+                                self.set_queue_item_error(job_id, str(self.server_name))
+                                self.last_info = "ERROR id: {}".format(job_id)
+                            else:
+                                self.set_queue_item_done(job_id, str(self.server_name))
+                                self.last_info = "DONE id: {}".format(job_id)
+                                
                             self.report_done_jobs += 1
                             self.jobs_computed += 1
                         else:
                             self.logger.err("interactions yyy  not loaded!")
+                            self.set_queue_item_error(job_id, str(self.server_name))
+                            self.last_info = "ERROR id: {}".format(job_id)
+                            self.jobs_computed += 1
                         #######
                         is_something_more_to_compute = self.is_something_to_do(force_software=self.force_software)
 
@@ -696,6 +733,31 @@ class SimBatchServer:
             if check_breaker:
                 self.logger.inf(("breaking main loop", self.last_info))
                 self.logger.deepdb(("breaking file exists: ", external_breaker))
+                
+                # Reset the node state to OFFLINE when broken
+                if self.current_simnode_state == self.batch.sts.INDEX_STATE_WORKING:
+                    offline_state_id = self.batch.sts.INDEX_STATE_OFFLINE
+                    self.logger.inf(f"Resetting node state from WORKING to OFFLINE")
+                    
+                    # Update state file
+                    if self.server_name is not None:
+                        self.batch.nod.create_node_state_file(
+                            self.server_dir + self.state_file_name, 
+                            self.server_name, 
+                            offline_state_id, 
+                            update_mode=True
+                        )
+                    
+                    # If any current queue item is still marked as WORKING, reset it to ERROR
+                    if self.current_job is not None:
+                        try:
+                            job_id = int(self.current_job)
+                            self.set_queue_item_error(job_id, str(self.server_name) if self.server_name else "unknown")
+                            self.logger.inf(f"Reset queue job {job_id} to ERROR state")
+                        except (ValueError, TypeError):
+                            self.logger.wrn(f"Could not reset job state for {self.current_job}")
+                
+                # Rename break file
                 if self.batch.comfun.file_exists(external_breaker_off, info=False):
                     os.remove(external_breaker_off)
                 os.rename(external_breaker, external_breaker_off)
@@ -704,3 +766,22 @@ class SimBatchServer:
                 threading.Timer(self.timer_delay_seconds, lambda: self.run_loop()).start()
         else:
             self.logger.inf(("End main loop. ", self.last_info))
+
+
+
+if __name__ == "__main__":
+    print(os.linesep * 3)
+    print("[WARNING] This script is not intended to be executed directly. It meant to be launched via '../SimBatch_server.py'.")
+    print("          It does not initialize the required environment and will not function on its own!")
+    print()
+    print("[DETAILS] ")
+    print("          This script defines the SimBatchServer class, which handles execution of queued batch jobs.")
+    print("          This module is a backend component of the SimBatch system.")
+    print("          It depends on a properly initialized 'batch' object, typically created by the core SimBatch class.")
+    print("          The core.core.SimBatch instance object handles configuration, queue loading, logging and state tracking.")
+    print()
+    print()
+    print("[USAGE]")
+    print("          Run this server by launching 'SimBatch_server.py' from the SimBatch root directory.")
+    print()
+     

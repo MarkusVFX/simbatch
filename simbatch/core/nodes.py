@@ -69,8 +69,8 @@ class SimNodes:
 
     def print_all(self):
         self.batch.logger.raw(f"{os.linesep} Total nodes in database: {self.total_nodes}")
-        if self.batch.sts.installation_directory_abs is not None:
-            self.batch.logger.raw(f"{os.linesep} Source dir: {self.batch.sts.installation_directory_abs}")
+        if self.batch.sts.master_directory_abs is not None:
+            self.batch.logger.raw(f"{os.linesep} Source dir: {self.batch.sts.master_directory_abs}")
         for n in self.nodes_data:
             self.batch.logger.raw(f"{os.linesep} {n.id} {n.node_name}    {n.state} ({n.state_id})  {n.description} {os.linesep}  {n.state_file}")
 
@@ -112,7 +112,13 @@ class SimNodes:
             
     #  update id, index and current for fast use by all modules
     def update_current_from_index(self, index):
-        if 0 <= index < self.total_nodes:
+        if index is None:
+            self.current_node_id = None
+            self.current_node = None
+            self.current_node_index = None
+            self.batch.logger.wrn("(update_current_from_index) index is None")
+            return False
+        elif 0 <= index < self.total_nodes:
             self.current_node_index = index
             self.current_node_id = self.nodes_data[index].id
             self.current_node = self.nodes_data[index]
@@ -120,6 +126,7 @@ class SimNodes:
         else:
             self.current_node_id = None
             self.current_node = None
+            self.current_node_index = None
             self.batch.logger.err(f"(update_current_from_index) wrong index: {index}")
             self.batch.logger.err(f" total:{self.total_nodes}  len:{len(self.nodes_data)}")
             return False
@@ -224,7 +231,8 @@ class SimNodes:
 
     def load_nodes_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.batch.sts.store_data_json_directory_abs + os.sep + self.batch.sts.JSON_SIMNODES_FILE_NAME
+            json_file = os.path.join(self.batch.sts.store_data_json_directory_abs, self.batch.sts.JSON_SIMNODES_FILE_NAME)
+
         if self.comfun.file_exists(json_file, info="simnodes file"):
             self.batch.logger.inf(f"loading simnodes: {json_file}")
             json_nodes = self.comfun.load_json_file(json_file)
@@ -360,7 +368,7 @@ class SimNodes:
             return -1
 
     def create_node_state_file(self, state_file, server_name, state, update_mode=False):
-        if self.comfun.file_exists(state_file, "set state file txt") is False or update_mode:
+        if self.comfun.file_exists(state_file, info=False) is False or update_mode:
             self.batch.logger.deepdb(f" [db] set state : {state}")
             try:
                 f = open(state_file, 'w')

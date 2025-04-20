@@ -22,7 +22,7 @@ class Settings:
     store_data_backup_directory_abs = None      # dir backup data
     store_definitions_directory = None          # dir with software, actions, engines and param definitions
     store_definitions_directory_abs = None      # dir with software, actions, engines and param definitions
-    installation_directory_abs = None           # dir used for update simnodes core (they can be independent)
+    master_directory_abs = None                 # dir used for update simnodes code
     store_abs_dir = ""                          #
     sql = [None, None, None, None]              # "db"  "pass"  "port"  "user" (PRO version)
     admin_user = None                           # PRO version
@@ -103,6 +103,7 @@ class Settings:
 
     window = None           # store def window position
     always_on_top = False   # obvious obviousness
+    save_window_position = True  # whether to save window position and size
     force_start_tab = 0     # if > 0 show tab with this index after run
 
     # check screen resolution: protect window position (outside screen if second monitor is off)
@@ -350,12 +351,19 @@ class Settings:
                     self.admin_user = self.json_settings_data["adminUser"].values()  # TODO order  values()
                     wnd = self.json_settings_data["window"]
                     self.window = [wnd["posX"], wnd["posY"], wnd["sizeX"], wnd["sizeY"]]
+                    # Store original window settings for use when save_window_position is False
+                    self.original_window_settings = {
+                        "posX": wnd["posX"], 
+                        "posY": wnd["posY"], 
+                        "sizeX": wnd["sizeX"], 
+                        "sizeY": wnd["sizeY"]
+                    }
                     self.always_on_top = wnd["alwaysOnTop"]
                     
                     if "simnodes" in self.json_settings_data:
                         simnodes = self.json_settings_data["simnodes"]
                         if "master_source" in simnodes:
-                            self.installation_directory_abs = simnodes["master_source"]
+                            self.master_directory_abs = simnodes["master_source"]
 
                     if "startup" in self.json_settings_data.keys():
                         if "tab" in self.json_settings_data["startup"].keys():
@@ -414,10 +422,21 @@ class Settings:
         self.default_settings["sql"]["user"] = self.sql[1]    # PRO VERSION
         self.default_settings["sql"]["pass"] = self.sql[2]    # PRO VERSION
         self.default_settings["sql"]["port"] = self.sql[3]    # PRO VERSION
-        self.default_settings["window"]["posX"] = self.window[0]
-        self.default_settings["window"]["posY"] = self.window[1]
-        self.default_settings["window"]["sizeX"] = self.window[2]
-        self.default_settings["window"]["sizeY"] = self.window[3]
+        
+        # Only save current window position and size if save_window_position is True
+        if self.save_window_position:
+            self.default_settings["window"]["posX"] = self.window[0]
+            self.default_settings["window"]["posY"] = self.window[1]
+            self.default_settings["window"]["sizeX"] = self.window[2]
+            self.default_settings["window"]["sizeY"] = self.window[3]
+        else:
+            # Use the original window settings from the loaded JSON file when save_window_position is False
+            if hasattr(self, 'original_window_settings'):
+                self.default_settings["window"]["posX"] = self.original_window_settings["posX"]
+                self.default_settings["window"]["posY"] = self.original_window_settings["posY"]
+                self.default_settings["window"]["sizeX"] = self.original_window_settings["sizeX"]
+                self.default_settings["window"]["sizeY"] = self.original_window_settings["sizeY"]
+        
         self.default_settings["window"]["alwaysOnTop"] = self.always_on_top
 
         if self.store_data_mode == 1:
@@ -458,6 +477,57 @@ class Settings:
         else:
             self.logger.err(f"found {errors} errors in config file")
             return False
+            
+    def get_settings_as_json(self):
+        """
+        Return the current settings as a JSON object loaded from config.ini
+        """
+        # Use the existing ini file or find it
+        config_file = self.ini_file
+        
+        # Check if file exists
+        if not self.comfun.file_exists(config_file, info=False):
+            self.logger.wrn(f"Config file not found: {config_file}")
+            return None
+            
+        # Load settings from file
+        try:
+            with open(config_file) as f:
+                settings_data = json.load(f)
+                
+            # Ensure simnodes section exists
+            if "simnodes" not in settings_data:
+                settings_data["simnodes"] = {}
+                
+            # Set master_source to current installation directory if available
+            current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   #mmm
+            settings_data["simnodes"]["master_source"] = current_dir
+            
+            # Make sure storeData paths are defined
+            if "storeData" not in settings_data:
+                settings_data["storeData"] = {}
+                
+            # Update storeData paths if they exist
+            if "dataDirectory" in settings_data["storeData"]:
+                data_dir = settings_data["storeData"]["dataDirectory"]
+                if not os.path.isabs(data_dir) and data_dir:
+                    settings_data["storeData"]["dataDirectory"] = os.path.join(current_dir, data_dir)
+                    
+            if "backupDirectory" in settings_data["storeData"]:
+                backup_dir = settings_data["storeData"]["backupDirectory"]
+                if not os.path.isabs(backup_dir) and backup_dir:
+                    settings_data["storeData"]["backupDirectory"] = os.path.join(current_dir, backup_dir)
+                    
+            if "definitionsDirectory" in settings_data["storeData"]:
+                defs_dir = settings_data["storeData"]["definitionsDirectory"]
+                if not os.path.isabs(defs_dir) and defs_dir:
+                    settings_data["storeData"]["definitionsDirectory"] = os.path.join(current_dir, defs_dir)
+                
+            return settings_data
+            
+        except Exception as e:
+            self.logger.err(f"Error loading settings from {config_file}: {str(e)}")
+            return None
 
     def rbg_to_brush(self, r, g, b):
         self.logger.wrn("This function should be never used")

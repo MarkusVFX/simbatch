@@ -1,4 +1,5 @@
 import platform
+import os
 
 from .settings import Settings
 from .lib.common import CommonFunctions
@@ -49,42 +50,42 @@ class SimBatch:
         self.pat = Patterns()           # pat
         #  abbreviation  END
 
-        self.logger.inf("SimBatch {} started".format(self.sts.get_version()), nl=True, nl_after=True)
+        self.logger.inf(f"SimBatch {self.sts.get_version()} started", nl=True, nl_after=True)
 
     def print_data(self):
         self.prj.print_all()
 
     def print_important_values(self):
-        print(f"\n\n  Current runtime_env: {self.sts.runtime_env}")
+        print(f"{os.linesep}{os.linesep}  Current runtime_env: {self.sts.runtime_env}")
 
         # projects
-        print("\n PROJECTS: ")
+        print(f"{os.linesep} PROJECTS: ")
         self.prj.print_current()
 
         # schemas
-        print("\n SCHEMAS: ")
+        print(f"{os.linesep} SCHEMAS: ")
         self.sch.print_current()
 
         # tasks
-        print("\n TASKS: ")
+        print(f"{os.linesep} TASKS: ")
         self.tsk.print_current()
 
         # queue
-        print("\n QUEUE: ")
+        print(f"{os.linesep} QUEUE: ")
         self.que.print_current()
 
         # nodes
-        print("\n NODES: ")
+        print(f"{os.linesep} NODES: ")
         self.nod.print_current()
 
         # definitions
-        print("\n DEFINITIONS: ")
+        print(f"{os.linesep} DEFINITIONS: ")
         self.dfn.print_current()
 
-        print("\n\n")
+        print(f"{os.linesep}{os.linesep}")
 
     def print_current_detailed_values(self, index):
-        print("  \n\n")
+        print(f"  {os.linesep}{os.linesep}")
         if self.sts.ui_edition_mode == 0:    # open source no wizard tab
             index += 1                       # index compensation
 
@@ -118,7 +119,7 @@ class SimBatch:
             print(" SETTINGS: ")
             self.sts.print_all()
 
-        print("\n\n")
+        print(f"{os.linesep}{os.linesep}")
 
     def clear_all_stored_data(self):
         self.prj.clear_all_projects_data(clear_stored_data=True)
@@ -131,7 +132,7 @@ class SimBatch:
     def loading_errors(self, check_this, counter, msg):
         if self.comfun.is_int(check_this):
             counter += check_this
-            self.logger.err("Loading error! File: ({}) file errors count:{}".format(msg, check_this))
+            self.logger.err(f"Loading error! File: ({msg}) file errors count:{check_this}")
         return counter
 
     def load_data(self):

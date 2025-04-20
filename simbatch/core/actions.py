@@ -1,4 +1,5 @@
 import copy
+import os
 
 from .lib.common import Logger
 
@@ -143,7 +144,7 @@ class SingleAction:
                 template_with_values[i] = "\"" + template_with_values[i] + "\""
         scr = "".join(template_with_values)
         if with_new_line:
-            scr += "\n"
+            scr += os.linesep
         return scr
 
 
@@ -174,7 +175,7 @@ class MultiAction:
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw(f"\nname:  {self.name}     total_actions:  {self.actions_count} ")
+        logger_raw(f"{os.linesep}name:  {self.name}     total_actions:  {self.actions_count} ")
         for i, ac in enumerate(self.actions):
             logger_raw(f"   action:  {ac.name}    desc: {ac.description} ")
 

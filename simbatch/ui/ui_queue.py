@@ -356,7 +356,7 @@ class QueueUI:
             prev_dir = self.comfun.dirname(ret)
             self.batch.logger.inf(("Prev dir: ", prev_dir))
 
-            prev_dir = prev_dir + self.sts.dir_separator
+            prev_dir = prev_dir + os.sep
             if self.comfun.path_exists(prev_dir, " prev open "):
                 if self.sts.current_os == 1:
                     os.system('xdg-open "{}"'.format(prev_dir))
@@ -373,7 +373,7 @@ class QueueUI:
             prev_dir = self.comfun.dirname(ret)
             self.batch.logger.inf(("Prev dir: ", prev_dir))
 
-            prev_dir = prev_dir + self.sts.dir_separator
+            prev_dir = prev_dir + os.sep
             if self.comfun.path_exists(prev_dir, " prev open "):
                 import subprocess
                 if self.sts.current_os == 1:

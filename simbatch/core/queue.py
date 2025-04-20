@@ -61,17 +61,14 @@ class QueueItem:
         self.soft_id = soft_id
 
     def __str__(self):
-        return "QueueItem: {},{},{},... ,{},{},{},... ,{},{},{},{} ".format(self.id, self.queue_item_name, self.task_id,
-                                                                            self.sequence, self.shot, self.take,
-                                                                            self.version, self.evolution,
-                                                                            self.evolution_nr, self.evolution_script)
+        return f"QueueItem: {self.id},{self.queue_item_name},{self.task_id},... ,{self.sequence},{self.shot},{self.take},... ,{self.version},{self.evolution},{self.evolution_nr},{self.evolution_script}"
 
     def print_this(self):
-        print("\n QUEUE ITEM: {}".format(self.queue_item_name))
-        print("   id: {}   [seq|sh|tk] : [{}|{}|{}] \n".format(self.id, self.sequence, self.shot, self.take))
-        print("   ver:{}  evo_nr: {}   evo: {}    \n".format(self.version, self.evolution_nr, self.evolution))
-        print("   state:{}  state_id: {}    \n".format(self.state, self.state_id))
-        print("   evolution_script:{}\n".format(self.evolution_script))
+        print(f"{os.linesep} QUEUE ITEM: {self.queue_item_name}")
+        print(f"   id: {self.id}   [seq|sh|tk] : [{self.sequence}|{self.shot}|{self.take}] {os.linesep}")
+        print(f"   ver:{self.version}  evo_nr: {self.evolution_nr}   evo: {self.evolution}    {os.linesep}")
+        print(f"   state:{self.state}  state_id: {self.state_id}    {os.linesep}")
+        print(f"   evolution_script:{self.evolution_script}{os.linesep}")
 
     """ marker ATQ 220   generate name   """
     def generate_queue_item_name(self, task, with_update=False, with_sufix=None):
@@ -95,7 +92,7 @@ class QueueItem:
     def get_evolution_script_with_nl(self):
         es = self.evolution_script
         es_arr = es.split(";")
-        return "\n           " + "\n          ".join(es_arr)
+        return f"{os.linesep}          ".join(es_arr)
 
 
 class Queue:
@@ -122,15 +119,11 @@ class Queue:
 
     '''   print project data, mainly for debug  '''
     def print_info(self):
-        print("\n QUEUE: ")
-        print("     current queue item id: {}   index: {}   total queue items: {}\n".format(self.current_queue_id,
-                                                                                          self.current_queue_index,
-                                                                                          self.total_queue_items))
+        print(f"{os.linesep} QUEUE: ")
+        print(f"     current queue item id: {self.current_queue_id}   index: {self.current_queue_index}   total queue items: {self.total_queue_items}{os.linesep}")
 
     def print_current(self):
-        print(" QUEUE INFO:   items total:{}, current index:{}, current id:{}".format(self.total_queue_items, 
-                                                                                     self.current_queue_index,
-                                                                                     self.current_queue_id))
+        print(f" QUEUE INFO:   items total:{self.total_queue_items}, current index:{self.current_queue_index}, current id:{self.current_queue_id}")
         if self.current_queue_index is not None:
             self.current_queue.print_this()
 
@@ -138,10 +131,8 @@ class Queue:
         if self.total_queue_items == 0:
             print("   [INF] no queue items loaded")
         for q in self.queue_data:
-            print("\n\n {}  {}  {}  {} state:{}   evo:{}   simnode:{}  desc:{}".format(q.id, q.queue_item_name, q.prior,
-                                                                                        q.proj_id, q.state, q.evolution,
-                                                                                        q.sim_node, q.description))
-        print("\n\n")
+            print(f"{os.linesep}{os.linesep} {q.id}  {q.queue_item_name}  {q.prior}  {q.proj_id} state:{q.state}   evo:{q.evolution}   simnode:{q.sim_node}  desc:{q.description}")
+        print(f"{os.linesep}{os.linesep}")
 
     @staticmethod
     def get_blank_queue_item():
@@ -196,8 +187,7 @@ class Queue:
                             en = self.queue_data[i].description.find("]")
                             if en > 0:
                                 self.queue_data[i].description = self.queue_data[i].description[en+1:]
-                    self.queue_data[i].description = "[{}]  {}".format(self.comfun.get_current_time(only_time=True),
-                                                                       self.queue_data[i].description)
+                    self.queue_data[i].description = f"[{self.comfun.get_current_time(only_time=True)}]  {self.queue_data[i].description}"
                 elif set_time is not None:
                     if len(self.queue_data[i].description) > 3:
                         if self.queue_data[i].description[0] == "[":
@@ -205,7 +195,7 @@ class Queue:
                             if en > 0:
                                 self.queue_data[i].description = self.queue_data[i].description[en+1:]
                     time_string = self.comfun.format_seconds_to_string(set_time)
-                    self.queue_data[i].description = "[{}]  {}".format(time_string, self.queue_data[i].description)
+                    self.queue_data[i].description = f"[{time_string}]  {self.queue_data[i].description}"
                 return True
         return False
 
@@ -520,8 +510,7 @@ class Queue:
                                     full_name_param = ie[0]
                                     self.batch.logger.wrn(("(et_array_of_scripts...) ai.parameters is not None! ", ie[0]) )
                                 '''
-                                scr = 'interactions.set_param("{}","{}",{})'.format(splited_actual_value[0],
-                                                                                    execution_name, subie)
+                                scr = f'interactions.set_param("{splited_actual_value[0]}","{execution_name}",{subie})'
                                 param_arr.append([descr, scr])
                         all_evos.append(param_arr)
         return all_evos
@@ -611,25 +600,25 @@ class Queue:
         scr = que_item.evolution_script
         if "_save_scene" in scr:
             spl_scr = scr.split("_save_scene")
-            self.batch.logger.deepdb("(get_simed_shot_file_name) found_A:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+            self.batch.logger.deepdb(f"(get_simed_shot_file_name) found_A:{len(spl_scr)}, spl_scr:{spl_scr}")
 
             if len(spl_scr)>0:
                 spl_spl_scr = spl_scr[1][2:]
-                self.batch.logger.deepdb("(get_simed_shot_file_name) found_B:{}, spl_scr:{}  ".format(len(spl_spl_scr), spl_spl_scr))
+                self.batch.logger.deepdb(f"(get_simed_shot_file_name) found_B:{len(spl_spl_scr)}, spl_spl_scr:{spl_spl_scr}")
                 spl_spl_spl_scr = spl_spl_scr.split(")")[0][:-1]
                 if len(spl_spl_spl_scr) > 0:
-                    self.batch.logger.deepdb("(get_simed_shot_file_name) name:{}  ".format(spl_spl_spl_scr))
+                    self.batch.logger.deepdb(f"(get_simed_shot_file_name) name:{spl_spl_spl_scr}")
                     return spl_spl_spl_scr
                 else:
-                    self.batch.logger.deepdb("(get_simed_shot_file_name) found_C:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+                    self.batch.logger.deepdb(f"(get_simed_shot_file_name) found_C:{len(spl_scr)}, spl_scr:{spl_scr}")
                     return None
             else:
-                self.batch.logger.deepdb("(get_simed_shot_file_name) found:{}, spl_scr:{}  ".format(len(spl_scr), spl_scr))
+                self.batch.logger.deepdb(f"(get_simed_shot_file_name) found:{len(spl_scr)}, spl_scr:{spl_scr}")
                 return None
 
         else:
             self.batch.logger.deepdb("(get_simed_shot_file_name) None")
-            return None
+            return None 
 
     """ marker ATQ 304   get scripts set_param  from combinations array   """
     def get_params_from_evo_combinations(self, arr):

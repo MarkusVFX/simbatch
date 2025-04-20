@@ -503,12 +503,10 @@ class SettingsUI:
         self.batch.logger.db("test conn sql  .... ")
 
     def on_click_get_data_dir(self):
-        self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog,
-                                         dir_separator=self.settings.dir_separator)
+        self.comfun.get_dialog_directory(self.qt_settings_data_directory_edit, QFileDialog)
 
     def on_click_get_definitions_dir(self):
-        self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog,
-                                         dir_separator=self.settings.dir_separator)
+        self.comfun.get_dialog_directory(self.qt_settings_definitions_directory_edit, QFileDialog)
 
     def on_click_create_example_data(self):
         batch = self.batch

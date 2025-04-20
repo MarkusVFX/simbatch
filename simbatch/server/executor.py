@@ -32,7 +32,7 @@ class SimBatchExecutor():
         self.batch.load_data()
         self.batch.dfn.update_current_definition_by_name("Maya")
 
-        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
+        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep
         self.add_to_log_with_new_line("")
         time.sleep(0.5)
         self.add_to_log_with_new_line("")

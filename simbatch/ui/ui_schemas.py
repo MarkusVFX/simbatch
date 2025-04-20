@@ -10,6 +10,7 @@ except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 import copy
+import os
 
 from .widgets import *
 from .ui_schemas_form import SchemaFormCreateOrEdit
@@ -575,8 +576,7 @@ class SchemasUI:
             self.remove_form_state = 0
 
     def add_single_schema(self, new_schema_item):
-        new_schema_item.id = -1  # TODO check -1
-        self.sch.add_schema(new_schema_item, do_save=True)
+        self.batch.sch.add_schema(new_schema_item, do_save=True)
         list_item = QListWidgetItem(self.list_schemas)
         list_item_widget = SchemaListItem(str(new_schema_item.id), new_schema_item.schema_name,
                                           new_schema_item.description, str(new_schema_item.schema_version))
@@ -590,9 +590,9 @@ class SchemasUI:
             list_item_widget.setStyleSheet("background-color: rgb(" + color + ");")       # uicolor
 
         sch_dir = self.batch.prj.current_project.working_directory_absolute
-        sch_dir += self.batch.sio.get_flat_name(new_schema_item.schema_name) + self.sts.dir_separator
+        sch_dir += self.batch.sio.get_flat_name(new_schema_item.schema_name) + os.sep
 
-        self.batch.sio.create_schema_directory(sch_dir)
+        self.batch.sio.create_schema_directories(sch_dir)
 
     def on_click_add_schema(self, new_schema_item, save_as_base=0):
         self.batch.logger.db(("adding schema with name: ", new_schema_item.schema_name))

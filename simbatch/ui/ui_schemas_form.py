@@ -1,3 +1,4 @@
+from typing import List, Optional, Any
 import copy
 
 try:  # Maya 2016
@@ -15,15 +16,18 @@ from .widgets import *
 
 
 class SchemaFormCreateOrEdit(QWidget):
-    local_schema_item = None
-    save_as_base_state = 1
-
-    form_mode = 1  # 1 create    2 edit
-
-    # actions
-    form_actions_count = 0
-    action_widgets = []
-    actions_string = ""
+    """A form widget for creating or editing schema items.
+    
+    This class handles the UI and logic for creating new schemas or editing existing ones.
+    It manages action widgets and their interactions with the schema definition system.
+    """
+    
+    local_schema_item: Optional[Any] = None
+    save_as_base_state: int = 1
+    form_mode: int = 1  # 1 create, 2 edit
+    form_actions_count: int = 0
+    action_widgets: List[Any] = []
+    actions_string: str = ""
 
     # ui
     execute_button = None
@@ -37,8 +41,15 @@ class SchemaFormCreateOrEdit(QWidget):
     qt_lay_fae_actions_buttons = None
     schema_form_buttons = None
 
-    def __init__(self, batch, mode, top):
-        QWidget.__init__(self)
+    def __init__(self, batch: Any, mode: str, top: Any) -> None:
+        """Initialize the schema form.
+        
+        Args:
+            batch: The main batch object containing core functionality
+            mode: The form mode ("create" or "edit")
+            top: The top-level UI object
+        """
+        super().__init__()
         self.action_widgets = []
         self.batch = batch
         self.local_schema_item = batch.sch.get_blank_schema()
@@ -204,84 +215,128 @@ class SchemaFormCreateOrEdit(QWidget):
             b.button.setEnabled(False)
         return b
 
-    # add horizontal row of defined action buttons
-    def add_defined_action_buttons(self, nr=None):
-        self.batch.logger.deepdb(("add act but, dfn idx:", nr))
+    def add_defined_action_buttons(self, nr: Optional[int] = None) -> None:
+        """Add action buttons based on the current definition.
+        
+        Args:
+            nr: Optional index of the definition to use. If None, uses current definition.
+        """
+        self.batch.logger.deepdb(f"Adding action buttons for definition index: {nr}")
+        
         if nr is None:
             nr = self.batch.dfn.current_definition_index
+            
         curr_proj = self.batch.prj.current_project
-        if curr_proj is not None:
-            if nr is not None and nr < len(self.batch.dfn.definitions_array):
-                for multi_action in self.batch.dfn.definitions_array[nr].multi_actions_array:
-                    b = self.add_defined_action_button(multi_action.name)
-                    b.button.clicked.connect(lambda a=multi_action: self.on_click_defined_action_button(a))
-            else:
-                if nr is None:
-                    self.batch.logger.wrn("add act but nr is None !")
-                else:
-                    self.batch.logger.wrn(("add act but nr < definitions count ___ ", nr, "  < ",
-                                           len(self.batch.dfn.definitions_array)))
-        else:
-            self.batch.logger.wrn("Current project undefined !")
+        if curr_proj is None:
+            self.batch.logger.wrn("Current project undefined!")
+            return
+            
+        if nr is None:
+            self.batch.logger.wrn("Definition index is None!")
+            return
+            
+        if nr >= len(self.batch.dfn.definitions_array):
+            self.batch.logger.wrn(f"Definition index {nr} out of range (max: {len(self.batch.dfn.definitions_array)})")
+            return
+            
+        try:
+            for multi_action in self.batch.dfn.definitions_array[nr].multi_actions_array:
+                if not hasattr(multi_action, 'name'):
+                    self.batch.logger.err(f"Invalid multi_action object: {multi_action}")
+                    continue
+                    
+                b = self.add_defined_action_button(multi_action.name)
+                def create_click_handler(action):
+                    return lambda: self.on_click_defined_action_button(action)
+                b.button.clicked.connect(create_click_handler(multi_action))
+        except Exception as e:
+            self.batch.logger.err(f"Error adding action buttons: {str(e)}")
 
-    def create_action_widget(self, multi_action):
+    def create_action_widget(self, multi_action: Any) -> Any:
+        """Create a widget for a multi-action.
+        
+        Args:
+            multi_action: The multi-action object to create a widget for
+            
+        Returns:
+            An ActionWidget instance for the given multi-action
+        """
+        if not hasattr(multi_action, 'actions'):
+            self.batch.logger.err(f"Invalid multi_action object: {multi_action}")
+            dummy_multiaction = self.batch.dfn.create_multiaction(-1, "empty action")
+            return ActionWidget(self.batch, self.top_ui, self, "incorrectly defined action", dummy_multiaction)
+            
         combo_items = []
         button_1_caption = None
         button_2_caption = None
         button_1_function_str = None
         button_2_function_str = None
-        if len(multi_action.actions) > 0:
-            if multi_action.actions[0].ui is not None:
-                if len(multi_action.actions[0].ui) > 1:
-                    button_1_caption = multi_action.actions[0].ui[1][0]
-                    button_1_function_str = multi_action.actions[0].ui[1][1]
-                if len(multi_action.actions[0].ui) > 2:
-                    button_2_caption = multi_action.actions[0].ui[2][0]
-                    button_2_function_str = multi_action.actions[0].ui[2][1]
+        
+        if len(multi_action.actions) > 0 and hasattr(multi_action.actions[0], 'ui'):
+            if len(multi_action.actions[0].ui) > 1:
+                button_1_caption = multi_action.actions[0].ui[1][0]
+                button_1_function_str = multi_action.actions[0].ui[1][1]
+            if len(multi_action.actions[0].ui) > 2:
+                button_2_caption = multi_action.actions[0].ui[2][0]
+                button_2_function_str = multi_action.actions[0].ui[2][1]
 
-        batch = self.batch
-        '''  share logger and interaction from definition  '''
-        top = self.top_ui
-        if multi_action.actions_count == 0:   # incorrectly defined action
+        if multi_action.actions_count == 0:
+            self.batch.logger.wrn("Creating widget for empty multi_action")
             dummy_multiaction = self.batch.dfn.create_multiaction(-1, "empty action")
-            action_widget = ActionWidget(batch, top, self, "incorrectly defined action", dummy_multiaction)
-        else:
+            return ActionWidget(self.batch, self.top_ui, self, "incorrectly defined action", dummy_multiaction)
 
-            if multi_action.actions_count == 1:   # single action, no combo
-                if len(multi_action.actions[0].actual_value) == 0:
-                    # multi_action.actions[0].actual_value = multi_action.actions[0].default_value
-                    multi_action.actions[0].actual_value = multi_action.actions[0].ui[0]
-                action_widget = ActionWidget(batch, top, self, multi_action.actions[0].name,
-                                             copy.deepcopy(multi_action),
-                                             button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
-                                             button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str)
+        # Single action, no combo    
+        if multi_action.actions_count == 1:
+            if len(multi_action.actions[0].actual_value) == 0:
+                multi_action.actions[0].actual_value = multi_action.actions[0].ui[0]
+            return ActionWidget(
+                self.batch, self.top_ui, self, 
+                multi_action.actions[0].name,
+                copy.deepcopy(multi_action),
+                button_1_caption=button_1_caption,
+                button_1_fun_str=button_1_function_str,
+                button_2_caption=button_2_caption,
+                button_2_fun_str=button_2_function_str
+            )
+            
+        # Multi-action case
+        for action in multi_action.actions:
+            combo_items.append(action.mode)
+            action.actual_value = action.ui[0]
+            
+        return ActionWidget(
+            self.batch, self.top_ui, self,
+            multi_action.name,
+            copy.deepcopy(multi_action),
+            button_1_caption=button_1_caption,
+            button_1_fun_str=button_1_function_str,
+            button_2_caption=button_2_caption,
+            button_2_fun_str=button_2_function_str,
+            combo_items=combo_items
+        )
 
-            else:            # multi action :  import ANI, CAM, ENV
-                for i, a in enumerate(multi_action.actions):
-                    combo_items.append(a.mode)
+    def add_action_widget_to_form(self, multi_action: Any) -> None:
+        try:
+            new_widget = self.create_action_widget(multi_action)
+            self.qt_lay_fae_actions.addWidget(new_widget)
+            self.action_widgets.append(new_widget)
+            current_action = new_widget.get_current_action()
+            if current_action is not None:
+                self.local_schema_item.actions_array.append(current_action)
+            self.form_actions_count += 1
+        except Exception as e:
+            self.batch.logger.err(f"Error adding action widget: {str(e)}")
 
-                    # a.actual_value = a.default_value    # TODO actual vs user val
-                    a.actual_value = a.ui[0]
-                action_widget = ActionWidget(batch, top, self, multi_action.name, copy.deepcopy(multi_action),
-                                             button_1_caption=button_1_caption, button_1_fun_str=button_1_function_str,
-                                             button_2_caption=button_2_caption, button_2_fun_str=button_2_function_str,
-                                             combo_items=combo_items)
-        return action_widget
-
-    def add_action_widget_to_form(self, multi_action):
-        qt_lay = self.qt_lay_fae_actions
-
-        new_widget = self.create_action_widget(multi_action)
-
-        qt_lay.addWidget(new_widget)
-        self.action_widgets.append(new_widget)
-        self.local_schema_item.actions_array.append(new_widget.get_current_action())
-        self.form_actions_count += 1
-
-    """ on click one of horizontal button """
-    """ ADD action widget to vertical list of schema's actions """
-    def on_click_defined_action_button(self, multi_action):
-        self.add_action_widget_to_form(copy.deepcopy(multi_action))
+    def on_click_defined_action_button(self, multi_action: Any) -> None:
+        """ on click one of horizontal button """
+        """ ADD action widget to vertical list of schema's actions """
+        try:
+            if not hasattr(multi_action, 'actions'):
+                self.batch.logger.err(f"Invalid multi_action object: {multi_action}")
+                return
+            self.add_action_widget_to_form(copy.deepcopy(multi_action))
+        except Exception as e:
+            self.batch.logger.err(f"Error handling action button click: {str(e)}")
 
     # ACTIONS
     # ACTIONS

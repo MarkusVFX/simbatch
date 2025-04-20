@@ -12,25 +12,25 @@ class FileSystemOperations:
         pass
 
     def info(self, full=False, short=False):
-        print("\n\nFileSystemOperations")
-        print("max_dir_depth: {}".format(self.max_dir_depth))
-        print("dirs count: {}".format(len(self.arr_dirs)))
-        print("files count: {}".format(len(self.arr_files)))
+        print(f"{os.linesep}{os.linesep}FileSystemOperations")
+        print(f"max_dir_depth: {self.max_dir_depth}")
+        print(f"dirs count: {len(self.arr_dirs)}")
+        print(f"files count: {len(self.arr_files)}")
         if short is False:
             for ad in self.arr_dirs:
-                print("{}".format(ad))
-            print("\n\n")
+                print(f"{ad}")
+            print(f"{os.linesep}{os.linesep}")
             for i, fi in enumerate(self.arr_files):
                 if len(self.arr_files) > 20 and full is False:
                     if i < 6 or i > len(self.arr_files)-8:
-                        print("[{}]  {}".format(i, fi))
+                        print(f"[{i}]  {fi}")
                     elif i == 6:
-                        print("[{}]  {}\n...\n...\n...".format(i, fi))
+                        print(f"[{i}]  {fi}{os.linesep}...{os.linesep}...{os.linesep}...")
                     else:
                         pass
                 else:
-                    print("[{}]  {}".format(i, fi))
-        print("\n\n", len(self.arr_files))
+                    print(f"[{i}]  {fi}")
+        print(f"{os.linesep}{os.linesep}{len(self.arr_files)}")
 
     def reset(self):
         del self.arr_files[:]
@@ -170,7 +170,7 @@ class Patterns:    # TODO  TESTS !!!!
         return [pattern_s_n, n_count]
 
     def get_pattern_from_string(self, stri, is_final=False, number_types=("seq", "sh", "take")):
-        print(f"  [db] get_pattern_from_string  {stri} {number_types}")   # TODO logger
+        print(f"  [db] get_pattern_from_string  {stri} {number_types}{os.linesep}")   # TODO logger
         last_s_n = "."
         pattern_s_n = ""        # pattern type:  snsn
         pattern_final = ""      # seq<nr##>_sh<nr####>    <seq##>_<sh####>
@@ -220,15 +220,15 @@ class Patterns:    # TODO  TESTS !!!!
             pattern_s_n = ret[0]
             if pattern_s_n == patt:
                 num_types = ["seq", "sh", "take"]
-                print(" \n\n [db] pre SN pattern", ret)   # TODO  logger
+                print(f" {os.linesep}{os.linesep} [db] pre SN pattern {ret}")   # TODO  logger
                 if ret[1] == 1:
                     if lvl == 2:
                         num_types = ["sh"]
-                        print(" over write num_types ", num_types)  # TODO  logger
+                        print(f" over write num_types {num_types}")  # TODO  logger
                     if lvl == 3:
                         num_types = ["take"]
                 ret = self.get_pattern_from_string(a, is_final=True, number_types=num_types)
-                print("     [db]   final paterrn : ", pattern_s_n, ret)   # TODO  logger
+                print(f"     [db]   final paterrn : {pattern_s_n} {ret}{os.linesep}")   # TODO  logger
                 return ret
 
     def get_dir_patterns(self, dir, db=False):
@@ -245,7 +245,7 @@ class Patterns:    # TODO  TESTS !!!!
 
         for i in self.fso.arr_dirs:
             if db:
-                print("self.fso.arr_dirs   ", i[0], "...", i[1], "...", i[2])     # TODO logger
+                print(f"self.fso.arr_dirs   {i[0]}...{i[1]}...{i[2]}")     # TODO logger
             if i[0] == 1:
                 level1arr.append(i[1])
             if i[0] == 2:
@@ -262,39 +262,39 @@ class Patterns:    # TODO  TESTS !!!!
         most_occurred_pattern = self.check_dir_pattern(level2arr)
         if len(most_occurred_pattern) > 0:
             patt2 = self.generate_final_pattern(level2arr, most_occurred_pattern, 2)
-            full_dir_pattern += "\\" + patt2  # TODO os.separator
+            full_dir_pattern += os.sep + patt2
         patt3 = ""
         most_occurred_pattern = self.check_dir_pattern(level3arr)
         if len(most_occurred_pattern) > 0:
             patt3 = self.generate_final_pattern(level3arr, most_occurred_pattern, 3)
-            full_dir_pattern += "\\" + patt3  # TODO os.separator
-        print("\n [db]  ret full_dir_pattern     ", full_dir_pattern)     # TODO  logger
+            full_dir_pattern += os.sep + patt3
+        print(f"{os.linesep} [db]  ret full_dir_pattern     {full_dir_pattern}{os.linesep}")     # TODO  logger
         return full_dir_pattern
 
     def get_seq_pattern(self, full_dir_pattern):
-        p_arr = full_dir_pattern.split("\\")  # TODO os.separator
+        p_arr = full_dir_pattern.split(os.sep)
         if len(p_arr) > 0:
             return p_arr[0]
         else:
             return ""
 
     def get_sh_pattern(self, full_dir_pattern):
-        p_arr = full_dir_pattern.split("\\")  # TODO os.separator
+        p_arr = full_dir_pattern.split(os.sep)
         if len(p_arr) > 1:
             return p_arr[1]
         else:
             return ""
 
     def get_take_pattern(self, full_dir_pattern):
-        p_arr = full_dir_pattern.split("\\")  # TODO os.separator
+        p_arr = full_dir_pattern.split(os.sep)
         if len(p_arr) > 2:
             return p_arr[2]
         else:
             return ""
 
     def print_minimum(self):
-        print("   {}   name: {}".format(self.abbrev, self.name))
+        print(f"   {self.abbrev}   name: {self.name}")
 
     def print_params(self):
         for p in self.param_list:
-            print("  {}  _  {}   __   {}    ___  {}".format(p.abbrev, p.name, p.description, p.execution_name))
+            print(f"  {p.abbrev}  _  {p.name}   __   {p.description}    ___  {p.execution_name}")

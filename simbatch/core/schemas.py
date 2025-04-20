@@ -72,27 +72,26 @@ class SchemaItem:
         # soft_name = "Maya_TODO"  # TODO
 
     def __str__(self):
-        return "SchemaItem   id:{}  name:{}".format(self.id, self.schema_name)
+        return f"SchemaItem   id:{self.id}  name:{self.schema_name}"
 
     def print_this(self, detailed=False):
-        print("\n SCHEMA: {}".format(self.schema_name))
-        print("   id: {}  state: {}  project_id: {}  definition: {}".format(
-            self.id, self.state, self.project_id, self.based_on_definition))
-        print("   version: {}  description: {}".format(self.schema_version, self.description))
+        print(f"{os.linesep} SCHEMA: {self.schema_name}")
+        print(f"   id: {self.id}  state: {self.state}  project_id: {self.project_id}  definition: {self.based_on_definition}")
+        print(f"   version: {self.schema_version}  description: {self.description}")
         if detailed:
             self.detailed_print()
         else:
             self.basic_print()
 
     def basic_print(self):
-        print("   actions: {}".format(len(self.actions_array)))
+        print(f"   actions: {len(self.actions_array)}")
         for a in self.actions_array:
-            print("     {}  {}".format(a.name, a.actual_value))
+            print(f"     {a.name}  {a.actual_value}")
 
     def detailed_print(self):
-        print("   actions: {}".format(len(self.actions_array)))
+        print(f"   actions: {len(self.actions_array)}")
         for a in self.actions_array:
-            print("     {}  {}  {}  {}".format(a.name, a.actual_value, a.template, a.mode))
+            print(f"     {a.name}  {a.actual_value}  {a.template}  {a.mode}")
 
     def add_example_actions_to_schema(self):
         self.based_on_definition = "virtual_definition"
@@ -234,13 +233,12 @@ class Schemas:
         if schema is None:
             schema = self.current_schema
         if schema is not None:
-            print("\n SCHEMA: {}".format(schema.schema_name))
-            print("   id: {}  state: {}  project_id: {}  definition: {}".format(
-                schema.id, schema.state, schema.project_id, schema.based_on_definition))
-            print("   version: {}  description: {}".format(schema.schema_version, schema.description))
-            print("   actions: {}".format(len(schema.actions_array)))
+            print(f"{os.linesep} SCHEMA: {schema.schema_name}")
+            print(f"   id: {schema.id}  state: {schema.state}  project_id: {schema.project_id}  definition: {schema.based_on_definition}")
+            print(f"   version: {schema.schema_version}  description: {schema.description}")
+            print(f"   actions: {len(schema.actions_array)}")
             for a in schema.actions_array:
-                print("     {}  {}  {}  {}".format(a.name, a.actual_value, a.template, a.mode))
+                print(f"     {a.name}  {a.actual_value}  {a.template}  {a.mode}")
         else:
             print("   [INF] no schema to print")
 
@@ -251,14 +249,13 @@ class Schemas:
         if self.total_schemas == 0:
             print("   [INF] no schemas loaded")
         for s in self.schemas_data:
-            print("\n\n   {} id:{} state:{} project_id:{}".format(
-                s.schema_name, s.id, s.state, s.project_id))
-            print("   definition: {} version:{}".format(s.based_on_definition, s.schema_version))
-            print("   description: {}".format(s.description))
-            print("   actions count: {}".format(len(s.actions_array)))
+            print(f"{os.linesep}{os.linesep}   {s.schema_name} id:{s.id} state:{s.state} project_id:{s.project_id}")
+            print(f"   definition: {s.based_on_definition} version:{s.schema_version}")
+            print(f"   description: {s.description}")
+            print(f"   actions count: {len(s.actions_array)}")
             for a in s.actions_array:
-                print("   __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template))
-        print("\n\n")
+                print(f"   __action: {a.name}__{a.ui[0]}__{a.actual_value}__{a.template}")
+        print(f"{os.linesep}{os.linesep}")
 
     def get_schema_names(self, as_string=False, fit=()):
         schema_names = []
@@ -570,15 +567,14 @@ class Schemas:
                                                          int(li['version']), li['desc'])
                             self.add_schema(new_schema_item)
                         else:
-                            self.batch.logger.err(("schema json data not consistent: ", len(li),
-                                                   len(SCHEMA_ITEM_FIELDS_NAMES)))
+                            self.batch.logger.err(f"schema json data not consistent: {len(li)},{len(SCHEMA_ITEM_FIELDS_NAMES)}")
                 else:
-                    self.batch.logger.wrn(("no projects data in: ", json_file))
+                    self.batch.logger.wrn(f"no projects data in: {json_file}")
                 return True
             else:
-                self.batch.logger.err(("wrong format data: ", json_file))
+                self.batch.logger.err(f"wrong format data: {json_file}")
         else:
-            self.batch.logger.err(("no schema file: ", json_file))
+            self.batch.logger.err(f"no schema file: {json_file}")
         return False
 
     def load_schemas_from_mysql(self):

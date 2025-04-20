@@ -5,6 +5,9 @@
 #  www.SimBatch.com
 #
 # JSON Name Format, PEP8 Name Format
+
+import os
+
 NODES_ITEM_FIELDS_NAMES = [
     ('id', 'id'),
     ('name', 'node_name'),
@@ -24,8 +27,7 @@ class SingleNode:
         self.description = description
 
     def __str__(self):
-        return "SingleNode  node_id:{}  node_name:{}  state:{}  state_id:{}  state_file:{}  description:{}".format(
-            self.id, self.node_name, self.state, self.state_id, self.state_file, self.description)
+        return f"SingleNode  node_id:{self.id}  node_name:{self.node_name}  state:{self.state}  state_id:{self.state_id}  state_file:{self.state_file}  description:{self.description}"
 
 
 class SimNodes:
@@ -59,25 +61,24 @@ class SimNodes:
         if index is not None and index >= 0:
             if index < self.total_nodes:
                 n = self.nodes_data[index]
-                self.batch.logger.raw("\n\n {} node: {}  {}  {}".format(prefix, n.node_name, n.state, n.description))
+                self.batch.logger.raw(f"{os.linesep}{os.linesep} {prefix} node: {n.node_name}  {n.state}  {n.description}")
             else:
-                self.batch.logger.raw("\n no {} node with index: {} ".format(prefix, index))
+                self.batch.logger.raw(f"{os.linesep} no {prefix} node with index: {index} ")
         else:
-            self.batch.logger.raw("\n no {} node, index: {} ".format(prefix, index))
+            self.batch.logger.raw(f"{os.linesep} no {prefix} node, index: {index} ")
 
     def print_all(self):
-        self.batch.logger.raw("\n Total nodes in database: {}".format(self.total_nodes))
+        self.batch.logger.raw(f"{os.linesep} Total nodes in database: {self.total_nodes}")
         if self.batch.sts.installation_directory_abs is not None:
-            self.batch.logger.raw("\n Source dir: {}".format(self.batch.sts.installation_directory_abs))
+            self.batch.logger.raw(f"{os.linesep} Source dir: {self.batch.sts.installation_directory_abs}")
         for n in self.nodes_data:
-            self.batch.logger.raw("\n {} {}    {} ({})  {} \n  {}".format(n.id, n.node_name, n.state, n.state_id,
-                                                                          n.description, n.state_file))
+            self.batch.logger.raw(f"{os.linesep} {n.id} {n.node_name}    {n.state} ({n.state_id})  {n.description} {os.linesep}  {n.state_file}")
 
     def get_index_by_id(self, get_id):
         for i, nod in enumerate(self.nodes_data):
             if nod.id == get_id:
                 return i
-        self.batch.logger.wrn(("no node with ID: ", get_id))
+        self.batch.logger.wrn(f"no node with ID: {get_id}")
         return None
         
     """ get node by name | return False if no node, index if one, -count if found > 0 """
@@ -100,7 +101,7 @@ class SimNodes:
                     nod_count += 1
                     nod_last_index = i
         if force_db:
-            self.batch.logger.deepdb("(gnibp) found:{} count:{} by name:{}".format(str(nod_last_index), nod_count, name), force_print=force_db)
+            self.batch.logger.deepdb(f"(gnibp) found:{str(nod_last_index)} count:{nod_count} by name:{name}", force_print=force_db)
         if nod_last_index is None:
             return False
         elif nod_count == 1:
@@ -119,8 +120,8 @@ class SimNodes:
         else:
             self.current_node_id = None
             self.current_node = None
-            self.batch.logger.err(("(update_current_from_index) wrong index:", index))
-            self.batch.logger.err(" total:{}  len:{}".format(self.total_nodes, len(self.nodes_data)))
+            self.batch.logger.err(f"(update_current_from_index) wrong index: {index}")
+            self.batch.logger.err(f" total:{self.total_nodes}  len:{len(self.nodes_data)}")
             return False
             
     def set_node_state_in_database(self, index, state_id):
@@ -129,7 +130,7 @@ class SimNodes:
             self.nodes_data[index].state_id = state_id 
             return self.save_nodes()
         else:
-            self.batch.logger.err("Wrong node index:{} ! State NOT updated!".format(index))
+            self.batch.logger.err(f"Wrong node index:{index} ! State NOT updated!")
 
     @staticmethod
     def get_new_node(node_name, node_state, node_state_id, state_file, desc):
@@ -161,9 +162,7 @@ class SimNodes:
                         dup_last_id = nodi.id
 
         if dup_count > 0:
-            self.batch.logger.wrn("Simnode duplicates found ({}) in database. Last id: {}, file:{}".format(dup_count,
-                                                                                                           dup_last_id,
-                                                                                                           dup_last))
+            self.batch.logger.wrn(f"Simnode duplicates found ({dup_count}) in database. Last id: {dup_last_id}, file:{dup_last}")
         return dup_count, dup_last_id
 
     def update_from_nodes(self, with_save=False):
@@ -189,7 +188,7 @@ class SimNodes:
                         nod.node_name = node_info.node_name
                         changes_count += 1
             else:
-                self.batch.logger.wrn(("No access to: ", nod.state_file))
+                self.batch.logger.wrn(f"No access to: {nod.state_file}")
 
         if with_save and changes_count > 0:
             return self.save_nodes(), changes_count
@@ -225,9 +224,9 @@ class SimNodes:
 
     def load_nodes_from_json(self, json_file=""):
         if len(json_file) == 0:
-            json_file = self.batch.sts.store_data_json_directory_abs + self.batch.sts.JSON_SIMNODES_FILE_NAME
+            json_file = self.batch.sts.store_data_json_directory_abs + os.sep + self.batch.sts.JSON_SIMNODES_FILE_NAME
         if self.comfun.file_exists(json_file, info="simnodes file"):
-            self.batch.logger.inf(("loading simnodes: ", json_file))
+            self.batch.logger.inf(f"loading simnodes: {json_file}")
             json_nodes = self.comfun.load_json_file(json_file)
             if json_nodes is not None and "simnodes" in json_nodes.keys():
                 if json_nodes['simnodes']['meta']['total'] > 0:
@@ -237,15 +236,14 @@ class SimNodes:
                                                           int(li['stateId']), li['stateFile'], li['desc'])
                             self.add_simnode(new_simnode_item)
                         else:
-                            self.batch.logger.wrn(("simnode json data not consistent: ", len(li),
-                                                   len(NODES_ITEM_FIELDS_NAMES)))
+                            self.batch.logger.wrn(f"simnode json data not consistent: {len(li)}, {len(NODES_ITEM_FIELDS_NAMES)}")
                 else:
-                    self.batch.logger.inf(("no nodes data in : ", json_file))
+                    self.batch.logger.inf(f"no nodes data in : {json_file}")
                 return True
             else:
-                self.batch.logger.err(("wrong format data in: ", json_file))
+                self.batch.logger.err(f"wrong format data in: {json_file}")
         else:
-            self.batch.logger.err(("no simnodes file: ", json_file))
+            self.batch.logger.err(f"no simnodes file: {json_file}")
         return False
 
     def load_nodes_from_mysql(self):
@@ -261,7 +259,7 @@ class SimNodes:
             
     def save_nodes_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_SIMNODES_FILE_NAME
+            json_file = self.sts.store_data_json_directory_abs + os.sep + self.sts.JSON_SIMNODES_FILE_NAME
         content = self.format_nodes_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
@@ -330,16 +328,16 @@ class SimNodes:
                 li = first_line.split(";")
                 state_int = self.comfun.int_or_val(li[0], -1)
                 if state_int > 0:
-                    self.batch.logger.deepdb(("State from file : ", state_int))
+                    self.batch.logger.deepdb(f"State from file : {state_int}")
                     server_name = li[1]
                     state_name = self.batch.sts.states_visible_names[state_int]
                     node_info = SingleNode(-1, server_name, state_name, state_int, state_file, "info from state file")
                     return node_info
                 else:
-                    self.batch.logger.err("State file err, wrong status value : {}".format(li[0]))
+                    self.batch.logger.err(f"State file err, wrong status value : {li[0]}")
                     return False
             else:
-                self.batch.logger.err("First line of state file is empty : {}".format(state_file))
+                self.batch.logger.err(f"First line of state file is empty : {state_file}")
                 return False
         else:
             return None
@@ -353,33 +351,33 @@ class SimNodes:
                 li = first_line.split(";")
             else:
                 li = [-1]
-                self.batch.logger.deepdb((" [db] len(first_line) : ", len(first_line), " ___ ", len(first_line)))
+                self.batch.logger.deepdb(f" [db] len(first_line) : {len(first_line)} ___ {len(first_line)}")
 
             state_int = self.comfun.int_or_val(li[0], -1)
-            self.batch.logger.deepdb((" [db] get state_int : ", state_int))
+            self.batch.logger.deepdb(f" [db] get state_int : {state_int}")
             return state_int
         else:
             return -1
 
     def create_node_state_file(self, state_file, server_name, state, update_mode=False):
         if self.comfun.file_exists(state_file, "set state file txt") is False or update_mode:
-            self.batch.logger.deepdb((" [db] set state : ", state))
+            self.batch.logger.deepdb(f" [db] set state : {state}")
             try:
                 f = open(state_file, 'w')
-                f.write(str(state) + ";" + server_name + ";" + self.comfun.get_current_time())
+                f.write(f"{state};{server_name};{self.comfun.get_current_time()}")
                 f.close()
             except IOError:
                 if update_mode is False:
-                    self.batch.logger.err(("Creating state file error:", state_file))
+                    self.batch.logger.err(f"Creating state file error: {state_file}")
                 else:
-                    self.batch.logger.err(("Update state file error:", state_file))
+                    self.batch.logger.err(f"Update state file error: {state_file}")
                 return False
             return True
         else:
             if update_mode is False:
-                self.batch.logger.err(("[ERR] state file NOT created, file exist: ", state_file))
+                self.batch.logger.err(f"[ERR] state file NOT created, file exist: {state_file}")
             else:
-                self.batch.logger.err(("[ERR] state file NOT updated, file exist: ", state_file))
+                self.batch.logger.err(f"[ERR] state file NOT updated, file exist: {state_file}")
             return False
 
     def check_node_as_server(self, must_also_check_database):
@@ -401,7 +399,7 @@ class SimNodes:
         ret = self.check_node_as_server(must_also_check_database=must_set_in_database)
 
         if ret is False:
-            self.logger.err("State {} NOT set! Wrong server init".format(state_id))
+            self.logger.err(f"State {state_id} NOT set! Wrong server init")
             return False
         else:
             state_file = self.state_file
@@ -428,19 +426,19 @@ class SimNodes:
                 if len(li) > 0:
                     return li[1]
                 else:
-                    self.batch.logger.wrn(("sim node name missing: ", li))
+                    self.batch.logger.wrn(f"sim node name missing: {li}")
                     return ""
             else:
-                self.batch.logger.wrn(("len(first_line): ", len(first_line)))
+                self.batch.logger.wrn(f"len(first_line): {len(first_line)}")
                 return ""
         else:
-            self.batch.logger.err(("server state file not exist: ", server_state_file))
+            self.batch.logger.err(f"server state file not exist: {server_state_file}")
             return ""
 
     def create_example_nodes_data(self, do_save=True):
         state_off = self.sts.states_visible_names[self.sts.INDEX_STATE_OFFLINE]
         state_off_id = self.sts.INDEX_STATE_OFFLINE
-        state_file = "/srv/simbatch/server_1/state.txt"
+        state_file = f"{os.sep}srv{os.sep}simbatch{os.sep}server_1{os.sep}state.txt"
         example_node = SingleNode(0, "example sim node", state_off, state_off_id, state_file, "example node 1")
         self.add_simnode(example_node, do_save=do_save)
         return True
@@ -454,7 +452,7 @@ class SimNodes:
                 executor_inject = "executor_"
             else:
                 executor_inject = ""
-            log_file = log_dir + self.batch.sts.dir_separator + executor_inject + "log.txt"
+            log_file = log_dir + os.sep + executor_inject + "log.txt"
             content = self.comfun.load_from_file(log_file)
             self.batch.logger.raw(content)
 

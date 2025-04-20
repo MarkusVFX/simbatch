@@ -32,9 +32,9 @@ class CommonFunctions:
     def print_list(self, get_list, check_float=False):
         for index, val in enumerate(get_list):
             if check_float:
-                print("     ", index, " : ", val, "  ___  ", self.is_float(val))
+                print(f"     {index} : {val}  ___  {self.is_float(val)}")
             else:
-                print("     ", index, " : ", val)
+                print(f"     {index} : {val}")
 
     @staticmethod
     def is_int(value):     # check is int   [for True return 0]
@@ -87,7 +87,7 @@ class CommonFunctions:
     def str_with_zeros(self, number, zeros=3):
         if self.can_get_int(zeros) is False:
             zeros = 0
-            self.logger.err(("(str_with_zeros) zeros is not number:", zeros))
+            self.logger.err(f"(str_with_zeros) zeros is not number: {zeros}")
         stri = str(number)
         while len(stri) < zeros:
             stri = "0" + stri
@@ -101,16 +101,16 @@ class CommonFunctions:
                 else:
                     text += " "
         else:
-            self.logger.err(("(str_with_spaces) length is not int:", length))
+            self.logger.err(f"(str_with_spaces) length is not int: {length}")
 
         return text
 
     @staticmethod
     def str_get_decorative(txt, header=False):
         if header:
-            txt = " _______/// {} \\\\\\_______ ".format(txt)
+            txt = f" _______/// {txt} \\\\\\_______ "
         else:
-            txt = " _/|\\_ _/|\\_ _/|\\_ {} _/|\\_ _/|\\_ ".format(txt)
+            txt = f" _/|\\_ _/|\\_ _/|\\_ {txt} _/|\\_ _/|\\_ "
         return txt
 
     @staticmethod
@@ -130,8 +130,7 @@ class CommonFunctions:
                     tmp_sin.append(int(amplitude * math.sin(ti * math.pi / period * 2)))
                 sin_arr.append(tmp_sin)
                 if debug_mode > 0:
-                    print(" [{}]   new sinus len:{}    per:{}   amp:{}".format(len(sin_arr), len(sin_arr[-1]), period,
-                                                                               amplitude))
+                    print(f" [{len(sin_arr)}]   new sinus len:{len(sin_arr[-1])}    per:{period}   amp:{amplitude}")
                     if debug_mode > 1:
                         print(sin_arr[-1])
             if debug_mode > 0:
@@ -173,21 +172,21 @@ class CommonFunctions:
         for index, sa in enumerate(strings_array):
             if exactly:
                 if sa == wanted_string:
-                    self.logger.deepdb(("isStringInArray : exactly ", sa, wanted_string), force_print=db)
+                    self.logger.deepdb(f"isStringInArray : exactly {sa} {wanted_string}", force_print=db)
                     return index
             else:
                 if starting:
                     if sa.startswith(wanted_string):
-                        self.logger.deepdb(("isStringInArray : starting ", sa, wanted_string), force_print=db)
+                        self.logger.deepdb(f"isStringInArray : starting {sa} {wanted_string}", force_print=db)
                         return index
                 else:
                     ret = sa.find(wanted_string)
                     if ret >= 0:
-                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_print=db)
+                        self.logger.deepdb(f"isStringInArray : substring {sa} {wanted_string}", force_print=db)
                         return index
                     ret = wanted_string.find(sa)
                     if ret >= 0:
-                        self.logger.deepdb(("isStringInArray : substring ", sa, wanted_string), force_print=db)
+                        self.logger.deepdb(f"isStringInArray : substring {sa} {wanted_string}", force_print=db)
                         return index
         return None
 
@@ -207,14 +206,14 @@ class CommonFunctions:
             if self.can_get_float(seconds):
                 seconds = float(seconds)
             else:
-                return "NaN:{}".format(seconds)
+                return f"NaN:{seconds}"
 
         if seconds < 60:
-            return str(int(seconds)) + "s"
+            return f"{int(seconds)}s"
         elif seconds < 3600:
-            return "{:.1f}m".format(1.0 * seconds / 60)
+            return f"{1.0 * seconds / 60:.1f}m"
         else:
-            return "{:.1f}h".format(1.0 * seconds / 3600)
+            return f"{1.0 * seconds / 3600:.1f}h"
 
     # files and directories ...
     def current_scripts_path(self):
@@ -233,9 +232,9 @@ class CommonFunctions:
         else:
             if len(check_file) > 0:
                 if info is not False:
-                    self.logger.wrn("File {} not exist ! ({})\n".format(check_file, info))
+                    self.logger.wrn(f"File {check_file} not exist ! ({info}){os.linesep}")
             else:
-                self.logger.err("File name length is zero! {}".format(info))
+                self.logger.err(f"File name length is zero! {info}")
             return False
 
     def path_exists(self, check_path, info=""):
@@ -244,10 +243,10 @@ class CommonFunctions:
                 return True
             else:
                 if len(info) > 0:
-                    self.logger.err(("Dir ", info, " don't exist!"))
+                    self.logger.err(f"Dir {info} don't exist!")
                 return False
         else:
-            self.logger.err(("(path_exists) wrong parameter!", check_path, info))
+            self.logger.err(f"(path_exists) wrong parameter! {check_path} {info}")
             return False
             
     def get_dir_depth(self, dir, level=1):
@@ -293,7 +292,7 @@ class CommonFunctions:
                 if get_path[-1] != "\\":
                     get_path += "\\"
         else:
-            self.logger.err("(get_proper_path) param len 0 ! ({})".format(info))
+            self.logger.err(f"(get_proper_path) param len 0 ! ({info})")
         return get_path
     
     def get_path_from_full(self, full):
@@ -318,27 +317,27 @@ class CommonFunctions:
                     if os.path.exists(check_drive):   # TODO os.access
                         os.makedirs(directory)
                         if os.path.exists(directory):
-                            self.logger.deepdb(("directory created ", directory))
+                            self.logger.deepdb(f"directory created {directory}")
                             return True
                         else:
-                            self.logger.wrn(("directory not created ", directory))
+                            self.logger.wrn(f"directory not created {directory}")
                             return False
                     else:
-                        self.logger.err(("drive: ", directory[0], " NOT EXIST !!!"))
+                        self.logger.err(f"drive: {directory[0]} NOT EXIST !!!")
                         return False
                 else:  # linux /     or     win server \\
                     os.makedirs(directory)
                     if os.path.exists(directory):
-                        self.logger.deepdb(("directory created ", directory))
+                        self.logger.deepdb(f"directory created {directory}")
                         return True
                     else:
-                        self.logger.wrn(("directory not created ", directory))
+                        self.logger.wrn(f"directory not created {directory}")
                         return False
             else:
-                self.logger.inf(("directory EXIST, not created:  ", directory))
+                self.logger.inf(f"directory EXIST, not created: {directory}")
                 return False
         else:
-            self.logger.wrn(("directory null name ", directory))
+            self.logger.wrn(f"directory null name {directory}")
             return False
 
     def remove_directory(self, directory):
@@ -350,16 +349,16 @@ class CommonFunctions:
                         os.rmdir(directory)           # TODO shutil.rmtree
                         return True
                     else:
-                        self.logger.err(("drive: ", directory[0], " NOT EXIST !!!"))
+                        self.logger.err(f"drive: {directory[0]} NOT EXIST !!!")
                         return False
                 else:  # TODO test server \\
                     os.rmdir(directory)
                     return True
             else:
-                self.logger.inf(("directory not EXIST, not removed:  ", directory))
+                self.logger.inf(f"directory not EXIST, not removed: {directory}")
                 return False
         else:
-            self.logger.wrn(("directory null name    ", directory))
+            self.logger.wrn(f"directory null name {directory}")
             return False
 
     def test_directory_access(self, directory, directory_info="directory", with_info=True):
@@ -367,17 +366,17 @@ class CommonFunctions:
         ret_w = False
         if ret_r:
             if with_info:
-                self.logger.inf("Read from {} test ({})".format(directory_info, directory), force_prefix="OK ")
+                self.logger.inf(f"Read from {directory_info} test ({directory})", force_prefix="OK ")
             ret_w = os.access(directory, os.W_OK)
             if ret_w:
                 if with_info:
-                    self.logger.inf("Save to {} test ({})".format(directory_info, directory), force_prefix="OK ")
+                    self.logger.inf(f"Save to {directory_info} test ({directory})", force_prefix="OK ")
             else:
                 if with_info:
-                    self.logger.err("Could NOT save to {} :  {} ".format(directory_info, directory))
+                    self.logger.err(f"Could NOT save to {directory_info} : {directory} ")
         else:
             if with_info:
-                self.logger.err("Could NOT read from {} :  {} ".format(directory_info, directory))
+                self.logger.err(f"Could NOT read from {directory_info} : {directory} ")
         return ret_r, ret_w
 
     @staticmethod
@@ -397,7 +396,7 @@ class CommonFunctions:
                 pass
             return True
         except Exception as e:
-            self.logger.err(("Error creating empty file:", str(e)))
+            self.logger.err(f"Error creating empty file: {str(e)}")
             return False
 
     def delete_file(self, file_name):
@@ -405,10 +404,10 @@ class CommonFunctions:
             os.remove(file_name)
             return True
         except IOError as e:
-            self.logger.err("I/O error({0}): {1}".format(e.errno, e.strerror))
+            self.logger.err(f"I/O error({e.errno}): {e.strerror}")
             return True
         except RuntimeError:
-            self.logger.err(("Unexpected error:", sys.exc_info()[0]))
+            self.logger.err(f"Unexpected error: {sys.exc_info()[0]}")
             raise
 
     def load_from_file(self, file_name, force_no_lines=False):  # TODO rename it: load content from file
@@ -422,10 +421,10 @@ class CommonFunctions:
                         content = f.read()
                     return content
             except IOError:
-                self.logger.err(("Loading IOError error:", file_name))
+                self.logger.err(f"Loading IOError error: {file_name}")
                 return None
         else:
-            self.logger.err(("Loading: File not exists:", file_name))
+            self.logger.err(f"Loading: File not exists: {file_name}")
 
     def load_json_file(self, file_name):
         if self.file_exists(file_name, info=file_name, check_not_empty=True):
@@ -433,10 +432,10 @@ class CommonFunctions:
                 with open(file_name, 'r') as f:
                     return json.load(f)
             except json.JSONDecodeError as e:
-                self.logger.err(("JSON decode error:", str(e)))
+                self.logger.err(f"JSON decode error: {str(e)}")
                 return None
             except Exception as e:
-                self.logger.err(("Error loading JSON file:", str(e)))
+                self.logger.err(f"Error loading JSON file: {str(e)}")
                 return None
         else:
             return None
@@ -448,7 +447,7 @@ class CommonFunctions:
                 json.dump(content, f, indent=2)
             return True
         except Exception as e:
-            self.logger.err(("Error saving JSON file:", str(e)))
+            self.logger.err(f"Error saving JSON file: {str(e)}")
             return False
 
     def save_to_file(self, file_name, content, nl_at_end=False):
@@ -456,10 +455,10 @@ class CommonFunctions:
             with open(file_name, 'w') as f:
                 f.write(content)
                 if nl_at_end:
-                    f.write('\n')
+                    f.write(os.linesep)
             return True
         except Exception as e:
-            self.logger.err(("Error saving file:", str(e)))
+            self.logger.err(f"Error saving file: {str(e)}")
             return False
 
     """
@@ -484,7 +483,7 @@ class CommonFunctions:
 
     def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir="", dir_separator="/"):
         start_dir = ""
-        self.logger.deepdb(("force_start_dir:", force_start_dir ))
+        self.logger.deepdb(f"force_start_dir: {force_start_dir}")
         if len(force_start_dir) > 0:
             start_dir = force_start_dir
         else:
@@ -493,8 +492,8 @@ class CommonFunctions:
 
         '''  getExistingDirectory always return UNIX format /  '''
         get_directory = qt_file_dialog.getExistingDirectory(dir=start_dir)  # TODO caption="dir ...."
-        self.logger.deepdb(("dir_separator:", dir_separator, "start_dir:", start_dir))
-        self.logger.inf(("selected directory:", get_directory))
+        self.logger.deepdb(f"dir_separator: {dir_separator} start_dir: {start_dir}")
+        self.logger.inf(f"selected directory: {get_directory}")
         if len(get_directory) > 0:
             if dir_separator == "\\":  # OS MARKER
                 get_directory = self.convert_to_win_path(get_directory)
@@ -510,7 +509,7 @@ class CommonFunctions:
     def file_dialog_to_edit_line(self, qt_edit_line, qt_file_dialog, init_dir):
         file_dialog = qt_file_dialog.getOpenFileName(dir=init_dir)
         get_file = file_dialog[0]
-        self.logger.db(("selected file:", get_file))
+        self.logger.db(f"selected file: {get_file}")
         if len(get_file) > 0:
             qt_edit_line.setText(get_file)
             return get_file
@@ -525,9 +524,9 @@ class CommonFunctions:
         last_not_digit = next((i for i, j in list(enumerate(name_in, 1))[::-1] if not j.isdigit()), -1)
         if db:
             if (len(name_in) - last_not_digit) > 0:
-                self.logger.deepdb(("(get_incremented_name) (gin) last ", name_in[-(len(name_in) - last_not_digit):]))
-                self.logger.deepdb(("(get_incremented_name) (gin) len ", len(name_in) - last_not_digit))
-                self.logger.deepdb(("(get_incremented_name) (gin) head ", name_in[:-(len(name_in) - last_not_digit)]))
+                self.logger.deepdb(f"(get_incremented_name) (gin) last {name_in[-(len(name_in) - last_not_digit):]}")
+                self.logger.deepdb(f"(get_incremented_name) (gin) len {len(name_in) - last_not_digit}")
+                self.logger.deepdb(f"(get_incremented_name) (gin) head {name_in[:-(len(name_in) - last_not_digit)]}")
             else:
                 self.logger.deepdb("(get_incremented_name) (gin) empty")
         if (len(name_in) - last_not_digit) > 0:
@@ -539,213 +538,8 @@ class CommonFunctions:
             head = name_in
             number = "_02"
         if db:
-            self.logger.deepdb(("(get_incremented_name) (gin) return ", head, number))
+            self.logger.deepdb(f"(get_incremented_name) (gin) return {head} {number}")
         return head + number
-
-    def get_random_int(self, min_val, max_val):
-        return random.randint(min_val, max_val)
-
-    def get_random_float(self, min_val, max_val):
-        return random.uniform(min_val, max_val)
-
-    def get_sinus_array(self, length, period, amplitude):
-        sin_arr = []
-        for i in range(length):
-            sin_arr.append(amplitude * math.sin(2 * math.pi * i / period))
-        return sin_arr
-
-    def get_cosinus_array(self, length, period, amplitude):
-        cos_arr = []
-        for i in range(length):
-            cos_arr.append(amplitude * math.cos(2 * math.pi * i / period))
-        return cos_arr
-
-    def get_tangens_array(self, length, period, amplitude):
-        tan_arr = []
-        for i in range(length):
-            tan_arr.append(amplitude * math.tan(2 * math.pi * i / period))
-        return tan_arr
-
-    def get_cotangens_array(self, length, period, amplitude):
-        cot_arr = []
-        for i in range(length):
-            cot_arr.append(amplitude * (1 / math.tan(2 * math.pi * i / period)))
-        return cot_arr
-
-    def get_random_array(self, length, min_val, max_val):
-        rand_arr = []
-        for i in range(length):
-            rand_arr.append(random.uniform(min_val, max_val))
-        return rand_arr
-
-    def get_random_int_array(self, length, min_val, max_val):
-        rand_arr = []
-        for i in range(length):
-            rand_arr.append(random.randint(min_val, max_val))
-        return rand_arr
-
-    def get_random_bool_array(self, length):
-        rand_arr = []
-        for i in range(length):
-            rand_arr.append(random.choice([True, False]))
-        return rand_arr
-
-    def get_random_string_array(self, length, min_len, max_len):
-        rand_arr = []
-        for i in range(length):
-            rand_arr.append(''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for _ in range(random.randint(min_len, max_len))))
-        return rand_arr
-
-    def get_random_string(self, min_len, max_len):
-        return ''.join(random.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for _ in range(random.randint(min_len, max_len)))
-
-    def get_random_bool(self):
-        return random.choice([True, False])
-
-    def get_random_choice(self, choices):
-        return random.choice(choices)
-
-    def get_random_choices(self, choices, k):
-        return random.choices(choices, k=k)
-
-    def get_random_sample(self, choices, k):
-        return random.sample(choices, k)
-
-    def get_random_shuffle(self, choices):
-        random.shuffle(choices)
-        return choices
-
-    def get_random_seed(self, seed):
-        random.seed(seed)
-        return random.random()
-
-    def get_random_state(self):
-        return random.getstate()
-
-    def set_random_state(self, state):
-        random.setstate(state)
-        return True
-
-    def get_random_bytes(self, length):
-        return random.randbytes(length)
-
-    def get_random_bits(self, length):
-        return random.getrandbits(length)
-
-    def get_random_gauss(self, mu, sigma):
-        return random.gauss(mu, sigma)
-
-    def get_random_normalvariate(self, mu, sigma):
-        return random.normalvariate(mu, sigma)
-
-    def get_random_lognormvariate(self, mu, sigma):
-        return random.lognormvariate(mu, sigma)
-
-    def get_random_expovariate(self, lambd):
-        return random.expovariate(lambd)
-
-    def get_random_gammavariate(self, alpha, beta):
-        return random.gammavariate(alpha, beta)
-
-    def get_random_betavariate(self, alpha, beta):
-        return random.betavariate(alpha, beta)
-
-    def get_random_paretovariate(self, alpha):
-        return random.paretovariate(alpha)
-
-    def get_random_weibullvariate(self, alpha, beta):
-        return random.weibullvariate(alpha, beta)
-
-    def get_random_vonmisesvariate(self, mu, kappa):
-        return random.vonmisesvariate(mu, kappa)
-
-    def get_random_triangular(self, low, high, mode):
-        return random.triangular(low, high, mode)
-
-    def get_random_uniform(self, a, b):
-        return random.uniform(a, b)
-
-    def get_random_betavariate(self, alpha, beta):
-        return random.betavariate(alpha, beta)
-
-    def get_random_expovariate(self, lambd):
-        return random.expovariate(lambd)
-
-    def get_random_gammavariate(self, alpha, beta):
-        return random.gammavariate(alpha, beta)
-
-    def get_random_gauss(self, mu, sigma):
-        return random.gauss(mu, sigma)
-
-    def get_random_lognormvariate(self, mu, sigma):
-        return random.lognormvariate(mu, sigma)
-
-    def get_random_normalvariate(self, mu, sigma):
-        return random.normalvariate(mu, sigma)
-
-    def get_random_paretovariate(self, alpha):
-        return random.paretovariate(alpha)
-
-    def get_random_triangular(self, low, high, mode):
-        return random.triangular(low, high, mode)
-
-    def get_random_uniform(self, a, b):
-        return random.uniform(a, b)
-
-    def get_random_vonmisesvariate(self, mu, kappa):
-        return random.vonmisesvariate(mu, kappa)
-
-    def get_random_weibullvariate(self, alpha, beta):
-        return random.weibullvariate(alpha, beta)
-
-    def get_random_betavariate(self, alpha, beta):
-        return random.betavariate(alpha, beta)
-
-    def get_random_expovariate(self, lambd):
-        return random.expovariate(lambd)
-
-    def get_random_gammavariate(self, alpha, beta):
-        return random.gammavariate(alpha, beta)
-
-    def get_random_gauss(self, mu, sigma):
-        return random.gauss(mu, sigma)
-
-    def get_random_lognormvariate(self, mu, sigma):
-        return random.lognormvariate(mu, sigma)
-
-    def get_random_normalvariate(self, mu, sigma):
-        return random.normalvariate(mu, sigma)
-
-    def get_random_paretovariate(self, alpha):
-        return random.paretovariate(alpha)
-
-    def get_random_triangular(self, low, high, mode):
-        return random.triangular(low, high, mode)
-
-    def get_random_uniform(self, a, b):
-        return random.uniform(a, b)
-
-    def get_random_vonmisesvariate(self, mu, kappa):
-        return random.vonmisesvariate(mu, kappa)
-
-    def get_random_weibullvariate(self, alpha, beta):
-        return random.weibullvariate(alpha, beta)
-
-    def print_this(self):
-        print("   [INF] Common Functions: ")
-        print("       debug level: {}".format(self.debug_level))
-        print("       console print: {}".format(self.console_print))
-        print("       file print: {}".format(self.file_print))
-        print("       log file: {}".format(self.log_file))
-        print("       log file path: {}".format(self.log_file_path))
-        print("       log file name: {}".format(self.log_file_name))
-        print("       log file extension: {}".format(self.log_file_extension))
-        print("       log file full path: {}".format(self.log_file_full_path))
-        print("       log file full name: {}".format(self.log_file_full_name))
-        print("       log file full extension: {}".format(self.log_file_full_extension))
-        print("       log file full path: {}".format(self.log_file_full_path))
-        print("       log file full name: {}".format(self.log_file_full_name))
-        print("       log file full extension: {}".format(self.log_file_full_extension))
-
+        
     def is_string(self, val):
         return isinstance(val, str)  # Replace basestring with str for Python 3

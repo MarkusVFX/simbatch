@@ -8,7 +8,10 @@ try:
 except ImportError:
     pass
 
+import os
 from .actions import MultiAction, SingleAction, ActionParameters
+
+
 
 # JSON Name Format, PEP8 Name Format
 DEFINITION_ITEM_FIELDS_NAMES = [
@@ -83,7 +86,7 @@ class SingleDefinition:
         self.logger.clear_buffer()
         self.logger.buffering_on()
         logger_raw = self.logger.raw
-        logger_raw(f"\n\n name: {self.name} total_actions: {self.total_actions} names count: {len(self.action_names)}")
+        logger_raw(f"{os.linesep}{os.linesep} name: {self.name} total_actions: {self.total_actions} names count: {len(self.action_names)}")
         for i, an in enumerate(self.action_names):
             logger_raw(f"  arr action_names: {i}  {an} ")
         for i, ga in enumerate(self.multi_actions_array):
@@ -169,17 +172,15 @@ class Definitions:
 
     '''  print project data, for debug  '''
     def print_current(self):
-        print("     current definition: id: {}     index: {}    total_definitions: {}\n".format(self.current_definition_id,
-                                                                                             self.current_definition_index,
-                                                                                             self.total_definitions))
+        print(f"     current definition:     index: {self.current_definition_index}    total_definitions: {self.total_definitions}{os.linesep}")
         if self.current_definition_index is not None:
             cur_def = self.current_definition
-            print("       current definition: ", cur_def.definition_name)
-            print("       software: ", cur_def.software)
-            print("       description: ", cur_def.description)
-            print("       actions count: ", len(cur_def.actions_array))
+            print(f"       current definition: {cur_def.definition_name}")
+            print(f"       software: {cur_def.software}")
+            print(f"       description: {cur_def.description}")
+            print(f"       actions count: {len(cur_def.actions_array)}")
             for a in cur_def.actions_array:
-                print("       __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template))
+                print(f"       __action: {a.name}__{a.ui[0]}__{a.actual_value}__{a.template}")
 
     '''  print definitions data, for debug  '''
     def print_total(self, print_children=False):
@@ -192,12 +193,12 @@ class Definitions:
         if self.total_definitions == 0:
             print("   [INF] no definitions loaded")
         for d in self.definitions_array:
-            print("\n\n   {}   id:{}   software:{}".format(d.name, d.id, d.software))
-            print("   description: ", d.description)
-            print("   actions count: ", len(d.actions_array))
+            print(f"{os.linesep}{os.linesep}   {d.name}   id:{d.id}   software:{d.software}")
+            print(f"   description: {d.description}")
+            print(f"   actions count: {len(d.actions_array)}")
             for a in d.actions_array:
-                print("   __action: {}__{}__{}__{}".format(a.name, a.ui[0], a.actual_value, a.template))
-            print("\n\n")
+                print(f"   __action: {a.name}__{a.ui[0]}__{a.actual_value}__{a.template}")
+            print(f"{os.linesep}{os.linesep}")
 
     def get_definitions(self):
         return self.definitions_array

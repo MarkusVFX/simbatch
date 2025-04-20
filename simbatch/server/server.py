@@ -58,7 +58,7 @@ class SimBatchServer:
 
         ''' elif self.framework_mode is True: queue is already loaded ! (no need to load) '''
 
-        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + self.batch.sts.dir_separator
+        self.server_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep
         self.test_server_dir()
 
         simnode_state_file = self.server_dir + self.state_file_name

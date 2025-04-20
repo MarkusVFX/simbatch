@@ -52,11 +52,11 @@ class PredefinedVariables:
         self.batch = batch
 
     def convert_single_variable_to_values(self, check_str, key, predefined_item, param="", option=""):
-        key_plus = "<" + key + ">"
+        key_plus = f"<{key}>"
         if check_str.find(key_plus) >= 0:
             if key == "max":
                 param = check_str
-            function_to_eval = 'self.{}("{}", option="{}")'.format(predefined_item["function"], param, option)
+            function_to_eval = f'self.{predefined_item["function"]}("{param}", option="{option}")'
             #  TODO !!!
             if predefined_item["type"] == "o":  # SCENE OBJECT !, do not update on ATQ, update on renderfarm   # TODO !
                 return check_str
@@ -65,7 +65,7 @@ class PredefinedVariables:
                 eval_ret = str(eval(function_to_eval))
                 # print "___eval ", function_to_eval
                 if eval_ret is False or eval_ret == "False":
-                    self.batch.logger.err(("Could NOT convert_single_variable_to_values:", param, option))
+                    self.batch.logger.err(f"Could NOT convert_single_variable_to_values: {param}, {option}")
                     return check_str
                 else:
                     return check_str.replace(key_plus, eval_ret)
@@ -90,15 +90,15 @@ class PredefinedVariables:
         if len(evo_inject) == 0:
             ei_str = ""
         else:
-            ei_str = "evo_inject=" + str(evo_inject)
+            ei_str = f"evo_inject={str(evo_inject)}"
 
         if template is not None:
             for key, get_default in self.defaults.items():
-                check = "<"+key+">"
+                check = f"<{key}>"
                 if template.find(check) > 0:
                     # print "check", check ,  "   get_default: " , get_default
                     try:
-                        function_to_eval = "self.{}({})".format(get_default, ei_str)
+                        function_to_eval = f"self.{get_default}({ei_str})"
                         eval_ret = eval(function_to_eval)
                         # print "eval_ret", eval_ret
                         template = template.replace(check, str(eval_ret))
@@ -429,7 +429,7 @@ class StorageInOut:
         self.prj = batch.prj
         self.sts = batch.sts
         self.predefined = PredefinedVariables(batch)
-        self.dir_separator = batch.sts.dir_separator
+        self.dir_separator = os.sep
 
     def get_files_from_dir(self, directory, types=""):
         files = []
@@ -453,11 +453,11 @@ class StorageInOut:
         else:
             if ends_with is None:
                 shutil.copyfile(src, dest)
-                self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
+                self.batch.logger.inf(f"copied  from: {src}     to: {dest}")
             else:
                 if src.endswith(ends_with):
                     shutil.copyfile(src, dest)
-                    self.batch.logger.inf("copied  from: {}     to: {}".format(src, dest))
+                    self.batch.logger.inf(f"copied  from: {src}     to: {dest}")
                 else:
                     pass
 
@@ -471,19 +471,19 @@ class StorageInOut:
         try:
             self.recursive_overwrite(src, dst, ends_with=".py")
         except IOError as why:
-            self.batch.logger.err("copy_tree  IOError  from: {}     to: {}\n{}".format(src, dst, why))
+            self.batch.logger.err(f"copy_tree  IOError  from: {src}     to: {dst}{os.linesep}{why}")
         except OSError as why:
-            self.batch.logger.err("copy_tree  OSError  from: {}     to: {}\n{}".format(src, dst, why))
+            self.batch.logger.err(f"copy_tree  OSError  from: {src}     to: {dst}{os.linesep}{why}")
         except TypeError as why:
-            self.batch.logger.err("copy_tree  TypeError  from: {}     to: {}\n{}".format(src, dst, why))
+            self.batch.logger.err(f"copy_tree  TypeError  from: {src}     to: {dst}{os.linesep}{why}")
         except:
-            self.batch.logger.err("copy_tree {}".format(sys.exc_info()[0]))
+            self.batch.logger.err(f"copy_tree {sys.exc_info()[0]}")
 
     def copy_file(self, src_path, dst_path, file_name, sub_dir=None):
         if sub_dir is not None:
             if len(sub_dir) > 0:
-                src_path += sub_dir + self.batch.sts.dir_separator
-                dst_path += sub_dir + self.batch.sts.dir_separator
+                src_path += sub_dir + self.dir_separator
+                dst_path += sub_dir + self.dir_separator
             else:
                 self.batch.logger.wrn("sub dir is zero size")
 
@@ -492,17 +492,17 @@ class StorageInOut:
         try:
             shutil.copyfile(src_file, dst_file)
         except IOError as why:
-            self.batch.logger.err("copy_file  IOError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+            self.batch.logger.err(f"copy_file  IOError  from: {src_file}     to: {dst_file}{os.linesep}{why}")
         except OSError as why:
-            self.batch.logger.err("copy_file  OSError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+            self.batch.logger.err(f"copy_file  OSError  from: {src_file}     to: {dst_file}{os.linesep}{why}")
         except TypeError as why:
-            self.batch.logger.err("copy_file  TypeError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+            self.batch.logger.err(f"copy_file  TypeError  from: {src_file}     to: {dst_file}{os.linesep}{why}")
         except NameError as why:
-            self.batch.logger.err("copy_file  NameError  from: {}     to: {}\n{}".format(src_file, dst_file, why))
+            self.batch.logger.err(f"copy_file  NameError  from: {src_file}     to: {dst_file}{os.linesep}{why}")
         except:
-            self.batch.logger.err("copy_file {}".format(sys.exc_info()[0]))
+            self.batch.logger.err(f"copy_file {sys.exc_info()[0]}")
         else:
-            self.batch.logger.inf("copy_file  from: {}     to: {}\n".format(src_file, dst_file))
+            self.batch.logger.inf(f"copy_file  from: {src_file}     to: {dst_file}{os.linesep}")
         
     @staticmethod
     def get_flat_name(name):
@@ -515,20 +515,20 @@ class StorageInOut:
         else:
             ret = self.comfun.create_directory(dir_path)
             if ret:
-                self.batch.logger.inf(("Data directory created: ", dir_path))
+                self.batch.logger.inf(f"Data directory created: {dir_path}")
                 return True
             else:
-                self.batch.logger.err(("Data directory NOT created: ", dir_path))
+                self.batch.logger.err(f"Data directory NOT created: {dir_path}")
                 return False
         
     def create_project_working_directory(self, dir_path):
         self.comfun.create_directory(dir_path)
 
-    def create_schema_directory(self, directory):
-        self.comfun.create_directory(directory + "base_setup" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "shot_setup" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "prevs" + self.sts.dir_separator)
-        self.comfun.create_directory(directory + "cache" + self.sts.dir_separator)
+    def create_schema_directories(self, directory):
+        self.comfun.create_directory(f"{directory}base_setup{os.sep}")
+        self.comfun.create_directory(f"{directory}shot_setup{os.sep}")
+        self.comfun.create_directory(f"{directory}prevs{os.sep}")
+        self.comfun.create_directory(f"{directory}cache{os.sep}")
 
     def create_example_data(self):
         self.prj.create_example_project_data(do_save=True)
@@ -730,7 +730,7 @@ class StorageInOut:
         end = 0
         if os.path.isdir(directory):
             for fi in os.listdir(directory):
-                if os.path.isfile(directory + self.sts.dir_separator + fi):
+                if os.path.isfile(directory + self.dir_separator + fi):
                     fi_no_ext = fi[:-4]
                     fi_arr = fi_no_ext.split("__")
                     if self.comfun.is_float(fi_arr[1]):
@@ -743,8 +743,7 @@ class StorageInOut:
 
     def generate_base_setup_file_name(self, schema_name="", ver=None):  # from existing TASK and SCHEMA data
         if len(self.prj.projects_data) < self.prj.current_project_index or self.prj.current_project_index < 0:
-            self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index,
-                                   len(self.prj.projects_data)))
+            self.batch.logger.err(f"Wrong current proj ID  {self.prj.current_project_index} {len(self.prj.projects_data)}")
             return False
         else:
             if ver is None:
@@ -764,16 +763,16 @@ class StorageInOut:
 
             proj_working_dir = self.prj.current_project.working_directory_absolute
             schema_flat_name = self.get_flat_name(schema_name)
-            directory = proj_working_dir+schema_flat_name+self.dir_separator+"base_setup"+self.dir_separator
-            file_version = "_v" + self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
+            directory = f"{proj_working_dir}{schema_flat_name}{os.sep}base_setup{os.sep}"
+            file_version = f"_v{self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)}"
             file_ext = self.batch.dfn.get_current_setup_ext()
-            out_filename = directory + schema_flat_name + file_version + "." + file_ext
-            self.batch.logger.deepdb(("(generate_base_setup_file_...) file name ", out_filename))
+            out_filename = f"{directory}{schema_flat_name}{file_version}.{file_ext}"
+            self.batch.logger.deepdb(f"(generate_base_setup_file_...) file name {out_filename}")
             return out_filename
 
     def generate_shot_setup_file_name(self, tsk_id=None, ver=None, evo_nr=None, evo_inject="", simed=False):
         if self.prj.current_project_index < 0:
-            self.batch.logger.err(("Wrong current proj ID  ", self.prj.current_project_index))
+            self.batch.logger.err(f"Wrong current proj ID  {self.prj.current_project_index}")
             return False
         else:
             if tsk_id is None:
@@ -799,7 +798,7 @@ class StorageInOut:
             else:
                 schema_name = self.batch.tsk.get_schema_name_from_task_id(tsk_id)
                 schema_flat_name = self.get_flat_name(schema_name)
-                directory = abs_shot_working_dir[1] + "shot_setup" + self.dir_separator
+                directory = f"{abs_shot_working_dir[1]}shot_setup{os.sep}"
                 if ver is None:
                     ver = self.batch.tsk.current_task.queue_ver + 1
                 file_version = self.comfun.str_with_zeros(ver, self.prj.current_project.zeros_in_version)
@@ -808,8 +807,8 @@ class StorageInOut:
                     simed_inject = "__simed__v"
                 else:
                     simed_inject = "__v"
-                out_filename = directory + schema_flat_name + simed_inject + file_version + evo_inject + "." + file_ext
-                self.batch.logger.deepdb(("(generate_shot_setup_...) file name ", out_filename))
+                out_filename = f"{directory}{schema_flat_name}{simed_inject}{file_version}{evo_inject}.{file_ext}"
+                self.batch.logger.deepdb(f"(generate_shot_setup_...) file name {out_filename}")
                 return out_filename
 
     def generate_shot_name(self):
@@ -821,11 +820,11 @@ class StorageInOut:
             shot_name = ""
             cur_tsk = self.batch.tsk.current_task
             if len(cur_tsk.sequence) > 0:
-                shot_name += cur_tsk.sequence + "_"
+                shot_name += f"{cur_tsk.sequence}_"
             if len(cur_tsk.shot) > 0:
-                shot_name += cur_tsk.shot + "_"
+                shot_name += f"{cur_tsk.shot}_"
             if len(cur_tsk.take) > 0:
-                shot_name += cur_tsk.take + "_"
+                shot_name += f"{cur_tsk.take}_"
             shot_name = shot_name[:-1]
             return 1, shot_name
 
@@ -836,11 +835,11 @@ class StorageInOut:
             shot_dir = self.prj.current_project.cache_directory_absolute
             cur_tsk = self.batch.tsk.current_task
             if len(cur_tsk.sequence) > 0:
-                shot_dir += cur_tsk.sequence + self.dir_separator
+                shot_dir += f"{cur_tsk.sequence}{os.sep}"
             if len(cur_tsk.shot) > 0:
-                shot_dir += cur_tsk.shot + self.dir_separator
+                shot_dir += f"{cur_tsk.shot}{os.sep}"
             if len(cur_tsk.take) > 0:
-                shot_dir += cur_tsk.take + self.dir_separator
+                shot_dir += f"{cur_tsk.take}{os.sep}"
 
             return 1, shot_dir
 
@@ -851,11 +850,11 @@ class StorageInOut:
             shot_dir = self.prj.current_project.cameras_directory_absolute
             cur_tsk = self.batch.tsk.current_task
             if len(cur_tsk.sequence) > 0:
-                shot_dir += cur_tsk.sequence + self.dir_separator
+                shot_dir += f"{cur_tsk.sequence}{os.sep}"
             if len(cur_tsk.shot) > 0:
-                shot_dir += cur_tsk.shot + self.dir_separator
+                shot_dir += f"{cur_tsk.shot}{os.sep}"
             if len(cur_tsk.take) > 0:
-                shot_dir += cur_tsk.take + self.dir_separator
+                shot_dir += f"{cur_tsk.take}{os.sep}"
 
             return 1, shot_dir
 
@@ -880,13 +879,13 @@ class StorageInOut:
 
         shot_dir = prj.working_directory_absolute
         schema_name = sch.schema_name
-        shot_dir += self.get_flat_name(schema_name) + self.dir_separator
+        shot_dir += f"{self.get_flat_name(schema_name)}{os.sep}"
         if len(tsk.sequence) > 0:
-            shot_dir += tsk.sequence + self.dir_separator
+            shot_dir += f"{tsk.sequence}{os.sep}"
         if len(tsk.shot) > 0:
-            shot_dir += tsk.shot + self.dir_separator
+            shot_dir += f"{tsk.shot}{os.sep}"
         if len(tsk.take) > 0:
-            shot_dir += tsk.take + self.dir_separator
+            shot_dir += f"{tsk.take}{os.sep}"
 
         return 1, shot_dir
 
@@ -895,7 +894,7 @@ class StorageInOut:
 
     def generate_project_cache_path(self):
         ret = self.get_project_data_dir()
-        return ret[0], ret[1] + "cache" + self.dir_separator
+        return ret[0], f"{ret[1]}cache{os.sep}"
 
     def generate_shot_ani_cache_path(self):
         ret = self.generate_shot_ani_cache_dir()
@@ -909,7 +908,7 @@ class StorageInOut:
         else:
             version = "00000"   # TODO
 
-        return ret[0], ret[1] + "cache" + self.dir_separator + "cache_v" + version + evo_inject
+        return ret[0], ret[1] + "cache" + os.sep + "cache_v" + version + evo_inject
 
     def generate_shot_cam_path(self):
         ret = self.generate_shot_cam_dir()
@@ -918,12 +917,12 @@ class StorageInOut:
 
     def generate_project_props_path(self):
         ret = self.generate_shot_working_dir()
-        return ret[0], ret[1] + "props" + self.dir_separator
+        return ret[0], ret[1] + "props" + os.sep
 
     def generate_shot_prev_file(self, evo_inject="", seq="", prj=None, sch=None, tsk=None, ver=None, evo=None):  # get_shot_prev_seq
         ret = self.generate_shot_working_dir(prj=prj, sch=sch, tsk=tsk)
         if ret[0] == 1:
-            ret_file_and_path = ret[1] + "prev" + self.dir_separator
+            ret_file_and_path = ret[1] + "prev" + os.sep
             if sch is None:
                 schema_name = self.batch.sch.current_schema.schema_name
             else:
@@ -942,7 +941,7 @@ class StorageInOut:
             file_version = self.comfun.str_with_zeros(que_ver, self.prj.current_project.zeros_in_version)
             file_ext = self.batch.dfn.get_current_prev_ext()
             dir_and_head_name = schema_flat_name + "__prev__v" + file_version + evo_inject + evo_inject2
-            ret_file_and_path += dir_and_head_name + self.dir_separator + dir_and_head_name + seq + "." + file_ext
+            ret_file_and_path += dir_and_head_name + os.sep + dir_and_head_name + seq + "." + file_ext
             return 1, ret_file_and_path
         return ret
 
@@ -952,7 +951,7 @@ class StorageInOut:
     def generate_scripts_dir(self):
         ret = self.get_project_data_dir()
         if ret[0] == 1:
-            return ret[1] + "scripts" + self.dir_separator
+            return ret[1] + "scripts" + os.sep
         else:
             return False
 
@@ -960,7 +959,7 @@ class StorageInOut:
     #  pattern is generated basis on directories structure on storage
     #  used for construct new path, generate path for load
     def get_dir_patterns(self, directory):
-        self.batch.logger.db(("(get_dir_patterns) deep debug start dir:", directory))
+        self.batch.logger.db(f"(get_dir_patterns) deep debug start dir: {directory}")
         full_dir_pattern = None
         return full_dir_pattern
 
@@ -968,32 +967,6 @@ class StorageInOut:
         # TODO "<default_camera>"
         return 1, ""
 
-    def print_this(self):
-        print("   [INF] IO: ")
-        print("       data dir: {}".format(self.data_directory))
-        print("       json dir: {}".format(self.json_directory))
-        print("       scripts dir: {}".format(self.scripts_directory))
-        print("       templates dir: {}".format(self.templates_directory))
-        print("       logs dir: {}".format(self.logs_directory))
-        print("       cache dir: {}".format(self.cache_directory))
-        print("       temp dir: {}".format(self.temp_directory))
-        print("       backup dir: {}".format(self.backup_directory))
-        print("       user dir: {}".format(self.user_directory))
-        print("       project dir: {}".format(self.project_directory))
-        print("       task dir: {}".format(self.task_directory))
-        print("       queue dir: {}".format(self.queue_directory))
-        print("       schema dir: {}".format(self.schema_directory))
-        print("       definition dir: {}".format(self.definition_directory))
-        print("       action dir: {}".format(self.action_directory))
-        print("       node dir: {}".format(self.node_directory))
-        print("       user dir: {}".format(self.user_directory))
-        print("       project dir: {}".format(self.project_directory))
-        print("       task dir: {}".format(self.task_directory))
-        print("       queue dir: {}".format(self.queue_directory))
-        print("       schema dir: {}".format(self.schema_directory))
-        print("       definition dir: {}".format(self.definition_directory))
-        print("       action dir: {}".format(self.action_directory))
-        print("       node dir: {}".format(self.node_directory))
 
 
 

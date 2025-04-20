@@ -1,4 +1,5 @@
 import copy
+import os
 # import time
 
 try:  # Maya 2016
@@ -789,3 +790,15 @@ class TasksUI:
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
                                                                          len(self.batch.tsk.tasks_data)))
+
+    def get_task_directory(self, project_name, schema_name, sequence, shot, take):
+        return f"{self.batch.prj.current_project.working_directory_absolute}{project_name}{os.sep}{schema_name}{os.sep}{sequence}{os.sep}{shot}{os.sep}{take}{os.sep}"
+
+    def get_task_file_path(self, project_name, schema_name, sequence, shot, take):
+        return f"{self.get_task_directory(project_name, schema_name, sequence, shot, take)}task.json"
+
+    def get_shot_setup_directory(self, project_name, schema_name, sequence, shot, take):
+        return f"{self.get_task_directory(project_name, schema_name, sequence, shot, take)}shot_setup{os.sep}"
+
+    def get_cache_directory(self, project_name, schema_name, sequence, shot, take):
+        return f"{self.get_task_directory(project_name, schema_name, sequence, shot, take)}cache{os.sep}"

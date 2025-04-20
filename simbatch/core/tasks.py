@@ -1,5 +1,6 @@
 import copy
 import os
+from .queue import QueueItem
 
 # JSON Name Format, PEP8 Name Format
 TASK_ITEM_FIELDS_NAMES = [
@@ -101,52 +102,44 @@ class Tasks:
         if task is None:
             prefix = "current "
             if self.current_task_id is not None:
-                print("       current task index: {}, id: {}, total: {}".format(self.current_task_index,
-                                                                             self.current_task_id,
-                                                                             self.total_tasks))
+                print(f"       current task index: {self.current_task_index}, id: {self.current_task_id}, total: {self.total_tasks}{os.linesep}")
                 task = self.current_task
             else:
                 self.batch.logger.wrn("current task undefined, nothing to print")
                 return False
 
-        print("       {}task name: {}".format(prefix, task.task_name))
-        print("       projectID: {}    schemaID: {}".format(task.project_id, task.schema_id))
-        print("       seq/shot/take: {} {} {}".format(task.sequence, task.shot, task.take))
-        print("       sim frame range {} {} ".format(task.sim_frame_start, task.sim_frame_end))
-        print("       prev frame range {} {} ".format(task.prev_frame_start, task.prev_frame_end))
-        print("       state: {}    state_id: {} ".format(task.state, task.state_id))
-        print("       sch v: {}    tsk v: {}    que v: {} ".format(task.schema_ver, task.task_ver, task.queue_ver))
-        print("       options ", task.options)
-        print("       description ", task.description)
+        print(f"       {prefix}task name: {task.task_name}")
+        print(f"       projectID: {task.project_id}    schemaID: {task.schema_id}")
+        print(f"       seq/shot/take: {task.sequence} {task.shot} {task.take}")
+        print(f"       sim frame range {task.sim_frame_start} {task.sim_frame_end} ")
+        print(f"       prev frame range {task.prev_frame_start} {task.prev_frame_end} ")
+        print(f"       state: {task.state}    state_id: {task.state_id} ")
+        print(f"       sch v: {task.schema_ver}    tsk v: {task.task_ver}    que v: {task.queue_ver} ")
+        print(f"       options {task.options}")
+        print(f"       description {task.description}")
         base_setup_name = self.batch.sch.get_base_setup(use_task_id=str(self.current_task_id))
-        print("       base setup: ", base_setup_name)
+        print(f"       base setup: {base_setup_name}")
 
     def print_current(self):
-        print("     current task: id: {}     index: {}    total_tasks: {}\n".format(self.current_task_id,
-                                                                                  self.current_task_index,
-                                                                                  self.total_tasks))
+        print(f"     current task: id: {self.current_task_id}     index: {self.current_task_index}    total_tasks: {self.total_tasks}{os.linesep}")
         if self.current_task_index is not None:
             cur_task = self.current_task
-            print("       current task: ", cur_task.task_name)
-            print("       task_directory ", cur_task.task_directory)
-            print("       working_directory ", cur_task.working_directory)
-            print("       cameras_directory ", cur_task.cameras_directory)
-            print("       cache_directory ", cur_task.cache_directory)
-            print("       seq_shot_take_pattern:{}, zeros:{}, description:{}".format(cur_task.seq_shot_take_pattern,
-                                                                                   cur_task.zeros_in_version,
-                                                                                   cur_task.description))
+            print(f"       current task: {cur_task.task_name}")
+            print(f"       task_directory {cur_task.task_directory}")
+            print(f"       working_directory {cur_task.working_directory}")
+            print(f"       cameras_directory {cur_task.cameras_directory}")
+            print(f"       cache_directory {cur_task.cache_directory}")
+            print(f"       seq_shot_take_pattern:{cur_task.seq_shot_take_pattern}, zeros:{cur_task.zeros_in_version}, description:{cur_task.description}")
 
     def print_all(self):
         if self.total_tasks == 0:
             print("   [INF] no tasks loaded")
         for t in self.tasks_data:
-            print("\n\n   {} id:{} is_default:{} state:{}".format(t.task_name, t.id, t.is_default, t.state))
-            print("   ", t.task_directory)
-            print("   ", t.working_directory_absolute)
-            print("   seq_shot_take_pattern:{}, zeros:{}, description:{}".format(t.seq_shot_take_pattern,
-                                                                                t.zeros_in_version,
-                                                                                t.description))
-        print("\n\n")
+            print(f"{os.linesep}{os.linesep}   {t.task_name} id:{t.id} is_default:{t.is_default} state:{t.state}")
+            print(f"   {t.task_directory}")
+            print(f"   {t.working_directory_absolute}")
+            print(f"   seq_shot_take_pattern:{t.seq_shot_take_pattern}, zeros:{t.zeros_in_version}, description:{t.description}")
+        print(f"{os.linesep}{os.linesep}")
 
     def get_index_by_id(self, get_id):
         for i, tsk in enumerate(self.tasks_data):
@@ -227,7 +220,6 @@ class Tasks:
         return ret
 
     def additional_task_action(self, input):
-        from .queue import QueueItem  # Lazy import
         self.batch.logger.inf(" additional_task_action " + input)   # TODO !!!
         que = self.batch.que.current_queue
         task = self.batch.tsk.get_task_by_id(que.task_id)

@@ -1,3 +1,4 @@
+import os
 from .io import *
 
 # JSON Name Format, PEP8 Name Format
@@ -72,33 +73,33 @@ class SingleProject:
 
     def update_absolute_directories(self):
         if self.comfun.is_absolute(self.working_directory) is False:
-            self.working_directory_absolute = self.project_directory + self.working_directory
+            self.working_directory_absolute = f"{self.project_directory}{self.working_directory}"
         else:
             self.working_directory_absolute = self.working_directory
         if self.comfun.is_absolute(self.cameras_directory) is False:
-            self.cameras_directory_absolute = self.project_directory + self.cameras_directory
+            self.cameras_directory_absolute = f"{self.project_directory}{self.cameras_directory}"
         else:
             self.cameras_directory_absolute = self.cameras_directory
         if self.comfun.is_absolute(self.cache_directory) is False:
-            self.cache_directory_absolute = self.project_directory + self.cache_directory
+            self.cache_directory_absolute = f"{self.project_directory}{self.cache_directory}"
         else:
             self.cache_directory_absolute = self.cache_directory
 
         # TODO standard directories on settings
         if self.comfun.is_absolute(self.env_directory) is False:
-            self.env_directory_absolute = self.project_directory + self.env_directory
+            self.env_directory_absolute = f"{self.project_directory}{self.env_directory}"
         else:
             self.env_directory_absolute = self.env_directory
         if self.comfun.is_absolute(self.props_directory) is False:
-            self.props_directory_absolute = self.project_directory + self.props_directory
+            self.props_directory_absolute = f"{self.project_directory}{self.props_directory}"
         else:
             self.props_directory_absolute = self.props_directory
         if self.comfun.is_absolute(self.scripts_directory) is False:
-            self.scripts_directory_absolute = self.project_directory + self.scripts_directory
+            self.scripts_directory_absolute = f"{self.project_directory}{self.scripts_directory}"
         else:
             self.scripts_directory_absolute = self.scripts_directory
         if self.comfun.is_absolute(self.custom_directory) is False:
-            self.custom_directory_absolute = self.project_directory + self.custom_directory
+            self.custom_directory_absolute = f"{self.project_directory}{self.custom_directory}"
         else:
             self.custom_directory_absolute = self.custom_directory
 
@@ -128,35 +129,29 @@ class Projects:
         return "Projects(SimBatch())"
 
     def __str__(self):
-        return "Projects, current_project_id:{}  total_projects:{}".format(self.current_project_id, self.total_projects)
+        return f"Projects, current_project_id:{self.current_project_id}  total_projects:{self.total_projects}"
 
     #  print project data, for debug
     def print_current(self):
-        print("     current project: id: {}     index: {}    total_projects: {}\n".format(self.current_project_id,
-                                                                                        self.current_project_index,
-                                                                                        self.total_projects))
+        print(f"     current project: id: {self.current_project_id}     index: {self.current_project_index}    total_projects: {self.total_projects}{os.linesep}")
         if self.current_project_index is not None:
             cur_proj = self.current_project
-            print("       current project: ", cur_proj.project_name)
-            print("       project_directory ", cur_proj.project_directory)
-            print("       working_directory ", cur_proj.working_directory)
-            print("       cameras_directory ", cur_proj.cameras_directory)
-            print("       cache_directory ", cur_proj.cache_directory)
-            print("       seq_shot_take_pattern:{}, zeros:{}, description:{}".format(cur_proj.seq_shot_take_pattern,
-                                                                                   cur_proj.zeros_in_version,
-                                                                                   cur_proj.description))
+            print(f"       current project: {cur_proj.project_name}")
+            print(f"       project_directory {cur_proj.project_directory}")
+            print(f"       working_directory {cur_proj.working_directory}")
+            print(f"       cameras_directory {cur_proj.cameras_directory}")
+            print(f"       cache_directory {cur_proj.cache_directory}")
+            print(f"       seq_shot_take_pattern:{cur_proj.seq_shot_take_pattern}, zeros:{cur_proj.zeros_in_version}, description:{cur_proj.description}")
 
     def print_all(self):
         if self.total_projects == 0:
             print("   [INF] no projects loaded")
         for p in self.projects_data:
-            print("\n\n   {} id:{} is_default:{} state:{}".format(p.project_name, p.id, p.is_default, p.state))
-            print("   ", p.project_directory)
-            print("   ", p.working_directory_absolute)
-            print("   seq_shot_take_pattern:{}, zeros:{}, description:{}".format(p.seq_shot_take_pattern,
-                                                                                p.zeros_in_version,
-                                                                                p.description))
-        print("\n\n")
+            print(f"{os.linesep}{os.linesep}   {p.project_name} id:{p.id} is_default:{p.is_default} state:{p.state}{os.linesep}")
+            print(f"   {p.project_directory}")
+            print(f"   {p.working_directory_absolute}")
+            print(f"   seq_shot_take_pattern:{p.seq_shot_take_pattern}, zeros:{p.zeros_in_version}, description:{p.description}{os.linesep}")
+        print(f"{os.linesep}{os.linesep}")
 
     #  get index from list 'projects_data'  by id of project
     def get_index_from_id(self, proj_id):
@@ -183,7 +178,7 @@ class Projects:
                     return p.id
                     
         if msg:
-            self.batch.logger.wrn(("no project with name: ", name))
+            self.batch.logger.wrn(f"no project with name: {name}")
         return None
 
     def is_project_exists(self, name, msg=True):
@@ -207,7 +202,7 @@ class Projects:
             self.current_project = self.projects_data[self.current_project_index]
             return True
         else:
-            self.batch.logger.err("(update_current_from_id)  no index found:{}".format(proj_id))
+            self.batch.logger.err(f"(update_current_from_id)  no index found: {proj_id}")
             self.current_project_id = None
             return False
 
@@ -221,8 +216,8 @@ class Projects:
         else:
             self.current_project_id = None
             self.current_project = None
-            self.batch.logger.err(("(update_current_from_index) wrong index:", index))
-            self.batch.logger.err(" total:{}  len:{}".format(self.total_projects, len(self.projects_data)))
+            self.batch.logger.err(f"(update_current_from_index) wrong index: {index}")
+            self.batch.logger.err(f" total:{self.total_projects}  len:{len(self.projects_data)}")
             return False
 
     #  prepare 'projects_data' for backup or save
@@ -388,7 +383,7 @@ class Projects:
         if json_file is None:
             json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
         if self.comfun.file_exists(json_file, info="projects file"):
-            self.batch.logger.inf(("loading projects: ", json_file), nl=True)
+            self.batch.logger.inf(f"loading projects: {json_file}", nl=True)
             json_projects = self.comfun.load_json_file(json_file)
             if json_projects is not None and "projects" in json_projects.keys():
                 if json_projects['projects']['meta']['total'] > 0:
@@ -401,15 +396,14 @@ class Projects:
                                                         li['zerosInVersion'])
                             self.add_project(new_project)
                         else:
-                            self.batch.logger.err(("proj data not consistent ", len(li),
-                                                   len(PROJECT_ITEM_FIELDS_NAMES)))
+                            self.batch.logger.err(f"proj data not consistent {len(li)} {len(PROJECT_ITEM_FIELDS_NAMES)}")
                 else:
-                    self.batch.logger.wrn(("no projects data in: ", json_file))
+                    self.batch.logger.wrn(f"no projects data in: {json_file}")
                 return True
             else:
-                self.batch.logger.err(("wrong format data in: ", json_file))
+                self.batch.logger.err(f"wrong format data in: {json_file}")
         else:
-            self.batch.logger.err(("projects file not exists: ", json_file))
+            self.batch.logger.err(f"projects file not exists: {json_file}")
         return False
 
     #  load projects data from sql
@@ -428,7 +422,7 @@ class Projects:
     #  save projects data as json
     def save_projects_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = f"{self.sts.store_data_json_directory_abs}{self.sts.JSON_PROJECTS_FILE_NAME}"
         content = self.format_projects_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
@@ -461,7 +455,7 @@ class Projects:
     #  delete json file from storage
     def delete_json_project_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = f"{self.sts.store_data_json_directory_abs}{self.sts.JSON_PROJECTS_FILE_NAME}"
         if self.comfun.file_exists(json_file):
             return os.remove(json_file)
         else:
@@ -470,7 +464,7 @@ class Projects:
     #  clear json file content
     def clear_json_project_file(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory_abs + self.sts.JSON_PROJECTS_FILE_NAME
+            json_file = f"{self.sts.store_data_json_directory_abs}{self.sts.JSON_PROJECTS_FILE_NAME}"
         if self.comfun.file_exists(json_file):
             return self.comfun.save_to_file(json_file, "")
         else:

@@ -13,7 +13,7 @@ class Settings:
 
     # fundamental settings (config.ini)
     current_os = -1                             # 1 Linux, 2 windoza   detected on __init__ or forced by force_os
-    dir_separator = ""                          # set on __init__   depend on  current_os
+    dir_separator = ""                          # set on __init__   depend on  current_os        # TODO move to os.sep
     store_data_mode = None                      # 1 json     2 MySQL (PRO version)
     debug_level = None                          # 1 only ERR, 2 +WRN, 3 +INF, 4 +important [db], 5 +[db], 6 ALL
     store_data_json_directory = None            # dir basic config settings (def:config.ini)
@@ -24,7 +24,7 @@ class Settings:
     store_definitions_directory_abs = None      # dir with software, actions, engines and param definitions
     installation_directory_abs = None           # dir used for update simnodes core (they can be independent)
     store_abs_dir = ""                          #
-    sql = [None, None, None, None]              # "db"  "pass" "port" "user" (PRO version)
+    sql = [None, None, None, None]              # "db"  "pass"  "port"  "user" (PRO version)
     admin_user = None                           # PRO version
 
     # predefined settings
@@ -142,12 +142,12 @@ class Settings:
         else:
             self.current_os = force_os
         if self.current_os == 1:
-            self.dir_separator = "/"
+            self.dir_separator = "/"        # TODO  move to os.sep
         else:
-            self.dir_separator = "\\"
+            self.dir_separator = "\\"       # TODO  move to os.sep
 
         """  STANDALONE """
-        self.store_abs_dir = (os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) + self.dir_separator
+        self.store_abs_dir = f"{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}{os.sep}"
 
         """  MAYA win  C:\Program Files\Autodesk\Maya2014\ """
         # TODO check abs
@@ -168,7 +168,7 @@ class Settings:
         self.load_settings()
 
         if self.loading_state < 4:
-            self.logger.err("Data not loaded !!!  ({})".format(self.loading_state))
+            self.logger.err(f"Data not loaded !!!  ({self.loading_state})")
 
     def get_version(self):
         return self.SIMBATCH_VERSION
@@ -248,7 +248,7 @@ class Settings:
             ini_file_and_path = ini_file
         else:
             if ini_path == "":
-                check_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + self.dir_separator
+                check_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
                 ini_file_and_path = check_ini_path + ini_file
                 if check_is_exists:
                     if self.comfun.file_exists(check_ini_path + ini_file) is False:
@@ -256,8 +256,8 @@ class Settings:
             else:
                 if ini_path == "tests":
                     check_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                    check_ini_path = os.path.dirname(check_ini_path) + self.dir_separator + "tests"   # cd ../tests
-                    check_ini_path += self.dir_separator
+                    check_ini_path = os.path.dirname(check_ini_path) + os.sep + "tests"   # cd ../tests
+                    check_ini_path += os.sep
                     ini_file_and_path = check_ini_path + ini_file
                     if check_is_exists:
                         if self.comfun.file_exists(check_ini_path + ini_file) is False:
@@ -281,7 +281,7 @@ class Settings:
 
     def update_absolute_directories(self):
         data_path = self.store_data_json_directory
-        dir_sep = self.dir_separator
+        dir_sep = os.sep
 
         if len(data_path) == 0:
             self.store_data_json_directory_abs = ""
@@ -360,7 +360,7 @@ class Settings:
                     if "startup" in self.json_settings_data.keys():
                         if "tab" in self.json_settings_data["startup"].keys():
                             self.force_start_tab = self.json_settings_data["startup"]["tab"]
-                            self.logger.inf("forced startup tab index: {}".format(self.force_start_tab))
+                            self.logger.inf(f"forced startup tab index: {self.force_start_tab}")
 
                     if self.comfun.can_get_int(self.store_data_mode):
                         if self.store_data_mode == 1:
@@ -378,7 +378,7 @@ class Settings:
                                 """ SETTINGS VALUES ARE OK"""
                                 self.loading_state = 4
                                 if self.debug_level >= 3:
-                                    self.logger.inf(("settings loaded ", self.ini_file))
+                                    self.logger.inf(f"settings loaded {self.ini_file}")
                                 return True
 
                         elif self.store_data_mode == 2:
@@ -387,15 +387,15 @@ class Settings:
                             self.settings_err_info = "MySQL will be supported with the PRO version"
                         else:
                             self.loading_state = 3
-                            self.settings_err_info = "Store data mode: {} incorrect value".format(self.store_data_mode)
+                            self.settings_err_info = f"Store data mode: {self.store_data_mode} incorrect value"
                 else:
-                    print(" [WRN] json data inconsistency:", self.ini_file)
+                    self.logger.wrn(f"json data inconsistency: {self.ini_file}")
                     self.loading_state = 2
         else:
-            self.settings_err_info = " [ERR] config.ini file not exists: {}".format(self.ini_file)
+            self.settings_err_info = f" [ERR] config.ini file not exists: {self.ini_file}"
             self.loading_state = -1
 
-        print("\n\n[ERR] ", self.settings_err_info)
+        print(f"\n\n[ERR] {self.settings_err_info}")
         return False
 
     def save_settings(self, settings_file=""):
@@ -456,7 +456,7 @@ class Settings:
         if errors == 0:
             return True
         else:
-            self.logger.err("found {} errors in config file".format(errors))
+            self.logger.err(f"found {errors} errors in config file")
             return False
 
     def rbg_to_brush(self, r, g, b):
@@ -467,17 +467,17 @@ class Settings:
         if self.store_definitions_directory_abs is not None:
             palette_id = self.ui_color_mode
             if palette_id == 1:
-                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                color_file = self.store_definitions_directory_abs + "colors" + os.sep + \
                              self.COLORS_GRAY_FILE_NAME
             elif palette_id == 2:
-                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                color_file = self.store_definitions_directory_abs + "colors" + os.sep + \
                              self.COLORS_PASTEL_FILE_NAME
             elif palette_id == 3:
-                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                color_file = self.store_definitions_directory_abs + "colors" + os.sep + \
                              self.COLORS_DARK_FILE_NAME
             else:
                 #  palette_id == 4:
-                color_file = self.store_definitions_directory_abs + "colors" + self.dir_separator + \
+                color_file = self.store_definitions_directory_abs + "colors" + os.sep + \
                              self.COLORS_CUSTOM_FILE_NAME
 
             if self.comfun.file_exists(color_file, info="colors file"):

@@ -1,3 +1,5 @@
+import os
+
 try:  # Maya 2016
     from PySide.QtCore import *
     from PySide.QtGui import *
@@ -370,8 +372,7 @@ class NodesUI:
 
     def on_click_path_get(self):
         # self.batch.comfun.file_dialog_to_edit_line(self.qt_form_add_node_el_path, QFileDialog, "")
-        self.batch.comfun.get_dialog_directory(self.qt_form_add_node_el_path, QFileDialog,
-                                               dir_separator=self.batch.sts.dir_separator)
+        self.batch.comfun.get_dialog_directory(self.qt_form_add_node_el_path, QFileDialog, dir_separator=os.sep)
 
     def on_click_path_check(self):
         dir = self.qt_form_add_node_el_path.text()
@@ -524,3 +525,9 @@ class NodesUI:
                     self.top_ui.set_top_info("Current node:   " + str(cur_node.node_name))
             else:
                 self.batch.logger.wrn(("(on change) Wrong current_list_index: ", current_list_index))
+
+    def get_node_directory(self, project_name, schema_name, node_name):
+        return f"{self.batch.prj.current_project.working_directory_absolute}{project_name}{os.sep}{schema_name}{os.sep}nodes{os.sep}{node_name}{os.sep}"
+
+    def get_node_file_path(self, project_name, schema_name, node_name):
+        return f"{self.get_node_directory(project_name, schema_name, node_name)}node.json"

@@ -10,6 +10,7 @@ except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from .widgets import *
+import os
 
 
 class ProjectListItem(QWidget):
@@ -392,40 +393,39 @@ class ProjectsUI:
 
     def fa_get_project_directory(self, qt_edit_line):
         force_start_dir = ""
-        if self.batch.prj.current_project_index >= 0:
-            force_start_dir = self.batch.prj.projects_data[self.batch.prj.current_project_index].project_directory
+        if self.batch.prj.current_project is not None:
+            force_start_dir = self.batch.prj.current_project.project_directory
             if self.batch.sts.current_os == 2:  # OS MARKER
                 force_start_dir = self.batch.comfun.convert_to_win_path(force_start_dir)
 
-        sep = self.sts.dir_separator
-        self.batch.logger.deepdb(("dir separator:", sep, "force_start_dir:", force_start_dir))
-        ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir, dir_separator=sep)
+        self.batch.logger.deepdb((f"dir separator: {os.sep}, force_start_dir: {force_start_dir}"))
+        ret = self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, force_start_dir, dir_separator=os.sep)
         if len(ret) > 0:
-            self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, ret + "FX" + sep)  # TODO user cfg FX
-            self.comfun.if_empty_put_text(self.wfa_cam_dir_edit.qt_edit_line, ret + "cam" + sep)     # TODO user cfg cam
-            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "ani" + sep)     # TODO user cfg ani
-            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, ret + "env" + sep)    # TODO user cfg ani
+            self.comfun.if_empty_put_text(self.wfa_working_dir_edit.qt_edit_line, f"{ret}FX{os.sep}")  # TODO user cfg FX
+            self.comfun.if_empty_put_text(self.wfa_cam_dir_edit.qt_edit_line, f"{ret}cam{os.sep}")     # TODO user cfg cam
+            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, f"{ret}ani{os.sep}")     # TODO user cfg ani
+            self.comfun.if_empty_put_text(self.wfa_ani_dir_edit.qt_edit_line, f"{ret}env{os.sep}")    # TODO user cfg ani
 
     def fa_get_working_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     def fa_get_cam_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     def fa_get_cache_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     def get_dialog_project_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     def get_dialog_working_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     def get_dialog_cam_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     def get_dialog_anicache_directory(self, qt_edit_line):
-        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=self.sts.dir_separator)
+        return self.comfun.get_dialog_directory(qt_edit_line, QFileDialog, dir_separator=os.sep)
 
     #  Add
     #  Add  Add

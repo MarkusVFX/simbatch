@@ -175,12 +175,16 @@ class Definitions:
         print(f"     current definition:     index: {self.current_definition_index}    total_definitions: {self.total_definitions}{os.linesep}")
         if self.current_definition_index is not None:
             cur_def = self.current_definition
-            print(f"       current definition: {cur_def.definition_name}")
+            print(f"       current definition: {cur_def.name}")
             print(f"       software: {cur_def.software}")
-            print(f"       description: {cur_def.description}")
-            print(f"       actions count: {len(cur_def.actions_array)}")
-            for a in cur_def.actions_array:
-                print(f"       __action: {a.name}__{a.ui[0]}__{a.actual_value}__{a.template}")
+            print(f"       actions count: {len(cur_def.multi_actions_array)}")
+            for group in cur_def.multi_actions_array:
+                for action in group.actions:
+                    if hasattr(action, 'ui') and len(action.ui) > 0:
+                        ui_value = action.ui[0]
+                    else:
+                        ui_value = "N/A"
+                    print(f"       __action: {action.name}__{ui_value}")
 
     '''  print definitions data, for debug  '''
     def print_total(self, print_children=False):

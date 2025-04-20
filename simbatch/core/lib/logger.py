@@ -15,11 +15,17 @@ class Logger:
         self.log_file_level = log_level
 
     def dispatch(self, level, message, force_print=False, raw=False, nl=False, nla=False, force_prefix=None):
+        if self.console_level is None:
+            self.console_level = 3  # Default to INFO level if None
+        
         if self.console_level >= level or force_print:
             console_print = True
         else:
             console_print = False
 
+        if self.log_file_level is None:
+            self.log_file_level = 0  # Default to no file logging if None
+            
         if self.log_file_level >= level:
             log_append = True
         else:
@@ -124,7 +130,7 @@ class Logger:
     def set_console_level(self, lvl):
         self.console_level = lvl
 
-    def add_to_log(self, prefix, message):
+    def add_to_log(self, message, prefix=""):
         pass
         # TODO !!!
         

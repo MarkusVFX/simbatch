@@ -228,7 +228,7 @@ class Patterns:    # TODO  TESTS !!!!
                     if lvl == 3:
                         num_types = ["take"]
                 ret = self.get_pattern_from_string(a, is_final=True, number_types=num_types)
-                print(f"     [db]   final paterrn : {pattern_s_n} {ret}{os.linesep}")   # TODO  logger
+                print(f"     [db]   final paterrn : {pattern_s_n} {ret}")   # TODO  logger
                 return ret
 
     def get_dir_patterns(self, dir, db=False):
@@ -268,7 +268,7 @@ class Patterns:    # TODO  TESTS !!!!
         if len(most_occurred_pattern) > 0:
             patt3 = self.generate_final_pattern(level3arr, most_occurred_pattern, 3)
             full_dir_pattern += os.sep + patt3
-        print(f"{os.linesep} [db]  ret full_dir_pattern     {full_dir_pattern}{os.linesep}")     # TODO  logger
+        print(f"{os.linesep} [db]  ret full_dir_pattern     {full_dir_pattern}")     # TODO  logger
         return full_dir_pattern
 
     def get_seq_pattern(self, full_dir_pattern):

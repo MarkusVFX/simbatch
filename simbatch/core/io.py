@@ -479,13 +479,16 @@ class StorageInOut:
         except:
             self.batch.logger.err(f"copy_tree {sys.exc_info()[0]}")
 
-    def copy_file(self, src_path, dst_path, file_name, sub_dir=None):
+    def copy_file(self, src_path, dst_path, file_name, sub_dir=None, create_dst_dir=False):
         if sub_dir is not None:
             if len(sub_dir) > 0:
                 src_path += sub_dir + self.dir_separator
                 dst_path += sub_dir + self.dir_separator
             else:
                 self.batch.logger.wrn("sub dir is zero size")
+
+        if create_dst_dir:
+            self.comfun.create_directory(dst_path)
 
         src_file = src_path + file_name
         dst_file = dst_path + file_name

@@ -135,11 +135,9 @@ class Tasks:
         if self.total_tasks == 0:
             print("   [INF] no tasks loaded")
         for t in self.tasks_data:
-            print(f"{os.linesep}{os.linesep}   {t.task_name} id:{t.id} is_default:{t.is_default} state:{t.state}")
-            print(f"   {t.task_directory}")
-            print(f"   {t.working_directory_absolute}")
-            print(f"   seq_shot_take_pattern:{t.seq_shot_take_pattern}, zeros:{t.zeros_in_version}, description:{t.description}")
-        print(f"{os.linesep}{os.linesep}")
+            print(f"{os.linesep}{os.linesep}   {t.task_name} id:{t.id} state:{t.state}")
+            print(f"   seq:{t.sequence} shot:{t.shot} take:{t.take}   schema_id:{t.schema_id} project_id:{t.project_id}  description: {t.description}")
+        print(f"{os.linesep}")
 
     def get_index_by_id(self, get_id):
         for i, tsk in enumerate(self.tasks_data):
@@ -181,7 +179,12 @@ class Tasks:
         return None
 
     def update_current_from_index(self, index):
-        if len(self.tasks_data) > index >= 0:
+        if index is None:
+            self.current_task_index = None
+            self.current_task_id = None
+            self.current_task = None
+            return False
+        elif len(self.tasks_data) > index >= 0:
             self.current_task_id = self.tasks_data[index].id
             self.current_task_index = index
             self.current_task = self.tasks_data[index]

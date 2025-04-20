@@ -314,7 +314,8 @@ class TasksUI:
         self.clear_list(with_freeze=False)
         self.init_tasks(filters)
         self.update_list_of_visible_ids(filters)
-        self.batch.tsk.update_current_from_index(index)
+        if index is not None and isinstance(index, int):
+            self.batch.tsk.update_current_from_index(index)
         self.freeze_list_on_changed = 0
 
     def reload_tasks_data_and_refresh_list(self, filters=None):
@@ -442,10 +443,10 @@ class TasksUI:
     def on_click_show_create_form(self):
         if self.create_form_state == 0:
             self.hide_all_forms()
-            if self.batch.tsk.current_task_index >= 0:
+            if self.batch.tsk.current_task_index is not None and self.batch.tsk.current_task_index >= 0:
                 curr_task = self.batch.tsk.tasks_data[self.batch.tsk.current_task_index]
                 self.qt_form_create.update_create_ui(curr_task.schema_id)
-            elif self.batch.sch.current_schema_index >= 0:
+            elif self.batch.sch.current_schema_index is not None and self.batch.sch.current_schema_index >= 0:
                 cur_sch = self.batch.sch.schemas_data[self.batch.sch.current_schema_index]
                 self.qt_form_create.update_create_ui(schema_id=cur_sch.id)
             else:
@@ -790,15 +791,3 @@ class TasksUI:
             else:
                 self.batch.logger.err("on chng list task {} < {}".format(current_task_index,
                                                                          len(self.batch.tsk.tasks_data)))
-
-    def get_task_directory(self, project_name, schema_name, sequence, shot, take):
-        return f"{self.batch.prj.current_project.working_directory_absolute}{project_name}{os.sep}{schema_name}{os.sep}{sequence}{os.sep}{shot}{os.sep}{take}{os.sep}"
-
-    def get_task_file_path(self, project_name, schema_name, sequence, shot, take):
-        return f"{self.get_task_directory(project_name, schema_name, sequence, shot, take)}task.json"
-
-    def get_shot_setup_directory(self, project_name, schema_name, sequence, shot, take):
-        return f"{self.get_task_directory(project_name, schema_name, sequence, shot, take)}shot_setup{os.sep}"
-
-    def get_cache_directory(self, project_name, schema_name, sequence, shot, take):
-        return f"{self.get_task_directory(project_name, schema_name, sequence, shot, take)}cache{os.sep}"

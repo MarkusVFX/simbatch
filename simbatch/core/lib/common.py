@@ -481,7 +481,7 @@ class CommonFunctions:
         for ar in arr:
             lay.addLayout(ar)
 
-    def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir="", dir_separator="/"):
+    def get_dialog_directory(self, qt_edit_line, qt_file_dialog, force_start_dir="", dir_separator=os.sep):
         start_dir = ""
         self.logger.deepdb(f"force_start_dir: {force_start_dir}")
         if len(force_start_dir) > 0:

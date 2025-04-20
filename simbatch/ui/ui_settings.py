@@ -321,6 +321,13 @@ class SettingsUI:
             qt_cb_always_on_top.setChecked(True)
         qt_cb_always_on_top.stateChanged.connect(self.on_changed_always_on_top)
         qt_lay_settings_buttons.addWidget(qt_cb_always_on_top)
+        
+        qt_cb_save_pos = QCheckBox("Save pos and size")
+        if settings.save_window_position:
+            qt_cb_save_pos.setChecked(True)
+        qt_cb_save_pos.stateChanged.connect(self.on_changed_save_window_position)
+        qt_lay_settings_buttons.addWidget(qt_cb_save_pos)
+        self.qt_cb_save_pos = qt_cb_save_pos
 
         qt_button_save = QPushButton("Save")
         qt_button_save.clicked.connect(self.on_click_save_settings)
@@ -591,3 +598,11 @@ class SettingsUI:
         else:
             self.batch.logger.err((" Wrong data path, directory not exist :", data_path))
         self.resize_settings_widget(self.settings.window[2])
+
+    def on_changed_save_window_position(self, state):   # state values 0 or 2  !
+        if state == 0:
+            self.settings.save_window_position = False
+        elif state == 2:
+            self.settings.save_window_position = True
+        else:
+            self.batch.logger.wrn("unknown state on_changed_save_window_position : " + str(state))

@@ -667,7 +667,7 @@ class SchemasUI:
             try:
                 self.batch.dfn.current_interactions.open_setup(file_to_load)   # TODO ret
             except Exception as e:
-                self.logger.err(e)
+                self.batch.logger.err(e)
         else:
             self.batch.logger.err("Could NOT load base setup!")
 

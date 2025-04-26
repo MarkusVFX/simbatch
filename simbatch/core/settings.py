@@ -413,17 +413,6 @@ class Settings:
         print(f"\n\n[ERR] {self.settings_err_info}")
         return False
 
-    def load_default_state_colors(self, color_file=None):
-        if color_file is None:
-            color_file = self.colors_ini_file
-
-        try:
-            f = open(color_file, 'r', encoding='utf-8')
-            self.colors_info = json.load(f)
-            f.close()
-            
-            # ... rest of code remains the same
-
     def save_settings(self, settings_file=""):
         if len(settings_file) == 0:
             settings_file = self.ini_file  # JSON format
@@ -510,7 +499,7 @@ class Settings:
             
         # Load settings from file
         try:
-            with open(config_file) as f:
+            with open(config_file, encoding='utf-8') as f:
                 settings_data = json.load(f)
                 
             # Ensure simnodes section exists
@@ -518,7 +507,7 @@ class Settings:
                 settings_data["simnodes"] = {}
                 
             # Set master_source to current installation directory if available
-            current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   #mmm
+            current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             settings_data["simnodes"]["master_source"] = current_dir
             
             # Make sure storeData paths are defined
@@ -542,7 +531,12 @@ class Settings:
                     settings_data["storeData"]["definitionsDirectory"] = os.path.join(current_dir, defs_dir)
                 
             return settings_data
-            
+        except json.JSONDecodeError as e:
+            self.logger.err(f"JSON decode error in {config_file}: {str(e)}")
+            return None    
+        except IOError as e:
+            self.logger.err(f"I/O error loading settings from {config_file}: {str(e)}")
+            return None
         except Exception as e:
             self.logger.err(f"Error loading settings from {config_file}: {str(e)}")
             return None
@@ -570,30 +564,33 @@ class Settings:
 
             if self.comfun.file_exists(color_file, info="colors file"):
                 self.clear_state_colors()
-                f = open(color_file, 'r', encoding='utf-8')
-                for li_counter, line in enumerate(f.readlines()):
-                    li = line.split(";")
-                    if len(li) > 7: 
-                        self.state_colors[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[2], 40), 
-                                                                          self.comfun.int_or_val(li[3], 40),
-                                                                          self.comfun.int_or_val(li[4], 40))
-                                                                            
-                        self.state_colors_up[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[6], 140), 
-                                                                             self.comfun.int_or_val(li[7], 140),
-                                                                             self.comfun.int_or_val(li[8], 140))
+                try:
+                    with open(color_file, 'r', encoding='utf-8') as f:
+                        for li_counter, line in enumerate(f.readlines()):
+                            li = line.split(";")
+                            if len(li) > 7: 
+                                self.state_colors[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[2], 40), 
+                                                                                  self.comfun.int_or_val(li[3], 40),
+                                                                                  self.comfun.int_or_val(li[4], 40))
+                                                                                    
+                                self.state_colors_up[li_counter] = self.rbg_to_brush(self.comfun.int_or_val(li[6], 140), 
+                                                                                     self.comfun.int_or_val(li[7], 140),
+                                                                                     self.comfun.int_or_val(li[8], 140))
 
-                        self.state_colors_rgb_str[li_counter] = ", ".join([str(self.comfun.int_or_val(li[2], 40)), 
-                                                                           str(self.comfun.int_or_val(li[3], 40)),
-                                                                           str(self.comfun.int_or_val(li[4], 40))])
+                                self.state_colors_rgb_str[li_counter] = ", ".join([str(self.comfun.int_or_val(li[2], 40)), 
+                                                                                   str(self.comfun.int_or_val(li[3], 40)),
+                                                                                   str(self.comfun.int_or_val(li[4], 40))])
 
-                        self.state_colors_up_rgb_str[li_counter] = ", ".join([str(self.comfun.int_or_val(li[6], 140)), 
-                                                                              str(self.comfun.int_or_val(li[7], 140)),
-                                                                              str(self.comfun.int_or_val(li[8], 140))])
-                f.close()
-
-                if self.debug_level >= 3:
-                    self.logger.inf(("loaded colors: ", color_file))
-                return True
+                                self.state_colors_up_rgb_str[li_counter] = ", ".join([str(self.comfun.int_or_val(li[6], 140)), 
+                                                                                      str(self.comfun.int_or_val(li[7], 140)),
+                                                                                      str(self.comfun.int_or_val(li[8], 140))])
+                    
+                    if self.debug_level >= 3:
+                        self.logger.inf(("loaded colors: ", color_file))
+                    return True
+                except Exception as e:
+                    self.logger.err(f"Error loading colors: {str(e)}")
+                    return False
             else:
                 for i in range(0, 40):
                     self.state_colors.append(self.default_gray_brush)
@@ -605,5 +602,5 @@ class Settings:
                     self.logger.wrn(("NOT loaded colors: ", color_file))
                 return False
         else:
-            self.logger.wrn("store_definitions_directory  is None")
+            self.logger.wrn("store_definitions_directory is None")
             return False

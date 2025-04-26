@@ -46,14 +46,36 @@ class SimBatchExecutor():
     def add_to_log(self, log_txt, with_new_line=False):
         log_file = self.server_dir + self.log_file_name
 
-        text_file = open(log_file, "a", encoding='utf-8')
-        if len(log_txt) == 0:
-            text_file.write("\n")
-        else:
-            if with_new_line:
-                log_txt += "\n"
-            text_file.write(self.get_current_time() + "   " + log_txt)
-        text_file.close()
+        try:
+            with open(log_file, "a", encoding='utf-8') as text_file:
+                if len(log_txt) == 0:
+                    text_file.write("\n")
+                else:
+                    if with_new_line:
+                        log_txt += "\n"
+                    text_file.write(self.get_current_time() + "   " + log_txt)
+        except IOError as e:
+            print(f"Error writing to log file {log_file}: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error writing to log file {log_file}: {str(e)}")
+
+    def log_to_file(self, log_txt):
+        """Write log message to executor log file with proper exception handling"""
+        log_file = os.path.join(os.path.dirname(self.server_dir), "executor_log.txt")
+        
+        try:    
+            # Append the log message
+            with open(log_file, "a", encoding='utf-8') as text_file:
+                if len(log_txt) > 0:
+                    text_file.write("\n")
+                text_file.write(self.get_current_time() + "   " + log_txt)
+            return True
+        except IOError as e:
+            print(f"I/O error writing to log file {log_file}: {str(e)}")
+            return False
+        except Exception as e:
+            print(f"Unexpected error writing to log file {log_file}: {str(e)}")
+            return False
 
     @staticmethod
     def get_current_time(filename_mode=False):
@@ -89,34 +111,62 @@ class SimBatchExecutor():
         self.set_queue_state_and_add_to_log("ERR", 9, server_name, with_save=with_save, add_current_time=True)
 
     def finalize_queue_job(self):
-        time.sleep(1)
-        job_time = str(0.1 * int((time.time() - self.job_start_time) * 10))
-        print(" [INF] job time   ", job_time)
+        try:
+            time.sleep(1)
+            job_time = str(0.1 * int((time.time() - self.job_start_time) * 10))
+            print(f" [INF] job time: {job_time}")
 
-        ret = self.set_queue_job_done(self.node_name, set_time=job_time)
+            # Update queue item status to DONE
+            try:
+                ret = self.set_queue_job_done(self.node_name, set_time=job_time)
+                print(f" [INF] set_queue_job_done: {ret}")
+            except Exception as e:
+                print(f" [ERR] Error setting queue job done: {str(e)}")
+                self.add_to_log(f"Error setting queue job done: {str(e)}")
+                
+            # Update node state
+            try:
+                self.batch.nod.reload_nodes()
+                idx = self.batch.nod.get_node_index_by_name(self.node_name)
+                if idx is not None and idx is not False:
+                    self.batch.nod.set_node_state_in_database(idx, 2)
+                    self.batch.nod.update_current_from_index(idx)
+                    cur_nod = self.batch.nod.current_node
+                    if cur_nod is not None:
+                        state_id = self.batch.sts.INDEX_STATE_WAITING
+                        self.batch.nod.create_node_state_file(cur_nod.state_file, cur_nod.node_name, state_id, update_mode=True)
+                    else:
+                        print(" [ERR] Current node is None")
+                else:
+                    print(f" [ERR] Invalid node index: {idx}")
+            except Exception as e:
+                print(f" [ERR] Error updating node state: {str(e)}")
+                self.add_to_log(f"Error updating node state: {str(e)}")
 
-        print(" [INF] set_queue_job_done   ", ret)
+            time.sleep(1)
 
-        self.batch.nod.reload_nodes()
-        idx = self.batch.nod.get_node_index_by_name(self.node_name)
-        # print(" idx  ", idx, self.node_name)
-        self.batch.nod.set_node_state_in_database(idx, 2)
-        
-        self.batch.nod.update_current_from_index(idx)
-        cur_nod = self.batch.nod.current_node
-        state_id = self.batch.sts.INDEX_STATE_WAITING
-        self.batch.nod.create_node_state_file(cur_nod.state_file, cur_nod.node_name, state_id, update_mode=True)
-
-        time.sleep(1)
-
-        if self.softID == 1:
-            self.add_to_log_with_new_line("HOU Exiting")
-            print(" [INF] HOU Exit  ")
-            self.exit_houdini()
-        else:  # maya !!!
-            self.add_to_log_with_new_line("Maya Exiting")
-            print(" [INF] Maya Exit  ")
-            self.exit_maya()
+            # Exit the application
+            try:
+                if self.softID == 1:
+                    self.add_to_log_with_new_line("HOU Exiting")
+                    print(" [INF] HOU Exit")
+                    self.exit_houdini()
+                else:  # maya or other software, TODO define it
+                    self.add_to_log_with_new_line("Maya Exiting")
+                    print(" [INF] Maya Exit")
+                    self.exit_maya()
+            except Exception as e:
+                print(f" [ERR] Error during application exit: {str(e)}")
+                self.add_to_log(f"Error during application exit: {str(e)}")
+                
+        except Exception as e:
+            print(f" [ERR] Unhandled exception in finalize_queue_job: {str(e)}")
+            self.add_to_log(f"Unhandled exception in finalize_queue_job: {str(e)}")
+            # Try to set error state as a fallback
+            try:
+                self.set_queue_job_error(self.node_name)
+            except:
+                pass
 
     def exit_houdini(self):
         import hou

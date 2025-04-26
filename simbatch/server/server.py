@@ -352,7 +352,7 @@ class SimBatchServer:
         date = self.comfun.get_current_time()
         if log_file is None:
             log_file = self.server_dir + self.log_file_name
-        f = open(log_file, 'a')
+        f = open(log_file, 'a', encoding='utf-8')
         f.write(date + " " + info + '; \n')
         f.close()
         self.logger.log(info)

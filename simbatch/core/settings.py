@@ -2,6 +2,7 @@ import os
 import json
 from random import randint
 from .lib.common import CommonFunctions
+import sys
 
 
 class Settings:
@@ -323,12 +324,9 @@ class Settings:
         self.settings_err_info = ""
         if self.comfun.file_exists(self.ini_file, info="settings init"):
             self.loading_state = 1
-            with open(self.ini_file) as f:
-                try:
+            try:
+                with open(self.ini_file, encoding='utf-8') as f:
                     self.json_settings_data = json.load(f)
-                except IOError:
-                    print(" [ERR] json.load(f) exception ", f)
-                    pass
                 ret = self.check_data_integration()
                 if ret:
                     self.debug_level = self.json_settings_data["debugLevel"]["current"]
@@ -399,12 +397,32 @@ class Settings:
                 else:
                     self.logger.wrn(f"json data inconsistency: {self.ini_file}")
                     self.loading_state = 2
+            except IOError as e:
+                self.logger.err(("I/O error loading settings file({0}): {1}".format(e.errno, e.strerror), self.ini_file))
+                return False
+            except ValueError as ve:
+                self.logger.err(("value error settings:", ve, self.ini_file))
+                return False
+            except Exception:
+                self.logger.err(("unexpected error loading settings:", sys.exc_info()[0], self.ini_file))
+                return False
         else:
             self.settings_err_info = f" [ERR] config.ini file not exists: {self.ini_file}"
             self.loading_state = -1
 
         print(f"\n\n[ERR] {self.settings_err_info}")
         return False
+
+    def load_default_state_colors(self, color_file=None):
+        if color_file is None:
+            color_file = self.colors_ini_file
+
+        try:
+            f = open(color_file, 'r', encoding='utf-8')
+            self.colors_info = json.load(f)
+            f.close()
+            
+            # ... rest of code remains the same
 
     def save_settings(self, settings_file=""):
         if len(settings_file) == 0:
@@ -552,7 +570,7 @@ class Settings:
 
             if self.comfun.file_exists(color_file, info="colors file"):
                 self.clear_state_colors()
-                f = open(color_file, 'r')
+                f = open(color_file, 'r', encoding='utf-8')
                 for li_counter, line in enumerate(f.readlines()):
                     li = line.split(";")
                     if len(li) > 7: 

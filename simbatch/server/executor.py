@@ -46,7 +46,7 @@ class SimBatchExecutor():
     def add_to_log(self, log_txt, with_new_line=False):
         log_file = self.server_dir + self.log_file_name
 
-        text_file = open(log_file, "a")
+        text_file = open(log_file, "a", encoding='utf-8')
         if len(log_txt) == 0:
             text_file.write("\n")
         else:
@@ -91,17 +91,17 @@ class SimBatchExecutor():
     def finalize_queue_job(self):
         time.sleep(1)
         job_time = str(0.1 * int((time.time() - self.job_start_time) * 10))
-        print " [INF] job time   ", job_time
+        print(" [INF] job time   ", job_time)
 
         ret = self.set_queue_job_done(self.node_name, set_time=job_time)
 
-        print " [INF] set_queue_job_done   ", ret
+        print(" [INF] set_queue_job_done   ", ret)
 
         self.batch.nod.reload_nodes()
         idx = self.batch.nod.get_node_index_by_name(self.node_name)
-        # print " idx  ", idx, self.node_name
+        # print(" idx  ", idx, self.node_name)
         self.batch.nod.set_node_state_in_database(idx, 2)
-
+        
         self.batch.nod.update_current_from_index(idx)
         cur_nod = self.batch.nod.current_node
         state_id = self.batch.sts.INDEX_STATE_WAITING
@@ -111,11 +111,11 @@ class SimBatchExecutor():
 
         if self.softID == 1:
             self.add_to_log_with_new_line("HOU Exiting")
-            print " [INF] HOU Exit  "
+            print(" [INF] HOU Exit  ")
             self.exit_houdini()
         else:  # maya !!!
             self.add_to_log_with_new_line("Maya Exiting")
-            print " [INF] Maya Exit  "
+            print(" [INF] Maya Exit  ")
             self.exit_maya()
 
     def exit_houdini(self):

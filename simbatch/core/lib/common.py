@@ -392,7 +392,7 @@ class CommonFunctions:
 
     def create_empty_file(self, file_name):
         try:
-            with open(file_name, 'w') as f:
+            with open(file_name, 'w', encoding='utf-8') as f:
                 pass
             return True
         except Exception as e:
@@ -413,7 +413,7 @@ class CommonFunctions:
     def load_from_file(self, file_name, force_no_lines=False):  # TODO rename it: load content from file
         if self.file_exists(file_name):
             try:
-                with open(file_name, 'r') as f:
+                with open(file_name, 'r', encoding='utf-8') as f:
                     if force_no_lines:
                         content = f.readlines()
                         content = [x.strip() for x in content]
@@ -429,7 +429,7 @@ class CommonFunctions:
     def load_json_file(self, file_name):
         if self.file_exists(file_name, info=file_name, check_not_empty=True):
             try:
-                with open(file_name, 'r') as f:
+                with open(file_name, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except json.JSONDecodeError as e:
                 self.logger.err(f"JSON decode error: {str(e)}")
@@ -443,7 +443,7 @@ class CommonFunctions:
     @staticmethod
     def save_json_file(file_name, content):
         try:
-            with open(file_name, 'w') as f:
+            with open(file_name, 'w', encoding='utf-8') as f:
                 json.dump(content, f, indent=2)
             return True
         except Exception as e:
@@ -452,7 +452,7 @@ class CommonFunctions:
 
     def save_to_file(self, file_name, content, nl_at_end=False):
         try:
-            with open(file_name, 'w') as f:
+            with open(file_name, 'w', encoding='utf-8') as f:
                 f.write(content)
                 if nl_at_end:
                     f.write(os.linesep)

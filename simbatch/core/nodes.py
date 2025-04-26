@@ -329,7 +329,7 @@ class SimNodes:
 
     def get_node_info_from_state_file(self, state_file):
         if self.comfun.file_exists(state_file, "get state file txt"):
-            f = open(state_file, 'r')
+            f = open(state_file, 'r', encoding='utf-8')
             first_line = f.readline()
             f.close()
             if len(first_line) > 0:
@@ -352,7 +352,7 @@ class SimNodes:
 
     def get_node_state(self, state_file):     # TODO tryToCreateIfNotExist = False,
         if self.comfun.file_exists(state_file, "get state file txt"):
-            f = open(state_file, 'r')
+            f = open(state_file, 'r', encoding='utf-8')
             first_line = f.readline()
             f.close()
             if len(first_line) > 0:
@@ -371,7 +371,7 @@ class SimNodes:
         if self.comfun.file_exists(state_file, info=False) is False or update_mode:
             self.batch.logger.deepdb(f" [db] set state : {state}")
             try:
-                f = open(state_file, 'w')
+                f = open(state_file, 'w', encoding='utf-8')
                 f.write(f"{state};{server_name};{self.comfun.get_current_time()}")
                 f.close()
             except IOError:
@@ -426,7 +426,7 @@ class SimNodes:
 
     def get_server_name_from_file(self, server_state_file):
         if self.comfun.file_exists(server_state_file, "get_server_name_from_file"):
-            f = open(server_state_file, 'r')
+            f = open(server_state_file, 'r', encoding='utf-8')
             first_line = f.readline()
             f.close()
             if len(first_line) > 0:

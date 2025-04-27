@@ -1,6 +1,7 @@
 import datetime
 import time
 import os
+import sys
 
 try:
     import hou
@@ -10,6 +11,11 @@ except ImportError:
 try:
     import maya.cmds as cmds
     import maya.mel as ml
+except ImportError:
+    pass
+
+try:
+    import bpy
 except ImportError:
     pass
 
@@ -30,7 +36,22 @@ class SimBatchExecutor():
 
         self.batch = batch
         self.batch.load_data()
-        self.batch.dfn.update_current_definition_by_name("Maya")
+        
+        # Set active definition based on software ID
+        if self.softID == 1:
+            # Houdini
+            self.batch.dfn.update_current_definition_by_name("Houdini")
+        elif self.softID == 2:
+            # Maya
+            self.batch.dfn.update_current_definition_by_name("Maya")
+        elif self.softID == 3:
+            # Blender
+            self.batch.dfn.update_current_definition_by_name("Blender")
+        else:
+            # Standalone mode when softID is not recognized
+            self.add_to_log_with_new_line(f"Using standalone mode - unrecognized softID: {self.softID}")
+            print(f" [INF] Using standalone mode - unrecognized softID: {self.softID}")
+            # Don't set any definition, operate in standalone mode
 
         self.server_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep
         self.add_to_log_with_new_line("")
@@ -151,10 +172,19 @@ class SimBatchExecutor():
                     self.add_to_log_with_new_line("HOU Exiting")
                     print(" [INF] HOU Exit")
                     self.exit_houdini()
-                else:  # maya or other software, TODO define it
+                elif self.softID == 2:
                     self.add_to_log_with_new_line("Maya Exiting")
                     print(" [INF] Maya Exit")
                     self.exit_maya()
+                elif self.softID == 3:
+                    self.add_to_log_with_new_line("Blender Exiting")
+                    print(" [INF] Blender Exit")
+                    self.exit_blender()
+                else:
+                    self.add_to_log_with_new_line("Standalone Exiting")
+                    print(" [INF] Standalone Exit")
+                    # sys.exit() TODO: test this on multiple OS
+                    sys.exit(0)  # Clean exit with success code
             except Exception as e:
                 print(f" [ERR] Error during application exit: {str(e)}")
                 self.add_to_log(f"Error during application exit: {str(e)}")
@@ -175,4 +205,8 @@ class SimBatchExecutor():
     def exit_maya(self):
         import maya.cmds as cmds
         cmds.evalDeferred("import maya.cmds as cmds; cmds.quit(force=True)")
+
+    def exit_blender(self):
+        import bpy
+        bpy.ops.wm.quit_blender()
 

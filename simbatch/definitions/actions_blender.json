@@ -1,0 +1,178 @@
+{
+	"definition": {
+		"meta": {
+			"name": "Blender",
+			"version": 1,
+			"software": "Blender",
+			"totalActions": 7,
+			"setupExt" : "blend",
+			"prevExt" : "jpg",
+			"interactionScript": "interactions_blender.py",
+			"format": "more about json format: http://json-schema.org/ or http://json.org"
+		},		
+		"actions": {
+			"1":{
+				"id": 1,
+				"type": "single",
+				"name": "Open",
+				"desc": "Open Blender file",
+				"ui" : ["<schema_base_setup>", ["Get file","[get_file]"]],
+				"template": ["interactions.blender_open_file(", "<ui>", ")"]
+			},
+			"2":{
+				"id": 2,
+				"type": "single",
+				"name": "Select",
+				"desc": "Select objects in scene",
+				"ui" : ["", ["Get current selection","interactions.blender_get_selection"]],
+				"template": ["interactions.blender_select_objects(", "<ui>", ")"]
+			},
+			"3":{
+				"id": 3,
+				"type": "multi",
+				"name": "Import",
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "ANI",
+						"desc": "Animation cache",
+						"ui" : ["<shot_ani_cache_dir>", ["Get dir","[get_directory]"],["Get selection","interactions.blender_get_selection"]],
+						"template": ["interactions.blender_import_ani(", "<ui>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "CAM",
+						"desc": "Camera file",
+						"ui" : ["<shot_cam_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.blender_import_cam(", "<ui>", ")"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "OBJ",
+						"desc": "Geometry file",
+						"ui" : ["<project_props_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.blender_import_obj(", "<ui>", ")"]
+					},
+					"4": {
+						"id": 4,
+						"mode": "FBX",
+						"desc": "FBX file",
+						"ui" : ["<project_props_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.blender_import_fbx(", "<ui>", ")"]
+					},
+					"5": {
+						"id": 5,
+						"mode": "ALEMBIC",
+						"desc": "Alembic file",
+						"ui" : ["<project_props_dir>", ["Get dir","[get_directory]"],["Get file","[get_file]"]],
+						"template": ["interactions.blender_import_alembic(", "<ui>", ")"]
+					}
+				}
+			},
+			"4":{
+				"id": 4,
+				"type": "single",
+				"name": "Set Value",
+				"desc": "Set value for object property",
+ 				"ui" : ["<object>.<param>=<value>", ["Get selection","interactions.blender_get_selection"],["Info","[show_info|format: object.param=value]"]],
+                "template": ["interactions.blender_set_param(", "<ui>", ")"]
+			},
+			"5":{
+				"id": 5,
+				"type": "multi",
+				"name": "Simulate", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "Cloth",
+						"desc": "Cloth sim",
+						"ui" : ["<cloth_objects>", ["Get selection","interactions.blender_get_selection"]],
+						"template": ["interactions.blender_simulate_cloth(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"],
+                        "params":{
+                            "paramsTemplate": ["interactions.blender_set_param(", "<s>", ")"],
+                            "paramsList":{
+                                "MAS": ["Mass", "mass", 1.0, "cloth point mass"],
+                                "AIR": ["Air Damping", "air_damping", 1.0, "air damping"],
+                                "BND": ["Bending", "bending_stiffness", 0.5, "bending stiffness"],
+                                "TEN": ["Tension", "tension_stiffness", 1.0, "tension stiffness"],
+                                "SHR": ["Shear", "shear_stiffness", 0.5, "shear stiffness"],
+                                "QUA": ["Quality", "quality", 5, "simulation quality steps"]
+                            }
+                        }
+					},
+					"2": {
+						"id": 2,
+						"mode": "Fluid",
+						"desc": "Fluid sim",
+						"ui" : ["<fluid_objects>", ["Get selection","interactions.blender_get_selection"]],
+						"template": ["interactions.blender_simulate_fluid(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "Particles",
+						"desc": "Particle sim",
+						"ui" : ["<particle_objects>", ["Get selection","interactions.blender_get_selection"]],
+						"template": ["interactions.blender_simulate_particles(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
+					},
+					"4": {
+						"id": 4,
+						"mode": "Rigid",
+						"desc": "Rigid body sim",
+						"ui" : ["<rigid_objects>", ["Get selection","interactions.blender_get_selection"]],
+						"template": ["interactions.blender_simulate_rigid(", "<sim_time_start>", ", ", "<sim_time_end>", ", ", "<ui>", ", ", "<shot_cache_out_dir>", ")"]
+					}
+				}
+			},
+			"6":{
+				"id": 6,
+				"type": "multi",
+				"name": "Render", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "VIEWPORT",
+						"desc": "grab viewport",
+						"ui" : ["<shot_prev_seq>",["Get dir","[get_directory]"]],
+						"template": ["interactions.blender_render_viewport(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
+					},
+					"2": {
+						"id": 2,
+						"mode": "CYCLES",
+						"desc": "render with Cycles",
+						"ui" : ["<shot_prev_seq>", ["Get dir","[get_directory]"]],
+						"template": ["interactions.blender_render_cycles(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
+					},
+					"3": {
+						"id": 3,
+						"mode": "EEVEE",
+						"desc": "render with Eevee",
+						"ui" : ["<shot_prev_seq>", ["Get dir","[get_directory]"]],
+						"template": ["interactions.blender_render_eevee(", "<prev_time_start>", ", ", "<prev_time_end>", ", ", "<ui>", ")"]
+					}
+				}
+			},
+			"7":{
+				"id": 7,
+				"type": "single",
+				"name": "Save",
+				"desc": "Save Blender File",
+				"ui" : ["<shot_setup>", ["Get dir","[get_directory]"]],
+				"template": ["interactions.blender_save_file(", "<ui>", ")"]
+			},
+			"8":{
+				"id": 8,
+				"type": "multi",
+				"name": "Script", 
+				"subActions":{
+					"1": {
+						"id": 1,
+						"mode": "PY",
+						"desc": "run Python file",
+						"ui" : ["<scripts_dir>*.py", ["Get dir","[get_directory]"], ["Get file","[get_file]"]],
+						"template": ["interactions.blender_script_py(", "<ui>", ")"]
+					}
+				}
+			}
+		}
+	}	
+} 

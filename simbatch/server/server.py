@@ -441,7 +441,30 @@ class SimBatchServer:
         script_out += "\nimport core.core as simbatch_core\nimport server.executor as executor"
         script_out += '\n\nsimbatch = simbatch_core.SimBatch("executor")'
 
-        script_out += "\nsibe = executor.SimBatchExecutor(simbatch, 2, " + str(job_id) + ", \"" + server_name + "\")"
+        # Get the softID from the queue item
+        queue_item = self.batch.que.queue_data[self.batch.que.get_index_by_id(job_id)]
+        soft_id = 0  # Default to standalone mode
+        
+        if queue_item.soft_id != "TMP" and isinstance(queue_item.soft_id, int):
+            soft_id = queue_item.soft_id
+        elif queue_item.soft_id != "TMP" and queue_item.soft_id.isdigit():
+            soft_id = int(queue_item.soft_id)
+        else:
+            # Try to get softID from schema based on definition
+            try:
+                current_schema = self.batch.sch.get_schema_by_id(self.batch.tsk.get_task_by_id(queue_item.task_id).schema_id)
+                definition_name = current_schema.based_on_definition
+                if definition_name == "Maya":
+                    soft_id = 2
+                elif definition_name == "Houdini":
+                    soft_id = 1
+                elif definition_name == "Blender":
+                    soft_id = 3
+            except:
+                self.batch.logger.wrn("Could not determine softID from schema")
+                soft_id = 0  # Fallback to standalone mode
+        
+        script_out += f"\nsibe = executor.SimBatchExecutor(simbatch, {soft_id}, {job_id}, \"{server_name}\")"
         script_out += "\ninteractions = sibe.batch.dfn.current_interactions"
 
         script_out += "\nsibe.add_to_log_with_new_line( \"START:" + job_description + "\")\n"  # TODO Soft+format+PEP

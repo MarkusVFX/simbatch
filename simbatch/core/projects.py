@@ -1,5 +1,5 @@
 import os
-from .io import *
+from .io import PredefinedVariables, StorageInOut
 
 # JSON Name Format, PEP8 Name Format
 PROJECT_ITEM_FIELDS_NAMES = [

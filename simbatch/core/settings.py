@@ -90,7 +90,7 @@ class Settings:
     with_gui = 1                                # loading color schema # TODO auto detect
     runtime_env = ""        # runtime environment as software name display on frame and set active definition
     ui_edition_mode = 0     # 0 open source    1 Pro version (with Wizard tab as first)
-    ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dark,  4 custom
+    ui_color_mode = 1       # color palette    1 gray,  2 pastel,  3 dimmed,  4 custom
     ui_brightness_mode = 1  # 0 dark mode  1 light mode
     state_colors = []       # item list colors
     state_colors_up = []    # selected item list colors
@@ -112,7 +112,7 @@ class Settings:
     COLORS_PASTEL_FILE_NAME = "colors_pastel.ini"
     COLORS_CUSTOM_FILE_NAME = "colors_custom.ini"
     COLORS_GRAY_FILE_NAME = "colors_gray.ini"
-    COLORS_DARK_FILE_NAME = "colors_dark.ini"
+    COLORS_DIMMED_FILE_NAME = "colors_dimmed.ini"
 
     default_settings = {"! json info":
                         {"config": "this is fundamental config file", "format": "more about format: http://json.org"},
@@ -556,7 +556,7 @@ class Settings:
                              self.COLORS_PASTEL_FILE_NAME
             elif palette_id == 3:
                 color_file = self.store_definitions_directory_abs + "colors" + os.sep + \
-                             self.COLORS_DARK_FILE_NAME
+                             self.COLORS_DIMMED_FILE_NAME
             else:
                 #  palette_id == 4:
                 color_file = self.store_definitions_directory_abs + "colors" + os.sep + \

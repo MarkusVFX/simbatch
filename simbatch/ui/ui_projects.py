@@ -1,15 +1,15 @@
 try:  # Maya 2016
-    from PySide.QtCore import *
+    from PySide.QtCore import Qt, QObject, QSize, QPoint, QTimer
     from PySide.QtGui import *
 except ImportError:
     try:  # Maya 2017
-        from PySide2.QtCore import *
-        from PySide2.QtGui import *
+        from PySide2.QtCore import Qt, QObject, QSize, QPoint, QTimer
+        from PySide2.QtGui import QFont
         from PySide2.QtWidgets import *
     except ImportError:
         raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
-from .widgets import *
+from .widgets import SimpleLabel, EditLineWithButtons, ButtonWithCheckBoxes
 import os
 
 

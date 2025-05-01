@@ -338,13 +338,18 @@ class Queue:
                 if json_nodes['queueItems']['meta']['total'] > 0:
                     for li in json_nodes['queueItems']['data'].values():
                         if len(li) == len(QUEUE_ITEM_FIELDS_NAMES):
+                            # Process softId appropriately
+                            soft_id = li['softId'] 
+                            if soft_id.isdigit():
+                                soft_id = int(soft_id)
+                                
                             new_queue_item = QueueItem(int(li['id']), li['name'], int(li['taskId']), li['user'],
                                                        int(li['userId']), li['sequence'], li['shot'], li['take'],
                                                        int(li['frameFrom']), int(li['frameTo']),
                                                        li['state'], int(li['stateId']), li['ver'],
                                                        li['evo'], int(li['evoNr']), li['evoScript'], int(li['prior']),
                                                        li['desc'], li['simNode'], int(li['simNodeId']),
-                                                       li['time'], int(li['projId']), "TMP")  # TODO int(li['softId'])
+                                                       li['time'], int(li['projId']), soft_id)
                             self.add_to_queue((new_queue_item, ))
                         else:
                             self.batch.logger.wrn(("queue json data not consistent:", len(li),
@@ -414,12 +419,22 @@ class Queue:
             user = self.batch.usr.get_user_by_id(task.user_id)
             if user is None:
                 user = self.batch.usr.get_default_user()
+                
+            # Determine softId based on schema definition
+            soft_id = 0  # Default to standalone mode
+            if schema.based_on_definition == "Houdini":
+                soft_id = 1
+            elif schema.based_on_definition == "Maya":
+                soft_id = 2
+            elif schema.based_on_definition == "Blender":
+                soft_id = 3
+                
             proxy_queue_item = QueueItem(0, "template queue item", task.id, user.abbrev, 0, task.sequence,
                                          task.shot, task.take, task.sim_frame_start, task.sim_frame_end,
                                          self.batch.sts.states_visible_names[self.batch.sts.INDEX_STATE_WAITING],
                                          self.batch.sts.INDEX_STATE_WAITING, task.queue_ver, "evo", 0, "evo_script",
                                          task.priority, task.description, "", -1, current_time, task.project_id,
-                                         schema.soft_name)
+                                         soft_id)
             return proxy_queue_item
         else:
             return None

@@ -98,10 +98,10 @@ class SimBatchServer:
                 self.logger.err("Server NOT initiated properly!")
         
         if self.framework_mode is True:
-            print_server_name = "{} ({})".format(self.server_name , batch.sts.runtime_env)
+            print_server_name = f"{self.server_name} ({batch.sts.runtime_env})"
         else:
             simnode_name = self.batch.nod.get_server_name_from_file(simnode_state_file)
-            print_server_name = "{} ({})".format(simnode_name, batch.sts.runtime_env)
+            print_server_name = f"{simnode_name} ({batch.sts.runtime_env})"
         self.logger.inf(("init server :", print_server_name, self.server_dir))
         
     def print_is_something_to_do(self):
@@ -444,25 +444,19 @@ class SimBatchServer:
         # Get the softID from the queue item
         queue_item = self.batch.que.queue_data[self.batch.que.get_index_by_id(job_id)]
         soft_id = 0  # Default to standalone mode
-        
-        if queue_item.soft_id != "TMP" and isinstance(queue_item.soft_id, int):
-            soft_id = queue_item.soft_id
-        elif queue_item.soft_id != "TMP" and queue_item.soft_id.isdigit():
-            soft_id = int(queue_item.soft_id)
-        else:
-            # Try to get softID from schema based on definition
-            try:
-                current_schema = self.batch.sch.get_schema_by_id(self.batch.tsk.get_task_by_id(queue_item.task_id).schema_id)
-                definition_name = current_schema.based_on_definition
-                if definition_name == "Maya":
-                    soft_id = 2
-                elif definition_name == "Houdini":
-                    soft_id = 1
-                elif definition_name == "Blender":
-                    soft_id = 3
-            except:
-                self.batch.logger.wrn("Could not determine softID from schema")
-                soft_id = 0  # Fallback to standalone mode
+
+        try:
+            current_schema = self.batch.sch.get_schema_by_id(self.batch.tsk.get_task_by_id(queue_item.task_id).schema_id)
+            definition_name = current_schema.based_on_definition
+            if definition_name == "Houdini":
+                soft_id = 1
+            elif definition_name == "Maya":
+                soft_id = 2
+            elif definition_name == "Blender":
+                soft_id = 3
+        except:
+            self.batch.logger.wrn("Could not determine softID from schema")
+            soft_id = 0  # Fallback to standalone mode
         
         script_out += f"\nsibe = executor.SimBatchExecutor(simbatch, {soft_id}, {job_id}, \"{server_name}\")"
         script_out += "\ninteractions = sibe.batch.dfn.current_interactions"

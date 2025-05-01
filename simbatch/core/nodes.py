@@ -267,7 +267,7 @@ class SimNodes:
             
     def save_nodes_to_json(self, json_file=None):
         if json_file is None:
-            json_file = self.sts.store_data_json_directory_abs + os.sep + self.sts.JSON_SIMNODES_FILE_NAME
+            json_file = f"{self.sts.store_data_json_directory_abs}{os.sep}{self.sts.JSON_SIMNODES_FILE_NAME}"
         content = self.format_nodes_data(json=True)
         return self.comfun.save_json_file(json_file, content)
 
@@ -329,9 +329,8 @@ class SimNodes:
 
     def get_node_info_from_state_file(self, state_file):
         if self.comfun.file_exists(state_file, "get state file txt"):
-            f = open(state_file, 'r', encoding='utf-8')
-            first_line = f.readline()
-            f.close()
+            with open(state_file, 'r', encoding='utf-8') as f:
+                first_line = f.readline()
             if len(first_line) > 0:
                 li = first_line.split(";")
                 state_int = self.comfun.int_or_val(li[0], -1)
@@ -352,9 +351,8 @@ class SimNodes:
 
     def get_node_state(self, state_file):     # TODO tryToCreateIfNotExist = False,
         if self.comfun.file_exists(state_file, "get state file txt"):
-            f = open(state_file, 'r', encoding='utf-8')
-            first_line = f.readline()
-            f.close()
+            with open(state_file, 'r', encoding='utf-8') as f:
+                first_line = f.readline()
             if len(first_line) > 0:
                 li = first_line.split(";")
             else:
@@ -371,9 +369,8 @@ class SimNodes:
         if self.comfun.file_exists(state_file, info=False) is False or update_mode:
             self.batch.logger.deepdb(f" [db] set state : {state}")
             try:
-                f = open(state_file, 'w', encoding='utf-8')
-                f.write(f"{state};{server_name};{self.comfun.get_current_time()}")
-                f.close()
+                with open(state_file, 'w', encoding='utf-8') as f:
+                    f.write(f"{state};{server_name};{self.comfun.get_current_time()}")
             except IOError:
                 if update_mode is False:
                     self.batch.logger.err(f"Creating state file error: {state_file}")
@@ -426,9 +423,8 @@ class SimNodes:
 
     def get_server_name_from_file(self, server_state_file):
         if self.comfun.file_exists(server_state_file, "get_server_name_from_file"):
-            f = open(server_state_file, 'r', encoding='utf-8')
-            first_line = f.readline()
-            f.close()
+            with open(server_state_file, 'r', encoding='utf-8') as f:
+                first_line = f.readline()
             if len(first_line) > 0:
                 li = first_line.split(";")
                 if len(li) > 0:
@@ -460,7 +456,7 @@ class SimNodes:
                 executor_inject = "executor_"
             else:
                 executor_inject = ""
-            log_file = log_dir + os.sep + executor_inject + "log.txt"
+            log_file = f"{log_dir}{os.sep}{executor_inject}log.txt"
             content = self.comfun.load_from_file(log_file)
             self.batch.logger.raw(content)
 

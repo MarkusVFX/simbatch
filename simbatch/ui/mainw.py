@@ -39,6 +39,13 @@ class TopMenuUI:
 
     def __init__(self, layout, instance, batch):
         self.batch = batch
+        try:
+            self.debug_level = getattr(self.batch.sts, 'debug_level', 0)
+            if self.debug_level is None:
+                self.debug_level = 3
+        except (AttributeError, TypeError):
+            self.debug_level = 3
+
         qt_lay_top_menu = QHBoxLayout()
         self.qt_lay_top_menu = qt_lay_top_menu
         self.instance = instance
@@ -75,7 +82,7 @@ class TopMenuUI:
         qt_but_print_details.setMinimumSize(22, 22)
         qt_but_print_details.setMaximumSize(22, 22)
         qt_lay_top_menu.addWidget(qt_but_print_details)
-        if self.batch.sts.debug_level < 4:            # hide debug button
+        if self.debug_level < 4:            # hide debug button
             qt_but_print_details.hide()
         self.qt_but_print_details = qt_but_print_details
 
@@ -83,7 +90,7 @@ class TopMenuUI:
         qt_but_debug.setMinimumSize(22, 22)
         qt_but_debug.setMaximumSize(22, 22)
         qt_lay_top_menu.addWidget(qt_but_debug)
-        if self.batch.sts.debug_level < 4:            # hide debug button
+        if self.debug_level < 4:            # hide debug button
             qt_but_debug.hide()
         self.qt_but_debug = qt_but_debug
 
@@ -166,7 +173,15 @@ class MainWindow(QMainWindow):
         self.batch = server.batch
         self.comfun = server.batch.comfun
         self.sts = server.batch.sts
-        self.debug_level = server.batch.sts.debug_level
+        
+        # Initialize debug_level with a default value if not set
+        try:
+            self.debug_level = getattr(self.sts, 'debug_level', 0)
+            if self.debug_level is None:
+                self.debug_level = 0
+        except (AttributeError, TypeError):
+            self.debug_level = 0
+            
         self.init_sts_colors()
         self.init_ui(server.batch)
 

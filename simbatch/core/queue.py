@@ -338,10 +338,9 @@ class Queue:
                 if json_nodes['queueItems']['meta']['total'] > 0:
                     for li in json_nodes['queueItems']['data'].values():
                         if len(li) == len(QUEUE_ITEM_FIELDS_NAMES):
-                            # Process softId appropriately
                             soft_id = li['softId'] 
-                            if soft_id.isdigit():
-                                soft_id = int(soft_id)
+                            if soft_id is None:
+                                soft_id = 0
                                 
                             new_queue_item = QueueItem(int(li['id']), li['name'], int(li['taskId']), li['user'],
                                                        int(li['userId']), li['sequence'], li['shot'], li['take'],

@@ -1,13 +1,9 @@
-try:  # Maya 2016
-    from PySide.QtCore import *
-    from PySide.QtGui import *
+try:
+    from PySide2.QtCore import *
+    from PySide2.QtGui import *
+    from PySide2.QtWidgets import *
 except ImportError:
-    try:  # Maya 2017
-        from PySide2.QtCore import *
-        from PySide2.QtGui import *
-        from PySide2.QtWidgets import *
-    except ImportError:
-        raise Exception('PySide import ERROR!  Please install PySide or PySide2')
+    raise Exception('PySide import ERROR!  Please install PySide or PySide2')
 
 from .widgets import *
 

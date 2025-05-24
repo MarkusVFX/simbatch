@@ -174,7 +174,6 @@ class MainWindow(QMainWindow):
         self.comfun = server.batch.comfun
         self.sts = server.batch.sts
         
-        # Initialize debug_level with a default value if not set
         try:
             self.debug_level = getattr(self.sts, 'debug_level', 0)
             if self.debug_level is None:

@@ -88,8 +88,8 @@ class DefinitionsUI:
 
     def init_tree(self):
         tree = self.qt_definitions_tree
-        qt_light_brush = QBrush(QColor.fromRgb(0, 70, 140, a=255))
-        qt_dark_brush = QBrush(QColor.fromRgb(0, 90, 22, a=255))
+        qt_green_action_brush = QBrush(QColor.fromRgb(40, 170, 55, a=255))
+        qt_blue_subaction_brush = QBrush(QColor.fromRgb(40, 70, 220, a=255))
         for i, de in enumerate(self.dfn.definitions_names):
             tree_item_soft = QTreeWidgetItem()
             tree_item_soft.setText(0, de)
@@ -103,17 +103,17 @@ class DefinitionsUI:
                 if multi_actions_count > 0:
                     tree_child_action.setText(2, str(multi_actions_count))
 
-                tree_child_action.setForeground(0, qt_dark_brush)
-                tree_child_action.setForeground(1, qt_dark_brush)
-                tree_child_action.setForeground(2, qt_dark_brush)
+                tree_child_action.setForeground(0, qt_green_action_brush)
+                tree_child_action.setForeground(1, qt_green_action_brush)
+                tree_child_action.setForeground(2, qt_green_action_brush)
 
                 for k, sa in enumerate(self.dfn.definitions_array[i].multi_actions_array[j].actions):
                     tree_child_subaction = QTreeWidgetItem(tree_child_action)
                     tree_child_subaction.setText(0, ac)
                     tree_child_subaction.setText(1, str(k))
                     tree_child_subaction.setText(3, sa.description)
-                    tree_child_subaction.setForeground(0, qt_light_brush)
-                    tree_child_subaction.setForeground(1, qt_light_brush)
+                    tree_child_subaction.setForeground(0, qt_blue_subaction_brush)
+                    tree_child_subaction.setForeground(1, qt_blue_subaction_brush)
                 # tree_item.addChild(tree_child)
             tree.addTopLevelItem(tree_item_soft)
 

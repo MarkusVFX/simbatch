@@ -2,7 +2,7 @@
   "projects": {
     "meta": {
       "total": 6,
-      "timestamp": "2025-04-19 13:05:56",
+      "timestamp": "2025-05-24 23:14:21",
       "jsonFormat": "http://json-schema.org/"
     },
     "data": {
@@ -77,42 +77,6 @@
         "pattern": "s_<sh##>",
         "zerosInVersion": 3,
         "desc": "project for unit tests"
-      },
-      "4": {
-        "id": 5,
-        "name": "asda",
-        "stateId": 22,
-        "state": "ACTIVE",
-        "isDefault": 0,
-        "dirProj": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirWrk": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirCam": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirCach": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirEnv": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirProp": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirScr": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirCust": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "pattern": null,
-        "zerosInVersion": 3,
-        "desc": "asasdads"
-      },
-      "5": {
-        "id": 6,
-        "name": "ppppp",
-        "stateId": 22,
-        "state": "ACTIVE",
-        "isDefault": 1,
-        "dirProj": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirWrk": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\FX\\",
-        "dirCam": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\cam\\",
-        "dirCach": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\ani\\",
-        "dirEnv": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirProp": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirScr": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "dirCust": "C:\\Users\\Markus\\Documents\\!_PROJEKTY\\tmp\\aaa\\",
-        "pattern": null,
-        "zerosInVersion": 3,
-        "desc": "dpdp  pdpd  ddp d pdp"
       }
     }
   }

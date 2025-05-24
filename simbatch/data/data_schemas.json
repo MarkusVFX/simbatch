@@ -167,39 +167,6 @@
         },
         "version": 1,
         "desc": "schema example"
-      },
-      "5": {
-        "id": 6,
-        "name": "aaa",
-        "stateId": 22,
-        "state": "ACTIVE",
-        "projId": 4,
-        "definition": "Stand-alone",
-        "actions": {},
-        "version": 1,
-        "desc": "asas asd as das das da"
-      },
-      "6": {
-        "id": 7,
-        "name": "aaa",
-        "stateId": 22,
-        "state": "ACTIVE",
-        "projId": 4,
-        "definition": "Stand-alone",
-        "actions": {},
-        "version": 1,
-        "desc": "asas asd as das das da"
-      },
-      "7": {
-        "id": 8,
-        "name": "aaa",
-        "stateId": 22,
-        "state": "ACTIVE",
-        "projId": 4,
-        "definition": "Stand-alone",
-        "actions": {},
-        "version": 1,
-        "desc": "asas asd as das das da"
       }
     }
   }

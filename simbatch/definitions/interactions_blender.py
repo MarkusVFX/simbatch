@@ -1,18 +1,33 @@
-import sys
 import os
+import sys
+import definitions.interactions_base as interactions_base
 
-class Interactions:
+class Interactions(interactions_base.BaseInteractions):
     current_os = -1
     logger = None
     comfun = None
+    _bpy_available = False
 
     def __init__(self, current_os, logger, comfun):
+        super().__init__(current_os, logger, comfun)
         self.current_os = current_os
         self.logger = logger
         self.comfun = comfun
+        # Try to import bpy but don't fail if not available
+        try:
+            import bpy
+            self._bpy_available = True
+        except ImportError:
+            self._bpy_available = False
+            self.logger.wrn("Blender Python API (bpy) not available - some functionality will be limited")
 
     def print_info(self):
         self.logger.raw("This is interaction with Blender")
+
+    def _check_bpy(self):
+        """Check if bpy is available and raise appropriate error if not"""
+        if not self._bpy_available:
+            raise ImportError("Blender Python API (bpy) not available")
 
     # common interactions
     def schema_item_double_click(self, param):
@@ -21,13 +36,16 @@ class Interactions:
     def task_item_double_click(self, param):
         self.blender_open_file(param)
 
-    def open_setup(self, param):
+    def open_scene(self, param):
+        """Open a scene file"""
         self.blender_open_file(param)
 
-    def save_setup(self, param):
+    def save_scene(self, param):
+        """Save current scene"""
         self.save_current_scene_as(param)
 
-    def save_setup_as_next_version(self, param):
+    def save_scene_as_next_version(self, param):
+        """Save current scene as next version"""
         self.save_current_scene_as(param)
 
     def set_param(self, objects, property, value):
@@ -37,7 +55,9 @@ class Interactions:
     def blender_open_file(self, target):
         self.logger.int(("blender_open_file", target))
         try:
+            self._check_bpy()
             import bpy
+            
             if self.comfun.file_exists(target, info="(interactions blender_open_file)"):
                 # Save and clear existing scene if it has changes
                 if bpy.data.is_dirty:
@@ -67,7 +87,6 @@ class Interactions:
             self.logger.db((" target_dir: ", str(target_dir)))
             self.comfun.create_directory_if_not_exists(target_dir)
             
-            import bpy
             bpy.ops.wm.save_as_mainfile(filepath=target_file)
             return True
         except Exception as e:
@@ -76,7 +95,6 @@ class Interactions:
 
     def blender_select_objects(self, objs):
         try:
-            import bpy
             # Deselect all objects
             bpy.ops.object.select_all(action='DESELECT')
             
@@ -104,7 +122,6 @@ class Interactions:
 
     def blender_get_selection(self):
         try:
-            import bpy
             selected = [obj.name for obj in bpy.context.selected_objects]
             return selected
         except Exception as e:
@@ -114,26 +131,31 @@ class Interactions:
     def get_curent_scene_file(self):
         self.logger.int("get_curent_scene_file")
         try:
-            import bpy
-            fi = bpy.data.filepath
-            if self.current_os == 2:  # Windows
-                fi = fi.replace('/', '\\')
+            # Get current .blend file path
+            current_file = bpy.data.filepath
             
-            basename = os.path.basename(fi)
-            if basename:
-                out_dir = fi[:-1*len(basename)]
-                parts = basename.split(".")
-                out_file_header = parts[0]
-                out_file_ext = parts[1] if len(parts) > 1 else "blend"
-                return out_dir, basename, out_file_header, out_file_ext
-            return "", "", "", "blend"
+            if not current_file:
+                self.logger.wrn("No current Blender scene file")
+                return "", "", "", "blend"
+                
+            # Convert path separators for Windows if needed
+            if self.current_os == 2:  # Windows
+                current_file = current_file.replace('/', '\\')
+            
+            # Split path into components
+            directory = os.path.dirname(current_file)
+            filename = os.path.basename(current_file)
+            filename_without_ext = os.path.splitext(filename)[0]
+            extension = os.path.splitext(filename)[1].lstrip('.')
+            
+            return directory, filename, filename_without_ext, extension
+            
         except Exception as e:
-            self.logger.err(f"Error getting current scene file: {str(e)}")
+            self.logger.err(f"Error getting current Blender scene file: {str(e)}")
             return "", "", "", "blend"
     
     def get_curent_frame_range(self):
         try:
-            import bpy
             scene = bpy.context.scene
             return scene.frame_start, scene.frame_end
         except Exception as e:
@@ -143,7 +165,6 @@ class Interactions:
     def blender_import_ani(self, objects, dir=""):
         self.logger.int(("blender_import_ani", objects, dir))
         try:
-            import bpy
             # Implementation depends on animation format
             # For Alembic:
             if dir.endswith(".abc"):
@@ -164,7 +185,6 @@ class Interactions:
     def blender_import_cam(self, objects, file_or_dir):
         self.logger.int(("blender_import_cam", objects, file_or_dir))
         try:
-            import bpy
             if file_or_dir.endswith(".fbx"):
                 bpy.ops.import_scene.fbx(filepath=file_or_dir, use_custom_normals=True)
                 return True
@@ -179,7 +199,6 @@ class Interactions:
     def blender_import_obj(self, objects, file_or_dir):
         self.logger.int(("blender_import_obj", objects, file_or_dir))
         try:
-            import bpy
             if file_or_dir.endswith(".obj"):
                 bpy.ops.import_scene.obj(filepath=file_or_dir)
                 return True
@@ -191,7 +210,6 @@ class Interactions:
     def blender_import_fbx(self, objects, file_or_dir):
         self.logger.int(("blender_import_fbx", objects, file_or_dir))
         try:
-            import bpy
             if file_or_dir.endswith(".fbx"):
                 bpy.ops.import_scene.fbx(filepath=file_or_dir)
                 return True
@@ -203,7 +221,6 @@ class Interactions:
     def blender_import_alembic(self, objects, file_or_dir):
         self.logger.int(("blender_import_alembic", objects, file_or_dir))
         try:
-            import bpy
             if file_or_dir.endswith(".abc"):
                 bpy.ops.wm.alembic_import(filepath=file_or_dir)
                 return True
@@ -214,104 +231,66 @@ class Interactions:
 
     def blender_set_param(self, val, abbrev_param=None, value=None):
         try:
-            import bpy
+            # Parse expression string like "Cube.scale=2.0"
+            str_expression = val
+            parts = str_expression.split(".")
+            if len(parts) < 2:
+                self.logger.err(f"Invalid expression format: {str_expression}")
+                return False
             
-            if abbrev_param is None:
-                # Parse expression string like "Cube.scale=2.0"
-                str_expression = val
-                parts = str_expression.split(".")
-                if len(parts) < 2:
-                    self.logger.err(f"Invalid expression format: {str_expression}")
-                    return False
-                
-                obj_name = parts[0].strip()
-                attr_value = parts[1].split("=")
-                
-                if len(attr_value) < 2:
-                    self.logger.err(f"Invalid expression format: {str_expression}")
-                    return False
-                
-                attr_name = attr_value[0].strip()
-                attr_val = attr_value[1].strip()
-                
-                # Get the object
-                if obj_name not in bpy.data.objects:
-                    self.logger.err(f"Object not found: {obj_name}")
-                    return False
-                
-                obj = bpy.data.objects[obj_name]
-                
-                # Handle common properties
-                if hasattr(obj, attr_name):
-                    # Check property type and convert value
-                    prop = getattr(obj, attr_name)
-                    if isinstance(prop, float):
-                        setattr(obj, attr_name, float(attr_val))
-                    elif isinstance(prop, int):
-                        setattr(obj, attr_name, int(attr_val))
-                    elif isinstance(prop, bool):
-                        setattr(obj, attr_name, bool(int(attr_val)))
-                    elif isinstance(prop, str):
-                        setattr(obj, attr_name, attr_val)
-                    else:
-                        # Handle vector properties (like location, scale)
-                        if attr_name in ('location', 'scale', 'rotation_euler'):
-                            # Assuming single axis value change like "Cube.location.x=5"
-                            parts = attr_name.split('.')
-                            if len(parts) > 1:
-                                main_attr = parts[0]
-                                sub_attr = parts[1]
-                                
-                                if main_attr in ('location', 'scale', 'rotation_euler'):
-                                    vec = getattr(obj, main_attr)
-                                    if sub_attr == 'x':
-                                        vec[0] = float(attr_val)
-                                    elif sub_attr == 'y':
-                                        vec[1] = float(attr_val)
-                                    elif sub_attr == 'z':
-                                        vec[2] = float(attr_val)
-                            else:
-                                self.logger.err(f"Unable to set vector property: {attr_name}")
-                                return False
+            obj_name = parts[0].strip()
+            attr_value = parts[1].split("=")
+            
+            if len(attr_value) < 2:
+                self.logger.err(f"Invalid expression format: {str_expression}")
+                return False
+            
+            attr_name = attr_value[0].strip()
+            attr_val = attr_value[1].strip()
+            
+            # Get the object
+            if obj_name not in bpy.data.objects:
+                self.logger.err(f"Object not found: {obj_name}")
+                return False
+            
+            obj = bpy.data.objects[obj_name]
+            
+            # Handle common properties
+            if hasattr(obj, attr_name):
+                # Check property type and convert value
+                prop = getattr(obj, attr_name)
+                if isinstance(prop, float):
+                    setattr(obj, attr_name, float(attr_val))
+                elif isinstance(prop, int):
+                    setattr(obj, attr_name, int(attr_val))
+                elif isinstance(prop, bool):
+                    setattr(obj, attr_name, bool(int(attr_val)))
+                elif isinstance(prop, str):
+                    setattr(obj, attr_name, attr_val)
                 else:
-                    self.logger.err(f"Property not found: {attr_name} on object {obj_name}")
-                    return False
+                    # Handle vector properties (like location, scale)
+                    if attr_name in ('location', 'scale', 'rotation_euler'):
+                        # Assuming single axis value change like "Cube.location.x=5"
+                        parts = attr_name.split('.')
+                        if len(parts) > 1:
+                            main_attr = parts[0]
+                            sub_attr = parts[1]
+                            
+                            if main_attr in ('location', 'scale', 'rotation_euler'):
+                                vec = getattr(obj, main_attr)
+                                if sub_attr == 'x':
+                                    vec[0] = float(attr_val)
+                                elif sub_attr == 'y':
+                                    vec[1] = float(attr_val)
+                                elif sub_attr == 'z':
+                                    vec[2] = float(attr_val)
+                        else:
+                            self.logger.err(f"Unable to set vector property: {attr_name}")
+                            return False
             else:
-                # Handle specific parameter setting with abbreviated param
-                objects = val
-                
-                if not objects or objects == "<cloth_objects>":
-                    objects_list = self.get_cloth_objects()
-                    if objects_list:
-                        objects = ",".join(objects_list)
-                    else:
-                        self.logger.err("No cloth objects found")
-                        return False
-                
-                for obj_name in objects.split(","):
-                    obj_name = obj_name.strip()
-                    if obj_name in bpy.data.objects:
-                        obj = bpy.data.objects[obj_name]
-                        
-                        # For cloth simulation parameters
-                        if hasattr(obj, 'modifiers'):
-                            for mod in obj.modifiers:
-                                if mod.type == 'CLOTH':
-                                    if abbrev_param == 'mass':
-                                        mod.settings.mass = float(value)
-                                    elif abbrev_param == 'air_damping':
-                                        mod.settings.air_damping = float(value)
-                                    elif abbrev_param == 'bending_stiffness':
-                                        mod.settings.bending_stiffness = float(value)
-                                    elif abbrev_param == 'tension_stiffness':
-                                        mod.settings.tension_stiffness = float(value)
-                                    elif abbrev_param == 'shear_stiffness':
-                                        mod.settings.shear_stiffness = float(value)
-                                    elif abbrev_param == 'quality':
-                                        mod.settings.quality = int(value)
-                    else:
-                        self.logger.err(f"Object not found: {obj_name}")
-                        
+                self.logger.err(f"Property not found: {attr_name} on object {obj_name}")
+                return False
+            
             return True
         except Exception as e:
             self.logger.err(f"Error setting parameter: {str(e)}")
@@ -319,8 +298,6 @@ class Interactions:
 
     def blender_simulate_cloth(self, ts, te, objects_names, cache_dir, cache_mode=1, cache_subsamples=1):
         try:
-            import bpy
-            
             # Set frame range if provided
             if ts != "0" and te != "0":
                 bpy.context.scene.frame_start = int(ts)
@@ -402,8 +379,6 @@ class Interactions:
 
     def blender_render_viewport(self, ts, te, out_file=""):
         try:
-            import bpy
-            
             # Set frame range
             if ts != "0" and te != "0":
                 start_frame = int(ts)
@@ -442,8 +417,6 @@ class Interactions:
 
     def blender_render_cycles(self, ts, te, out_file=""):
         try:
-            import bpy
-            
             # Set frame range
             if ts != "0" and te != "0":
                 start_frame = int(ts)
@@ -481,8 +454,6 @@ class Interactions:
             
     def blender_render_eevee(self, ts, te, out_file=""):
         try:
-            import bpy
-            
             # Set frame range
             if ts != "0" and te != "0":
                 start_frame = int(ts)
@@ -526,7 +497,6 @@ class Interactions:
                     script_content = f.read()
                     
                 # Execute the script in Blender's Python environment
-                import bpy
                 exec(script_content)
                 return True
             else:
@@ -538,7 +508,6 @@ class Interactions:
 
     def get_cloth_objects(self):
         try:
-            import bpy
             cloth_objects = []
             for obj in bpy.data.objects:
                 if obj.type == 'MESH':
@@ -553,7 +522,6 @@ class Interactions:
             
     def get_fluid_objects(self):
         try:
-            import bpy
             fluid_objects = []
             for obj in bpy.data.objects:
                 if obj.type == 'MESH':
@@ -568,7 +536,6 @@ class Interactions:
             
     def get_particle_objects(self):
         try:
-            import bpy
             particle_objects = []
             for obj in bpy.data.objects:
                 if obj.type == 'MESH':
@@ -581,7 +548,6 @@ class Interactions:
             
     def get_rigid_objects(self):
         try:
-            import bpy
             rigid_objects = []
             for obj in bpy.data.objects:
                 if obj.rigid_body:

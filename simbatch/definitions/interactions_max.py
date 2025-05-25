@@ -1,17 +1,34 @@
+import os
 import sys
+import definitions.interactions_base as interactions_base
 
-class Interactions:
+class Interactions(interactions_base.BaseInteractions):
     current_os = -1
     logger = None
     comfun = None
+    _max_available = False
 
     def __init__(self, current_os, logger, comfun):
+        super().__init__(current_os, logger, comfun)
         self.current_os = current_os
         self.logger = logger
         self.comfun = comfun
+        # Try to import MaxPlus but don't fail if not available
+        try:
+            import MaxPlus
+            self._max_available = True
+            self.MaxPlus = MaxPlus
+        except ImportError:
+            self._max_available = False
+            self.logger.wrn("3ds Max Python API not available - some functionality will be limited")
 
     def print_info(self):
         self.logger.raw("This is interaction with 3ds Max")
+
+    def _check_max(self):
+        """Check if MaxPlus is available and raise appropriate error if not"""
+        if not self._max_available:
+            raise ImportError("3ds Max Python API not available")
 
     # common interactions
     def schema_item_double_click(self, param):
@@ -20,13 +37,16 @@ class Interactions:
     def task_item_double_click(self, param):
         self.max_open_scene(param)
 
-    def open_setup(self, param):
-        self.max_open_scene(param)
+    def open_scene(self, param):
+        """Open a scene file"""
+        self.max_open_file(param)
 
-    def save_setup(self, param):
+    def save_scene(self, param):
+        """Save current scene"""
         self.save_current_scene_as(param)
 
-    def save_setup_as_next_version(self, param):
+    def save_scene_as_next_version(self, param):
+        """Save current scene as next version"""
         self.save_current_scene_as(param)
 
     def set_param(self, objects, property, value):
@@ -36,16 +56,20 @@ class Interactions:
     def max_open_scene(self, target):
         self.logger.int(("max_open_scene", target))
         try:
-            import MaxPlus
+            self._check_max()
             if self.comfun.file_exists(target, info="(interactions max_open_scene)"):
-                MaxPlus.FileManager.Open(target)
+                self.MaxPlus.FileManager.Open(target)
                 ret = True
             else:
                 self.logger.err((" no file :", target))
                 ret = False
             return ret
-        except IOError as e:
-            print(f"I/O error({e.errno}): {e.strerror}")
+        except ImportError:
+            self.logger.err("3ds Max Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error opening 3ds Max file: {str(e)}")
+            return False
 
     def max_save_scene(self, file):  # TODO cleanup  max_save_scene  vs save_current_scene_as
         self.logger.int(("max_save_scene", file))
@@ -57,26 +81,23 @@ class Interactions:
         self.comfun.create_directory_if_not_exists(target_dir)
         if self.comfun.path_exists(target_dir):
             self.comfun.create_directory(target_dir)
-        import MaxPlus
-        MaxPlus.FileManager.Save(target_file)
+        self.MaxPlus.FileManager.Save(target_file)
         return True
 
     def max_select_objects(self, objs):
-        import MaxPlus
-        MaxPlus.SelectionManager.ClearNodeSelection()
+        self.MaxPlus.SelectionManager.ClearNodeSelection()
         for obj in objs.split(","):
-            if MaxPlus.INode.GetINodeByName(obj):
-                MaxPlus.SelectionManager.SelectNode(MaxPlus.INode.GetINodeByName(obj), True)
+            if self.MaxPlus.INode.GetINodeByName(obj):
+                self.MaxPlus.SelectionManager.SelectNode(self.MaxPlus.INode.GetINodeByName(obj), True)
 
-        selected_count = MaxPlus.SelectionManager.GetCount()
+        selected_count = self.MaxPlus.SelectionManager.GetCount()
         if selected_count == 0:
             return False
         else:
             return selected_count
 
     def max_get_selection(self):
-        import MaxPlus
-        sel = MaxPlus.SelectionManager.GetNodes()
+        sel = self.MaxPlus.SelectionManager.GetNodes()
         return sel
 
     def max_get_camera(self):
@@ -84,22 +105,40 @@ class Interactions:
         pass
 
     def get_curent_scene_file(self):
-        self.logger.int("get_curent_scene_file")
-        import MaxPlus
-        fi = MaxPlus.FileManager.GetFileNameAndPath()
-        if self.current_os == 2:
-            fi = fi.replace('/', '\\')
-        basename = os.path.basename(fi)
-        out_dir = fi[:-1*len(basename)]
-        out_file_header = basename.split(".")[0]
-        out_file_ext = basename.split(".")[1]
-        return out_dir, basename, out_file_header, out_file_ext
+        """Get the current 3ds Max scene file path and info.
+        
+        Returns:
+            tuple: (directory, filename, filename_without_ext, extension)
+        """
+        try:
+            # Get current .max file path
+            current_file = self.MaxPlus.FileManager.GetFileNameAndPath()
+            
+            if not current_file:
+                self.logger.wrn("No current 3ds Max scene file")
+                return "", "", "", "max"
+                
+            # Convert path separators for Windows if needed
+            if self.current_os == 2:  # Windows
+                current_file = current_file.replace('/', '\\')
+            
+            # Split path into components
+            directory = os.path.dirname(current_file)
+            filename = os.path.basename(current_file)
+            filename_without_ext = os.path.splitext(filename)[0]
+            extension = os.path.splitext(filename)[1].lstrip('.')
+            
+            return directory, filename, filename_without_ext, extension
+            
+        except Exception as e:
+            self.logger.err(f"Error getting current 3ds Max scene file: {str(e)}")
+            return "", "", "", "max"
 
     def get_curent_frame_range(self):
-        import MaxPlus
-        playback_min = MaxPlus.Animation.GetAnimStart()
-        playback_max = MaxPlus.Animation.GetAnimEnd()
+        playback_min = self.MaxPlus.Animation.GetAnimStart()
+        playback_max = self.MaxPlus.Animation.GetAnimEnd()
         return playback_min, playback_max
+        
 
     def max_import_ani(self, objects, dir=""):
         self.logger.int(("max_import_ani", objects, dir))
@@ -110,6 +149,7 @@ class Interactions:
     def max_import_obj(self, objects, file_or_dir):
         self.logger.int(("max_import_obj", objects, file_or_dir))
 
+
     def max_set_param(self, val, abbrev_param=None, value=None):
         if abbrev_param is None:
             str_expression = val             # first input as expression string  # TODO
@@ -119,8 +159,7 @@ class Interactions:
             str_attrib = a2[0].strip()
             str_val = a2[1].strip()
             try:
-                import MaxPlus
-                MaxPlus.Core.EvalMAXScript(f"{str_obj}.{str_attrib} = {str_val}")
+                self.MaxPlus.Core.EvalMAXScript(f"{str_obj}.{str_attrib} = {str_val}")
             except Exception as e:
                 self.logger.err(("max_set_param: ", str_obj, str_attrib, str_val, "   ___   ", str_expression))
                 self.logger.err(("max_set_param e: ", e))
@@ -137,10 +176,9 @@ class Interactions:
                 if ret:
                     objects = ",".join(ret)
 
-            import MaxPlus
             for obj in objects.split(","):
                 param_full_name = abbrev_param
-                MaxPlus.Core.EvalMAXScript(f"{obj}.{param_full_name} = {value}")
+                self.MaxPlus.Core.EvalMAXScript(f"{obj}.{param_full_name} = {value}")
             self.logger.db(("max_set_param", object, property, value), nl=True)
 
     def max_simulate_cloth(self, ts, te, objects_names, cache_dir):
@@ -171,13 +209,11 @@ class Interactions:
         self.logger.int(("max_script_max", file))
 
     def max_get_scene_objects(self):
-        import MaxPlus
-        return MaxPlus.Core.GetRootNode().Children
+        return self.MaxPlus.Core.GetRootNode().Children
 
     def get_objects_by_type(self, type):
-        import MaxPlus
         objs = []
-        for obj in MaxPlus.Core.GetRootNode().Children:
+        for obj in self.MaxPlus.Core.GetRootNode().Children:
             if obj.Object.GetClassName() == type:
                 objs.append(obj.Name)
         return objs

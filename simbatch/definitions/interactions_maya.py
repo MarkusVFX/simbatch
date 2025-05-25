@@ -1,18 +1,37 @@
 import sys
 import os
+import definitions.interactions_base as interactions_base
 
-class Interactions:
+class Interactions(interactions_base.BaseInteractions):
     current_os = -1
     logger = None
     comfun = None
+    _maya_available = False
+    cmds = None
 
     def __init__(self, current_os, logger, comfun):
+        super().__init__(current_os, logger, comfun)
         self.current_os = current_os
         self.logger = logger
         self.comfun = comfun
+        
+        # Try to import maya but don't fail if not available
+        try:
+            import maya.cmds as cmds
+            self._maya_available = True
+            self.cmds = cmds
+        except ImportError:
+            self._maya_available = False
+            self.cmds = None
+            self.logger.wrn("Maya Python API not available - some functionality will be limited")
 
     def print_info(self):
         self.logger.raw("This is interaction with Maya")
+
+    def _check_maya(self):
+        """Check if maya is available and raise appropriate error if not"""
+        if not self._maya_available:
+            raise ImportError("Maya Python API not available")
 
     # common interactions
     def schema_item_double_click(self, param):
@@ -21,14 +40,17 @@ class Interactions:
     def task_item_double_click(self, param):
         self.maya_open_scene(param)
 
-    def open_setup(self, param):
-        self.maya_open_scene(param)
+    def open_scene(self, param):
+        """Open a scene file"""
+        self.maya_open_file(param)
 
-    def save_setup(self, param):
-        self.save_current_scene_as(param)
+    def save_scene(self, param):
+        """Save current scene"""
+        self.maya_save_scene(param)
 
-    def save_setup_as_next_version(self, param):
-        self.save_current_scene_as(param)
+    def save_scene_as_next_version(self, param):
+        """Save current scene as next version"""
+        self.maya_save_scene_as_next_version(param)
 
     def set_param(self, objects, property, value):
         self.maya_set_param(objects, property, value)
@@ -37,71 +59,162 @@ class Interactions:
     def maya_open_scene(self, target):
         self.logger.int(("maya_open_scene", target))
         try:
-            import maya.cmds as cmd
+            self._check_maya()
             if self.comfun.file_exists(target, info="(interactions maya_open_scene)"):
-                ret = cmd.file(target, o=True, force=True)
+                ret = self.cmds.file(target, o=True, force=True)
             else:
                 self.logger.err((" no file :", target))
                 ret = False
             return ret
-        except IOError as e:
-            print(f"I/O error({e.errno}): {e.strerror}")
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error opening Maya file: {str(e)}")
+            return False
 
-    def maya_save_scene(self, file):  # TODO cleanup  maya_save_scene  vs save_current_scene_as
+    def maya_save_scene(self, file):
         self.logger.int(("maya_save_scene", file))
-        self.save_current_scene_as(file)
+        return self.save_current_scene_as(file)
 
     def save_current_scene_as(self, target_file):
-        target_dir = self.comfun.dirname(target_file)
-        self.logger.db((" target_dir: ", str(target_dir)))
-        self.comfun.create_directory_if_not_exists(target_dir)
-        if self.comfun.path_exists(target_dir):
-            self.comfun.create_directory(target_dir)
-        import maya.cmds as cmd
-        cmd.file(rename=target_file)
-        ret = cmd.file(save=True, type="mayaBinary")
-        return ret
+        try:
+            self._check_maya()
+            target_dir = self.comfun.dirname(target_file)
+            self.logger.db((" target_dir: ", str(target_dir)))
+            self.comfun.create_directory_if_not_exists(target_dir)
+            if self.comfun.path_exists(target_dir):
+                self.comfun.create_directory(target_dir)
+            self.cmds.file(rename=target_file)
+            ret = self.cmds.file(save=True, type="mayaBinary")
+            return ret
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error saving Maya file: {str(e)}")
+            return False
 
     def maya_select_objects(self, objs):
-        import maya.cmds as cmds
-        cmds.select(cl=True)
-        for obj in objs.split(","):
-            if cmds.objExists(obj):
-                cmds.select(obj, tgl=True)
+        try:
+            self._check_maya()
+            self.cmds.select(cl=True)
+            for obj in objs.split(","):
+                if self.cmds.objExists(obj):
+                    self.cmds.select(obj, tgl=True)
 
-        selected_count = len(cmds.ls(sl=True))
-        if selected_count == 0:
+            selected_count = len(self.cmds.ls(sl=True))
+            if selected_count == 0:
+                return False
+            else:
+                return selected_count
+        except ImportError:
+            self.logger.err("Maya Python API not available")
             return False
-        else:
-            return selected_count
+        except Exception as e:
+            self.logger.err(f"Error selecting objects in Maya: {str(e)}")
+            return False
 
     def maya_get_selection(self):
-        import maya.cmds as cmds
-        sel = cmds.ls(selection=True)
-        return sel
+        try:
+            self._check_maya()
+            sel = self.cmds.ls(selection=True)
+            return sel
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return []
+        except Exception as e:
+            self.logger.err(f"Error getting selection in Maya: {str(e)}")
+            return []
+
+    def get_curent_scene_file(self):
+        """Get the current Maya scene file path and info.
         
+        Returns:
+            tuple: (directory, filename, filename_without_ext, extension)
+        """
+        try:
+            self._check_maya()
+            # Get current .ma/.mb file path
+            current_file = self.cmds.file(query=True, sceneName=True)
+            
+            if not current_file:
+                self.logger.wrn("No current Maya scene file")
+                return "", "", "", "mb"
+                
+            # Convert path separators for Windows if needed
+            if self.current_os == 2:  # Windows
+                current_file = current_file.replace('/', '\\')
+            
+            # Split path into components
+            directory = os.path.dirname(current_file)
+            filename = os.path.basename(current_file)
+            filename_without_ext = os.path.splitext(filename)[0]
+            extension = os.path.splitext(filename)[1].lstrip('.')
+            
+            return directory, filename, filename_without_ext, extension
+            
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return "", "", "", "mb"
+        except Exception as e:
+            self.logger.err(f"Error getting current Maya scene file: {str(e)}")
+            return "", "", "", "mb"
+
+    def get_curent_frame_range(self):
+        try:
+            self._check_maya()
+            playback_min = self.cmds.playbackOptions(query=True, minTime=True)
+            playback_max = self.cmds.playbackOptions(query=True, maxTime=True)
+            return playback_min, playback_max
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return 1, 250
+        except Exception as e:
+            self.logger.err(f"Error getting frame range in Maya: {str(e)}")
+            return 1, 250
+
+    def maya_set_param(self, val, abbrev_param=None, value=None):
+        try:
+            self._check_maya()
+            if abbrev_param is None:
+                str_expression = val
+                a1 = str_expression.split(".")
+                a2 = a1[1].split("=")
+                str_obj = a1[0].strip()
+                str_attrib = a2[0].strip()
+                str_val = a2[1].strip()
+                try:
+                    self.cmds.setAttr(f"{str_obj}.{str_attrib}", float(str_val))
+                except Exception as e:
+                    self.logger.err(("maya_set_param: ", str_obj, str_attrib, str_val, "   ___   ", str_expression))
+                    self.logger.err(("maya_set_param e: ", e))
+            else:
+                objects = val
+
+                if not objects:
+                    ret = self.get_cloth_objects()
+                    if ret:
+                        objects = ",".join(ret)
+
+                if objects == "<cloth_objects>":
+                    ret = self.get_cloth_objects()
+                    if ret:
+                        objects = ",".join(ret)
+
+                self.cmds.setAttr(f"{obj}.{param_full_name}", value)
+                self.logger.db(("maya_set_param", object, property, value), nl=True)
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error setting parameter in Maya: {str(e)}")
+            return False
+
     def maya_get_camera(self):
         print("TODO: maya_get_camera")
         pass
     
-    def get_curent_scene_file(self):
-        self.logger.int("get_curent_scene_file")
-        import maya.cmds as cmds
-        fi = cmds.file(query=True, sceneName=True)
-        if self.current_os == 2:
-            fi = fi.replace('/', '\\')
-        basename = os.path.basename(fi)
-        out_dir = fi[:-1*len(basename)]
-        out_file_header = basename.split(".")[0]
-        out_file_ext = basename.split(".")[1]
-        return out_dir, basename, out_file_header, out_file_ext
-    
-    def get_curent_frame_range(self):
-        import maya.cmds as cmds
-        playback_min = cmds.playbackOptions(query=True, minTime=True)
-        playback_max = cmds.playbackOptions(query=True, maxTime=True)
-        return playback_min, playback_max
-        
     def maya_import_ani(self, objects, dir=""):
         self.logger.int(("maya_import_ani", objects, dir))
         
@@ -111,238 +224,268 @@ class Interactions:
     def maya_import_obj(self, objects, file_or_dir):
         self.logger.int(("maya_import_obj", objects, file_or_dir))
 
-    def maya_set_param(self, val, abbrev_param=None, value=None):
-        if abbrev_param is None:
-            str_expression = val             # first input as expression string  # TODO
-            a1 = str_expression.split(".")
-            a2 = a1[1].split("=")
-            str_obj = a1[0].strip()
-            str_attrib = a2[0].strip()
-            str_val = a2[1].strip()
-            try:
-                import maya.cmds as cmds
-                cmds.setAttr(f"{str_obj}.{str_attrib}", float(str_val))   # TODO check vals !!!
-            except Exception as e:
-                self.logger.err(("maya_set_param: ", str_obj, str_attrib, str_val, "   ___   ", str_expression))
-                self.logger.err(("maya_set_param e: ", e))
-        else:
-            objects = val       # first input as objects string  # TODO
-
-            if not objects:
-                ret = self.get_cloth_objects()
-                if ret:
-                    objects = ",".join(ret)
-
-            if objects == "<cloth_objects>":
-                ret = self.get_cloth_objects()
-                if ret:
-                    objects = ",".join(ret)
-
-            import maya.cmds as cmds
-            for obj in objects.split(","):
-                param_full_name = abbrev_param
-                cmds.setAttr(f"{obj}.{param_full_name}", value)
-            self.logger.db(("maya_set_param", object, property, value), nl=True)
-
     def maya_animate_nucleus_follow(self, nucleus_name, object_to_follow, vtx_id_to_follow=None, vals=None):
-        import maya.cmds as cmds
+        try:
+            self._check_maya()
+            if vtx_id_to_follow is None:
+                vtx_id_to_follow = 1     # TODO get vtx close to center
+            if vals is None:
+                vals = ((self.simFrameStart, 1), (self.animFrameStart, 1), (self.simFrameEnd, 0))
 
-        if vtx_id_to_follow is None:
-            vtx_id_to_follow = 1     # TODO get vtx close to center
-        if vals is None:
-            vals = ((self.simFrameStart, 1), (self.animFrameStart, 1), (self.simFrameEnd, 0))
+            if self.cmds.objExists(nucleus_name):
+                if self.cmds.objExists(object_to_follow):
+                    if len(vals) == 0:
+                        # TODO val err
+                        pass
+                    elif len(vals) == 1:
+                        self.cmds.setAttr("nucleus1.enable", 0)
+                        for fr in range(self.cmds.playbackOptions(min=True, q=True), vals[0][0]):
+                            self.cmds.currentTime(fr)
+                            vtx_pos = self.cmds.pointPosition(f"{object_to_follow}.vtx[{vtx_id_to_follow}]", w=True)
+                            self.cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=vtx_pos[0])
+                            self.cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=vtx_pos[1])
+                            self.cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=vtx_pos[2])
 
-        if cmds.objExists(nucleus_name):
-            if cmds.objExists(object_to_follow):
-                if len(vals) == 0:
-                    # TODO val err
-                    pass
-                elif len(vals) == 1:
-                    cmds.setAttr("nucleus1.enable", 0)
-                    for fr in range(cmds.playbackOptions(min=True, q=True), vals[0][0]):
-                        cmds.currentTime(fr)
-                        vtx_pos = cmds.pointPosition(f"{object_to_follow}.vtx[{vtx_id_to_follow}]", w=True)
-                        cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=vtx_pos[0])
-                        cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=vtx_pos[1])
-                        cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=vtx_pos[2])
+                        self.cmds.setAttr("nucleus1.enable", 1)
+                    else:
+                        self.cmds.setAttr("nucleus1.enable", 0)
+                        nucleus_base_pos = self.cmds.getAttr("nucleus1.translate")[0]
+                        for i, v in enumerate(vals):
+                            if i == 0:
+                                val_from = v
+                            else:
+                                val_to = v
+                                for fr in range(val_from[0], val_to[0]):
+                                    self.cmds.currentTime(fr)
+                                    vtx_pos = self.cmds.pointPosition(f"{object_to_follow}.vtx[{vtx_id_to_follow}]", w=True)
 
-                    cmds.setAttr("nucleus1.enable", 1)
-                    # frs =
-                    # fre = cmds.playbackOptions(max=True, q=True)
-                else:
-                    cmds.setAttr("nucleus1.enable", 0)
-                    nucleus_base_pos = cmds.getAttr("nucleus1.translate")[0]
-                    for i, v in enumerate(vals):
-                        if i == 0:
-                            val_from = v
-                        else:
-                            val_to = v
-                            for fr in range(val_from[0], val_to[0]):
-                                cmds.currentTime(fr)
-                                vtx_pos = cmds.pointPosition(f"{object_to_follow}.vtx[{vtx_id_to_follow}]", w=True)
+                                    fr_min = val_from[0]
+                                    fr_max = val_to[0]
 
-                                fr_min = val_from[0]
-                                fr_max = val_to[0]
+                                    val_in_min = val_from[1]
+                                    val_in_max = val_to[1]
 
-                                val_in_min = val_from[1]
-                                val_in_max = val_to[1]
+                                    current_frame = fr
+                                    curent_multiper = val_in_min - 1.0 * (val_in_min - val_in_max) * 1.0 * (current_frame - fr_min) / (fr_max - fr_min)
 
-                                current_frame = fr
-                                curent_multiper = val_in_min - 1.0 * (val_in_min - val_in_max) * 1.0 * (current_frame - fr_min) / (fr_max - fr_min)
-                                # print fr, curent_multiper
+                                    med_x = vtx_pos[0]*curent_multiper+nucleus_base_pos[0]*(1-curent_multiper)
+                                    med_y = vtx_pos[1]*curent_multiper+nucleus_base_pos[1]*(1-curent_multiper)
+                                    med_z = vtx_pos[2]*curent_multiper+nucleus_base_pos[2]*(1-curent_multiper)
+                                    current_pos = [med_x, med_y, med_z]
 
-                                # simpler: vtx_pos*curent_multiper + nucleus_base_pos*(1-curent_multiper)
-                                med_x = vtx_pos[0]*curent_multiper+nucleus_base_pos[0]*(1-curent_multiper)
-                                med_y = vtx_pos[1]*curent_multiper+nucleus_base_pos[1]*(1-curent_multiper)
-                                med_z = vtx_pos[2]*curent_multiper+nucleus_base_pos[2]*(1-curent_multiper)
-                                current_pos = [med_x, med_y, med_z]
+                                    if curent_multiper == 1.0:
+                                        nucleus_base_pos = vtx_pos
+                                    self.cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=current_pos[0])
+                                    self.cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=current_pos[1])
+                                    self.cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=current_pos[2])
+                                val_from = v
 
-                                if curent_multiper == 1.0:
-                                    nucleus_base_pos = vtx_pos
-                                cmds.setKeyframe(nucleus_name, attribute='translateX', t=fr, v=current_pos[0])
-                                cmds.setKeyframe(nucleus_name, attribute='translateY', t=fr, v=current_pos[1])
-                                cmds.setKeyframe(nucleus_name, attribute='translateZ', t=fr, v=current_pos[2])
-                            val_from = v
+                        self.cmds.setAttr("nucleus1.enable", 1)
 
-                    cmds.setAttr("nucleus1.enable", 1)
-
-                return True
-
-            # TODO else err
-        # TODO else err
-
-        return False
+                    return True
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in nucleus follow animation: {str(e)}")
+            return False
 
     def maya_simulate_ncloth(self, ts, te, objects_names, cache_dir, cache_mode=1, cache_subsamples=1):
-        import maya.cmds as cmds
-        import maya.mel as ml
-
-        if ts == "0" and te == "0":
-            ts = cmds.playbackOptions(query=True, minTime=True)
-            te = cmds.playbackOptions(query=True, maxTime=True)
-            self.logger.int(("force simulate range from scene", ts, te))
-
-        self.logger.int(("maya_simulate_ncloth", ts, te, objects_names, cache_dir))
-
-        if self.comfun.path_exists(cache_dir) is False:
-            self.comfun.create_directory(cache_dir)
-
-        if len(objects_names) == 0 or objects_names == "<cloth_objects>":
-            ret = self.get_cloth_objects()
-            if len(ret) > 0:
-                objects_names = ",".join(ret)
-
-        if cache_mode == 1:
-            pc_mode = "OneFile"
-        if cache_mode == 2:
-            pc_mode = "OneFilePerFrame"
-
-        fr_start = self.comfun.int_or_val(ts, 0)
-        fr_end = self.comfun.int_or_val(te, 0)
-        cmds.playbackOptions(minTime=fr_start)
-        cmds.playbackOptions(maxTime=fr_end)
         try:
-            cmd = f'select -r {objects_names.replace(",", " ")}'    #  TODO ' ; viewFit;'
-            self.logger.inf(cmd, nl=True, nl_after=True)
-            ml.eval(cmd)
-            self.logger.int(("selected:", len(cmds.ls(sl=True))), nl=True)
+            self._check_maya()
+            import maya.mel as ml
 
-            cache_dir = cache_dir.replace("\\", "/")
+            if ts == "0" and te == "0":
+                ts = self.cmds.playbackOptions(query=True, minTime=True)
+                te = self.cmds.playbackOptions(query=True, maxTime=True)
+                self.logger.int(("force simulate range from scene", ts, te))
 
-            self.logger.int(("cache_dir:", cache_dir), nl=True)
+            self.logger.int(("maya_simulate_ncloth", ts, te, objects_names, cache_dir))
 
-            refresh_view = "1"    # TODO 0 for batch mode !!!
-            cache_per_geo = "1"    # TODO do user option !!!
+            if self.comfun.path_exists(cache_dir) is False:
+                self.comfun.create_directory(cache_dir)
 
-            # add, replace, merge or mergeDelete
+            if len(objects_names) == 0 or objects_names == "<cloth_objects>":
+                ret = self.get_cloth_objects()
+                if len(ret) > 0:
+                    objects_names = ",".join(ret)
 
-            # maya 2015  # TODO !!!
-            cmd = 'doCreateNclothCache 4 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'
-            cmd += ' "'+cache_per_geo+'", "", "0", "replace", "1", "' + str(cache_subsamples) + '", "1","0","1" } ;'
+            if cache_mode == 1:
+                pc_mode = "OneFile"
+            if cache_mode == 2:
+                pc_mode = "OneFilePerFrame"
 
-            # maya 2018
-            cmd = 'doCreateNclothCache 5 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'
-            cmd += ' "'+cache_per_geo+'", "", "0", "replace", "1", "' + str(cache_subsamples) + '", "1", "0", "1", "mcx"};'
+            fr_start = self.comfun.int_or_val(ts, 0)
+            fr_end = self.comfun.int_or_val(te, 0)
+            self.cmds.playbackOptions(minTime=fr_start)
+            self.cmds.playbackOptions(maxTime=fr_end)
+            try:
+                cmd = f'select -r {objects_names.replace(",", " ")}'
+                self.logger.inf(cmd, nl=True, nl_after=True)
+                ml.eval(cmd)
+                self.logger.int(("selected:", len(self.cmds.ls(sl=True))), nl=True)
 
-            self.logger.inf(cmd, nl=True, nl_after=True)
-            ml.eval(cmd)
-            status_after_sim = 4
-        except KeyboardInterrupt:
-            self.logger.inf("[runSim]   Canceled nCloth simulation by keyboard button!!!", nl=True, nl_after=True)
-            status_after_sim = 5
-        except RuntimeError:     # TODO catch e
-            status_after_sim = 6
-        # for fr in range(int(ts), int(te)):
-        #    cmd.currentTime(fr)
-        #    cmd.refresh()
-        return status_after_sim
+                cache_dir = cache_dir.replace("\\", "/")
+
+                self.logger.int(("cache_dir:", cache_dir), nl=True)
+
+                refresh_view = "1"
+                cache_per_geo = "1"
+
+                cmd = 'doCreateNclothCache 5 {"2", "1", "10", "' + pc_mode + '", "'+refresh_view+'", "' + cache_dir + '",'
+                cmd += ' "'+cache_per_geo+'", "", "0", "replace", "1", "' + str(cache_subsamples) + '", "1", "0", "1", "mcx"};'
+
+                self.logger.inf(cmd, nl=True, nl_after=True)
+                ml.eval(cmd)
+                status_after_sim = 4
+            except KeyboardInterrupt:
+                self.logger.inf("[runSim]   Canceled nCloth simulation by keyboard button!!!", nl=True, nl_after=True)
+                status_after_sim = 5
+            except RuntimeError:
+                status_after_sim = 6
+            return status_after_sim
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return 0
+        except Exception as e:
+            self.logger.err(f"Error in nCloth simulation: {str(e)}")
+            return 0
         
     def maya_simulate_nhair(self, ts, te, objects_names, cache_dir):
-        pass
+        try:
+            self._check_maya()
+            pass
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in nHair simulation: {str(e)}")
+            return False
         
     def maya_simulate_nparticle(self, ts, te, objects_names, cache_dir):
-        pass
+        try:
+            self._check_maya()
+            pass
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in nParticle simulation: {str(e)}")
+            return False
         
     def maya_simulate_fume(self, ts, te, fume_container, cache_dir):
-        pass
+        try:
+            self._check_maya()
+            pass
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in fume simulation: {str(e)}")
+            return False
         
     def maya_simulate_fumewt(self, ts, te, fume_container, cache_dir):
-        pass
+        try:
+            self._check_maya()
+            pass
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in fume with time simulation: {str(e)}")
+            return False
         
     def maya_render_blast(self, ts, te, out_file=""):
-        import maya.cmds as cmds
-        import maya.mel as ml
-        if ts == "0" and te == "0":
-            ts = cmds.playbackOptions(query=True, minTime=True)
-            te = cmds.playbackOptions(query=True, maxTime=True)
-            self.logger.int(("force playblast range from scene", ts, te))
+        try:
+            self._check_maya()
+            import maya.mel as ml
+            if ts == "0" and te == "0":
+                ts = self.cmds.playbackOptions(query=True, minTime=True)
+                te = self.cmds.playbackOptions(query=True, maxTime=True)
+                self.logger.int(("force playblast range from scene", ts, te))
 
-        self.logger.int(("maya_render_blast", ts, te, out_file))
+            self.logger.int(("maya_render_blast", ts, te, out_file))
 
+            fr_start = self.comfun.int_or_val(ts, 0)
+            fr_end = self.comfun.int_or_val(te, 0)
+            self.cmds.playbackOptions(minTime=fr_start)
+            self.cmds.playbackOptions(maxTime=fr_end)
 
-        fr_start = self.comfun.int_or_val(ts, 0)
-        fr_end = self.comfun.int_or_val(te, 0)
-        cmds.playbackOptions(minTime=fr_start)
-        cmds.playbackOptions(maxTime=fr_end)
-
-        if len(out_file) > 0:
-            # base_name = self.comfun.basename(out_file)
-            # out_dir = self.comfun.dirname(out_file)
-            # out_file_header = base_name.split(".")[0]
-            # out_file_ext = base_name.split(".")[1]
-            # print " [db] SimC Rend !   ",  out_dir,  out_file_header,  out_file_ext
-            out_file = out_file.replace("<fr>", "####")
-
-            out_file = out_file.replace("####", "")   # TODO !!!
-            out_file = out_file[:-5]
-            self.logger.db((" render out file: ",  out_file))
-            # cmds.playblast(f=outFile, st=int(ts), et=int(te), format='qt', compression='H.264', framePadding=4, percent=100, wh=[1920, 1080])
-            cmds.playblast(f=out_file, st=int(ts), et=int(te), format='image', compression='jpg', framePadding=4,
-                           percent=100, wh=[1280, 720], v=False)
-        else:
-            self.logger.err("var out_file is empty ")
+            if len(out_file) > 0:
+                out_file = out_file.replace("<fr>", "####")
+                out_file = out_file.replace("####", "")
+                out_file = out_file[:-5]
+                self.logger.db((" render out file: ",  out_file))
+                self.cmds.playblast(f=out_file, st=int(ts), et=int(te), format='image', compression='jpg', framePadding=4,
+                               percent=100, wh=[1280, 720], v=False)
+            else:
+                self.logger.err("var out_file is empty ")
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in playblast render: {str(e)}")
+            return False
         
     def maya_render_software(self, ts, te, out_file=""):
-        self.logger.int(("maya_render_software", ts, te, out_file))
+        try:
+            self._check_maya()
+            self.logger.int(("maya_render_software", ts, te, out_file))
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in software render: {str(e)}")
+            return False
         
     def maya_script_py(self, file):
-        self.logger.int(("maya_script_py file:", file))
-        filearr = file.split(" ")
-        file = filearr.pop(0)
-        if self.comfun.file_exists(file):
-            import sys
-            if len(filearr) > 0:
-                sys.argv = filearr
-            with open(file, 'r') as f:
-                exec(f.read())
-        else:
-            self.logger.err(("Script file not exist", file))
+        try:
+            self._check_maya()
+            self.logger.int(("maya_script_py file:", file))
+            filearr = file.split(" ")
+            file = filearr.pop(0)
+            if self.comfun.file_exists(file):
+                import sys
+                if len(filearr) > 0:
+                    sys.argv = filearr
+                with open(file, 'r') as f:
+                    exec(f.read())
+            else:
+                self.logger.err(("Script file not exist", file))
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error running Python script: {str(e)}")
+            return False
         
     def maya_script_mel(self, file):
-        self.logger.int(("maya_script_mel", file))
+        try:
+            self._check_maya()
+            import maya.mel as ml
+            self.logger.int(("maya_script_mel", file))
+            if self.comfun.file_exists(file):
+                ml.eval(f'source "{file}";')
+            else:
+                self.logger.err(("Script file not exist", file))
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error running MEL script: {str(e)}")
+            return False
 
     def maya_get_scene_objects(self):
-        self.logger.int(("maya_get_scene_objects"))
+        try:
+            self._check_maya()
+            self.logger.int(("maya_get_scene_objects"))
+            return self.cmds.ls()
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return []
+        except Exception as e:
+            self.logger.err(f"Error getting scene objects: {str(e)}")
+            return []
 
     """   DEFAULTS   """
 
@@ -360,20 +503,93 @@ class Interactions:
 
     def get_cloth_objects(self):
         try:
-            import maya.cmds as cmd
-            return cmd.ls(type='nCloth')
+            self._check_maya()
+            return self.cmds.ls(type='nCloth')
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return []
         except Exception as e:
-            self.logger.err(e)
+            self.logger.err(f"Error getting cloth objects in Maya: {str(e)}")
             return []
 
     def get_hair_objects(self):
-        return "hair"
+        try:
+            self._check_maya()
+            return "hair"
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return []
+        except Exception as e:
+            self.logger.err(f"Error getting hair objects in Maya: {str(e)}")
+            return []
 
     def get_particle_objects(self):
-        return "prt"
+        try:
+            self._check_maya()
+            return "prt"
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return []
+        except Exception as e:
+            self.logger.err(f"Error getting particle objects in Maya: {str(e)}")
+            return []
 
     def get_fume_container(self):
-        return "fume"
+        try:
+            self._check_maya()
+            return "fume"
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return []
+        except Exception as e:
+            self.logger.err(f"Error getting fume container in Maya: {str(e)}")
+            return []
 
     def import_camera(self):
-        return "cam"
+        try:
+            self._check_maya()
+            return "cam"
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return ""
+        except Exception as e:
+            self.logger.err(f"Error importing camera in Maya: {str(e)}")
+            return ""
+
+    def maya_import_file(self, file_name):
+        try:
+            self._check_maya()
+            if self.comfun.file_exists(file_name):
+                self.cmds.file(file_name, i=True)
+                return True
+            else:
+                self.logger.err(f"File does not exist: {file_name}")
+                return False
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error importing file: {str(e)}")
+            return False
+
+    def maya_simulate(self, ts, te, objects_names, cache_dir):
+        try:
+            self._check_maya()
+            pass
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in simulation: {str(e)}")
+            return False
+
+    def maya_render(self, ts, te, out_file=""):
+        try:
+            self._check_maya()
+            pass
+        except ImportError:
+            self.logger.err("Maya Python API not available")
+            return False
+        except Exception as e:
+            self.logger.err(f"Error in render: {str(e)}")
+            return False

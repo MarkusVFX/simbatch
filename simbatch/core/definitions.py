@@ -10,6 +10,7 @@ except ImportError:
 
 import os
 from .actions import MultiAction, SingleAction, ActionParameters
+import sys
 
 
 
@@ -322,20 +323,32 @@ class Definitions:
         example_defi.add_group_action(example_group_actions)
         return example_defi
 
-    # TODO move to common !!!!
     def class_from_file(self, filename):
         try:
-            with open(filename, 'r') as f:
-                content = f.read()
-            exec(content)
-            return eval("Interactions")
+            # Convert file path to module path
+            module_path = os.path.splitext(os.path.basename(filename))[0]
+            module_dir = os.path.dirname(filename)
+            
+            # Add the directory to Python path if it's not already there
+            if module_dir not in sys.path:
+                sys.path.insert(0, module_dir)
+            
+            # Import the module
+            module = __import__(module_path)
+            
+            # Get the Interactions class
+            if hasattr(module, 'Interactions'):
+                return module.Interactions
+            else:
+                self.batch.logger.err(f"No Interactions class found in file: {filename}")
+                return None
+                
         except SyntaxError as e:
             self.batch.logger.err(f"syntax error definition file: {filename}", nl=True, nl_after=True)
             return None
         except Exception as e:
             self.batch.logger.err(f"Error loading definition file: {str(e)}")
             return None
-    # TODO move to common !!!!
 
     def load_interaction_file(self, file_path):
         self.batch.logger.deepdb(("__load_interaction_file: ", file_path))
@@ -355,9 +368,18 @@ class Definitions:
         if len(definitions_dir) == 0:
             definitions_dir = self.sts.store_definitions_directory_abs
         loading_errors = 0
+        
+        # Get the current DCC from runtime environment
+        current_dcc = self.sts.runtime_env.lower()
+        self.batch.logger.inf(f"Loading definitions for: {current_dcc}")
+        
         if self.comfun.file_exists(definitions_dir):
             for file_nr, json_file in enumerate(self.batch.sio.get_files_from_dir(definitions_dir, types="json")):
-                self.batch.logger.inf(("loading definition: ", json_file))
+                # Only load the definition for the current DCC
+                if json_file != f"actions_{current_dcc}.json":
+                    continue
+                
+                self.batch.logger.inf(("loading action: ", json_file))
                 json_definition = self.comfun.load_json_file(definitions_dir+json_file)
                 if json_definition is not None and "definition" in json_definition.keys():
                     self.batch.logger.db(("definition loaded: ", json_file))

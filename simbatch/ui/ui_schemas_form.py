@@ -1,7 +1,6 @@
 from typing import List, Optional, Any
 import copy
 
-
 try:
     from PySide2.QtCore import *
     from PySide2.QtGui import *

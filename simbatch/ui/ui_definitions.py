@@ -88,7 +88,7 @@ class DefinitionsUI:
 
     def init_tree(self):
         tree = self.qt_definitions_tree
-        qt_green_action_brush = QBrush(QColor.fromRgb(40, 170, 55, a=255))
+        qt_green_action_brush = QBrush(QColor.fromRgb(240, 170, 55, a=255))
         qt_blue_subaction_brush = QBrush(QColor.fromRgb(40, 70, 220, a=255))
         for i, de in enumerate(self.dfn.definitions_names):
             tree_item_soft = QTreeWidgetItem()

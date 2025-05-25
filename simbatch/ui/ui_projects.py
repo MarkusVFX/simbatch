@@ -389,7 +389,19 @@ class ProjectsUI:
 
     def fa_get_project_directory(self, qt_edit_line):
         force_start_dir = ""
-        if self.batch.prj.current_project is not None:
+        
+        # First try to get current scene directory
+        if self.batch.dfn.current_interactions is not None:
+            try:
+                scene_info = self.batch.dfn.current_interactions.get_curent_scene_file()
+                if scene_info and scene_info[0]:  # Check if we got a valid directory
+                    force_start_dir = scene_info[0]
+                    self.batch.logger.deepdb(f"Using current scene directory: {force_start_dir}")
+            except Exception as e:
+                self.batch.logger.wrn(f"Could not get current scene directory: {str(e)}")
+        
+        # Fallback to current project directory if no scene directory
+        if not force_start_dir and self.batch.prj.current_project is not None:
             force_start_dir = self.batch.prj.current_project.project_directory
             if self.batch.sts.current_os == 2:  # OS MARKER
                 force_start_dir = self.batch.comfun.convert_to_win_path(force_start_dir)
